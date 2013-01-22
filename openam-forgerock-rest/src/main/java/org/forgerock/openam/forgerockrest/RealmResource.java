@@ -49,15 +49,10 @@ import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
 public final class RealmResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
 
-    /*
-     * Throughout this example backend we take care not to invoke result
-     * handlers while holding locks since result handlers may perform blocking
-     * IO operations.
-     */
-
     private Set subRealms = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
+
     /**
      * Creates a new empty backend.
      */
@@ -106,9 +101,8 @@ public final class RealmResource implements CollectionResourceProvider {
             handler.handleError(new PermanentException(401, "Unauthorized", null));
 
         final JsonValue jVal = request.getContent();
-        String realm = jVal.get("realm").asString(); // get the realm
-        final String rstatus = jVal.get(IdConstants.ORGANIZATION_STATUS_ATTR).asString();  //make sure input is either Active or Inactive
-        final String realmAliases = jVal.get(IdConstants.ORGANIZATION_ALIAS_ATTR).asString(); //get the realm/DNS Aliases
+        // get the realm
+        String realm = jVal.get("realm").asString();
 
         try {
             if (realm != null && !realm.startsWith("/")) {
@@ -117,24 +111,18 @@ public final class RealmResource implements CollectionResourceProvider {
             //build realm to comply with format
             String holdRealm = request.getResourceName();
             if (holdRealm != null && !holdRealm.isEmpty()) {
-                String tmp = holdRealm.substring(0, holdRealm.lastIndexOf("/realms/")); //take out last realm param
+                //take out last realms param, a realm can be called realms
+                String tmp = new String(holdRealm.substring(
+                        0, holdRealm.lastIndexOf("/realms/")));
                 realm = tmp + realm;
             }
 
             parentRealm = RealmUtils.getParentRealm(realm);
             childRealm = RealmUtils.getChildRealm(realm);
 
-            SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(   //grab admin token
-                    AdminTokenAction.getInstance());
-            OrganizationConfigManager ocm = new OrganizationConfigManager(adminSSOToken, parentRealm);
+            OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), parentRealm);
 
-            Map defaultValues = new HashMap(3);
-            Map map = new HashMap(3);
-            Set values = new HashSet(3);
-            values.add(rstatus);
-            map.put(IdConstants.ORGANIZATION_STATUS_ATTR, values);
-            map.put(IdConstants.ORGANIZATION_ALIAS_ATTR, realmAliases);
-            defaultValues.put(IdConstants.REPO_SERVICE, map);
+            Map defaultValues = createServicesMap(jVal);
             ocm.createSubOrganization(childRealm, defaultValues);
 
             //handle response
@@ -175,10 +163,14 @@ public final class RealmResource implements CollectionResourceProvider {
                 RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 handler.handleError(be);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
+        } catch (Exception e){
+            RestDispatcher.debug.error("RealmResource.createInstance()" + realm + ":" + e);
+            handler.handleError(new BadRequestException(e.getMessage(), e));
         }
+
     }
 
     /**
@@ -205,8 +197,10 @@ public final class RealmResource implements CollectionResourceProvider {
      * @return The JsonValue Object containing attributes assigned
      *         to the services
      */
-    private JsonValue serviceNamesToJSON(OrganizationConfigManager ocm, Set serviceNames) throws SMSException {
-        JsonValue realmServices = new JsonValue(new LinkedHashMap<String, Object>(1));
+    private JsonValue serviceNamesToJSON(OrganizationConfigManager ocm,
+                                         Set serviceNames) throws SMSException {
+        JsonValue realmServices = new JsonValue(
+                new LinkedHashMap<String, Object>(1));
         try {
             for (Object service : serviceNames) {
                 String tmp = (String) service;
@@ -224,8 +218,8 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
-                               final ResultHandler<Resource> handler) {
+    public void deleteInstance(final ServerContext context, final String resourceId,
+                               final DeleteRequest request, final ResultHandler<Resource> handler) {
 
         if (!hasPermission(context))
             handler.handleError(new PermanentException(401, "Unauthorized", null));
@@ -234,10 +228,12 @@ public final class RealmResource implements CollectionResourceProvider {
         Resource resource = null;
         String fqDomain = request.getResourceName();
 
+        SSOToken adminSSOToken = null;
+
         try {
-            SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(   //grab admin token
-                    AdminTokenAction.getInstance());
-            OrganizationConfigManager ocm = new OrganizationConfigManager(adminSSOToken, resourceId);
+            adminSSOToken = getSSOToken();
+            OrganizationConfigManager ocm = new OrganizationConfigManager(
+                    adminSSOToken, resourceId);
             ocm.deleteSubOrganization(null, recursive);
 
             resource = new Resource(resourceId, "0", createJsonMessage("success", "true"));
@@ -267,7 +263,7 @@ public final class RealmResource implements CollectionResourceProvider {
                 RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
                         + resourceId + ":" + smse);
                 handler.handleError(be);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         }
@@ -314,15 +310,15 @@ public final class RealmResource implements CollectionResourceProvider {
         if (!hasPermission(context))  //check to make sure superuser
             handler.handleError(new PermanentException(401, "Unauthorized", null));
 
+        SSOToken adminSSOToken = null;
         Resource resource = null;
         JsonValue jval = null;
         try {
-            SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(   //grab admin token
-                    AdminTokenAction.getInstance());
+            adminSSOToken = getSSOToken();
             OrganizationConfigManager ocm = new OrganizationConfigManager(
                     adminSSOToken, resourceId);
-
-            Set serviceNames = ocm.getAssignedServices();//get associated services for this realm , include mandatory service names.
+            //get associated services for this realm , include mandatory service names.
+            Set serviceNames = ocm.getAssignedServices();
             jval = createJsonMessage(SERVICE_NAMES, serviceNames);
             resource = new Resource(resourceId, "0", jval);
             handler.handleResult(resource);
@@ -352,7 +348,7 @@ public final class RealmResource implements CollectionResourceProvider {
                 RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 handler.handleError(be);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         }
@@ -362,7 +358,6 @@ public final class RealmResource implements CollectionResourceProvider {
      * Throws an appropriate HTTP status code
      *
      * @param exception SMSException to be mapped to HTTP Status code
-     *
      * @throws ForbiddenException
      * @throws NotFoundException
      * @throws PermanentException
@@ -383,24 +378,36 @@ public final class RealmResource implements CollectionResourceProvider {
         * sms-no-organization-schema
         * sms-attribute-values-does-not-match-schema
         */
-        if (exception.getErrorCode().equalsIgnoreCase("sms-REALM_NAME_NOT_FOUND")) {
+        if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-REALM_NAME_NOT_FOUND")) {
             throw new NotFoundException("Cannot find realm", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-INVALID_SSO_TOKEN")) {
-            throw new PermanentException(401, "Unauthorized-Invalid SSO Token", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-organization_already_exists1")) {
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-INVALID_SSO_TOKEN")) {
+            throw new PermanentException(401,
+                    "Unauthorized-Invalid SSO Token", exception);
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-organization_already_exists1")) {
             throw new ConflictException("Organization already exists", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-invalid-org-name")) {
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-invalid-org-name")) {
             throw new BadRequestException("Invalid organization name.", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-cannot_delete_rootsuffix")) {
-            throw new PermanentException(401, "Unauthorized-Cannot delete root suffix", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-entries-exists")) {
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-cannot_delete_rootsuffix")) {
+            throw new PermanentException(401,
+                    "Unauthorized-Cannot delete root suffix", exception);
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-entries-exists")) {
             throw new ConflictException("SMS entries already exist", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-SMSSchema_service_notfound")) {
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-SMSSchema_service_notfound")) {
             throw new NotFoundException("Cannot find SMSSchmea Service", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-no-organization-schema")) {
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-no-organization-schema")) {
             throw new NotFoundException("Cannot find organization schema", exception);
-        } else if (exception.getErrorCode().equalsIgnoreCase("sms-attribute-values-does-not-match-schema")) {
-            throw new BadRequestException("Attribute values do not match schema", exception);
+        } else if (exception.getErrorCode().equalsIgnoreCase(
+                "sms-attribute-values-does-not-match-schema")) {
+            throw new BadRequestException(
+                    "Attribute values do not match schema", exception);
         } else {
             throw new BadRequestException(exception.getMessage(), exception);
         }
@@ -410,33 +417,23 @@ public final class RealmResource implements CollectionResourceProvider {
     /**
      * Creates Organization within OpenAM
      *
-     * @param ocm Organization Configuration Manager
-     * @param jVal JSONvalue that contains the payload
+     * @param ocm   Organization Configuration Manager
+     * @param jVal  JSONvalue that contains the payload
      * @param realm Name of the realm to be created
      * @throws SMSException
      */
-    private void createOrganization(OrganizationConfigManager ocm, JsonValue jVal, String realm)
-            throws SMSException {
-        JsonValue realmDetails = jVal;
+    private void createOrganization(OrganizationConfigManager ocm,
+                                    JsonValue jVal, String realm) throws Exception {
+
 
         Map attributes = new HashMap(jVal.size());
-
-        final String rstatus = realmDetails.get(IdConstants.ORGANIZATION_STATUS_ATTR).asString();  //make sure input is either Active or Inactive
-        final String realmAliases = realmDetails.get(IdConstants.ORGANIZATION_ALIAS_ATTR).asString(); //get the realm/DNS Aliases
+        Map defaultValues = null;
         try {
-            //Build up Default Values for
-            Map defaultValues = new HashMap(3);
-            Map map = new HashMap(3);
-            Set values = new HashSet(3);
-            values.add(rstatus);
-            map.put(IdConstants.ORGANIZATION_STATUS_ATTR, values);
-            Set values1 = new HashSet(2);
-            values1.add(realmAliases);
-            map.put(IdConstants.ORGANIZATION_ALIAS_ATTR, values1);
-            defaultValues.put(IdConstants.REPO_SERVICE, map);
-
+            JsonValue realmDetails = jVal;
+            if(jVal != null){
+                defaultValues = createServicesMap(jVal);
+            }
             ocm.createSubOrganization(realm, defaultValues);
-
             //Get the Organization Configuration Manager for the new Realm
             ocm = new OrganizationConfigManager(getSSOToken(), realm);
 
@@ -444,24 +441,75 @@ public final class RealmResource implements CollectionResourceProvider {
             if (!newServiceNames.isEmpty() && newServiceNames != null) {
                 assignServices(ocm, newServiceNames); //assign services to realm
             }
-        } catch (SMSException e) {
+        } catch (SMSException smse) {
             //send back
+            throw smse;
+        } catch (Exception e){
+            RestDispatcher.debug.error("RealmResource.createOrganization()" + e);
             throw e;
         }
     }
 
+    private Map createServicesMap(JsonValue realmDetails) throws Exception{
+        //Default Attribtes
+        final String rstatus = realmDetails.get(
+                IdConstants.ORGANIZATION_STATUS_ATTR).asString();
+        //get the realm/DNS Aliases
+        final String realmAliases = realmDetails.get(
+                IdConstants.ORGANIZATION_ALIAS_ATTR).asString();
+        Map defaultValues = new HashMap(2);
+        try {
+            Map map = new HashMap(2);
+            Set values = new HashSet(2);
+            values.add(rstatus);
+            map.put(IdConstants.ORGANIZATION_STATUS_ATTR, values);
+            if (realmAliases != null && !realmAliases.isEmpty()) {
+                Set values1 = new HashSet(2);
+                values1.add(realmAliases);
+                map.put(IdConstants.ORGANIZATION_ALIAS_ATTR, values1);
+            }
+            defaultValues.put(IdConstants.REPO_SERVICE, map);
+        }catch (Exception e) {
+            throw e;
+        }
+        return defaultValues;
+    }
+
+    /**
+     * Update a service with new attributes
+     *
+     * @param ocm          Organization Configuration Manager
+     * @param serviceNames Map of service names
+     * @throws SMSException
+     */
+    private void updateConfiguredServices(OrganizationConfigManager ocm,
+                                          Map serviceNames) throws SMSException {
+        try {
+            ocm.setAttributes(IdConstants.REPO_SERVICE,
+                    (Map)serviceNames.get(IdConstants.REPO_SERVICE));
+        } catch (SMSException smse) {
+            throw smse;
+        }
+    }
+
+
     /**
      * Assigns Services to a realm
      *
-     * @param ocm Organization Configuration Manager
+     * @param ocm             Organization Configuration Manager
      * @param newServiceNames List of service names to be assigned/unassigned
      * @throws SMSException
      */
-    private void assignServices(OrganizationConfigManager ocm, List newServiceNames) throws SMSException {
+    private void assignServices(OrganizationConfigManager ocm, List newServiceNames)
+            throws SMSException {
         try {
-            Set assignedServices = ocm.getAssignedServices(); //include mandatory, otherwise pass in false
+            //include mandatory, otherwise pass in false
+            Set assignedServices = ocm.getAssignedServices();
             //combine new services names with current assigned services
-            Set allServices = new HashSet(newServiceNames.size() + assignedServices.size());
+            Set allServices = new HashSet(newServiceNames.size() +
+                    assignedServices.size());
+
+            //add all to make union of the two sets of service names
             allServices.addAll(assignedServices);
             allServices.addAll(newServiceNames);
 
@@ -487,12 +535,14 @@ public final class RealmResource implements CollectionResourceProvider {
     }
 
     /**
-     * Create an SSOToken
+     * Create an amAdmin SSOToken
+     *
      * @return SSOToken adminSSOtoken
      */
     private SSOToken getSSOToken() {
         SSOToken adminSSOToken = null;
-        adminSSOToken = (SSOToken) AccessController.doPrivileged(   //grab admin token
+        //grab admin token
+        adminSSOToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
         return adminSSOToken;
     }
@@ -521,11 +571,12 @@ public final class RealmResource implements CollectionResourceProvider {
         try {
             //The initial attempt to UPDATE a realm,
             // if the realm does not exist it must be created
-            adminSSOToken = (SSOToken) AccessController.doPrivileged(   //grab admin token
-                    AdminTokenAction.getInstance());
+            adminSSOToken = getSSOToken();
             ocm = new OrganizationConfigManager(adminSSOToken, realm);
 
             List newServiceNames = null;
+            //update ID_REPO attributes
+            updateConfiguredServices(ocm, createServicesMap(realmDetails));
             newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
             if (!newServiceNames.isEmpty() && newServiceNames != null) {
                 assignServices(ocm, newServiceNames); //assign services to realm
@@ -543,7 +594,6 @@ public final class RealmResource implements CollectionResourceProvider {
                     handler.handleResult(resource);
                 }
             }
-
         } catch (SMSException e) {
             try {
                 configureErrorMessage(e);
@@ -554,7 +604,9 @@ public final class RealmResource implements CollectionResourceProvider {
                 try {
                     String holdRealm = request.getResourceName();
                     if (holdRealm != null && !holdRealm.isEmpty()) {
-                        String tmp = new String(holdRealm.substring(0, holdRealm.lastIndexOf("/realms/"))); //take out last realm param
+                        //take out last realm param
+                        String tmp = new String(holdRealm.substring(
+                                0, holdRealm.lastIndexOf("/realms/")));
                         realm = tmp + realm;
                     }
                     String parentRealm = RealmUtils.getParentRealm(realm);
@@ -566,7 +618,8 @@ public final class RealmResource implements CollectionResourceProvider {
                     //handle response
                     //read the realm to make sure that it has been created...
                     String pattern = "*";
-                    boolean recursive = false;//Search only current nodes on tree, DOES NOT search subtree
+                    boolean recursive = false;
+                    //Search only current nodes on tree, DOES NOT search subtree
                     Set results = ocm.getSubOrganizationNames(pattern, recursive);
                     for (Object findRealm : results) {
                         String tmp = (String) findRealm;
@@ -603,7 +656,12 @@ public final class RealmResource implements CollectionResourceProvider {
                                 + resourceId + ":" + smse);
                         handler.handleError(be);
                     }
+                } catch (Exception ex) {
+                    RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                            + resourceId + ":" + ex);
+                    handler.handleError(new NotFoundException("Cannot update realm.", ex));
                 }
+
             } catch (ForbiddenException fe) {
                 //User does not have authorization
                 RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
