@@ -421,6 +421,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * @param jVal  JSONvalue that contains the payload
      * @param realm Name of the realm to be created
      * @throws SMSException
+     * @throws Exception
      */
     private void createOrganization(OrganizationConfigManager ocm,
                                     JsonValue jVal, String realm) throws Exception {
@@ -450,6 +451,13 @@ public final class RealmResource implements CollectionResourceProvider {
         }
     }
 
+    /**
+     * Creates a Map from JsonValue content
+     *
+     * @param realmDetails  Payload that is from request
+     * @return Map of default Services needed to create realm
+     * @throws SMSException
+     */
     private Map createServicesMap(JsonValue realmDetails) throws Exception{
         //Default Attribtes
         final String rstatus = realmDetails.get(
