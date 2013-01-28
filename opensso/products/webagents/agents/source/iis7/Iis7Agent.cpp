@@ -27,7 +27,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012 - 2013 ForgeRock AS
  */
 
 #include "agent_module.h"
@@ -353,7 +353,7 @@ static am_status_t check_for_post_data(IHttpContext* pHttpContext,
                     postdata_cache, actionurl, agent_config);
             *page = strdup(buffer_page);
             if (*page == NULL) {
-                am_web_log_error("%s: Not enough memory to allocate page");
+                am_web_log_error("%s: Not enough memory to allocate page", thisfunc);
                 status = AM_NO_MEMORY;
             }
             am_web_postcache_data_cleanup(&get_data);
@@ -581,8 +581,9 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     // Handle notification
     if ((status == AM_SUCCESS) && (B_TRUE == am_web_is_notification(origRequestURL.c_str(), agent_config))) {
         std::string data = "";
-        GetEntity(pHttpContext, data);
-        am_web_handle_notification(data.c_str(), data.size(), agent_config);
+        if (GetEntity(pHttpContext, data)) {
+            am_web_handle_notification(data.c_str(), data.size(), agent_config);
+        }
         OphResourcesFree(pOphResources);
         send_ok(pHttpContext);
         am_web_delete_agent_configuration(agent_config);
@@ -690,8 +691,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
             if (dpro_cookie == NULL && (post_page != NULL ||
                     am_web_is_url_enforced(requestURL.c_str(), pathInfo.c_str(),
                     clientIP, agent_config) == B_TRUE)) {
-                GetEntity(pHttpContext, response);
-                if (status == AM_SUCCESS) {
+                if (status == AM_SUCCESS && GetEntity(pHttpContext, response)) {
                     //Set original method to GET
                     orig_req_method = strdup(REQUEST_METHOD_GET);
                     if (orig_req_method != NULL) {
@@ -1271,34 +1271,49 @@ void OphResourcesFree(tOphResources* pOphResources) {
 
 /*
  * Retrieves entity data from the request.
- *
- * */
-void GetEntity(IHttpContext* pHttpContext, std::string& data) {
+ **/
+BOOL GetEntity(IHttpContext* pHttpContext, std::string& data) {
     HRESULT hr;
+    BOOL status = FALSE;
     IHttpRequest* pHttpRequest = pHttpContext->GetRequest();
-    DWORD cbBytesReceived = pHttpRequest->GetRemainingEntityBytes();
-    int cb = (int) cbBytesReceived;
-    void * pvRequestBody = pHttpContext->AllocateRequestMemory(cbBytesReceived);
-    void * entityBody;
-    data.clear();
-
-    if (cbBytesReceived > 0) {
-        while (pHttpRequest->GetRemainingEntityBytes() != 0) {
-            hr = pHttpRequest->ReadEntityBody(pvRequestBody, cbBytesReceived, false,
-                    &cbBytesReceived, NULL);
-            if (FAILED(hr)) {
-                return;
+    if (pHttpRequest) {
+        DWORD cbBytesReceived = pHttpRequest->GetRemainingEntityBytes();
+        if (cbBytesReceived > 0) {
+            void *pvRequestBody = NULL, *entityBody = NULL;
+            pvRequestBody = pHttpContext->AllocateRequestMemory(cbBytesReceived + 1);
+            data.clear();
+            if (pvRequestBody) {
+                while (pHttpRequest->GetRemainingEntityBytes() != 0) {
+                    hr = pHttpRequest->ReadEntityBody(pvRequestBody, cbBytesReceived, false,
+                            &cbBytesReceived, NULL);
+                    if (FAILED(hr)) {
+                        return status;
+                    }
+                    data.append((char*) pvRequestBody, (int) cbBytesReceived);
+                    am_web_log_debug("GetEntity(): %d bytes received", cbBytesReceived);
+                }
+                if (data.length() > 0) {
+                    //set it back in the request
+                    entityBody = pHttpContext->AllocateRequestMemory((DWORD) data.length() + 1);
+                    if (entityBody) {
+                        strcpy((char*) entityBody, data.c_str());
+                        pHttpRequest->InsertEntityBody(entityBody,
+                                (DWORD) strlen((char*) entityBody));
+                        status = TRUE;
+                    } else {
+                        am_web_log_error("GetEntity(): AllocateRequestMemory error %d", GetLastError());
+                    }
+                }
+            } else {
+                am_web_log_error("GetEntity(): AllocateRequestMemory error %d", GetLastError());
             }
-            data.append((char*) pvRequestBody, (int) cbBytesReceived);
+        } else {
+            am_web_log_debug("GetEntity(): zero bytes available");
         }
+    } else {
+        am_web_log_error("GetEntity(): failed to get IHttpRequest, error %d", GetLastError());
     }
-
-    //set it back in the request
-    entityBody = pHttpContext->AllocateRequestMemory((DWORD) data.length());
-    strcpy((char*) entityBody, data.c_str());
-    pHttpRequest->InsertEntityBody(entityBody,
-            (DWORD) strlen((char*) entityBody));
-
+    return status;
 }
 
 /*

@@ -27,7 +27,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012 - 2013 ForgeRock AS
  */
 
 #ifndef __IIS7AGENT_H__
@@ -59,7 +59,7 @@ am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
 
 BOOL loadAgentPropertyFile(IHttpContext* pHttpContext);
 
-void GetEntity(IHttpContext* pHttpContext, std::string& data);
+BOOL GetEntity(IHttpContext* pHttpContext, std::string& data);
 
 static am_status_t set_cookie(const char *header, void **args);
 
