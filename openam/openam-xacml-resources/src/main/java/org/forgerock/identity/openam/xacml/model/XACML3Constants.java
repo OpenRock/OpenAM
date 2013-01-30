@@ -45,8 +45,9 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
     public static final String AUTHORIZATION = "Authorization";
     public static final String DIGEST = "Digest";
+    public static final String REQUEST = "Request";
     public static final String REQUEST_ABSTRACT = "RequestAbstract";
-    public static final String  XSI_TYPE_ATTR = "xsi:type";
+    public static final String XSI_TYPE_ATTR = "xsi:type";
     public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
     public static final String METAALIAS_KEY = "/metaAlias" ;
 

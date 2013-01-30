@@ -700,8 +700,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
         if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty
-                        ())) {
+            (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
             // This Starts the Authorization via Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
             return;
@@ -743,10 +742,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // Now create a Document Object so we can scan for
             // a xacml-samlp:XACMLAuthzDecisionQuery Wrapper for the request.
             //
+
         } else {
             // **************************************************************
             // Else, our Content is assumed to be JSON, but we can still have
             // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
+
+
         }
         // ******************************************************************
         // Authenticate and Authorize
@@ -1353,6 +1355,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
 
+
+
+
+
+
     /**
      * Provide common Entry point Method for Parsing Initial Requests
      * to obtain information on how to process and route the request.
@@ -1382,9 +1389,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             xacmlRequestInformation.setOriginalContent(getRequestBody(request));
             // the Content Depending upon the Content Type.
             if (contentType.commonType().equals(CommonType.XML)) {
-                xacmlRequestInformation.setContent(parseXMLRequest(xacmlRequestInformation.getOriginalContent()));
-            } else if (contentType.commonType().equals(CommonType.JSON)) {
-                xacmlRequestInformation.setContent(parseJSONRequest(xacmlRequestInformation.getOriginalContent()));
+                parseXMLRequest(xacmlRequestInformation);
+            } else {
+                // Assume JSON, as no other content can get to this point.
+                parseJSONRequest(xacmlRequestInformation);
             }
             // **************************************
             // Return our Request Information for
@@ -1421,10 +1429,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     /**
      * Private Helper to Parse the XML Request Body.
      *
-     * @param requestBody
-     * @return
+     * @param xacmlRequestInformation
      */
-    private Document parseXMLRequest(final String requestBody) {
+    private void parseXMLRequest(XACMLRequestInformation xacmlRequestInformation) {
         // Get Document Builder Factory
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // Leave off validation, namespaces and Schema, otherwise we will have false-positive validation
@@ -1438,7 +1445,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             ByteArrayInputStream inputStream =
-                    new ByteArrayInputStream((XML_HEADER + requestBody).getBytes());
+                    new ByteArrayInputStream((XML_HEADER + xacmlRequestInformation.getOriginalContent()).getBytes());
             document = builder.parse(inputStream);
         } catch (SAXException se) {
             debug.error("SAXException: " + se.getMessage());
@@ -1449,7 +1456,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } catch (IOException ioe) {
             debug.error("IO Exception occurred obtaining Document Builder Factory: " + ioe.getMessage());
         }
-
+        // Save a Reference to our XML Document for later use.
+        xacmlRequestInformation.setContent(document);
         // ********************************************************
         // Now dig using XPaths to perform a validation.
         // We need to obtain the Request Node and the
@@ -1459,12 +1467,35 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         Node xacmlAuthzDecisionQueryNode;
 
         if (document != null) {
-            try {
-                XPathFactory xPathfactory = XPathFactory.newInstance();
-                XPath xpath = xPathfactory.newXPath();
+            XPathFactory xPathfactory = XPathFactory.newInstance();
+            XPath xpath = xPathfactory.newXPath();
 
+            // Now check to see if we have an optional XACMLAuthzDecisionQueryNode wrapper for the request...
+            try {
+                // Check for we have a XACMLAuthzDecisionQueryNode.
+                XPathExpression expr = xpath.compile("/" + XACML_AUTHZ_QUERY);
+                xacmlAuthzDecisionQueryNode = (Node) expr.evaluate(document, XPathConstants.NODE);
+                if (xacmlAuthzDecisionQueryNode != null) {
+                    // Save a Reference to our XML Node for later use.
+                    xacmlRequestInformation.setAuthenticationContent(xacmlAuthzDecisionQueryNode);
+                    for (int i = 0; i < xacmlAuthzDecisionQueryNode.getAttributes().getLength(); i++) {
+                        debug.error("Node: " + xacmlAuthzDecisionQueryNode.getNodeName() + " attribute: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i));
+                        // TODO Verify schema version.
+                        // TODO
+                    }
+                }
+            } catch (XPathExpressionException xee) {
+                // Our initial Expression for a Node was invalid, we have no Request Object.
+                // This could be a maintenance which has no request, but not part of specification yet...
+                // Document could be bad or suspect.
+                debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
+                return;
+            }
+
+            // Verify we have a PDP Request Request
+            try {
                 // Verify we have a Request.
-                XPathExpression expr = xpath.compile("/request");
+                XPathExpression expr = xpath.compile("/" + REQUEST);
                 requestNode = (Node) expr.evaluate(document, XPathConstants.NODE);
                 if (requestNode != null) {
                     for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
@@ -1473,29 +1504,24 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                         // TODO
                     }
                 }
-
-
             } catch (XPathExpressionException xee) {
-                // Our Expression for a Node was invalid,
+                // Our initial Expression for a Node was invalid, we have no Request Object.
+                // This could be a maintenance which has no request, but not part of specification yet...
                 // Document could be bad or suspect.
                 debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
-
-                return null;
             }
-        }
-        // Return the formulated document.
-        return document;
+
+        } // end of check for null document.
     }
 
     /**
      * Private Helper to Parse the JSON Request Body.
      *
-     * @param requestBody -- String JSON Data
+     * @param xacmlRequestInformation -- String JSON Data
      * @return
      */
-    private Document parseJSONRequest(final String requestBody) {
+    private void parseJSONRequest(XACMLRequestInformation xacmlRequestInformation) {
         // TODO
-        return null;
     }
 
 
