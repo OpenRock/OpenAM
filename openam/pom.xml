@@ -58,7 +58,7 @@
     <name>OpenAM Project</name>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+    <version>10.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -218,9 +218,6 @@
 
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
-
-        <!-- OpenAM Common Test Suite -->
-        <module>openam-test</module>
 
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>

@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-federation</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -39,6 +39,9 @@
     <description>OpenAM Federation</description>
     <artifactId>OpenFM</artifactId>
     <packaging>jar</packaging>
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
 
     <!-- Build -->
     <build>

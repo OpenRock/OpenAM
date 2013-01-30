@@ -11,42 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock Inc.
+ * Copyright 2013 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
 
-import java.lang.Exception;
-import java.lang.String;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.LinkedHashMap;
-import java.util.logging.Logger;
-import javax.servlet.ServletException;
-import javax.servlet.ServletContext;
-
-
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.Connection;
-import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Router;
-
-import static org.forgerock.json.resource.RoutingMode.EQUALS;
-
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.OrganizationConfigManager;
+import org.forgerock.json.resource.Router;
+import org.forgerock.openam.forgerockrest.session.SessionResource;
 
 import java.security.AccessController;
+import java.util.Set;
 
-import com.sun.identity.security.AdminTokenAction;
-
-
-import com.sun.identity.sm.OrganizationConfigManager;
+import static org.forgerock.json.resource.RoutingMode.EQUALS;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -71,7 +50,7 @@ public final class RealmDispatcher {
             router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));
 
             Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
-            router.addRoute(EQUALS, "/realms", new RealmResource(subOrgs));
+            router.addRoute(EQUALS, rName + "realms", new RealmResource(subOrgs));
             //Recursively calls on each realm registring users agents groups for each subrealm
             for (Object theRealm : subOrgs) {
                 String realm = rName + (String) theRealm;
@@ -82,12 +61,24 @@ public final class RealmDispatcher {
         }
     }
 
+    /**
+     * Provides routing definitions for routing end points that are not associated with realms.
+     *
+     * @param ocm Non null.
+     * @param router Non null.
+     */
+    private static void initGlobalEndpoints(OrganizationConfigManager ocm, Router router) {
+        // Add Session routing.
+        SessionResource.applyRouting(ocm, router);
+    }
+
     static public void initDispatcher(Router router) {
         try {
             SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                     AdminTokenAction.getInstance());
             OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken, "/");
             initRealmEndpoints(ocm, router);
+            initGlobalEndpoints(ocm, router);
         } catch (Exception e) {
 
         }
