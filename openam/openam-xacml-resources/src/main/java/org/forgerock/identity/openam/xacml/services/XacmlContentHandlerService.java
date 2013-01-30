@@ -177,9 +177,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     /**
      * Digest Authentication Global Constants.
      */
-    private String authMethod = "auth";
-    private String userName = "usm";
-    private String password = "password";
+    private final String authenticationMethod = "auth";
+    private final String userName = "username";
+
     /**
      * Digest Authentication Objects.
      */
@@ -260,12 +260,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         String realm = "example.org";  // TODO Fix Me.....
 
-        header.append("Digest realm=\"" + realm + "\",");
-        if (!StringUtils.isBlank(authMethod)) {
-            header.append("qop=" + authMethod + ",");
+        header.append("Digest realm=\"").append(realm).append("\",");
+        if (!StringUtils.isBlank(authenticationMethod)) {
+            header.append("qop=").append(authenticationMethod).append(",");
         }
-        header.append("nonce=\"" + nonce + "\",");
-        header.append("opaque=\"" + this.getOpaque(realm, nonce) + "\"");
+        header.append("algorithm=\"").append("md5").append("\",");
+        header.append("nonce=\"").append(nonce).append("\",");
+        header.append("opaque=\"").append(this.getOpaque(realm, nonce)).append("\"");
 
         return header.toString();
     }
@@ -273,9 +274,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     /**
      * Private Helper Method to Generate a random Seed for Authentication Digest.
      *
-     * @return String of Calculated
+     * @return String of Calculated Nonce
      */
-    private String calculateNonce() {
+    private final String calculateNonce() {
         Date d = new Date();
         SimpleDateFormat f = new SimpleDateFormat("yyyy:MM:dd:hh:mm:ss");
         String fmtDate = f.format(d);
@@ -284,14 +285,30 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         return DigestUtils.md5Hex(fmtDate + randomLong.toString());
     }
 
-    private String getOpaque(String domain, String nonce) {
+    /**
+     * Private Helper Method to Generate the Opaque Generated String
+     *
+     * @param domain
+     * @param nonce
+     * @return String of Calculated Opaque
+     */
+    private final String getOpaque(String domain, String nonce) {
         return DigestUtils.md5Hex(domain + nonce);
     }
 
     /**
      * Authenticate using a Digest.
      *
-     * @param authenticationHeader
+     * Per RFC2617: @see http://tools.ietf.org/html/rfc2617
+     *
+     *
+     *
+     *
+     *
+     * @param authenticationHeader -Example of Data for WWW-Authenticate.
+     *  Digest realm="example.org",qop=auth,nonce="9fc422776b40c52a8a107742f9a08d5c",
+     *                             opaque="aba7d38a079f1a7d2e0ba2d4b84f3aa2"
+     *
      * @param requestBody
      * @param request
      * @return AuthenticationDigest valid Object or Null is UnAuthorized.
@@ -302,13 +319,14 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                                                             final String requestBody,
                                                             final HttpServletRequest request, String realm)
             throws ServletException, IOException {
-        // ******************************************
-        // Parse the Digest Header Information.
-        System.out.println("authenticationHeader:["+authenticationHeader+"]");
+        // *********************************************
+        // Parse the Authentication Header Information.
+        System.out.println("authenticationHeader:["+authenticationHeader+"]"); // TODO Change Me...
 
-        String headerStringWithoutScheme = authenticationHeader.substring(authenticationHeader.indexOf(" ") + 1).trim();
+        String headerStringWithoutAuthScheme = authenticationHeader.substring(authenticationHeader.indexOf(" ") + 1)
+                .trim();
         HashMap<String, String> headerValues = new HashMap<String, String>();
-        String keyValueArray[] = headerStringWithoutScheme.split(",");
+        String keyValueArray[] = headerStringWithoutAuthScheme.split(",");
         for (String keyval : keyValueArray) {
             if (keyval.contains("=")) {
                 String key = keyval.substring(0, keyval.indexOf("="));
@@ -321,7 +339,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Obtain Each Value for Authentication
         // of the Digest.
         String method = request.getMethod();
-        String ha1 = DigestUtils.md5Hex(userName + ":" + realm + ":" + password);
+        String ha1 = DigestUtils.md5Hex(userName + ":" + realm + ":" + "password");    // TODO This needs to be fixed.
 
         String qop = headerValues.get("qop");
         String ha2;
@@ -340,7 +358,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         String serverResponse;
         if (StringUtils.isBlank(qop)) {
             serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":" + ha2);
-
         } else {
             String domain = headerValues.get("realm");   // TODO Fix me.....
 
@@ -383,7 +400,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if (maxContentLength != 0) {
             if (request.getContentLength() < 0) {
                 // We do not have any valid Content Length set.
-                response.setStatus(HttpServletResponse.SC_LENGTH_REQUIRED);
+                response.setStatus(HttpServletResponse.SC_LENGTH_REQUIRED);  // 411
                 response.setCharacterEncoding("UTF-8");
                 return ContentType.NONE;
             }
@@ -393,7 +410,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                             "Content length too large: " + request.getContentLength());
                 }
                 // We do not have any valid Content Length set.
-                response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE); // 413
                 response.setCharacterEncoding("UTF-8");
                 return ContentType.NONE;
             }
@@ -404,7 +421,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 ContentType.getNormalizedContentType(request.getContentType()));
         if (requestContentType == null) {
             // We do not have a valid Application Content Type!
-            response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);  // 415
             response.setCharacterEncoding("UTF-8");
             response.setContentLength(0);
             return ContentType.NONE;
@@ -471,10 +488,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param response
      */
     private void renderUnAuthorized(final ContentType requestContentType, HttpServletResponse response) {
-        response.addHeader(WWW_AUTHENTICATE_HEADER, generateAuthenticateHeader());
+        response.addHeader(WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader());
         response.setCharacterEncoding("UTF-8");
         response.setContentLength(0);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401
         renderResponse(requestContentType, null, response);
         return;
     }
@@ -501,6 +518,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final String classMethod = "XacmlContentHandlerService:doGet";
         boolean digest_valid = false;
+        boolean authenticated = false;
         // ******************************************************************
         // Validate Request and Obtain Media Type
         ContentType requestContentType = this.preProcessingRequest(request, response);
@@ -544,7 +562,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // We only support WWW Authenticate with Schemes:
             // + Digest, Basic Authentication is not supported per OASIS  Specification.
             //
-            // This Starts the Authorization via Digest Flow...
+            // This Starts the Authorization Digest Flow...
             this.renderUnAuthorized(requestContentType, response);
             return;
         }
@@ -698,6 +716,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             throws ServletException, IOException {
         String classMethod = "XacmlContentHandlerService:doPost";
         boolean digest_valid = false;
+        boolean authenticated = false;
         // ******************************************************************
         // Validate Request and Obtain Media Type
         ContentType requestContentType = this.preProcessingRequest(request, response);
@@ -736,31 +755,42 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             } else {
                 digest_valid = true;
             }
-        } else {
-            // We only support WWW Authenticate with Digest, Basic Authentication is not supported per OASIS
-            // Specification.
-            // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(requestContentType, response);
-            return;
         }
         // ******************************************************************
         // Check for Valid Digest Request.
         if (digest_valid) {
+
             // TODO -- Continue Validation of UserId and Password.
+
         }
         // ******************************************************************
-        // Check for any XACMLAuthzDecisionQuery Request
+        // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
         if (requestContentType.commonType() == CommonType.XML) {
-
+            // **************************************************************
+            // Content is XML.
+            // Now create a Document Object so we can scan for
+            // a xacml-samlp:XACMLAuthzDecisionQuery Wrapper for the request.
+            //
+        } else {
+            // **************************************************************
+            // Else, our Content is assumed to be JSON, but we can still have
+            // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
         }
-
         // ******************************************************************
         // Authenticate and Authorize
-        if (requestContentType.commonType() == CommonType.XML) {
-            // If Content is XML,
-        } else {
-            // Else, our Content is assumed to be JSON.
+        if (!authenticated) {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentLength(0);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403.
+            renderResponse(requestContentType, null, response);
+            return;
         }
+        // ******************************************************************
+        // Now this session has been Authenticated, either using Auth-Digest
+        // or via xacml-samlp:XACMLAuthzDecisionQuery Wrapper.
+        // Process the Authenticated Request...
+        //
+
 
         // POST operations to PDP.
 
@@ -944,14 +974,14 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Ready our Response Object...
         com.sun.identity.entitlement.xacml3.core.Response xacmlResponse = new com.sun.identity.entitlement.xacml3.core.Response();
         com.sun.identity.entitlement.xacml3.core.Result xacmlResult = new com.sun.identity.entitlement.xacml3.core.Result();
-        xacmlResult.setDecision(DecisionType.INDETERMINATE);
         xacmlResponse.getResult().add(xacmlResult);
 
         if (requestBody != null) {
 
             debug.error("XACML Incoming Request:[" + requestBody + "], Length:[" + requestBody.length() + "]");
 
-
+            // ********************************************
+            // Process the PDP Request from the PEP.
             String pepEntityID = null;    // TODO Need to resolve this.
             try {
                 Document requestDocument = parseXMLRequest(requestBody);
@@ -965,6 +995,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                         }
                     } catch (Exception e) {
                         debug.error("Exception performing xml to Object Graph.", e);
+
+                        // TODO --- This should send a 401
                     }
 
                     // TODO Needs Work to process the request....
@@ -985,22 +1017,22 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
 
                     // Set our Response Status per specification.
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(HttpServletResponse.SC_OK);   // 200
                 } else {
                     // Bad or no content.
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // Fix this Return.
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
                 }
 
             } catch (Exception se) {
                 debug.error(classMethod + "XACML Processing Exception", se);
                 // TODO Handle invalid.
                 // Bad or no content.
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // Fix this Return.
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
             }
 
         } else {
             // Bad or no content.
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // Fix this Return.
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
         }
         // TODO Handle invalid.
         SAML2Utils.putHeaders(headers, response);
@@ -1011,6 +1043,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         return xacmlStringResponse;
     }
+
+
+
 
 
     /**
@@ -1336,6 +1371,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
 
+
+
     /**
      * Provide common Entry point Method for Parsing Initial Requests
      * to obtain information on how to process and route the request.
@@ -1374,13 +1411,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private Document parseXMLRequest(final String requestBody) {
         // Get Document Builder Factory
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-        // Leave off validation, namespaces and Schema.
+        // Leave off validation, namespaces and Schema, otherwise we will have false-positive validation
+        // failures.  Validation will be performed using XPath Navigation.
         factory.setValidating(false);
         factory.setNamespaceAware(false);
         factory.setExpandEntityReferences(true);
         factory.setIgnoringComments(true);
-
+        // unMarshal the XML String into a Document Object.
         Document document = null;
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -1397,25 +1434,37 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             debug.error("IO Exception occurred obtaining Document Builder Factory: " + ioe.getMessage());
         }
 
+        // ********************************************************
         // Now dig using XPaths to perform a validation.
-        int invalidXPaths = 0;
-
+        // We need to obtain the Request Node and the
+        // XACMLAuthzDecisionQuery wrapper if applicable.
+        //
+       Node requestNode;
+       Node xacmlAuthzDecisionQueryNode;
 
         if (document != null) {
             try {
                 XPathFactory xPathfactory = XPathFactory.newInstance();
                 XPath xpath = xPathfactory.newXPath();
+
+                // Verify we have a Request.
                 XPathExpression expr = xpath.compile("/request");
-                Node node = (Node) expr.evaluate(document, XPathConstants.NODE);
-                if (node != null) {
-                    for (int i = 0; i < node.getAttributes().getLength(); i++) {
-                        debug.error("Node: " + node.getNodeName() + " attribute: " + node.getAttributes().item(i));
+                requestNode = (Node) expr.evaluate(document, XPathConstants.NODE);
+                if (requestNode != null) {
+                    for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
+                        debug.error("Node: " + requestNode.getNodeName() + " attribute: " + requestNode.getAttributes().item(i));
+                        // TODO Verify schema version.
+                        // TODO
                     }
                 }
+
+
+
             } catch (XPathExpressionException xee) {
                 // Our Expression for a Node was invalid,
                 // Document could be bad or suspect.
-                debug.error("XPathExpressException: " + xee.getMessage() + ", returning null bad bad content!");
+                debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
+
                 return null;
             }
         }
@@ -1424,9 +1473,23 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
+     * Private Helper to Parse the JSON Request Body.
+     *
+     * @param requestBody -- String JSON Data
+     * @return
+     */
+    private Document parseJSONRequest(final String requestBody) {
+        // TODO
+        return null;
+    }
+
+
+
+
+
+    /**
      * Marshal information into an xml string represented document.
      */
-
     private static String responseToXML(com.sun.identity.entitlement.xacml3.core.Response xacmlResponse) {
         StringWriter stringWriter = new StringWriter();
         try {
