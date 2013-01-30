@@ -158,6 +158,24 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Xerces-J -->
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.mockito</groupId>

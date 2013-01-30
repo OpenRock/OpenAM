@@ -1536,7 +1536,7 @@
                 <artifactId>freemarker</artifactId>
                 <version>2.3.19</version>
             </dependency>
-            <!-- Xerces-J Required for fedlet -->
+            <!-- Xerces-J Required for fedlet and XACML -->
             <dependency>
                 <groupId>xerces-J</groupId>
                 <artifactId>xercesImpl</artifactId>

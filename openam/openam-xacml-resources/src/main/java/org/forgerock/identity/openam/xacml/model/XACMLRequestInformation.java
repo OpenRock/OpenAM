@@ -37,11 +37,47 @@ import org.forgerock.identity.openam.xacml.commons.ContentType;
  */
 public class XACMLRequestInformation {
 
-    private ContentType contentType;
+    /**
+     * Requested URI
+     */
     private String requestURI;
+    /**
+     * Meta Alias Information.
+     */
     private String metaAlias;
+    /**
+     * Our PDP Entity ID.
+     */
     private String pdpEntityID;
+    /**
+     * Realm.
+     */
     private String realm;
+    /**
+     * Content Type
+     */
+    private ContentType contentType;
+    /**
+     * Original Request Content.
+     */
+    private String originalContent;
+    /**
+     * Content, can be either XML or JSON Object depending upon the specified ContentType.
+     */
+    private Object content;
+    /**
+     * Optional HTTP Digest Authorization Request
+     */
+    private String authenticationHeader;
+    /**
+     *  Indicates if this Request has been authenticated or not.
+     */
+    private boolean authenticated;
+    /**
+     * Content, can be either XML or JSON depending upon the specified ContentType.
+     * If this object is Null, we have an Anonymous/Guest Request.
+     */
+    private Object authenticationContent;
 
 
     /**
@@ -60,6 +96,8 @@ public class XACMLRequestInformation {
               this.pdpEntityID = pdpEntityID;
               this.realm = realm;
     }
+
+
 
     public ContentType getContentType() {
         return contentType;
@@ -101,15 +139,60 @@ public class XACMLRequestInformation {
         this.realm = realm;
     }
 
+    public String getOriginalContent() {
+        return originalContent;
+    }
+
+    public void setOriginalContent(String originalContent) {
+        this.originalContent = originalContent;
+    }
+
+    public Object getContent() {
+        return content;
+    }
+
+    public void setContent(Object content) {
+        this.content = content;
+    }
+
+    public String getAuthenticationHeader() {
+        return authenticationHeader;
+    }
+
+    public void setAuthenticationHeader(String authenticationHeader) {
+        this.authenticationHeader = authenticationHeader;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
+    public Object getAuthenticationContent() {
+        return authenticationContent;
+    }
+
+    public void setAuthenticationContent(Object authenticationContent) {
+        this.authenticationContent = authenticationContent;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
         sb.append("XACMLRequestInformation");
-        sb.append("{contentType=").append(contentType.applicationType());
-        sb.append(", requestURI='").append(requestURI).append('\'');
+        sb.append("{requestURI='").append(requestURI).append('\'');
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
         sb.append(", realm='").append(realm).append('\'');
+        sb.append(", contentType=").append(contentType);
+        sb.append(", originalContent='").append(originalContent).append('\'');
+        sb.append(", content=").append(content);
+        sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
+        sb.append(", authenticated=").append(authenticated);
+        sb.append(", authenticationContent=").append(authenticationContent);
         sb.append('}');
         return sb.toString();
     }
