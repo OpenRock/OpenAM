@@ -23,6 +23,7 @@
  */
 package org.forgerock.openam.oauth2.model;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -96,4 +97,11 @@ public interface Token {
      *          false if not expired
      */
     public boolean isExpired();
+
+    /**
+     * Converts the token to Map
+     *
+     * @return new Map representation of this AccessToken
+     */
+    public Map<String, Object> convertToMap();
 }

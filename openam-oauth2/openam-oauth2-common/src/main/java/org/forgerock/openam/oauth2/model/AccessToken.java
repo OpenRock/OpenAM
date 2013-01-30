@@ -49,12 +49,6 @@ public interface AccessToken extends Token {
     @JsonSerialize
     public String getRefreshToken();
 
-    /**
-     * Converts the token to Map
-     * 
-     * @return new Map representation of this AccessToken
-     */
-    public Map<String, Object> convertToMap();
 
     /**
      * Gets information about the token for the tokeninfo end point

@@ -87,7 +87,14 @@
                         <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
+                <AttributeSchema name="forgerock-oauth2-provider-token-map-class"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple">
 
@@ -142,6 +149,14 @@
                                      i18nKey="a104">
                         <DefaultValues>
                             <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-oauth2-provider-token-map-class"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a105">
+                        <DefaultValues>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

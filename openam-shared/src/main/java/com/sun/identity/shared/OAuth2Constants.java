@@ -102,6 +102,11 @@ public class OAuth2Constants {
         public static final String RESPONSE_TYPE = "response_type";
 
         /**
+         * Delimiter that seperates the response_type values
+         */
+        public static final String RESPONSE_TYPE_DELIMITER = " ";
+
+        /**
          * Parameter usage location: authorization request, token request
          */
         public static final String REDIRECT_URI = "redirect_uri";
@@ -669,6 +674,7 @@ public class OAuth2Constants {
         public static final String ACCESS_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-access-token-lifetime";
         public static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
+        public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
     }
 
     /**

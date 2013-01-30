@@ -24,13 +24,18 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.exceptions.TokenTypeNotFoundException;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.Token;
+import org.forgerock.openam.oauth2.model.TokenManager;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.model.AccessToken;
+import org.mozilla.jss.crypto.TokenSupplierManager;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;

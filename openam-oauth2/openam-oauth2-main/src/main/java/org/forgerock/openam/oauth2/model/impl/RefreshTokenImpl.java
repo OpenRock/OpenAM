@@ -24,7 +24,9 @@
 
 package org.forgerock.openam.oauth2.model.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
