@@ -465,6 +465,20 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
+     * Simple Helper Method to provide common Not Authorized render Method.
+     *
+     * @param requestContentType
+     * @param response
+     */
+    private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentLength(0);
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 400
+        renderResponse(requestContentType, null, response);
+        return;
+    }
+
+    /**
      * Returns a short description of the servlet.
      *
      * @return a String containing servlet description
@@ -503,8 +517,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
         if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty
-                        ())) {
+                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
             // This Starts the Authorization via Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
             return;
@@ -525,9 +538,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             } else {
                 digest_valid = true;
             }
-        } else {
+        } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
+            // ***********************************************************
+            // if no XACML saml Wrapper,
             // We only support WWW Authenticate with Schemes:
             // + Digest, Basic Authentication is not supported per OASIS  Specification.
+            // Or Content whose contents contains a wrapper in either XML or JSON.
+            // + XACMLAuthzDecisionQuery Wrapper Of Request.
             //
             // This Starts the Authorization Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
@@ -559,9 +576,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } catch (JSONException je) {
             debug.error("JSON processing Exception: " + je.getMessage(), je);
         }
-        // ***************************************************************
-        // Determine based upon the contentType on how to consume and
-        // respond to the incoming Request.
 
 
         /**
@@ -700,9 +714,16 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
         if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
-            (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
+                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
             // This Starts the Authorization via Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+            return;
+        }
+        // ******************************************************************
+        // Check for a existence of a XACML Request
+        if (xacmlRequestInformation.isRequestNodePresent()) {
+            // No Request Node found within the document, not valid request.
+            this.renderBadRequest(requestContentType, response);
             return;
         }
         // ******************************************************************
@@ -721,9 +742,12 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             } else {
                 digest_valid = true;
             }
-        } else {
+        } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
+            // if no XACML saml Wrapper,
             // We only support WWW Authenticate with Schemes:
             // + Digest, Basic Authentication is not supported per OASIS  Specification.
+            // Or Content whose contents contains a wrapper in either XML or JSON.
+            // + XACMLAuthzDecisionQuery Wrapper Of Request.
             //
             // This Starts the Authorization Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
@@ -736,23 +760,24 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
-        if (requestContentType.commonType() == CommonType.XML) {
-            // **************************************************************
-            // Content is XML.
-            // Now create a Document Object so we can scan for
-            // a xacml-samlp:XACMLAuthzDecisionQuery Wrapper for the request.
-            //
+        if (xacmlRequestInformation.getAuthenticationContent() != null) {
+            if (requestContentType.commonType() == CommonType.XML) {
+                // **************************************************************
+                // Content is XML and Nodes are Available to be consumed.
 
-        } else {
-            // **************************************************************
-            // Else, our Content is assumed to be JSON, but we can still have
-            // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
+                // TODO
 
+            } else {
+                // **************************************************************
+                // Else, our Content is assumed to be JSON, but we can still have
+                // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
 
-        }
-        // ******************************************************************
-        // Authenticate and Authorize
-        if (!authenticated) {
+                // TODO
+
+            }
+        } else if (!authenticated) {
+            // ******************************************************************
+            // Authenticate and Authorize
             response.setCharacterEncoding("UTF-8");
             response.setContentLength(0);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403.
@@ -950,6 +975,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         com.sun.identity.entitlement.xacml3.core.Result xacmlResult = new com.sun.identity.entitlement.xacml3.core.Result();
         xacmlResponse.getResult().add(xacmlResult);
 
+        String xacmlStringResponse = null;
+
+        // Check Original Content
         if (xacmlRequestInformation.getOriginalContent() != null) {
 
             debug.error("XACML Incoming Request:[" + xacmlRequestInformation.getOriginalContent() + "], " +
@@ -975,6 +1003,15 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
                             // TODO --- This should send a 401
                         }
+                        Response samlResponse =
+                                processSAMLRequest(xacmlRequestInformation.getRealm(),
+                                        xacmlRequestInformation.getPdpEntityID(),
+                                        ((Document) xacmlRequestInformation.getAuthenticationContent()).getDocumentElement(), request,
+                                        requestDocument.getDocumentElement());
+                        if (samlResponse != null) {
+                            xacmlStringResponse = samlResponse.toXMLString(true, true);
+                        }
+
 
                         // TODO Needs Work to process the request....
 
@@ -984,12 +1021,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                          Element reqAbs = XACML3Utils.getSamlpElement(requestDocument.getDocumentElement(),
                          REQUEST_ABSTRACT);
 
-                         Response samlResponse =
-                         processSAMLRequest(xacmlRequestInformation.getRealm(),
-                         xacmlRequestInformation.getPdpEntityID(), reqAbs, request, requestDocument.getDocumentElement());
-                         if (samlResponse != null) {
-                         replyResponse = samlResponse.toXMLString(true, true);
-                         }
                          *****/
 
 
@@ -1025,7 +1056,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         SAML2Utils.putHeaders(headers, response);
 
         // TODO Temporary return...
-        String xacmlStringResponse = DEFAULT_RESPONSE;
+        if (xacmlStringResponse == null) {
+            xacmlStringResponse = DEFAULT_RESPONSE;
+        }
 
 
         return xacmlStringResponse;
@@ -1355,11 +1388,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
 
-
-
-
-
-
     /**
      * Provide common Entry point Method for Parsing Initial Requests
      * to obtain information on how to process and route the request.
@@ -1429,7 +1457,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     /**
      * Private Helper to Parse the XML Request Body.
      *
-     * @param xacmlRequestInformation
+     * @param xacmlRequestInformation To indicate the XACMLRequestInformation's request Node
+     *                                does not exist, the XACMLRequestInformation.isRequestNodePresent() will
+     *                                return false, which indicates an Invalid XACML Request.
      */
     private void parseXMLRequest(XACMLRequestInformation xacmlRequestInformation) {
         // Get Document Builder Factory
@@ -1480,7 +1510,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     xacmlRequestInformation.setAuthenticationContent(xacmlAuthzDecisionQueryNode);
                     for (int i = 0; i < xacmlAuthzDecisionQueryNode.getAttributes().getLength(); i++) {
                         debug.error("Node: " + xacmlAuthzDecisionQueryNode.getNodeName() + " attribute: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i));
-                        // TODO Verify schema version.
+                        // TODO Verify.....
                         // TODO
                     }
                 }
@@ -1498,9 +1528,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 XPathExpression expr = xpath.compile("/" + REQUEST);
                 requestNode = (Node) expr.evaluate(document, XPathConstants.NODE);
                 if (requestNode != null) {
+                    // Indicate our Request Node is in fact present, either wrapped or not.
+                    xacmlRequestInformation.setRequestNodePresent(true);
                     for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
                         debug.error("Node: " + requestNode.getNodeName() + " attribute: " + requestNode.getAttributes().item(i));
-                        // TODO Verify schema version.
+                        // TODO Verify....
                         // TODO
                     }
                 }

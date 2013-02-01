@@ -54,6 +54,10 @@ public class XACMLRequestInformation {
      */
     private String realm;
     /**
+     *
+     */
+    private boolean requestNodePresent;
+    /**
      * Content Type
      */
     private ContentType contentType;
@@ -179,6 +183,14 @@ public class XACMLRequestInformation {
         this.authenticationContent = authenticationContent;
     }
 
+    public boolean isRequestNodePresent() {
+        return requestNodePresent;
+    }
+
+    public void setRequestNodePresent(boolean requestNodePresent) {
+        this.requestNodePresent = requestNodePresent;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
@@ -187,6 +199,7 @@ public class XACMLRequestInformation {
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
         sb.append(", realm='").append(realm).append('\'');
+        sb.append(", requestNodePresent=").append(requestNodePresent);
         sb.append(", contentType=").append(contentType);
         sb.append(", originalContent='").append(originalContent).append('\'');
         sb.append(", content=").append(content);

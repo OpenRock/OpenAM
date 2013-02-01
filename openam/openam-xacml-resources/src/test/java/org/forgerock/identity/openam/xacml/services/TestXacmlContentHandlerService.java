@@ -37,8 +37,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 
 /**
@@ -51,12 +54,16 @@ public class TestXacmlContentHandlerService {
 
     private static ServletTester servletTester;
 
+    private final static String testAuthzDecisionQuery_FileName = "test_data/xacml3_authzDecisionQuery.xml";
+
     @BeforeClass
     public void before() throws Exception {
 
         servletTester = new ServletTester();
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml");
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/authorization");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/relation/pdp");
         servletTester.start();
     }
 
@@ -72,7 +79,7 @@ public class TestXacmlContentHandlerService {
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
         request.setURI("/xacml");
-        request.setVersion("HTTP/1.0");
+        request.setVersion("HTTP/1.1");
 
         try {
             // Check for a 411 No Content Length Provided.
@@ -95,7 +102,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/xacml");
         request.setContent(""); // Set content Length to zero.
-        request.setVersion("HTTP/1.0");
+        request.setVersion("HTTP/1.1");
 
         try {
             // Check for a 415 Unsupported Media Type.
@@ -119,7 +126,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
         request.setURI("/xacml/authorization");
         request.setContent(""); // Set content Length to zero.
-        request.setVersion("HTTP/1.0");
+        request.setVersion("HTTP/1.1");
 
         try {
             // Check for a 401 Not Authorized with a WWW-Authenticate Digest.
@@ -143,7 +150,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Content-Type", ContentType.XML.applicationType());
         request.setURI("/xacml/authorization");
         request.setContent(""); // Set content Length to zero.
-        request.setVersion("HTTP/1.0");
+        request.setVersion("HTTP/1.1");
 
         try {
             // Check for a 401 Not Authorized with a WWW-Authenticate Digest.
@@ -176,6 +183,66 @@ public class TestXacmlContentHandlerService {
 
         }
 
+    }
+
+    @Test
+    public void testUseCase_XML_Forbidden() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("POST");
+        request.addHeader("Host", "example.org");
+        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.setURI("/xacml/pdp");
+        request.setVersion("HTTP/1.1");
+
+        String testData = this.getFileContents(testAuthzDecisionQuery_FileName);
+        assertNotNull(testData);
+        request.setContent(testData); // Set content Length to zero.
+
+        try {
+            // Check for a 403 Forbidden.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),403);
+            assertNotNull(response.getHeader("Content-Type"));
+            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
+
+            assertNotNull(response.getHeader("Content-Length"));
+            assertTrue(response.getHeader("Content-Length").equals("0"));
+
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    /**
+     * Simple Helper Method to read in Test Files.
+     * @param resourceName
+     * @return String containing the Resource Contents.
+     */
+    private String getFileContents(final String resourceName) {
+        InputStream inputStream = null;
+        try {
+            if (resourceName != null) {
+                inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
+            }
+        } catch (Exception e) {
+            // TODO
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch(IOException ioe) {
+
+                }
+            }
+        } // End of Finally Clause.
+        // Catch All.
+        return null;
     }
 
 
