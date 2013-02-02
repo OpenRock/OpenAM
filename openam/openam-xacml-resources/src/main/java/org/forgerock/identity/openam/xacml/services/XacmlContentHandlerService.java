@@ -172,12 +172,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static Schema xacmlSchema;
 
     /**
-     * Digest Authentication Global Constants.
-     */
-    private final String authenticationMethod = "auth";
-    private final String USERNAME = "username";
-
-    /**
      * Digest Authentication Objects.
      */
     private static String nonce;
@@ -499,8 +493,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final String classMethod = "XacmlContentHandlerService:doGet";
-        boolean digest_valid = false;
-        boolean authenticated = false;
         // ******************************************************************
         // Validate Request and Obtain Media Type
         ContentType requestContentType = this.preProcessingRequest(request, response);
@@ -536,7 +528,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
                 return;
             } else {
-                digest_valid = true;
+                xacmlRequestInformation.setDigestValid(true);
             }
         } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
             // ***********************************************************
@@ -552,7 +544,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************************
         // Check for Valid Digest Request.
-        if (digest_valid) {
+        if (xacmlRequestInformation.isDigestValid()) {
             // TODO -- Continue Validation of UserId and Password.
         }
 
@@ -560,8 +552,12 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Determine our Content Type Language, XML or JSON for now.
         if (requestContentType.commonType() == CommonType.XML) {
             // If Content is XML,
+
+
         } else {
             // Else, our Content is assumed to be JSON.
+
+
         }
 
 
@@ -647,6 +643,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          mandatory
          */
 
+        /**
 
         // Check our query string.
         String queryParam = request.getQueryString();
@@ -672,13 +669,15 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             xacmlStringBuilderResponse.append("</resource>");
             xacmlStringBuilderResponse.append(" </resources>");
         }
+
+        **/
         // TODO Determine if there are any other Get Request Types we need to deal with,
         // TODO otherwise pass along.
 
 
         // *****************************************************************
         // Render our Response
-        renderResponse(requestContentType, xacmlStringBuilderResponse.toString(), response);
+        renderResponse(requestContentType, xacmlRequestInformation.getXacmlStringResponse(), response);
     }
 
     /**
@@ -696,8 +695,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             HttpServletResponse response)
             throws ServletException, IOException {
         String classMethod = "XacmlContentHandlerService:doPost";
-        boolean digest_valid = false;
-        boolean authenticated = false;
         // ******************************************************************
         // Validate Request and Obtain Media Type
         ContentType requestContentType = this.preProcessingRequest(request, response);
@@ -740,7 +737,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
                 return;
             } else {
-                digest_valid = true;
+                xacmlRequestInformation.setDigestValid(true);
             }
         } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
             // if no XACML saml Wrapper,
@@ -755,18 +752,22 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************************
         // Check for Valid Digest Request.
-        if (digest_valid) {
+        if (xacmlRequestInformation.isDigestValid()) {
             // TODO -- Continue Validation of UserId and Password.
         }
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
         if (xacmlRequestInformation.getAuthenticationContent() != null) {
+            // If the Content is XML Based, we have a DOM.
             if (requestContentType.commonType() == CommonType.XML) {
                 // **************************************************************
                 // Content is XML and Nodes are Available to be consumed.
-
-                // TODO
-
+                // So perform the PDP Request from the PEP, Authentication will
+                // be performed naturally since the request is wrapped in a
+                // PEP Authentication outer request.
+                xacmlRequestInformation.setXacmlStringResponse(processPDP_XMLRequest(xacmlRequestInformation,
+                        request, response));
+                // TODO -- Analyze Response.
             } else {
                 // **************************************************************
                 // Else, our Content is assumed to be JSON, but we can still have
@@ -775,9 +776,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // TODO
 
             }
-        } else if (!authenticated) {
+        } else if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
-            // Authenticate and Authorize
+            // Not Authenticated nor Authorized, Forbidden.
             response.setCharacterEncoding("UTF-8");
             response.setContentLength(0);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403.
@@ -937,11 +938,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          */
 
         // *****************************************************************
-        // perform the PDP Request from the PEP.
-        String xacmlStringResponse = processPDPRequest(xacmlRequestInformation, request, response);
-        // *****************************************************************
         // Render our Response
-        renderResponse(requestContentType, xacmlStringResponse, response);
+        renderResponse(requestContentType, xacmlRequestInformation.getXacmlStringResponse(), response);
     }
 
     @Override
@@ -955,18 +953,18 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
-     * Processes the POST Request for the PDP.
+     * Processes XML Requests from the PEP Request for the PDP.
      *
      * @param request
      * @param response
      * @throws ServletException
      * @throws IOException
      */
-    private String processPDPRequest(XACMLRequestInformation xacmlRequestInformation,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response)
+    private String processPDP_XMLRequest(XACMLRequestInformation xacmlRequestInformation,
+                                         HttpServletRequest request,
+                                         HttpServletResponse response)
             throws ServletException, IOException {
-        String classMethod = "XacmlContentHandlerService:processPDPRequest";
+        String classMethod = "XacmlContentHandlerService:processPDP_XMLRequest";
         // Get all the headers from the HTTP request
         MimeHeaders headers = SAML2Utils.getHeaders(request);
 
@@ -988,7 +986,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             String pepEntityID = null;    // TODO Need to resolve this.
 
             try {
-                if (xacmlRequestInformation.getContentType().commonType().equals(CommonType.XML)) {
                     Document requestDocument = (Document) xacmlRequestInformation.getContent();
                     if (requestDocument != null) {
                         Object xacmlRequestObject = null;
@@ -1026,15 +1023,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
                         // Set our Response Status per specification.
                         response.setStatus(HttpServletResponse.SC_OK);   // 200
-                    } else if (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) {
 
 
-                        // Set our Response Status per specification.
-                        response.setStatus(HttpServletResponse.SC_OK);   // 200
-                    } else {
-                        // Invalid content.
-                        response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);   // 415
-                    }
 
                 } else {
                     // Bad or no content.

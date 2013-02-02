@@ -82,6 +82,18 @@ public class XACMLRequestInformation {
      * If this object is Null, we have an Anonymous/Guest Request.
      */
     private Object authenticationContent;
+    /**
+     * Response Field for Request,
+     * Digest Valid Indicator.
+     * Can be False, if a XACMLAuthzDecisionQuery is performed.
+     */
+    private boolean digestValid = false;
+    /**
+     * Response Field for Request,
+     * Digest Valid Indicator.
+     * Ca
+     */
+    private String xacmlStringResponse = null;
 
 
     /**
@@ -191,6 +203,26 @@ public class XACMLRequestInformation {
         this.requestNodePresent = requestNodePresent;
     }
 
+    // **********************************************
+    // Response Fields for Request
+    // **********************************************
+
+    public boolean isDigestValid() {
+        return digestValid;
+    }
+
+    public void setDigestValid(boolean digestValid) {
+        this.digestValid = digestValid;
+    }
+
+    public String getXacmlStringResponse() {
+        return xacmlStringResponse;
+    }
+
+    public void setXacmlStringResponse(String xacmlStringResponse) {
+        this.xacmlStringResponse = xacmlStringResponse;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
@@ -206,6 +238,8 @@ public class XACMLRequestInformation {
         sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
         sb.append(", authenticated=").append(authenticated);
         sb.append(", authenticationContent=").append(authenticationContent);
+        sb.append(", digestValid=").append(digestValid);
+        sb.append(", xacmlStringResponse='").append(xacmlStringResponse).append('\'');
         sb.append('}');
         return sb.toString();
     }

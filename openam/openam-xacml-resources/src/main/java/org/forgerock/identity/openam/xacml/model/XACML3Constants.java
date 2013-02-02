@@ -40,6 +40,12 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String NAME_META_ALIAS_IN_URI = "metaAlias";
 
     /**
+     * Digest Authentication Global Constants.
+     */
+    public static final String authenticationMethod = "auth";
+    public static final String USERNAME = "username";
+
+    /**
      * Common Globals Definitions
      */
     public static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
@@ -54,7 +60,7 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
     /**
-     * RESTful XACML XACML 3 Name Space Definitions.
+     * RESTful XACML 3.0 Name Space Definitions.
      */
     public static final String URN_HTTP = "urn:oasis:names:tc:xacml:3.0:profile:rest:http";
     public static final String URN_HOME = "urn:oasis:names:tc:xacml:3.0:profile:rest:home";
