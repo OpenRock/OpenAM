@@ -34,18 +34,10 @@
         <version>10.2.0-SNAPSHOT</version>
     </parent>
 
-
-    <properties>
-        <bundle.symbolicName>fedletAG</bundle.symbolicName>
-        <bundle.namespace></bundle.namespace>
-    </properties>
-
-
-    <!-- Component Definition -->
-    <name>${bundle.symbolicName}</name>
+    <name>OpenAM Federation Fedlet</name>
     <description>OpenAM Federation Fedlet AG.</description>
     <artifactId>openam-federation-fedletAG</artifactId>
-    <packaging>war</packaging>
+    <packaging>bundle</packaging>
 
     <!-- Build -->
     <build>
@@ -74,49 +66,33 @@
                     </execution>
                 </executions>
             </plugin-->
-
             <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <!-- add the generated manifest to the war -->
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>1.7.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>2.3.7</version>
+                <extensions>true</extensions>
                 <configuration>
-                    <supportedProjectTypes>
-                        <supportedProjectType>jar</supportedProjectType>
-                        <supportedProjectType>bundle</supportedProjectType>
-                        <supportedProjectType>war</supportedProjectType>
-                    </supportedProjectTypes>
                     <instructions>
-                        <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
-                        <Bundle-Version>${pom.version}</Bundle-Version>
-                        <Embed-Dependency>openam-federation-library,openam-saml2-schema;scope=compile|runtime</Embed-Dependency>
-                        <Import-Package>*</Import-Package>
-
-                        <!--
-                           | assume public classes are in the top package, and private classes are under ".internal"
-                        -->
-                        <Export-Package></Export-Package>
-                        <Private-Package>*</Private-Package>
-                        <!--
-                           | each module can override these defaults in their osgi.bnd file
-                        -->
-                        <_include>-osgi.bnd</_include>
+                        <!-- http://felix.apache.org/site/apache-felix-maven-bundle-plugin-bnd.html -->
+                        <Embed-Dependency>
+                            *;scope=compile|runtime;inline=false
+                        </Embed-Dependency>
+                        <Import-Package>!com.sun.identity*,*</Import-Package>
+                        <_failok>true</_failok>
+                        <Private-Package>org.forgerock.identity.fedlet</Private-Package>
                     </instructions>
                 </configuration>
             </plugin>

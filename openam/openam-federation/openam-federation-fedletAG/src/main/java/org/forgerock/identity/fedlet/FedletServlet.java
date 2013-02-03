@@ -38,7 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.ConfigurationPolicy;
+import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
@@ -68,23 +70,34 @@ public final class FedletServlet
     final static Logger logger = LoggerFactory.getLogger(FedletServlet.class);
 
     //TODO Decide where to put the web and the java resources. Now both are in root
+    //This requires to create new HttpContext from single bundle with that path,
     private final String path = "/sf";
-    @Reference
-    HttpService httpService;
 
-    @Reference(target="(openidm.contextid=shared)")
-    HttpContext httpContext;
-
-    ComponentContext context;
+    ServiceRegistration<HttpServlet> serviceRegistration = null;
 
     @Activate
     protected void activate(ComponentContext context) throws ServletException, NamespaceException {
-        this.context = context;
 
-        String alias = "/sf";
-        Dictionary<String, Object> props = new Hashtable<String, Object>();
-        httpService.registerServlet(alias, this,  props, httpContext);
+        //context.getProperties().get("openam.fedlet.alias");
+        String alias = path;
+        // TODO Read these from configuraton
+        Dictionary<String,Object> properties = new Hashtable<String,Object>();
+        properties.put("alias", alias);
+        properties.put("httpContext.id", "openidm");
+        properties.put("servletNames", "OpenIDM Fedlet");
+
+        // All WebApplication elements must be registered with the same
+        // BundleContext
+        serviceRegistration = context.getBundleContext()
+                        .registerService(HttpServlet.class, this, properties);
         logger.debug("Registered fedlet servlet at {}", alias);
+    }
+
+    @Deactivate
+    protected synchronized void deactivate(ComponentContext context) {
+        if (null != serviceRegistration) {
+            serviceRegistration.unregister();
+        }
     }
 
     @Override
