@@ -51,6 +51,7 @@
         <!-- OpenAM Federation Modules -->
         <module>openam-federation-library</module>
         <module>OpenFM</module>
+        <module>openam-federation-fedletAG</module>
     </modules>
 
     <!-- Build -->
