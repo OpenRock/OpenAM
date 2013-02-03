@@ -105,14 +105,14 @@
                     <instructions>
                         <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
                         <Bundle-Version>${pom.version}</Bundle-Version>
-                        <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
-                        <Embed-Directory>WEB-INF/lib</Embed-Directory>
-                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Dependency>openam-federation-library,openam-saml2-schema;scope=compile|runtime</Embed-Dependency>
+                        <Import-Package>*</Import-Package>
+
                         <!--
                            | assume public classes are in the top package, and private classes are under ".internal"
                         -->
-                        <Export-Package>!${bundle.namespace}.internal.*,${bundle.namespace}.*;version="${pom.version}"</Export-Package>
-                        <Private-Package>${bundle.namespace}.internal.*</Private-Package>
+                        <Export-Package></Export-Package>
+                        <Private-Package>*</Private-Package>
                         <!--
                            | each module can override these defaults in their osgi.bnd file
                         -->
