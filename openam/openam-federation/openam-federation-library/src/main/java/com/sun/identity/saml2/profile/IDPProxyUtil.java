@@ -284,6 +284,7 @@ public class IDPProxyUtil {
             SPCache.requestHash.put(requestID, reqInfo);
         }
         if (SAML2Utils.isSAML2FailOverEnabled()) {
+/*
             try {
             // sessionExpireTime is counted in seconds
             long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
@@ -295,7 +296,8 @@ public class IDPProxyUtil {
             } catch(StoreException se) {
                 SAML2Utils.debug.error(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID + ", has failed!",se);
             }
-        }        
+*/
+        }
     }
 
     /**

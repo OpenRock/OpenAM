@@ -419,6 +419,7 @@ public class IDPArtifactResolution {
             }
 
             if (saml2FailoverEnabled) {
+/*
                 // Check the Persistent DB store
                 try {
                     if (SAML2Utils.debug.messageEnabled()) {
@@ -438,6 +439,7 @@ public class IDPArtifactResolution {
                             SAML2Constants.CLIENT_FAULT,
                             "UnableToFindResponseInRepo", null);
                 }
+*/
             }
         }
 
@@ -448,6 +450,7 @@ public class IDPArtifactResolution {
         }
 
         // Remove Response from persistent DB
+/*
         try {
             if (saml2FailoverEnabled) {
                 SAML2RepositoryFactory.getInstance().deleteSAML2Token(artStr);
@@ -457,6 +460,7 @@ public class IDPArtifactResolution {
         } catch (StoreException e) {
             SAML2Utils.debug.error(classMethod + " Error deleting the SAML object from the CTS Repository", e);
         }
+*/
 
         Map props = new HashMap();
         String nameIDString = SAML2Utils.getNameIDStringFromResponse(res);

@@ -435,6 +435,7 @@ public class AssertionIDRequestUtil {
                         "reading assertion from DB. ID = " + assertionID);
                 }
                 String assertionStr = null;
+/*
                 try {
                     assertionStr =
                     (String) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(assertionID);
@@ -443,6 +444,7 @@ public class AssertionIDRequestUtil {
                             "processAssertionIDRequest: " +
                             "reading assertion from Repository. ID = " + assertionID + ", Operation has Failed!",se);
                 }
+*/
                 if (assertionStr != null) {
                     assertion = AssertionFactory.getInstance().createAssertion(
                         assertionStr);

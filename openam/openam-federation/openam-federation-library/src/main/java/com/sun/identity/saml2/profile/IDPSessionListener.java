@@ -204,9 +204,11 @@ public class IDPSessionListener
                 } catch (SAML2Exception se) {
                            SAML2Utils.debug.error(
                            "IDPSessionListener.sessionInvalidated:", se);
+/*
                 } catch (SessionException s) {
                            SAML2Utils.debug.error(
                            "IDPSessionListener.sessionInvalidated:", s);
+*/
                 }
                
                 synchronized(IDPCache.idpSessionsByIndices) {
@@ -245,9 +247,11 @@ public class IDPSessionListener
                 IDPCache.spSessionPartnerBySessionID.remove(sessID);
             }
 
+/*
             if (SAML2Utils.isSAML2FailOverEnabled()) {
                 SAML2RepositoryFactory.getInstance().deleteSAML2Token(sessionIndex);
             }
+*/
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                    classMethod +
@@ -271,9 +275,11 @@ public class IDPSessionListener
                 SAML2Utils.debug.warning(
                         classMethod + "SAML2 Repository error.", samle);
             }
+/*
         } catch (StoreException se) {
              SAML2Utils.debug.error(
                         classMethod + "SAML2 Repository error, "+se.getMessage(), se);
+*/
         }
     }
 

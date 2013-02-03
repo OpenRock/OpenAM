@@ -1446,6 +1446,7 @@ public class SPACSUtils {
         String assertionID=authnAssertion.getID();
         if (respInfo.getProfileBinding().equals(SAML2Constants.HTTP_POST)) {
             SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
+/*
             try {
                 if (SAML2Utils.isSAML2FailOverEnabled()) {
                     SAML2RepositoryFactory.getInstance().saveSAML2Token(assertionID,
@@ -1458,6 +1459,7 @@ public class SPACSUtils {
             } catch (SAML2Exception e) {
                 SAML2Utils.debug.error(classMethod + "DB error!", e); 
             }
+*/
         }
         respInfo.setAssertion(authnAssertion);
  
@@ -1800,7 +1802,9 @@ public class SPACSUtils {
             if (cache != null) {
                 relayStateUrl = (String)cache.getObject();
             } else if (SAML2Utils.isSAML2FailOverEnabled()) {
+/*
                 try {
+
                     // Try and retrieve the value from the SAML2 repository
                     // The key is this way to make it unique compared to when
                     // the same key is used to store a copy of the AuthnRequestInfo
@@ -1813,6 +1817,7 @@ public class SPACSUtils {
                                 + " retrieved from SAML2 repository for relayStateID: " + relayStateID);
                         }
                     }
+
                 } catch (StoreException se) {
                     SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
                             + relayStateID, se);
@@ -1820,6 +1825,7 @@ public class SPACSUtils {
                     SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
                             + relayStateID, ex);                    
                 }
+*/
             } else {
                 // !SAML2Utils.isSAML2FailOverEnabled()
                 if (SAML2Utils.debug.messageEnabled()) {

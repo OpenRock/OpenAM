@@ -242,12 +242,14 @@ public class AuthnQueryUtil {
                     "getting user assertions from DB. user = " + cacheKey);
             }
             List list = null;
+/*
             try {
                    SAML2RepositoryFactory.getInstance().retrieveSAML2TokenWithSecondaryKey(cacheKey);
             } catch(StoreException se) {
                 SAML2Utils.debug.error("AuthnQueryUtil.processAuthnQuery: " +
                         "Unable to obtain user assertions from CTS Repository. user = " + cacheKey+", "+se.getMessage(),se);
             }
+*/
             if ((list != null) && (!list.isEmpty())) {
                 assertions = new ArrayList();
                 for(Iterator iter = list.iterator(); iter.hasNext(); ) {

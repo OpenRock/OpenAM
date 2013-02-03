@@ -860,12 +860,14 @@ public class IDPSSOUtil {
                     (SAML2Utils.isSAML2FailOverEnabled())) {
                 // Read from DataBase
                 IDPSessionCopy idpSessionCopy = null;
+/*
                 try {
                     idpSessionCopy = (IDPSessionCopy)
                             SAML2RepositoryFactory.getInstance().retrieveSAML2Token(sessionIndex);
                 } catch (StoreException se) {
                     SAML2Utils.debug.error("Unable to obtain the IDPSessionCopy from the CTS Repository: " + se.getMessage(), se);
                 }
+*/
                 // Copy back to IDPSession
                 if (idpSessionCopy != null) {
                     idpSession = new IDPSession(idpSessionCopy);
@@ -1005,6 +1007,7 @@ public class IDPSSOUtil {
 
             IDPCache.assertionByIDCache.put(assertionID, assertion);
             if (SAML2Utils.isSAML2FailOverEnabled()) {
+/*
                 try {
                     SAML2RepositoryFactory.getInstance().saveSAML2Token(assertionID,
                             assertion.toXMLString(true, true),
@@ -1017,6 +1020,7 @@ public class IDPSSOUtil {
                 } catch (StoreException se) {
                     SAML2Utils.debug.error("Unable to save the Assertion to the CTS Repository: " + se.getMessage(), se);
                 }
+*/
             }
         }
         //  Save to persistent datastore 
@@ -1024,21 +1028,27 @@ public class IDPSSOUtil {
             long sessionExpireTime = System.currentTimeMillis() / 1000 +
                     (sessionProvider.getTimeLeft(session));
             if (SAML2Utils.isSAML2FailOverEnabled()) {
+/*
                 SAML2RepositoryFactory.getInstance().saveSAML2Token(sessionIndex,
                         new IDPSessionCopy(idpSession), sessionExpireTime, null);
+*/
             }
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("SAVE IDPSession!");
             }
+/*
         } catch (SAML2Exception e) {
             SAML2Utils.debug.error(classMethod + "DB error!");
+*/
         } catch (SessionException se) {
             SAML2Utils.debug.error(classMethod +
                     "Unable to get left-time from the session.", se);
             throw new SAML2Exception(
                     SAML2Utils.bundle.getString("invalidSSOToken"));
+/*
         } catch (StoreException se) {
             SAML2Utils.debug.error("Unable to save the IDPSession to the CTS Repository: "+se.getMessage(),se);
+*/
         }
         return assertion;
     }
@@ -2146,9 +2156,11 @@ public class IDPSSOUtil {
             if (SAML2Utils.isSAML2FailOverEnabled()) {
                 long expireTime = getValidTimeofResponse(
                         realm, idpEntityID, res);
+/*
                 SAML2RepositoryFactory.getInstance().saveSAML2Token(
                         artStr, res.toXMLString(true, true), expireTime / 1000,
                         null);
+*/
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message(classMethod +
                             "Save Response to DB!");
