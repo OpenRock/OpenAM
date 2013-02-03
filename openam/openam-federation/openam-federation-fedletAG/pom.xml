@@ -153,6 +153,11 @@
 
         <dependency>
             <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
             <artifactId>webservices-api</artifactId>
         </dependency>
 
