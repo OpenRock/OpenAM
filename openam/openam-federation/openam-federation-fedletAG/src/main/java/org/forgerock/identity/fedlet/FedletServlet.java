@@ -16,19 +16,9 @@
  */
 package org.forgerock.identity.fedlet;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -42,54 +32,59 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.identity.saml2.assertion.*;
-import com.sun.identity.saml2.common.*;
-import com.sun.identity.fedlet.ag.*;
-
+import com.sun.identity.fedlet.ag.AssertionGen;
+import com.sun.identity.fedlet.ag.MetaDataParser;
+import com.sun.identity.saml2.common.SAML2Utils;
 
 /**
  * Servlet to handle the REST interface
- *
- * Based on apache felix org/apache/felix/http/base/internal/service/ResourceServlet.java
- *
+ * 
+ * Based on apache felix
+ * org/apache/felix/http/base/internal/service/ResourceServlet.java
+ * 
  * Changes and additions by
+ * 
  * @author laszlo
  * @author aegloff
  */
-@Component(name = "org.forgerock.identity.fedlet",
-        immediate = true,
+@Component(name = "org.forgerock.identity.fedlet", immediate = true,
         policy = ConfigurationPolicy.IGNORE)
-public final class FedletServlet
-        extends HttpServlet {
+public final class FedletServlet extends HttpServlet {
     final static Logger logger = LoggerFactory.getLogger(FedletServlet.class);
 
-    //TODO Decide where to put the web and the java resources. Now both are in root
-    //This requires to create new HttpContext from single bundle with that path,
+    // TODO Decide where to put the web and the java resources. Now both are in
+    // root
+    // This requires to create new HttpContext from single bundle with that
+    // path,
     private final String path = "/sf";
 
-    ServiceRegistration<HttpServlet> serviceRegistration = null;
+    @Reference
+    HttpService httpService;
+
+    ServiceRegistration serviceRegistration = null;
 
     @Activate
     protected void activate(ComponentContext context) throws ServletException, NamespaceException {
 
-        //context.getProperties().get("openam.fedlet.alias");
+        // context.getProperties().get("openam.fedlet.alias");
         String alias = path;
         // TODO Read these from configuraton
-        Dictionary<String,Object> properties = new Hashtable<String,Object>();
+        Dictionary<String, Object> properties = new Hashtable<String, Object>();
         properties.put("alias", alias);
-        properties.put("httpContext.id", "openidm");
-        properties.put("servletNames", "OpenIDM Fedlet");
+        properties.put("httpContext.id", "openam");
+        properties.put("servletNames", "OpenAM Fedlet");
 
         // All WebApplication elements must be registered with the same
         // BundleContext
-        serviceRegistration = context.getBundleContext()
-                        .registerService(HttpServlet.class, this, properties);
+        //serviceRegistration = context.getBundleContext().registerService(HttpServlet.class, this, properties);
+
+
+        httpService.registerServlet(alias, this, properties, httpService.createDefaultHttpContext());
         logger.debug("Registered fedlet servlet at {}", alias);
     }
 
@@ -98,26 +93,27 @@ public final class FedletServlet
         if (null != serviceRegistration) {
             serviceRegistration.unregister();
         }
+        httpService.unregister(path);
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
+            IOException {
         logger.debug("GET call on {}", req);
         AssertionGen ag = new AssertionGen();
 
-        String[] attrs = {"ATTR_UID"};
-        String[] vals =  {"VALUE"};
+        String[] attrs = { "ATTR_UID" };
+        String[] vals = { "VALUE" };
 
         vals[0] = req.getParameter("ATTR_UID");
 
-        String encodedResMsg = SAML2Utils.encodeForPOST(ag.getResponse(attrs,vals));
+        String encodedResMsg = SAML2Utils.encodeForPOST(ag.getResponse(attrs, vals));
         MetaDataParser lparser = new MetaDataParser();
         String relayState = null;
         String acsURL = lparser.getSPbaseUrl();
 
-        SAML2Utils.postToTarget(res, "SAMLResponse",
-                encodedResMsg, "RelayState", relayState, acsURL);
+        SAML2Utils.postToTarget(res, "SAMLResponse", encodedResMsg, "RelayState", relayState,
+                acsURL);
 
     }
 

@@ -90,7 +90,39 @@
                         <Embed-Dependency>
                             *;scope=compile|runtime;inline=false
                         </Embed-Dependency>
-                        <Import-Package>!com.sun.identity*,*</Import-Package>
+                        <Import-Package>
+                            !com.sun.identity*,
+                            com.ibm.security*;resolution:=optional,
+                            com.iplanet.dpro.session*;resolution:=optional,
+                            com.sun.appserv*;resolution:=optional,
+                            com.sun.enterprise*;resolution:=optional,
+                            com.sun.jersey*;resolution:=optional,
+                            com.sun.mirror*;resolution:=optional,
+                            com.sun.org.apache*;resolution:=optional,
+                            com.sun.relaxng*;resolution:=optional,
+                            com.sun.security*;resolution:=optional,
+                            com.sun.tools*;resolution:=optional,
+                            com.sun.xml.ws.spi*;resolution:=optional,
+                            javax.ejb*;resolution:=optional,
+                            javax.resource.spi*;resolution:=optional,
+                            javax.ws.rs*;resolution:=optional,
+                            javax.xml.messaging*;resolution:=optional,
+                            jp.co.swiftinc.relax*;resolution:=optional,
+                            org.apache.catalina*;resolution:=optional,
+                            org.apache.coyote*;resolution:=optional,
+                            org.apache.tomcat*;resolution:=optional,
+                            org.apache.tools*;resolution:=optional,
+                            org.bouncycastle*;resolution:=optional,
+                            org.dom4j*;resolution:=optional,
+                            org.forgerock.openam.utils*;resolution:=optional,
+                            org.owasp.esapi*;resolution:=optional,
+                            com.sun.javadoc*;resolution:=optional,
+                            org.json*;resolution:=optional,
+                            org.mozilla*;resolution:=optional,
+                            sun*;resolution:=optional,
+                            sun.io*;resolution:=optional,
+                            *
+                        </Import-Package>
                         <_failok>true</_failok>
                         <Private-Package>org.forgerock.identity.fedlet</Private-Package>
                     </instructions>
@@ -106,12 +138,17 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-saml2-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-saml2-schema</artifactId>
+            <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>
