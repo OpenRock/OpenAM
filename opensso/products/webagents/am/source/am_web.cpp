@@ -6727,6 +6727,17 @@ extern "C" AM_WEB_EXPORT const char *am_web_get_password_encryption_key(void* ag
     return (*agentConfigPtr)->password_encr_key;
 }
 
+extern "C" AM_WEB_EXPORT boolean_t
+am_web_is_remoteuser_header_disabled(void* agent_config) {
+    boolean_t status = B_FALSE;
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    if ((*agentConfigPtr)->remote_user_header_disable == 1) {
+        status = B_TRUE;
+    }
+    return status;
+}
+
 extern "C" AM_WEB_EXPORT am_status_t
 am_web_get_logout_url(char** logout_url, void* agent_config)
 {

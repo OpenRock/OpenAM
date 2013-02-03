@@ -182,6 +182,7 @@ SUNW_1.0 {
                 am_web_is_iis_logonuser_enabled;
                 am_web_is_password_header_enabled;
                 am_web_get_password_encryption_key;
+                am_web_is_remoteuser_header_disabled;
 
 	local:
 		*;

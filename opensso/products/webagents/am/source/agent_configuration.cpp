@@ -560,6 +560,14 @@ am_status_t AgentConfiguration::populateAgentProperties()
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->password_encr_key);
     }
     
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.remote_user_header.disable";
+        status = am_properties_get_boolean_with_default(this->properties,
+                parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->remote_user_header_disable));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->remote_user_header_disable ? "TRUE" : "FALSE"));
+    }
+    
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
         status = am_properties_get_boolean_with_default(this->properties,

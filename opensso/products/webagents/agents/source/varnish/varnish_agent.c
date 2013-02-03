@@ -236,7 +236,11 @@ static am_status_t content_read(void **args, char **rbuf) {
         }
         while (content_length) {
             bytes_read = content_length > buf_length ? buf_length : content_length;
+#ifdef VARNISH303
+            bytes_read = HTC_Read(r->s->wrk, r->s->htc, buf, bytes_read);
+#else
             bytes_read = HTC_Read(r->s->htc, buf, bytes_read);
+#endif
             if (bytes_read <= 0) {
                 sts = AM_FAILURE;
                 break;
@@ -316,12 +320,14 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
 static am_status_t set_user(void **args, const char *user) {
     const char *thisfunc = "set_user()";
     sess_record* r = NULL;
+    void *agent_config = NULL;
     am_status_t sts = AM_SUCCESS;
-    if (args == NULL || (r = (sess_record *) args[0]) == NULL) {
+    agent_config = am_web_get_agent_configuration();
+    if (args == NULL || (r = (sess_record *) args[0]) == NULL || agent_config == NULL) {
         am_web_log_error("%s: invalid argument passed", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
-        if (user != NULL)
+        if (user != NULL && !am_web_is_remoteuser_header_disabled(agent_config))
             apr_table_add(r->response.headers_out, "REMOTE_USER", user);
         sts = AM_SUCCESS;
     }
@@ -595,7 +601,6 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     sess_record* r = NULL;
     int ret = OK;
     void *args[] = {NULL, (void*) &ret};
-    socklen_t addr_len = sizeof (*cip);
     char client_ip[INET6_ADDRSTRLEN];
     char client_host[NI_MAXHOST];
     am_web_req_method_t method;
@@ -673,7 +678,14 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     }
 
     if (status == AM_SUCCESS) {
-        int err = getnameinfo((struct sockaddr*) cip, addr_len, client_ip, sizeof (client_ip), 0, 0, NI_NUMERICHOST);
+        socklen_t slen;
+        int err;
+        if (cip->ss_family == AF_INET) {
+            slen = sizeof (struct sockaddr_in);
+        } else {
+            slen = sizeof (struct sockaddr_in6);
+        }
+        err = getnameinfo((struct sockaddr *) cip, slen, client_ip, sizeof (client_ip), 0, 0, NI_NUMERICHOST);
         if (err == 0) {
             am_web_log_debug("%s: client host ip: %s", thisfunc, client_ip);
             req_params.client_ip = client_ip;
@@ -683,7 +695,7 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
             status = AM_FAILURE;
         }
         if (status == AM_SUCCESS) {
-            err = getnameinfo((struct sockaddr*) cip, addr_len, client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
+            err = getnameinfo((struct sockaddr *) cip, slen, client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
             if (err == 0) {
                 am_web_log_debug("%s: client host name: %s", thisfunc, client_host);
                 req_params.client_hostname = client_host;

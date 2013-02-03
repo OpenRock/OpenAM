@@ -202,6 +202,7 @@ public:
     int password_header_enabled;
     int iis_logonuser_enabled;
     const char *password_encr_key;
+    PRBool remote_user_header_disable;
     
     smap_t cond_login_url;
     
@@ -306,6 +307,7 @@ public:
         this->password_header_enabled = 0;
         this->iis_logonuser_enabled = 0;
         this->password_encr_key = NULL;
+        this->remote_user_header_disable = AM_FALSE;
 
     }
     

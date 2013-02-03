@@ -880,6 +880,9 @@ am_web_is_iis_logonuser_enabled(void* agent_config);
 AM_WEB_EXPORT boolean_t
 am_web_is_password_header_enabled(void* agent_config);
 
+AM_WEB_EXPORT boolean_t
+am_web_is_remoteuser_header_disabled(void* agent_config);
+
 AM_WEB_EXPORT const char *am_web_get_password_encryption_key(void* agent_config);
 
 AM_WEB_EXPORT am_status_t am_web_check_cookie_in_post(
