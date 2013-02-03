@@ -32,7 +32,7 @@
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.common.SystemConfigurationUtil;
-import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
+import com.sun.identity.saml2.plugins.JMQSAML2Repository;
 
 /**
  * <code>SAML2RepositoryFactory</code> represents the saml2 repository,
@@ -58,7 +58,7 @@ public class SAML2RepositoryFactory {
     /**
      * Cached Instance Reference to our SAML2 Token Repository
      */
-    private static volatile AMTokenSAML2Repository saml2Repository = null;
+    private static volatile JMQSAML2Repository saml2Repository = null;
 
     /**
      * Prevent Instantiation and only use as a functional static class.
@@ -67,35 +67,39 @@ public class SAML2RepositoryFactory {
     }
 
     /**
-     * @return the instance of AMTokenSAML2Repository
-     * @throws SAML2Exception when failed to instantiate AMTokenSAML2Repository
+     * @return the instance of JMQSAML2Repository
+     * @throws SAML2Exception when failed to instantiate JMQSAML2Repository
      */
-    public static AMTokenSAML2Repository getInstance()
+    public static JMQSAML2Repository getInstance()
             throws SAML2Exception {
         if (saml2Repository == null) {
-            if (CTS_SAML2_REPOSITORY_CLASS_NAME.equals(DEFAULT_REPOSITORY_CLASS)) {
-                saml2Repository = SAML2CTSPersistentStore.getInstance();
-            } else {
-                // Here we have an the default or customer / client implementation, for SAML2 Persistence.
-                // So simply Instantiate the specified Implementation.
-                try {
-                    saml2Repository = (AMTokenSAML2Repository) Class.forName(
-                            CTS_SAML2_REPOSITORY_CLASS_NAME).newInstance();
-                } catch (Exception e) {
-                    SAML2Utils.debug.error("Exception occurred attempting to instantiate " +
-                            "AMTokenSAML2Repository Implementation!", e);
-                    saml2Repository = null;
-                }
+            try {
+                saml2Repository = (JMQSAML2Repository) Class.forName(
+                        CTS_SAML2_REPOSITORY_CLASS_NAME).newInstance();
+            } catch (Exception e) {
+                SAML2Utils.debug.error("Exception occurred attempting to instantiate " +
+                        "JMQSAML2Repository Implementation!", e);
+                saml2Repository = null;
             }
-            // Determine if we were able to obtain the Instance for our AMTokenSAML2Repository.
+        }
+        if (saml2Repository == null) {
+            try {
+                saml2Repository = (JMQSAML2Repository) Class.forName(
+                        DEPRECATED_JMQ_REPOSITORY_CLASS).newInstance();
+            } catch (Exception e) {
+                SAML2Utils.debug.error("Exception occurred attempting to instantiate " +
+                        "JMQSAML2Repository Implementation!", e);
+                saml2Repository = null;
+            }
+        }
+        // Determine if we were able to obtain the Instance for our JMQSAML2Repository.
             if (saml2Repository == null)
             {
                 SAML2Utils.debug.error("Failed to instantiate " +
-                        "AMTokenSAML2Repository Implementation using "+CTS_SAML2_REPOSITORY_CLASS_NAME+", very bad!");
+                        "JMQSAML2Repository Implementation using "+CTS_SAML2_REPOSITORY_CLASS_NAME+", very bad!");
                 throw new SAML2Exception(
                         SAML2Utils.bundle.getString("nullSAML2Repository"));
             }
-        } // End of Check for null saml2Repository.
         // Return Instance.
         return saml2Repository;
     }

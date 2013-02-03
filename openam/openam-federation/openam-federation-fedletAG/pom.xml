@@ -37,7 +37,7 @@
 
     <properties>
         <bundle.symbolicName>fedletAG</bundle.symbolicName>
-        <bundle.namespace>fedletAG</bundle.namespace>
+        <bundle.namespace></bundle.namespace>
     </properties>
 
 

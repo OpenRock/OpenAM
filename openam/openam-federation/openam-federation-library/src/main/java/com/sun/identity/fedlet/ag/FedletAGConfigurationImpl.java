@@ -163,9 +163,6 @@ public class FedletAGConfigurationImpl implements ConfigurationInstance {
         if (metaXML == null) {
             return;
         }
-
-        this.getClass().getClassLoader().
-
         metaXML = workaroundAbstractRoleDescriptor(metaXML);
         String entityId = getEntityID(metaXML);
         if (entityId == null) {
