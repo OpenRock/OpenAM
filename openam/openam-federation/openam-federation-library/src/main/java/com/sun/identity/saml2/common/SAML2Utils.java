@@ -326,6 +326,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 if (SAML2Utils.isSAML2FailOverEnabled()) {
                     // Attempt to read AuthnRequestInfoCopy from SAML2 repository
                     AuthnRequestInfoCopy reqInfoCopy = null;
+/*
                     try {
                          reqInfoCopy =
                             (AuthnRequestInfoCopy) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(inRespToResp);
@@ -333,6 +334,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                         debug.error(method + "AuthnRequestInfoCopy"
                                 + " unable to retrieve from SAML2 repository for inResponseTo: " + inRespToResp);
                     }
+*/
                     if (reqInfoCopy != null) {
                         // Get back the AuthnRequestInfo
                         reqInfo = reqInfoCopy.getAuthnRequestInfo(httpRequest, httpResponse);
@@ -618,6 +620,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 } 
                
                 if ((!foundAssertion) && SAML2Utils.isSAML2FailOverEnabled()) {
+/*
                     try {
                         if ((SAML2RepositoryFactory.getInstance().retrieveSAML2Token(assertionID)) != null) {
                             foundAssertion = true; 
@@ -628,7 +631,8 @@ public class SAML2Utils extends SAML2SDKUtils {
                             "AMTokenSAML2Repository.");
                         }        
                     }
-                }    
+*/
+                }
                 if (foundAssertion) {
                     SAML2Utils.debug.error("Bearer Assertion is one time " +
                         "use only!"); 
