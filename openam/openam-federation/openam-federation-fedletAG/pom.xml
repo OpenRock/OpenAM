@@ -119,10 +119,27 @@
                             com.sun.javadoc*;resolution:=optional,
                             org.json*;resolution:=optional,
                             org.mozilla*;resolution:=optional,
-                            sun*;resolution:=optional,
+                            org.relaxng.datatype*;resolution:=optional,
                             sun.io*;resolution:=optional,
+                            org.iso_relax.verifier*;resolution:=optional,
+                            com.sun.msv*;resolution:=optional,
+                            com.sun.xml.bind*;resolution:=optional,
+                            com.sun.xml.rpc*;resolution:=optional,
+                            org.apache.xerces*;resolution:=optional,
+                            org.apache.xml*;resolution:=optional,
+                            org.apache.xpath*;resolution:=optional,
+                            org.w3c.dom.traversal*;resolution:=optional,
+                            sun.security*;resolution:=optional,
+                            com.sun.xml.xsom*;resolution:=optional,
+                            com.sun.net.httpserver*;resolution:=optional,
+                            javax.annotation*;resolution:=optional,
+                            javax.security.auth.message*;resolution:=optional,
+                            sun.nio.cs*;resolution:=optional,
+                            javax.xml.rpc*;resolution:=optional,
+                            javax.xml.registry*;resolution:=optional,
                             *
                         </Import-Package>
+                        <Include-Resource>{maven-resources}</Include-Resource>
                         <_failok>true</_failok>
                         <Private-Package>org.forgerock.identity.fedlet</Private-Package>
                     </instructions>
@@ -163,17 +180,17 @@
 
         <dependency>
             <groupId>external</groupId>
+            <artifactId>webservices-rt</artifactId>
+        </dependency>
+
+        <!--dependency>
+            <groupId>external</groupId>
             <artifactId>webservices-extra</artifactId>
         </dependency>
 
         <dependency>
             <groupId>external</groupId>
             <artifactId>webservices-extra-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-rt</artifactId>
         </dependency>
 
         <dependency>
@@ -204,7 +221,7 @@
         <dependency>
             <groupId>xerces-J</groupId>
             <artifactId>xml-serializer</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>net.java.dev.msv.datatype.xsd</groupId>
