@@ -30,14 +30,15 @@
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam-schema</artifactId>
+        <artifactId>oschema</artifactId>
         <version>10.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM WS Federation Schema</name>
-    <description>OpenAM Schemata Components</description>
-    <artifactId>openam-wsfederation-schema</artifactId>
+    <name>OpenAM SAML2 Schema</name>
+    <description>OpenAM Schemata Components 
+    </description>
+    <artifactId>saml2-schema</artifactId>
     <packaging>jar</packaging>
 
     <!-- Build -->
@@ -64,7 +65,7 @@
                 <version>1.3.1</version>
                 <executions>
                     <execution>
-                        <id>xjc-wsfederation</id>
+                        <id>xjc-saml2</id>
                         <goals>
                             <goal>xjc</goal>
                         </goals>
@@ -72,9 +73,21 @@
                </executions>
                <configuration>
                     <extension>true</extension>
+                    <schemaFiles>
+						entity-config-schema.xsd,
+						saml-schema-assertion-2.0.xsd,
+						saml-schema-metadata-2.0.xsd,
+						schema.xsd,
+						sstc-saml-metadata-ext-query.xsd,
+						sstc-saml-metadata-x509-query.xsd,
+						sstc-metadata-attr.xsd,
+						sstc-saml-attribute-ext.xsd,
+						sstc-saml-idp-discovery.xsd
+                    </schemaFiles>
                </configuration>
            </plugin>
 -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -98,11 +111,13 @@
                             <Version>${project.version}</Version>
                             <Create-On>${maven.build.timestamp}</Create-On>
                             <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
+                            <!-- TODO Add License to Manifest -->
                             <License />
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
+
         </plugins>
     
         <resources>

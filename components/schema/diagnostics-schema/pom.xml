@@ -30,14 +30,14 @@
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam-schema</artifactId>
+        <artifactId>schema</artifactId>
         <version>10.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
     <name>OpenAM Diagnostics Schema</name>
     <description>OpenAM Schemata Components</description>
-    <artifactId>openam-diagnostics-schema</artifactId>
+    <artifactId>diagnostics-schema</artifactId>
     <packaging>jar</packaging>
 
     <!-- Build -->

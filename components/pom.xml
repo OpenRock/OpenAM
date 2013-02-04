@@ -29,29 +29,105 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam</artifactId>
-        <version>10.2.0-SNAPSHOT</version>
+        <groupId>org.forgerock</groupId>
+        <artifactId>forgerock-parent</artifactId>
+        <version>1.1.0</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Federation</name>
-    <description>OpenAM Federation</description>
-    <artifactId>openam-federation</artifactId>
+    <name>Federation Component Project</name>
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>components</artifactId>
+    <version>10.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <!-- Sub-Parent Project Projects -->
+    <description>Federation Component</description>
+    <inceptionYear>2010</inceptionYear>
+
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.org</url>
+    </organization>
+    <url>http://www.forgerock.org</url>
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>CDDL-1.0</name>
+            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <comments>Common Development and Distribution License (CDDL) 1.0.
+                This license applies to OpenAM source code as indicated in the
+                sources themselves.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>CC BY-NC-ND 3.0</name>
+            <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+            <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+                Unported. This license applies to the site content, and to the
+                documentation as indicated in the documentation source code.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- Component Properties -->
     <properties>
+        <!-- **************************************************************** -->
+        <maven.build.timestamp.format>yyyy-MMM-dd HH:mm:ss</maven.build.timestamp.format>
+        <!-- **************************************************************** -->
+
         <!-- Java Properties -->
+
+        <java.source.version>1.5</java.source.version>
+        <!-- Backed off from 1.6 -->
+
+        <java.target.version>1.5</java.target.version>
+        <!-- Backed off from 1.6 -->
+
+        <!-- Surefire Argument Line -->
+        <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
+
+        <!-- JavaDoc Setting Properties -->
+        <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
+        <!-- Shade plugin setting for ClientSDK build -->
+        <generate.clientsdk.sources>false</generate.clientsdk.sources>
+
+        <!-- Project Encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Product Properties File Inclusion during Build -->
+        <openam.properties>openam.properties</openam.properties>
+
+        <!-- Version Properties -->
+        <opendj.server.version>2.4.6</opendj.server.version>
+        <opendj.sdk.version>3.0.0-OPENAMp3</opendj.sdk.version>
+
+        <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
+        <commons.json-resource.version>1.2.2</commons.json-resource.version>
+        <commons.json-patch.version>1.0.0</commons.json-patch.version>
+        <forgerock.json.version>2.0.0-Xpress2</forgerock.json.version>
+
+        <restlet.version>2.1.1</restlet.version>
+        <xercesj.version>2.11.0</xercesj.version>
+
+        <!--  Project web site -->
+        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
         <openam.federation.java.source.version>1.5</openam.federation.java.source.version>
         <openam.federation.java.target.version>1.5</openam.federation.java.target.version>
+
     </properties>
     <!-- Child Modules -->
     <modules>
         <!-- OpenAM Federation Modules -->
-        <module>openam-federation-library</module>
-        <module>OpenFM</module>
-        <module>openam-federation-fedletAG</module>
+        <module>schema</module>
+        <module>federation-library</module>
+        <module>federation-fedletAG</module>
     </modules>
 
     <!-- Build -->
