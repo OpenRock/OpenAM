@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>openam-federation-fedletAG-war</id>
+    <formats>
+        <format>war</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <!-- Library Dependency -->
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>WEB-INF/lib</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam:openam-federation-library</include>
+                <include>org.forgerock.openam:openam-jaxrpc-schema</include>
+                <include>org.forgerock.openam:openam-saml2-schema</include>
+                <include>org.forgerock.openam:openam-shared</include>
+                <include>external:esapiport</include>
+                <include>external:webservices-api</include>
+                <include>external:webservices-extra</include>
+                <include>external:webservices-extra-api</include>
+                <include>external:webservices-rt</include>
+                <include>com.sun.tools.ws:webservices-tools</include>
+                <include>xalan:xalan</include>
+                <include>xerces-J:xercesImpl</include>
+                <include>xerces-J:xml-apis</include>
+                <include>xerces-J:xml-resolver</include>
+                <include>xerces-J:xml-serializer</include>
+                <include>xml-security:xmlsec</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+
+    <!-- File Groupings -->
+    <fileSets>
+        <fileSet>
+            <outputDirectory>conf</outputDirectory>
+            <directory>${project.basedir}/src/main/webapp/conf</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory></outputDirectory>
+            <directory>${project.basedir}/src/main/webapp/</directory>
+            <includes>
+                <include>index.jsp</include>
+                <include>dispatch.jsp</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/</directory>
+            <includes>
+                <include>libSAML.properties</include>
+                <include>libSAML2.properties</include>
+                <include>libSAML2Meta.properties</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+
+    <!-- Single Files -->
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/webapp/WEB-INF/web.xml</source>
+            <outputDirectory>WEB-INF</outputDirectory>
+            <destName>web.xml</destName>
+        </file>
+    </files>
+</assembly>
+

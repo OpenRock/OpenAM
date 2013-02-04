@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EntityConfig entityID="https://saml.salesforce.com" hosted="false" xmlns="urn:sun:fm:SAML:2.0:entityconfig">
+    <SPSSOConfig>
+        <Attribute name="cotlist">
+            <Value>Cloud</Value>
+        </Attribute>
+        <Attribute name="attributeMap">
+            <Value>ATTR_UID=mail</Value>
+        </Attribute>
+    </SPSSOConfig>
+</EntityConfig>

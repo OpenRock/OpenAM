@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+    *
+    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    *
+    * The contents of this file are subject to the terms
+    * of the Common Development and Distribution License
+    * (the License). You may not use this file except in
+    * compliance with the License.
+    *
+    * You can obtain a copy of the License at
+    * http://forgerock.org/license/CDDLv1.0.html
+    * See the License for the specific language governing
+    * permission and limitations under the License.
+    *
+    * When distributing Covered Code, include this CDDL
+    * Header Notice in each file and include the License file
+    * at http://forgerock.org/license/CDDLv1.0.html
+    * If applicable, add the following below the CDDL Header,
+    * with the fields enclosed by brackets [] replaced by
+    * your own identifying information:
+    * "Portions Copyrighted [year] [name of copyright owner]"
+    *
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam-federation</artifactId>
+        <version>10.2.0-SNAPSHOT</version>
+    </parent>
+
+    <name>OpenAM Federation Fedlet</name>
+    <description>OpenAM Federation Fedlet AG.</description>
+    <artifactId>openam-federation-fedletAG</artifactId>
+    <packaging>bundle</packaging>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+
+            <!-- Pre-Packaging step for Zip Elements. -->
+
+            <!--plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>fedlet-assembly_1</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>openam-federation-fedletAG-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <descriptors>
+                                <descriptor>src/main/assembly/openAMFedletAG_WAR_Assembly_Descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin-->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>1.7.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <!-- http://felix.apache.org/site/apache-felix-maven-bundle-plugin-bnd.html -->
+                        <Embed-Dependency>
+                            *;scope=compile|runtime;inline=false
+                        </Embed-Dependency>
+                        <Import-Package>
+                            !com.sun.identity*,
+                            com.ibm.security*;resolution:=optional,
+                            com.iplanet.dpro.session*;resolution:=optional,
+                            com.sun.appserv*;resolution:=optional,
+                            com.sun.enterprise*;resolution:=optional,
+                            com.sun.jersey*;resolution:=optional,
+                            com.sun.mirror*;resolution:=optional,
+                            com.sun.org.apache*;resolution:=optional,
+                            com.sun.relaxng*;resolution:=optional,
+                            com.sun.security*;resolution:=optional,
+                            com.sun.tools*;resolution:=optional,
+                            com.sun.xml.ws.spi*;resolution:=optional,
+                            javax.ejb*;resolution:=optional,
+                            javax.resource.spi*;resolution:=optional,
+                            javax.ws.rs*;resolution:=optional,
+                            javax.xml.messaging*;resolution:=optional,
+                            jp.co.swiftinc.relax*;resolution:=optional,
+                            org.apache.catalina*;resolution:=optional,
+                            org.apache.coyote*;resolution:=optional,
+                            org.apache.tomcat*;resolution:=optional,
+                            org.apache.tools*;resolution:=optional,
+                            org.bouncycastle*;resolution:=optional,
+                            org.dom4j*;resolution:=optional,
+                            org.forgerock.openam.utils*;resolution:=optional,
+                            org.owasp.esapi*;resolution:=optional,
+                            com.sun.javadoc*;resolution:=optional,
+                            org.json*;resolution:=optional,
+                            org.mozilla*;resolution:=optional,
+                            org.relaxng.datatype*;resolution:=optional,
+                            sun.io*;resolution:=optional,
+                            org.iso_relax.verifier*;resolution:=optional,
+                            com.sun.msv*;resolution:=optional,
+                            com.sun.xml.bind*;resolution:=optional,
+                            com.sun.xml.rpc*;resolution:=optional,
+                            org.apache.xerces*;resolution:=optional,
+                            org.apache.xml*;resolution:=optional,
+                            org.apache.xpath*;resolution:=optional,
+                            org.w3c.dom.traversal*;resolution:=optional,
+                            sun.security*;resolution:=optional,
+                            com.sun.xml.xsom*;resolution:=optional,
+                            com.sun.net.httpserver*;resolution:=optional,
+                            javax.annotation*;resolution:=optional,
+                            javax.security.auth.message*;resolution:=optional,
+                            sun.nio.cs*;resolution:=optional,
+                            javax.xml.rpc*;resolution:=optional,
+                            javax.xml.registry*;resolution:=optional,
+                            *
+                        </Import-Package>
+                        <Include-Resource>{maven-resources}</Include-Resource>
+                        <_failok>true</_failok>
+                        <Private-Package>org.forgerock.identity.fedlet</Private-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-saml2-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-federation-library</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-rt</artifactId>
+        </dependency>
+
+        <!--dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-extra</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-extra-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.tools.ws</groupId>
+            <artifactId>webservices-tools</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
+        </dependency-->
+
+        <dependency>
+            <groupId>net.java.dev.msv.datatype.xsd</groupId>
+            <artifactId>xsdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.annotations</artifactId>
+            <version>1.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>1.4.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.foundation</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>4.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+
+
+    </dependencies>
+</project>
+
