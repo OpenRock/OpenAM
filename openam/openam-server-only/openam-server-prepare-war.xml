@@ -155,7 +155,7 @@
             </fileset>
         </copy>
 
-        <!-- Align in fedlet -->
+        <!-- Align in fedlet >
         <mkdir dir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
         <copy todir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/"
               filtering="false">
@@ -171,7 +171,7 @@
             <fileset dir="src/main/resources">
                 <include name="FederationConfig.properties"/>
             </fileset>
-        </copy>
+        </copy-->
 
         <!-- Align in auth -->
         <mkdir dir="${openam.temp.target}/config/auth"/>

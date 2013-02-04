@@ -14,7 +14,6 @@ import java.util.List;
 
 
 import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.sm.model.AMRecord;
 
 import java.util.List;
 

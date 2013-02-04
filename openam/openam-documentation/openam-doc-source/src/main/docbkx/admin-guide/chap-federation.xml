@@ -302,8 +302,8 @@
    </step>
    <step>
     <para>Enter the URL where the service provider will deploy the fedlet you
-    create, and name the fedlet. If you create multiple fedlets, use the URL
-    as a unique name that shows who has deployed the fedlet.</para>
+        create, and name the com.sun.identity.fedlet. If you create multiple fedlets, use the URL
+        as a unique name that shocom.sun.identity.fedlet.fedlet has deployed the fedlet.</para>
    </step>
    <step>
     <para>For the attributes you share, map service provider attribute names
