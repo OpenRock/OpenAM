@@ -81,22 +81,22 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-xacml3-schema</artifactId>
+            <artifactId>xacml3-schema</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-saml2-schema</artifactId>
+            <artifactId>saml2-schema</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-wsfederation-schema</artifactId>
+            <artifactId>wsfederation-schema</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-liberty-schema</artifactId>
+            <artifactId>liberty-schema</artifactId>
         </dependency>
 
         <dependency>

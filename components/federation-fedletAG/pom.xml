@@ -36,7 +36,7 @@
 
     <name>OpenAM Federation Fedlet</name>
     <description>OpenAM Federation Fedlet AG.</description>
-    <artifactId>openam-federation-fedletAG</artifactId>
+    <artifactId>federation-fedletAG</artifactId>
     <packaging>bundle</packaging>
 
     <!-- Build -->
@@ -155,17 +155,17 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-saml2-schema</artifactId>
+            <artifactId>saml2-schema</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-federation-library</artifactId>
+            <artifactId>federation-library</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-shared</artifactId>
+            <artifactId>shared</artifactId>
         </dependency>
 
         <dependency>

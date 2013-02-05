@@ -57,6 +57,7 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

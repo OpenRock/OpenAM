@@ -11,6 +11,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="openam-shared" />
+    <orderEntry type="library" name="Maven: external:jss4:2007-08-11" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
   </component>
 </module>
 
