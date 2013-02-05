@@ -60,6 +60,25 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
     /**
+     * Default Response
+     */
+    public static final String DEFAULT_RESPONSE = XML_HEADER + "<xacml-ctx:response " +
+            "xmlns:xacml-ctx=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\">" +
+            "</xacml-ctx:response>";
+
+    /**
+     * Current Standards Schema Resource Name.
+     */
+    public static final String xacmlCoreSchemaResourceName =
+            "xsd/xacml-core-v3-schema-wd-17.xsd";
+
+    /**
+     * XML Core Schema Resource Name.
+     */
+    public static final String xmlCoreSchemaResourceName =
+            "xsd/xml.xsd";
+
+    /**
      * RESTful XACML 3.0 Name Space Definitions.
      */
     public static final String URN_HTTP = "urn:oasis:names:tc:xacml:3.0:profile:rest:http";

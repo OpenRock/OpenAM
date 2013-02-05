@@ -27,6 +27,8 @@ package org.forgerock.identity.openam.xacml.model;
 
 import org.forgerock.identity.openam.xacml.commons.ContentType;
 
+import java.lang.reflect.Field;
+
 /**
  * XACMLRequestInformation
  *
@@ -83,6 +85,132 @@ public class XACMLRequestInformation {
      */
     private Object authenticationContent;
     /**
+     * XACMLAuthzDecisionQuery Fields.
+     *
+     * If this is an XACMLAuthzDecisionQuery, then the following fields
+     * will be populated during Parsing of the XACMLAuthzDecisionQuery wrapper Document.
+     *
+     * These fields are:
+     *      &lt;attribute name="ID" type="ID" use="required"/>
+     *          example: ID="ID_1e469be0-ecc4-11da-8ad9-0800200c9a66"
+     *      &lt;attribute name="Version" type="string" use="required"/>
+     *          example: Version="2.0"
+     *      &lt;attribute name="IssueInstant" type="dateTime" use="required"/>
+     *          example: IssueInstant="2001-12-17T09:30:47.0Z"
+     *      &lt;attribute name="Destination" type="anyURI" use="optional"/>
+     *  	&lt;attribute name="Consent" type="anyURI" use="optional"/>
+     *
+     *
+     */
+    public class XACMLAuthzDecisionQuery {
+        private static final String ID_NAME = "id";
+        private String id;
+
+        private static final String VERSION_NAME = "version";
+        private String version;
+
+        private static final String ISSUE_INSTANT_NAME = "issueinstant";
+        private String issueInstant;
+
+        private static final String DESTINATION_NAME = "destination";
+        private String destination;
+
+        private static final String CONSTENT_NAME = "consent";
+        private String consent;
+
+        XACMLAuthzDecisionQuery() {
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+
+        public String getIssueInstant() {
+            return issueInstant;
+        }
+
+        public void setIssueInstant(String issueInstant) {
+            this.issueInstant = issueInstant;
+        }
+
+        public String getDestination() {
+            return destination;
+        }
+
+        public void setDestination(String destination) {
+            this.destination = destination;
+        }
+
+        public String getConsent() {
+            return consent;
+        }
+
+        public void setConsent(String consent) {
+            this.consent = consent;
+        }
+
+        /**
+         * Set Field By Name, using Reflection.
+         *
+         * @param nodeName
+         * @param nodeValue
+         * @return boolean - indicator true if field set correctly, otherwise false.
+         */
+        public boolean setByName(final String nodeName, final String nodeValue) {
+            if ((nodeName == null) || (nodeName.isEmpty()) || (nodeValue == null) || (nodeValue.isEmpty())) {
+                return false;
+            }
+            if (nodeName.toLowerCase().contains(ID_NAME)) {
+                this.setId(nodeValue);
+                return true;
+            } else if (nodeName.toLowerCase().contains(VERSION_NAME)) {
+                this.setVersion(nodeValue);
+                return true;
+            } else if (nodeName.toLowerCase().contains(DESTINATION_NAME)) {
+                this.setDestination(nodeValue);
+                return true;
+            } else if (nodeName.toLowerCase().contains(CONSTENT_NAME)) {
+                this.setConsent(nodeValue);
+                return true;
+            } else if (nodeName.toLowerCase().contains(ISSUE_INSTANT_NAME)) {
+                this.setIssueInstant(nodeValue);
+                return true;
+            }
+            // Indicate Field Not Set.
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer();
+            sb.append("XACMLAuthzDecisionQuery");
+            sb.append("{id='").append(id).append('\'');
+            sb.append(", version='").append(version).append('\'');
+            sb.append(", issueInstant='").append(issueInstant).append('\'');
+            sb.append(", destination='").append(destination).append('\'');
+            sb.append(", consent='").append(consent).append('\'');
+            sb.append('}');
+            return sb.toString();
+        }
+    } // End of Inner Class.
+
+    /**
+     * Wrapper Object for the XACMLAuthzDecisionQuery Element Attributes
+     */
+    XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery;
+     /**
      * Response Field for Request,
      * Digest Valid Indicator.
      * Can be False, if a XACMLAuthzDecisionQuery is performed.
@@ -111,6 +239,7 @@ public class XACMLRequestInformation {
               this.metaAlias = metaAlias;
               this.pdpEntityID = pdpEntityID;
               this.realm = realm;
+              this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
     }
 
 
@@ -183,6 +312,14 @@ public class XACMLRequestInformation {
         return authenticated;
     }
 
+    public XACMLAuthzDecisionQuery getXacmlAuthzDecisionQuery() {
+        return xacmlAuthzDecisionQuery;
+    }
+
+    public void setXacmlAuthzDecisionQuery(XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery) {
+        this.xacmlAuthzDecisionQuery = xacmlAuthzDecisionQuery;
+    }
+
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
     }
@@ -238,6 +375,7 @@ public class XACMLRequestInformation {
         sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
         sb.append(", authenticated=").append(authenticated);
         sb.append(", authenticationContent=").append(authenticationContent);
+        sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
         sb.append(", digestValid=").append(digestValid);
         sb.append(", xacmlStringResponse='").append(xacmlStringResponse).append('\'');
         sb.append('}');

@@ -27,26 +27,10 @@ package org.forgerock.identity.openam.xacml.services;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 
-import com.sun.identity.saml.xmlsig.KeyProvider;
-import com.sun.identity.saml2.assertion.Assertion;
-import com.sun.identity.saml2.assertion.AssertionFactory;
-import com.sun.identity.saml2.assertion.EncryptedAssertion;
-import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.jaxb.metadata.XACMLAuthzDecisionQueryDescriptorElement;
-import com.sun.identity.saml2.key.EncInfo;
-import com.sun.identity.saml2.key.KeyUtil;
-import com.sun.identity.saml2.logging.LogUtil;
-import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.protocol.RequestAbstract;
-import com.sun.identity.saml2.protocol.Response;
-import com.sun.identity.saml2.soapbinding.RequestHandler;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.xacml.client.XACMLRequestProcessor;
 import com.sun.identity.xacml.common.XACMLException;
-import com.sun.identity.xacml.context.ContextFactory;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.identity.openam.xacml.commons.AuthenticationDigest;
@@ -56,9 +40,9 @@ import org.forgerock.identity.openam.xacml.commons.XACML3Utils;
 import org.forgerock.identity.openam.xacml.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.model.XACMLRequestInformation;
 import org.forgerock.identity.openam.xacml.resources.XacmlHomeResource;
+import org.forgerock.identity.openam.xacml.resources.XacmlPDPResource;
 import org.json.JSONException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -73,31 +57,28 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.*;
-import javax.xml.soap.MimeHeaders;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.*;
 import java.io.*;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /**
  * XACML Resource Router
  * <p/>
- * Provides main end-point for all XACML requests, either XML or JSON based over HTTP/HTTPS REST based protocol flow.
+ * Provides main end-point for all XACML v3.0 requests,
+ * either XML or JSON based over HTTP/HTTPS REST based protocol flow.
+ *
  * This ForgeRock developed XACML Resource Router complies with the following OASIS Specifications:
- * <p/>
- * <p/>
- * <p/>
- * Some content of this code was originally used from the @see com.sun.identity.saml2.soapbinding.QueryHandlerServlet.
+ * <ul/>
+ * <ul/>
+ * <ul/>
  *
  * @author Jeff.Schenk@forgerock.com
  */
@@ -108,22 +89,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     protected static final String RESOURCE_BUNDLE_NAME = "amXACML";
     protected static ResourceBundle resourceBundle =
             com.sun.identity.shared.locale.Locale.getInstallResourceBundle(RESOURCE_BUNDLE_NAME);
-
-
-    // TODO Fix this constant.
-
-    private static final String schemaFileName =
-            "/Users/jaschenk/MyWorkspaces/OPENAM/branches/openam_10.1.0_xacml3_JAS/openam/openam-schema/openam-xacml3-schema/src/main/resources/xsd/xacml-core-v3-schema-wd-17.xsd";
-
-
-    private static final String x = "<order xmlns=\042urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\042" +
-            " xmlns:xsi=\042http://www.w3.org/2001/XMLSchema-instance\042" +
-            " xsi:schemaLocation=\042urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 file:" + schemaFileName + "\042>";
-
-
-    private static final String DEFAULT_RESPONSE = XML_HEADER + "<xacml-ctx:response xmlns:xacml-ctx=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\">" +
-            "</xacml-ctx:response>";
-
     /**
      * Attribute that specifies maximum content length for SAML request in
      * <code>AMConfig.properties</code> file.
@@ -167,7 +132,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static XACMLRequestProcessor xacmlRequestProcessor;
 
     /**
-     * XACML Schema for Validation.
+     * XACML Schemata for Validation.
      */
     private static Schema xacmlSchema;
 
@@ -211,12 +176,20 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         try {
             SchemaFactory constraintFactory =
                     SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            // TODO Make this a Static variable to pick up xsd as a resource from a JAR.
-            Source xacmlSchemaSource = new StreamSource(
-                    new File(schemaFileName));
-            xacmlSchema = constraintFactory.newSchema(xacmlSchemaSource);
+            // Create Streams for every applicable schema.
+            InputStream xmlCoreSchemaResourceContentStream = getResourceContentStream(xmlCoreSchemaResourceName);
+            InputStream resourceContentStream = getResourceContentStream(xacmlCoreSchemaResourceName);
+            // Create the schema object from our Input Source Streams.
+            if ((xmlCoreSchemaResourceContentStream != null) && (resourceContentStream != null)) {
+                xacmlSchema = constraintFactory.newSchema(new StreamSource[]{new StreamSource
+                        (xmlCoreSchemaResourceContentStream), new StreamSource(resourceContentStream)});
+                xmlCoreSchemaResourceContentStream.close();
+                resourceContentStream.close();
+            }
         } catch (SAXException se) {
             debug.error("SAX Exception obtaining XACML Schema for Validation,", se);
+        } catch (IOException ioe) {
+            debug.error("IO Exception obtaining XACML Schema for Validation,", ioe);
         }
         // ***************************************************
         // Ensure we are ok and have necessary assets to run.
@@ -531,14 +504,15 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 xacmlRequestInformation.setDigestValid(true);
             }
         } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
-            // ***********************************************************
-            // if no XACML saml Wrapper,
+            // **************************************************************
+            // if no XACML saml Wrapper, then reject request as UnAuthorized.
+            //
             // We only support WWW Authenticate with Schemes:
             // + Digest, Basic Authentication is not supported per OASIS  Specification.
             // Or Content whose contents contains a wrapper in either XML or JSON.
             // + XACMLAuthzDecisionQuery Wrapper Of Request.
             //
-            // This Starts the Authorization Digest Flow...
+            // This will begin the Authorization Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
             return;
         }
@@ -645,32 +619,32 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         /**
 
-        // Check our query string.
-        String queryParam = request.getQueryString();
+         // Check our query string.
+         String queryParam = request.getQueryString();
 
-        // Formulate Response.
-        StringBuilder xacmlStringBuilderResponse = new StringBuilder();
-        if ((request.getContentType() == ContentType.NONE.applicationType()) ||
-                (request.getContentType().equalsIgnoreCase(ContentType.JSON_HOME.applicationType())) ||
-                (request.getContentType().equalsIgnoreCase(ContentType.JSON.applicationType()))) {
-            try {
-                xacmlStringBuilderResponse.append(XacmlHomeResource.getHome(xacmlRequestInformation, request)); // TODO -- Cache the Default Home JSON Document Object.
-            } catch (JSONException jsonException) {
-                // TODO
-            }
-        } else {
-            // Formulate the Home Document in XML.
-            // TODO
+         // Formulate Response.
+         StringBuilder xacmlStringBuilderResponse = new StringBuilder();
+         if ((request.getContentType() == ContentType.NONE.applicationType()) ||
+         (request.getContentType().equalsIgnoreCase(ContentType.JSON_HOME.applicationType())) ||
+         (request.getContentType().equalsIgnoreCase(ContentType.JSON.applicationType()))) {
+         try {
+         xacmlStringBuilderResponse.append(XACMLHomeResource.getHome(xacmlRequestInformation, request)); // TODO -- Cache the Default Home JSON Document Object.
+         } catch (JSONException jsonException) {
+         // TODO
+         }
+         } else {
+         // Formulate the Home Document in XML.
+         // TODO
 
-            xacmlStringBuilderResponse.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
-            xacmlStringBuilderResponse.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
-            xacmlStringBuilderResponse.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
-            xacmlStringBuilderResponse.append("<atom:link href=\042/authorization/pdp\042/>");  // TODO Static?
-            xacmlStringBuilderResponse.append("</resource>");
-            xacmlStringBuilderResponse.append(" </resources>");
-        }
+         xacmlStringBuilderResponse.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
+         xacmlStringBuilderResponse.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
+         xacmlStringBuilderResponse.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
+         xacmlStringBuilderResponse.append("<atom:link href=\042/authorization/pdp\042/>");  // TODO Static?
+         xacmlStringBuilderResponse.append("</resource>");
+         xacmlStringBuilderResponse.append(" </resources>");
+         }
 
-        **/
+         **/
         // TODO Determine if there are any other Get Request Types we need to deal with,
         // TODO otherwise pass along.
 
@@ -726,8 +700,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Obtain our Request Content Data.
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty()) &&
-                (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
+            (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
             AuthenticationDigest authenticationDigestResponse =
                     preAuthenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
                             xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
@@ -754,6 +727,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Check for Valid Digest Request.
         if (xacmlRequestInformation.isDigestValid()) {
             // TODO -- Continue Validation of UserId and Password.
+
+            // If Validated, indicated Authenticated Request.
+            xacmlRequestInformation.setAuthenticated(true);
         }
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
@@ -765,18 +741,22 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // So perform the PDP Request from the PEP, Authentication will
                 // be performed naturally since the request is wrapped in a
                 // PEP Authentication outer request.
-                xacmlRequestInformation.setXacmlStringResponse(processPDP_XMLRequest(xacmlRequestInformation,
-                        request, response));
+                // Response is located within the XacmlRequestInformation Object.
+                XacmlPDPResource.processPDP_XMLRequest(xacmlRequestInformation, request, response);
                 // TODO -- Analyze Response.
+
             } else {
                 // **************************************************************
                 // Else, our Content is assumed to be JSON, but we can still have
                 // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
 
-                // TODO
+                // TODO .....
 
             }
-        } else if (!xacmlRequestInformation.isAuthenticated()) {
+        }
+        // **********************************************************************
+        // Do Not Continue if we have not been authenticated.
+        if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized, Forbidden.
             response.setCharacterEncoding("UTF-8");
@@ -786,8 +766,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return;
         }
         // ******************************************************************
-        // Now this session has been Authenticated, either using Auth-Digest
-        // or via xacml-samlp:XACMLAuthzDecisionQuery Wrapper.
+        // Now this session has been Authenticated, using Auth-Digest,
         // Process the Authenticated Request...
         //
 
@@ -953,432 +932,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
-     * Processes XML Requests from the PEP Request for the PDP.
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
-    private String processPDP_XMLRequest(XACMLRequestInformation xacmlRequestInformation,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response)
-            throws ServletException, IOException {
-        String classMethod = "XacmlContentHandlerService:processPDP_XMLRequest";
-        // Get all the headers from the HTTP request
-        MimeHeaders headers = SAML2Utils.getHeaders(request);
-
-        // Ready our Response Object...
-        com.sun.identity.entitlement.xacml3.core.Response xacmlResponse = new com.sun.identity.entitlement.xacml3.core.Response();
-        com.sun.identity.entitlement.xacml3.core.Result xacmlResult = new com.sun.identity.entitlement.xacml3.core.Result();
-        xacmlResponse.getResult().add(xacmlResult);
-
-        String xacmlStringResponse = null;
-
-        // Check Original Content
-        if (xacmlRequestInformation.getOriginalContent() != null) {
-
-            debug.error("XACML Incoming Request:[" + xacmlRequestInformation.getOriginalContent() + "], " +
-                    "Length:[" + xacmlRequestInformation.getOriginalContent().length() + "]");
-
-            // ********************************************
-            // Process the PDP Request from the PEP.
-            String pepEntityID = null;    // TODO Need to resolve this.
-
-            try {
-                    Document requestDocument = (Document) xacmlRequestInformation.getContent();
-                    if (requestDocument != null) {
-                        Object xacmlRequestObject = null;
-                        try {
-                            // Formulate the XACML Request Object Graph.
-                            xacmlRequestObject = xmlToRequestObject(requestDocument);
-                            if (xacmlRequestObject != null) {
-                                debug.error("Unmarshalled Request Object:[" + xacmlRequestObject.toString() + "]");
-                            }
-                        } catch (Exception e) {
-                            debug.error("Exception performing xml to Object Graph.", e);
-
-                            // TODO --- This should send a 401
-                        }
-                        Response samlResponse =
-                                processSAMLRequest(xacmlRequestInformation.getRealm(),
-                                        xacmlRequestInformation.getPdpEntityID(),
-                                        ((Document) xacmlRequestInformation.getAuthenticationContent()).getDocumentElement(), request,
-                                        requestDocument.getDocumentElement());
-                        if (samlResponse != null) {
-                            xacmlStringResponse = samlResponse.toXMLString(true, true);
-                        }
-
-
-                        // TODO Needs Work to process the request....
-
-                        /*****
-
-                         // Find the Authorization Element.
-                         Element reqAbs = XACML3Utils.getSamlpElement(requestDocument.getDocumentElement(),
-                         REQUEST_ABSTRACT);
-
-                         *****/
-
-
-                        // Set our Response Status per specification.
-                        response.setStatus(HttpServletResponse.SC_OK);   // 200
-
-
-
-                } else {
-                    // Bad or no content.
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
-                }
-
-            } catch (Exception se) {
-                debug.error(classMethod + "XACML Processing Exception", se);
-                // TODO Handle invalid.
-                // Bad or no content.
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
-            }
-
-        } else {
-            // Bad or no content.
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
-        }
-        // TODO Handle invalid.
-        SAML2Utils.putHeaders(headers, response);
-
-        // TODO Temporary return...
-        if (xacmlStringResponse == null) {
-            xacmlStringResponse = DEFAULT_RESPONSE;
-        }
-
-
-        return xacmlStringResponse;
-    }
-
-
-    /**
-     * Signs an <code>Assertion</code>.
-     *
-     * @param realm       the realm name of the Policy Decision Point (PDP).
-     * @param pdpEntityID the entity id of the policy decision provider.
-     * @param assertion   the <code>Assertion</code> to be signed.
-     * @throws <code>SAML2Exception</code> it there is an error signing
-     *                                     the assertion.
-     */
-    static void signAssertion(String realm, String pdpEntityID,
-                              Assertion assertion) throws SAML2Exception {
-        String classMethod = "XacmlContentHandlerService.signAssertion: ";
-
-        // Don't load the KeyProvider object in static block as it can
-        // cause issues when doing a container shutdown/restart.
-        KeyProvider keyProvider = KeyUtil.getKeyProviderInstance();
-        if (keyProvider == null) {
-            debug.error(classMethod +
-                    "Unable to get a key provider instance.");
-            throw new SAML2Exception("nullKeyProvider");
-        }
-        String pdpSignCertAlias = SAML2Utils.getAttributeValueFromXACMLConfig(
-                realm, SAML2Constants.PDP_ROLE, pdpEntityID,
-                SAML2Constants.SIGNING_CERT_ALIAS);
-        if (pdpSignCertAlias == null) {
-            debug.error(classMethod +
-                    "Unable to get the hosted PDP signing certificate alias.");
-            String[] data = {realm, pdpEntityID};
-            LogUtil.error(Level.INFO, LogUtil.NULL_PDP_SIGN_CERT_ALIAS, data);
-            throw new SAML2Exception("missingSigningCertAlias");
-        }
-        assertion.sign(keyProvider.getPrivateKey(pdpSignCertAlias),
-                keyProvider.getX509Certificate(pdpSignCertAlias));
-    }
-
-    /**
-     * Returns the SAMLv2 <code>Response</code> received in response to
-     * the Request.
-     *
-     * @param realm              the realm of the entity.
-     * @param pdpEntityID        entity identifier of the Policy Decision Point.
-     * @param reqAbs             the Document Element object.
-     * @param request            the <code>HttpServletRequest</code> object.
-     * @param requestBodyElement the <code>Element</code> object
-     * @return the <code>Response</code> object.
-     * @throws <code>SAML2Exception</code> if there is an error processing
-     *                                     the request.
-     */
-    private Response processSAMLRequest(String realm, String pdpEntityID, Element reqAbs,
-                                        HttpServletRequest request, Element requestBodyElement)
-            throws SAML2Exception {
-        String classMethod = "XacmlContentHandlerService:processSAMLRequest";
-        Response samlResponse = null;
-
-        if (reqAbs != null) {
-            String xsiType = reqAbs.getAttribute(XSI_TYPE_ATTR);
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + "xsi type is : " + xsiType);
-            }
-            if (xsiType != null && xsiType.indexOf(XACML_AUTHZ_QUERY) != -1) {
-                RequestAbstract samlRequest =
-                        ContextFactory.getInstance()
-                                .createXACMLAuthzDecisionQuery(reqAbs);
-                String requestStr = samlRequest.toXMLString(true, true);
-                String[] data = {requestStr, pdpEntityID};
-                LogUtil.access(Level.FINE, LogUtil.REQUEST_MESSAGE, data);
-
-                Issuer issuer = samlRequest.getIssuer();
-                String pepEntityID = null;
-                if (issuer != null) {
-                    pepEntityID = issuer.getValue().trim();
-                }
-                if (debug.messageEnabled()) {
-                    debug.message(classMethod + "Issuer is:" + pepEntityID);
-                }
-                boolean isTrusted = false;
-                try {
-                    isTrusted = SAML2Utils.getSAML2MetaManager().
-                            isTrustedXACMLProvider(realm, pdpEntityID, pepEntityID,
-                                    SAML2Constants.PDP_ROLE);
-                } catch (SAML2MetaException sme) {
-                    debug.error("Error retreiving meta", sme);
-                }
-                if (!isTrusted) {
-                    if (debug.messageEnabled()) {
-                        debug.message(classMethod +
-                                "Issuer in Request is not valid." + pepEntityID);
-                    }
-                    String[] args = {realm, pepEntityID, pdpEntityID};
-                    LogUtil.error(Level.INFO,
-                            LogUtil.INVALID_ISSUER_IN_PEP_REQUEST,
-                            args);
-                    throw new SAML2Exception("invalidIssuerInRequest");
-                }
-                samlResponse =
-                        processXACMLResponse(realm, pdpEntityID, samlRequest, request,
-                                requestBodyElement);
-
-            }
-        }
-        return samlResponse;
-    }
-
-    /**
-     * Returns the received Response to the Requester.
-     * Validates the message signature if signed and invokes the
-     * Request Handler to pass the request for further processing.
-     *
-     * @param realm              realm of the entity.
-     * @param pdpEntityID        entity identifier of Policy Decision Point (PDP).
-     * @param samlRequest        the <code>RequestAbstract</code> object.
-     * @param request            the <code>HttpServletRequest</code> object.
-     * @param requestBodyElement the <code>Element</code> object.
-     * @throws <code>SAML2Exception</code> if there is an error processing
-     *                                     the request and returning a  response.
-     */
-    private Response processXACMLResponse(String realm, String pdpEntityID,
-                                          RequestAbstract samlRequest, HttpServletRequest request,
-                                          Element requestBodyElement) throws SAML2Exception {
-
-        String classMethod = "XacmlContentHandlerService:processXACMLResponse";
-        Response samlResponse = null;
-        String path = request.getPathInfo();
-        String key = path.substring(path.indexOf(METAALIAS_KEY) + 10);
-        String pepEntityID = samlRequest.getIssuer().getValue();
-        if (debug.messageEnabled()) {
-            debug.message(classMethod + "SOAPMessage KEY . :" + key);
-            debug.message(classMethod + "pepEntityID is :" + pepEntityID);
-        }
-        //Retreive metadata
-        boolean pdpWantAuthzQuerySigned =
-                SAML2Utils.getWantXACMLAuthzDecisionQuerySigned(realm,
-                        pdpEntityID, SAML2Constants.PDP_ROLE);
-
-        if (debug.messageEnabled()) {
-            debug.message(classMethod + "PDP wantAuthzQuerySigned:" +
-                    pdpWantAuthzQuerySigned);
-        }
-        if (pdpWantAuthzQuerySigned) {
-            if (samlRequest.isSigned()) {
-                XACMLAuthzDecisionQueryDescriptorElement pep =
-                        SAML2Utils.getSAML2MetaManager().
-                                getPolicyEnforcementPointDescriptor(
-                                        realm, pepEntityID);
-                X509Certificate cert =
-                        KeyUtil.getPEPVerificationCert(pep, pepEntityID);
-                if (cert == null ||
-                        !samlRequest.isSignatureValid(cert)) {
-                    // error
-                    debug.error(classMethod + "Invalid signature in message");
-                    throw new SAML2Exception("invalidQuerySignature");
-
-                } else {
-                    debug.message(classMethod + "Valid signature found");
-                }
-            } else {
-                debug.error("Request not signed");
-                throw new SAML2Exception("nullSig");
-            }
-        }
-
-        //getRequestHandlerClass
-        RequestHandler handler =
-                (RequestHandler) XacmlContentHandlerService.handlers.get(key);  // TODO -- THis was referencing handlers in the SOAPBindingService class.
-        if (handler != null) {
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + "Found handler");
-            }
-
-            // TODO Figure out how to implement this.
-            //samlResponse = handler.handleQuery(pdpEntityID, pepEntityID,
-            //        samlRequest, requestBodyElement);
-
-            // set response attributes
-            samlResponse.setID(SAML2Utils.generateID());
-            samlResponse.setVersion(SAML2Constants.VERSION_2_0);
-            samlResponse.setIssueInstant(new Date());
-            Issuer issuer = AssertionFactory.getInstance().createIssuer();
-            issuer.setValue(pdpEntityID);
-            samlResponse.setIssuer(issuer);
-            // end set Response Attributes
-
-            //set Assertion attributes
-            List assertionList = samlResponse.getAssertion();
-            Assertion assertion = (Assertion) assertionList.get(0);
-
-            assertion.setID(SAML2Utils.generateID());
-            assertion.setVersion(SAML2Constants.VERSION_2_0);
-            assertion.setIssueInstant(new Date());
-            assertion.setIssuer(issuer);
-            // end assertion set attributes
-
-            // check if assertion needs to be encrypted,signed.
-            String wantAssertionEncrypted =
-                    SAML2Utils.getAttributeValueFromXACMLConfig(
-                            realm, SAML2Constants.PEP_ROLE,
-                            pepEntityID,
-                            SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-
-
-            XACMLAuthzDecisionQueryDescriptorElement
-                    pepDescriptor = SAML2Utils.
-                    getSAML2MetaManager().
-                    getPolicyEnforcementPointDescriptor(realm,
-                            pepEntityID);
-
-            EncInfo encInfo = null;
-            boolean wantAssertionSigned = pepDescriptor.isWantAssertionsSigned();
-
-            if (debug.messageEnabled()) {
-                debug.message(classMethod +
-                        " wantAssertionSigned :" + wantAssertionSigned);
-            }
-            if (wantAssertionSigned) {
-                signAssertion(realm, pdpEntityID, assertion);
-            }
-
-            if (wantAssertionEncrypted != null
-                    && wantAssertionEncrypted.equalsIgnoreCase
-                    (SAML2Constants.TRUE)) {
-                encInfo = KeyUtil.getPEPEncInfo(pepDescriptor, pepEntityID);
-
-                // encrypt the Assertion
-                EncryptedAssertion encryptedAssertion =
-                        assertion.encrypt(
-                                encInfo.getWrappingKey(),
-                                encInfo.getDataEncAlgorithm(),
-                                encInfo.getDataEncStrength(),
-                                pepEntityID);
-                if (encryptedAssertion == null) {
-                    debug.error(classMethod + "Assertion encryption failed.");
-                    throw new SAML2Exception("FailedToEncryptAssertion");
-                }
-                assertionList = new ArrayList();
-                assertionList.add(encryptedAssertion);
-                samlResponse.setEncryptedAssertion(assertionList);
-                //reset Assertion list
-                samlResponse.setAssertion(new ArrayList());
-                if (debug.messageEnabled()) {
-                    debug.message(classMethod + "Assertion encrypted.");
-                }
-            } else {
-                List assertionsList = new ArrayList();
-                assertionsList.add(assertion);
-                samlResponse.setAssertion(assertionsList);
-            }
-            signResponse(samlResponse, realm, pepEntityID, pdpEntityID);
-
-        } else {
-            // error -  missing request handler.
-            debug.error(classMethod + "RequestHandler not found");
-            throw new SAML2Exception("missingRequestHandler");
-        }
-        return samlResponse;
-    }
-
-    /**
-     * Signs the <code>Response</code>.
-     *
-     * @param response    the <code>Response<code> object.
-     * @param realm       the realm of the entity.
-     * @param pepEntityID Policy Enforcement Point Entity Identitifer.
-     * @param pdpEntityID Policy Decision Point Entity Identifier.
-     * @throws <code>SAML2Exception</code> if there is an exception.
-     */
-    static void signResponse(Response response,
-                             String realm, String pepEntityID,
-                             String pdpEntityID)
-            throws SAML2Exception {
-        String classMethod = "signResponse : ";
-        String attrName = "wantXACMLAuthzDecisionResponseSigned";
-        String wantResponseSigned =
-                SAML2Utils.getAttributeValueFromXACMLConfig(realm,
-                        SAML2Constants.PEP_ROLE, pepEntityID, attrName);
-
-        if (wantResponseSigned == null ||
-                wantResponseSigned.equalsIgnoreCase("false")) {
-            if (debug.messageEnabled()) {
-                debug.message(classMethod +
-                        "Response doesn't need to be signed.");
-            }
-        } else {
-            String pdpSignCertAlias =
-                    SAML2Utils.getAttributeValueFromXACMLConfig(
-                            realm, SAML2Constants.PDP_ROLE, pdpEntityID,
-                            SAML2Constants.SIGNING_CERT_ALIAS);
-            if (pdpSignCertAlias == null) {
-                debug.error(classMethod + "PDP certificate alias is null.");
-                String[] data = {realm, pdpEntityID};
-                LogUtil.error(Level.INFO, LogUtil.NULL_PDP_SIGN_CERT_ALIAS, data);
-                throw new SAML2Exception("missingSigningCertAlias");
-            }
-
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + "realm is : " + realm);
-                debug.message(classMethod + "pepEntityID is :" + pepEntityID);
-                debug.message(classMethod + "pdpEntityID : " + pdpEntityID);
-                debug.message(classMethod + "wantResponseSigned" +
-                        wantResponseSigned);
-                debug.message(classMethod + "Cert Alias:" + pdpSignCertAlias);
-            }
-            // Don't load the KeyProvider object in static block as it can
-            // cause issues when doing a container shutdown/restart.
-            KeyProvider keyProvider = KeyUtil.getKeyProviderInstance();
-            if (keyProvider == null) {
-                debug.error(classMethod +
-                        "Unable to get a key provider instance.");
-                throw new SAML2Exception("nullKeyProvider");
-            }
-            PrivateKey signingKey = keyProvider.getPrivateKey(pdpSignCertAlias);
-            X509Certificate signingCert =
-                    keyProvider.getX509Certificate(pdpSignCertAlias);
-
-            if (signingKey != null) {
-                response.sign(signingKey, signingCert);
-            } else {
-                debug.error("Incorrect configuration for Signing Certificate.");
-                throw new SAML2Exception("metaDataError");
-            }
-        }
-    }
-
-
-    /**
      * Provide common Entry point Method for Parsing Initial Requests
      * to obtain information on how to process and route the request.
      *
@@ -1400,8 +953,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     XACML3Utils.getEntityByMetaAlias(queryMetaAlias);
             // Bootstrap our Request Information Object for this Request.
             XACMLRequestInformation xacmlRequestInformation = new XACMLRequestInformation(contentType, requestURI,
-                    queryMetaAlias, pdpEntityID,
-                    realm);
+                    queryMetaAlias, pdpEntityID, realm);
             // Consume the Request Content, by parsing
             // Get Raw Content.
             xacmlRequestInformation.setOriginalContent(getRequestBody(request));
@@ -1452,6 +1004,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      *                                return false, which indicates an Invalid XACML Request.
      */
     private void parseXMLRequest(XACMLRequestInformation xacmlRequestInformation) {
+        if ( (xacmlRequestInformation.getOriginalContent()==null)||
+             (xacmlRequestInformation.getOriginalContent().isEmpty()) ) {
+            return;
+        }
         // Get Document Builder Factory
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // Leave off validation, namespaces and Schema, otherwise we will have false-positive validation
@@ -1465,7 +1021,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             ByteArrayInputStream inputStream =
-                    new ByteArrayInputStream((XML_HEADER + xacmlRequestInformation.getOriginalContent()).getBytes());
+                    new ByteArrayInputStream(
+                            (xacmlRequestInformation.getOriginalContent().startsWith("<?") ?
+                                    xacmlRequestInformation.getOriginalContent().getBytes() :
+                                    (XML_HEADER + xacmlRequestInformation.getOriginalContent()).getBytes() ));
             document = builder.parse(inputStream);
         } catch (SAXException se) {
             debug.error("SAXException: " + se.getMessage());
@@ -1478,6 +1037,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // Save a Reference to our XML Document for later use.
         xacmlRequestInformation.setContent(document);
+        if (document == null) {
+            return;
+        }
         // ********************************************************
         // Now dig using XPaths to perform a validation.
         // We need to obtain the Request Node and the
@@ -1486,54 +1048,55 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         Node requestNode;
         Node xacmlAuthzDecisionQueryNode;
 
-        if (document != null) {
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
 
-            // Now check to see if we have an optional XACMLAuthzDecisionQueryNode wrapper for the request...
-            try {
-                // Check for we have a XACMLAuthzDecisionQueryNode.
-                XPathExpression expr = xpath.compile("/" + XACML_AUTHZ_QUERY);
-                xacmlAuthzDecisionQueryNode = (Node) expr.evaluate(document, XPathConstants.NODE);
-                if (xacmlAuthzDecisionQueryNode != null) {
-                    // Save a Reference to our XML Node for later use.
-                    xacmlRequestInformation.setAuthenticationContent(xacmlAuthzDecisionQueryNode);
-                    for (int i = 0; i < xacmlAuthzDecisionQueryNode.getAttributes().getLength(); i++) {
-                        debug.error("Node: " + xacmlAuthzDecisionQueryNode.getNodeName() + " attribute: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i));
-                        // TODO Verify.....
-                        // TODO
-                    }
+        // Now check to see if we have an optional XACMLAuthzDecisionQueryNode wrapper for the request...
+        try {
+            // Check for we have a XACMLAuthzDecisionQueryNode.
+            XPathExpression expr = xpath.compile("/" + XACML_AUTHZ_QUERY);
+            xacmlAuthzDecisionQueryNode = (Node) expr.evaluate(document, XPathConstants.NODE);
+            if (xacmlAuthzDecisionQueryNode != null) {
+                // Save a Reference to our XML Node for later use.
+                xacmlRequestInformation.setAuthenticationContent(xacmlAuthzDecisionQueryNode);
+                for (int i = 0; i < xacmlAuthzDecisionQueryNode.getAttributes().getLength(); i++) {
+                    xacmlRequestInformation.getXacmlAuthzDecisionQuery().setByName(xacmlAuthzDecisionQueryNode
+                            .getNodeName(), xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
+                    // Make me Message level....
+                    debug.error("Node: " + xacmlAuthzDecisionQueryNode.getNodeName() +
+                            " attribute: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
                 }
-            } catch (XPathExpressionException xee) {
-                // Our initial Expression for a Node was invalid, we have no Request Object.
-                // This could be a maintenance which has no request, but not part of specification yet...
-                // Document could be bad or suspect.
-                debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
-                return;
+                // Verify the Node attributes.
+                // They Must contain an ID,
             }
+        } catch (XPathExpressionException xee) {
+            // Our initial Expression for a Node was invalid, we have no Request Object.
+            // This could be a maintenance which has no request, but not part of specification yet...
+            // Document could be bad or suspect.
+            debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
+            return;
+        }
 
-            // Verify we have a PDP Request Request
-            try {
-                // Verify we have a Request.
-                XPathExpression expr = xpath.compile("/" + REQUEST);
-                requestNode = (Node) expr.evaluate(document, XPathConstants.NODE);
-                if (requestNode != null) {
-                    // Indicate our Request Node is in fact present, either wrapped or not.
-                    xacmlRequestInformation.setRequestNodePresent(true);
-                    for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
-                        debug.error("Node: " + requestNode.getNodeName() + " attribute: " + requestNode.getAttributes().item(i));
-                        // TODO Verify....
-                        // TODO
-                    }
+        // Verify we have a PDP Request Request
+        try {
+            // Verify we have a Request.
+            XPathExpression expr = xpath.compile("/" + REQUEST);
+            requestNode = (Node) expr.evaluate(document, XPathConstants.NODE);
+            if (requestNode != null) {
+                // Indicate our Request Node is in fact present, either wrapped or not.
+                xacmlRequestInformation.setRequestNodePresent(true);
+                for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
+                    debug.error("Node: " + requestNode.getNodeName() + " attribute: " + requestNode.getAttributes().item(i));
+                    // TODO Verify....
+                    // TODO
                 }
-            } catch (XPathExpressionException xee) {
-                // Our initial Expression for a Node was invalid, we have no Request Object.
-                // This could be a maintenance which has no request, but not part of specification yet...
-                // Document could be bad or suspect.
-                debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
             }
-
-        } // end of check for null document.
+        } catch (XPathExpressionException xee) {
+            // Our initial Expression for a Node was invalid, we have no Request Object.
+            // This could be a maintenance which has no request, but not part of specification yet...
+            // Document could be bad or suspect.
+            debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
+        }
     }
 
     /**
@@ -1543,7 +1106,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @return
      */
     private void parseJSONRequest(XACMLRequestInformation xacmlRequestInformation) {
-        // TODO
+        // TODO ...
+
+
+
+
     }
 
 
@@ -1579,7 +1146,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          // Provide the package name where our ObjectFactory can be found for unMarshaling.
          JAXBContext jaxbContext = JAXBContext.newInstance("com.sun.identity.entitlement.xacml3.core");
          Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-         //unmarshaller.setSchema(xacmlSchema);
+         unmarshaller.setSchema(xacmlSchema);
 
          // TODO -- This below fails!
          com.sun.identity.entitlement.xacml3.core.Request request =
@@ -1597,6 +1164,60 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         return request;
     }
 
+    /**
+     * Public Helper Method for accessing handlers.
+     *
+     * @return
+     */
+    public static HashMap getHandlers() {
+        return handlers;
+    }
+
+    /**
+     * Simple Helper Method to read in Test Files.
+     *
+     * @param resourceName
+     * @return String containing the Resource Contents.
+     */
+    public static String getResourceContents(final String resourceName) {
+        InputStream inputStream = null;
+        try {
+            if (resourceName != null) {
+                inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
+            }
+        } catch (Exception e) {
+            // TODO
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+
+                }
+            }
+        } // End of Finally Clause.
+        // Catch All.
+        return null;
+    }
+
+    /**
+     * Simple Helper Method to read in Test Files.
+     *
+     * @param resourceName
+     * @return InputStream containing the Resource Contents.
+     */
+    public static InputStream getResourceContentStream(final String resourceName) {
+        try {
+            if (resourceName != null) {
+                return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+            }
+        } catch (Exception e) {
+            // TODO
+        }
+        // Catch All.
+        return null;
+    }
 
 }
 

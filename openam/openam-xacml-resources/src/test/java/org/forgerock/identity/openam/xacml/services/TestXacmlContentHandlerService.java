@@ -37,11 +37,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 
 /**
@@ -54,7 +51,7 @@ public class TestXacmlContentHandlerService {
 
     private static ServletTester servletTester;
 
-    private final static String testAuthzDecisionQuery_FileName = "test_data/xacml3_authzDecisionQuery.xml";
+    private final static String testAuthzDecisionQuery_ResourceName = "test_data/xacml3_authzDecisionQuery.xml";
 
     @BeforeClass
     public void before() throws Exception {
@@ -195,9 +192,9 @@ public class TestXacmlContentHandlerService {
         request.setURI("/xacml/pdp");
         request.setVersion("HTTP/1.1");
 
-        String testData = this.getFileContents(testAuthzDecisionQuery_FileName);
+        String testData = XacmlContentHandlerService.getResourceContents(testAuthzDecisionQuery_ResourceName);
         assertNotNull(testData);
-        request.setContent(testData); // Set content Length to zero.
+        request.setContent(testData);
 
         try {
             // Check for a 403 Forbidden.
@@ -216,33 +213,6 @@ public class TestXacmlContentHandlerService {
 
         }
 
-    }
-
-    /**
-     * Simple Helper Method to read in Test Files.
-     * @param resourceName
-     * @return String containing the Resource Contents.
-     */
-    private String getFileContents(final String resourceName) {
-        InputStream inputStream = null;
-        try {
-            if (resourceName != null) {
-                inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
-            }
-        } catch (Exception e) {
-            // TODO
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch(IOException ioe) {
-
-                }
-            }
-        } // End of Finally Clause.
-        // Catch All.
-        return null;
     }
 
 
