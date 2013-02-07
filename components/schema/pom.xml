@@ -43,8 +43,8 @@
     <!-- Child Modules -->
     <modules>
         <module>mib-schema</module>
-        <module>idsvcs-schema</module>
-        <module>jaxrpc-schema</module>
+        <!--module>idsvcs-schema</module-->
+        <!--module>jaxrpc-schema</module-->
         <module>xacml3-schema</module>
         <module>saml2-schema</module>
         <module>wsfederation-schema</module>

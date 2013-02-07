@@ -127,6 +127,7 @@
     <modules>
         <!-- OpenAM Federation Modules -->
         <module>schema</module>
+        <module>entitlements</module>
         <module>federation-library</module>
         <module>federation-fedletAG</module>
     </modules>

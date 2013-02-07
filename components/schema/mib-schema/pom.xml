@@ -127,6 +127,7 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>jdmkrt</artifactId>
+            <version>2007-01-10</version>
         </dependency>
     </dependencies>
 </project>

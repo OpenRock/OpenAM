@@ -167,26 +167,31 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-libs</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>net.java.dev.msv.datatype.xsd</groupId>
             <artifactId>xsdlib</artifactId>
+            <version>20060615</version>
         </dependency>
 
     </dependencies>

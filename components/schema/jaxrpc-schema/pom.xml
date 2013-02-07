@@ -131,6 +131,7 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>idsvcs-schema</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -147,32 +148,39 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-libs</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
             <groupId>javax.xml</groupId>
             <artifactId>jaxrpc-api</artifactId>
+            <version>1.1</version>
         </dependency>
 
         <dependency>
             <groupId>external</groupId>
             <artifactId>jaxrpc-impl</artifactId>
+            <version>1.1.3_01-041406</version>
         </dependency>
 
         <dependency>
             <groupId>external</groupId>
             <artifactId>webservices-api</artifactId>
+            <version>2009-14-01</version>
         </dependency>
+
 
     </dependencies>
 

@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../target/classes" />
-    <output-test url="file://$MODULE_DIR$/../../target/test-classes" />
-    <exclude-output />
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/../../openam-schema/openam-liberty-schema/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.forgerock.openam:openam-shared:10.2.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: external:jss4:2007-08-11" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.parsers:jaxp-api:1.4.2" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-libs:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.msv.datatype.xsd:xsdlib:20060615" level="project" />
+    <orderEntry type="library" name="Maven: isorelax:isorelax:20030108" level="project" />
+    <orderEntry type="library" name="Maven: relaxngDatatype:relaxngDatatype:20020414" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-xjc:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.msv.datatype.xsd:xsdlib:20060615" level="project" />
   </component>
 </module>
 
