@@ -23,7 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.commons;
+package org.forgerock.identity.openam.xacml.v3.commons;
 
 /**
  * Normalized Content Types which are dealt with using XACML 3 via HTTP/REST.
