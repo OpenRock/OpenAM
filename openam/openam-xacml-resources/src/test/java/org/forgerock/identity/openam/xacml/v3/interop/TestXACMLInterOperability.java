@@ -23,7 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.interop;
+package org.forgerock.identity.openam.xacml.v3.interop;
 
 import org.forgerock.identity.openam.xacml.commons.ContentType;
 import org.forgerock.identity.openam.xacml.services.XacmlContentHandlerService;
