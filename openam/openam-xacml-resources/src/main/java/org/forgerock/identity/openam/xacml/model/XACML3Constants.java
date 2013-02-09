@@ -34,6 +34,11 @@ import com.sun.identity.entitlement.xacml3.XACMLConstants;
  *
  */
 public interface XACML3Constants extends XACMLConstants {
+
+    /**
+     *
+     */
+    public static final String XACML3_NAMESPACE = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
     /**
      * Constant used to identify meta alias.
      */
@@ -57,13 +62,14 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
     public static final String METAALIAS_KEY = "/metaAlias" ;
 
-    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+
 
     /**
      * Default Response
      */
     public static final String DEFAULT_RESPONSE = XML_HEADER + "<xacml-ctx:response " +
-            "xmlns:xacml-ctx=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\">" +
+            "xmlns:xacml-ctx=\""+XACML3_NAMESPACE+"\">" +
             "</xacml-ctx:response>";
 
     /**

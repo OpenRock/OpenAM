@@ -749,8 +749,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // **************************************************************
                 // Else, our Content is assumed to be JSON, but we can still have
                 // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
-
-                // TODO .....
+                XacmlPDPResource.processPDP_JSONRequest(xacmlRequestInformation, request, response);
+                // TODO -- Analyze Response.
 
             }
         }
@@ -1060,15 +1060,28 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // Save a Reference to our XML Node for later use.
                 xacmlRequestInformation.setAuthenticationContent(xacmlAuthzDecisionQueryNode);
                 for (int i = 0; i < xacmlAuthzDecisionQueryNode.getAttributes().getLength(); i++) {
-                    xacmlRequestInformation.getXacmlAuthzDecisionQuery().setByName(xacmlAuthzDecisionQueryNode
-                            .getNodeName(), xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
+                    xacmlRequestInformation.getXacmlAuthzDecisionQuery().setByName(
+                            xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeName(),
+                            xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
                     // Make me Message level....
-                    debug.error("Node: " + xacmlAuthzDecisionQueryNode.getNodeName() +
+                    debug.error("Node: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeName() +
                             " attribute: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
                 }
+                //
                 // Verify the Node attributes.
-                // They Must contain an ID,
-            }
+                // They Must contain an ID, IssueInstant and Version fields are Required.
+                // Destination and Consent Fields are Optional.
+                //
+                if ( (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId())) ||
+                     (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getIssueInstant())) ||
+                     (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getVersion())) ) {
+                    // Indicate Error in Request.
+                    debug.error(XACML_AUTHZ_QUERY+" Required Field Missing, must contain ID, " +
+                            "IssueInstant and Version.");
+                    return;
+                }
+
+            } // End of Check for XACMLAuthzDecisionQuery Node Element.
         } catch (XPathExpressionException xee) {
             // Our initial Expression for a Node was invalid, we have no Request Object.
             // This could be a maintenance which has no request, but not part of specification yet...
@@ -1077,7 +1090,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return;
         }
 
-        // Verify we have a PDP Request Request
+        // Verify we have a PEP Request
         try {
             // Verify we have a Request.
             XPathExpression expr = xpath.compile("/" + REQUEST);
@@ -1086,7 +1099,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // Indicate our Request Node is in fact present, either wrapped or not.
                 xacmlRequestInformation.setRequestNodePresent(true);
                 for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
-                    debug.error("Node: " + requestNode.getNodeName() + " attribute: " + requestNode.getAttributes().item(i));
+                    debug.error("Node: " + requestNode.getAttributes().item(i).getNodeName() + " attribute: " + requestNode
+                            .getAttributes().item(i));
                     // TODO Verify....
                     // TODO
                 }
@@ -1097,6 +1111,15 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // Document could be bad or suspect.
             debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
         }
+    }
+
+    /**
+     * Simple helper for checking required field is present or not.
+     * @param value
+     * @return boolean - indicator True if Field Present and False if not.
+     */
+    private static boolean isRequiredFieldPresent(String value) {
+        return  ( (value!=null)&&(!value.isEmpty()) );
     }
 
     /**
@@ -1130,7 +1153,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } catch (JAXBException jbe) {
             debug.error("JAXBException Occurred Marshaling Response Object to XML!", jbe);
         }
-        return "<xacml-ctx:response xmlns:xacml-ctx=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\">" +
+        return "<xacml-ctx:response xmlns:xacml-ctx=\""+XACML3_NAMESPACE+"\">" +
                 "</xacml-ctx:response>";
     }
 
@@ -1179,7 +1202,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param resourceName
      * @return String containing the Resource Contents.
      */
-    public static String getResourceContents(final String resourceName) {
+    protected static String getResourceContents(final String resourceName) {
         InputStream inputStream = null;
         try {
             if (resourceName != null) {
@@ -1207,7 +1230,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param resourceName
      * @return InputStream containing the Resource Contents.
      */
-    public static InputStream getResourceContentStream(final String resourceName) {
+    protected static InputStream getResourceContentStream(final String resourceName) {
         try {
             if (resourceName != null) {
                 return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);

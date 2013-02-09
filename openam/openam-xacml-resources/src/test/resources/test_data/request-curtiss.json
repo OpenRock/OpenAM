@@ -3,7 +3,7 @@
 {
  "ReturnPolicyIdList": true,
  "CombinedDecision": false,
- "xmlns": "oasis:names:tc:xacml:3.0:core:schema:os",
+ "xmlns": "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17",
  
  "Subject":
   {

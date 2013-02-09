@@ -29,9 +29,9 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.identity.openam.xacml.model.XACML3Constants;
 
 /**
- * XACML PAP Resource Router
+ * XACML PAP Resource
  * <p/>
- * Policy administration point (PAP)
+ * Policy Administration Point (PAP)
  * The system entity that creates a policy or policy set
  *
  * @author Jeff.Schenk@forgerock.com

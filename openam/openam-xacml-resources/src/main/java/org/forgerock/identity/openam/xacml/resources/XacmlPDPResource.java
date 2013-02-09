@@ -176,6 +176,27 @@ public class XacmlPDPResource implements XACML3Constants {
     }
 
     /**
+     * Processes XML Requests from the PEP Request for the PDP.
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    public static void processPDP_JSONRequest(XACMLRequestInformation xacmlRequestInformation,
+                                             HttpServletRequest request,
+                                             HttpServletResponse response)
+            throws ServletException, IOException {
+        String classMethod = "XacmlContentHandlerService:processPDP_JSONRequest";
+        // Get all the headers from the HTTP request
+        MimeHeaders headers = SAML2Utils.getHeaders(request);
+
+        // Ready our Response Object...
+
+        // TODO ....
+    }
+
+    /**
      * Returns the SAMLv2 <code>Response</code> received in response to
      * the Request.
      *
@@ -298,6 +319,7 @@ public class XacmlPDPResource implements XACML3Constants {
                     debug.error("Error retreiving meta", sme);
                 }
                 // Set our Authentication Indicator.
+                // If false, will trigger caller to send back a 403 Forbidden.
                 xacmlRequestInformation.setAuthenticated(isTrusted);
                 if (!isTrusted) {
                     if (debug.messageEnabled()) {
@@ -313,7 +335,8 @@ public class XacmlPDPResource implements XACML3Constants {
                 }
                 // Process the XACML Request.
                 samlResponse =
-                        processXACMLResponse(xacmlRequestInformation.getRealm(), xacmlRequestInformation.getPdpEntityID(), samlRequest, request,
+                        processXACML3Response(xacmlRequestInformation.getRealm(),
+                                xacmlRequestInformation.getPdpEntityID(), samlRequest, request,
                                 requestBodyNode.getOwnerDocument().getDocumentElement());  // TODO Verify...
 
             }
@@ -383,7 +406,7 @@ public class XacmlPDPResource implements XACML3Constants {
      * @throws <code>SAML2Exception</code> if there is an error processing
      *                                     the request and returning a  response.
      */
-    static Response processXACMLResponse(String realm, String pdpEntityID,
+    static Response processXACML3Response(String realm, String pdpEntityID,
                                          RequestAbstract samlRequest, HttpServletRequest request,
                                          Element requestBodyElement) throws SAML2Exception {
 

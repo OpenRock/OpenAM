@@ -31,7 +31,7 @@ import org.forgerock.identity.openam.xacml.model.XACML3Constants;
 /**
  * XACML PIP Resource
  * <p/>
- * Policy information point (PIP)
+ * Policy Information Point (PIP)
  * The system entity that acts as a source of attribute values
  *
  * @author Jeff.Schenk@forgerock.com
