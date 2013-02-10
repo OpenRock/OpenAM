@@ -22,4 +22,4 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.resources;
+package org.forgerock.identity.openam.xacml.v3.resources;

@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.resources;
+package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Assertion;
@@ -49,11 +49,11 @@ import com.sun.identity.xacml.common.XACMLSDKUtils;
 import com.sun.identity.xacml.context.ContextFactory;
 
 import com.sun.identity.xacml.saml2.XACMLAuthzDecisionQuery;
-import org.forgerock.identity.openam.xacml.model.XACML3AuthzDecisionQueryImpl;
-import org.forgerock.identity.openam.xacml.model.XACML3Constants;
-import org.forgerock.identity.openam.xacml.model.XACMLRequestInformation;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3AuthzDecisionQueryImpl;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 
-import org.forgerock.identity.openam.xacml.services.XacmlContentHandlerService;
+import org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

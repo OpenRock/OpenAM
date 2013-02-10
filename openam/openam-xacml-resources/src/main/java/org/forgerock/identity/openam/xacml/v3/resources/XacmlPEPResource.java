@@ -23,10 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.resources;
+package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.identity.openam.xacml.model.XACML3Constants;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
 /**
  * XACML PEP Resource

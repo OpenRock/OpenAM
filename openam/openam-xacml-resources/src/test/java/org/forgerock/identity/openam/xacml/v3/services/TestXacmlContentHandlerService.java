@@ -23,11 +23,11 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.services;
+package org.forgerock.identity.openam.xacml.v3.services;
 
 import static org.testng.Assert.*;
 
-import org.forgerock.identity.openam.xacml.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.junit.runner.RunWith;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;

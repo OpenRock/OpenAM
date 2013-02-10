@@ -25,8 +25,8 @@
  */
 package org.forgerock.identity.openam.xacml.v3.interop;
 
-import org.forgerock.identity.openam.xacml.commons.ContentType;
-import org.forgerock.identity.openam.xacml.services.XacmlContentHandlerService;
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService;
 import org.junit.runner.RunWith;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;

@@ -23,7 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.commons;
+package org.forgerock.identity.openam.xacml.v3.commons;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

@@ -23,9 +23,9 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.model;
+package org.forgerock.identity.openam.xacml.v3.model;
 
-import org.forgerock.identity.openam.xacml.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 
 import java.lang.reflect.Field;
 

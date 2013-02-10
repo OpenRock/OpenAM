@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.services;
+package org.forgerock.identity.openam.xacml.v3.services;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 
@@ -33,14 +33,16 @@ import com.sun.identity.xacml.client.XACMLRequestProcessor;
 import com.sun.identity.xacml.common.XACMLException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.identity.openam.xacml.commons.AuthenticationDigest;
-import org.forgerock.identity.openam.xacml.commons.CommonType;
-import org.forgerock.identity.openam.xacml.commons.ContentType;
-import org.forgerock.identity.openam.xacml.commons.XACML3Utils;
-import org.forgerock.identity.openam.xacml.model.XACML3Constants;
-import org.forgerock.identity.openam.xacml.model.XACMLRequestInformation;
-import org.forgerock.identity.openam.xacml.resources.XacmlHomeResource;
-import org.forgerock.identity.openam.xacml.resources.XacmlPDPResource;
+
+import org.forgerock.identity.openam.xacml.v3.commons.AuthenticationDigest;
+import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
+import org.forgerock.identity.openam.xacml.v3.resources.XacmlHomeResource;
+import org.forgerock.identity.openam.xacml.v3.resources.XacmlPDPResource;
+
 import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -57,7 +59,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.*;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;

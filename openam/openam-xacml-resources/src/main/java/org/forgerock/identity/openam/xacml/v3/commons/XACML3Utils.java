@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.commons;
+package org.forgerock.identity.openam.xacml.v3.commons;
 
 import com.sun.identity.plugin.configuration.ConfigurationException;
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -37,7 +37,7 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.xacml.common.XACMLException;
-import org.forgerock.identity.openam.xacml.model.XACML3Constants;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
