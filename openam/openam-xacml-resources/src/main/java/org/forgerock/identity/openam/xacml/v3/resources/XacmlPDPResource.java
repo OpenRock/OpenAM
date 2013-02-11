@@ -49,10 +49,10 @@ import com.sun.identity.xacml.common.XACMLSDKUtils;
 import com.sun.identity.xacml.context.ContextFactory;
 
 import com.sun.identity.xacml.saml2.XACMLAuthzDecisionQuery;
-import org.forgerock.identity.openam.xacml.v3.model.XACML3AuthzDecisionQueryImpl;
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
-import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+
+import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -343,30 +343,6 @@ public class XacmlPDPResource implements XACML3Constants {
         return samlResponse;
     }
 
-    /**
-     * Returns a new instance of <code>XACMLAuthzDecisionQuery</code>.
-     * The return object is immutable.
-     *
-     * @param elem an <code>Element</code> representation of
-     *                <code>XACMLAuthzDecisionQuery</code>.
-     * @return a new instance of <code>XACMLAuthzDecisionQuery</code>.
-     * @throws com.sun.identity.xacml.common.XACMLException if error occurs while processing the
-     *                <code>Element</code>.
-     * @throws SAML2Exception if not able to create the base saml
-     * <code>RequestAbstract</code>
-     *
-     */
-    private static XACMLAuthzDecisionQuery createXACMLAuthzDecisionQuery(Element elem)
-            throws XACMLException, SAML2Exception
-    {
-        Object obj = XACMLSDKUtils.getObjectInstance(
-                XACMLConstants.XACML_AUTHZ_DECISION_QUERY, elem);
-        if (obj == null) {
-            return new XACML3AuthzDecisionQueryImpl(elem);
-        } else {
-            return (XACMLAuthzDecisionQuery) obj;
-        }
-    }
 
     /**
      * Returns a new instance of <code>XACMLAuthzDecisionQuery</code>.
@@ -387,7 +363,9 @@ public class XacmlPDPResource implements XACML3Constants {
         Object obj = XACMLSDKUtils.getObjectInstance(
                 XACMLConstants.XACML_AUTHZ_DECISION_QUERY, node.getOwnerDocument().getDocumentElement());
         if (obj == null) {
-            return new XACML3AuthzDecisionQueryImpl(node.getOwnerDocument().getDocumentElement());
+            // TODO Fix.....
+            return null;
+            //return new XACML3AuthzDecisionQueryImpl(node.getOwnerDocument().getDocumentElement());
         } else {
             return (XACMLAuthzDecisionQuery) obj;
         }

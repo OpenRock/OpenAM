@@ -27,7 +27,6 @@ package org.forgerock.identity.openam.xacml.v3.model;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 
-import java.lang.reflect.Field;
 
 /**
  * XACMLRequestInformation
