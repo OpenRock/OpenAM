@@ -28,6 +28,7 @@ package org.forgerock.identity.openam.xacml.v3.services;
 import static org.testng.Assert.*;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.junit.runner.RunWith;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
@@ -192,7 +193,7 @@ public class TestXacmlContentHandlerService {
         request.setURI("/xacml/pdp");
         request.setVersion("HTTP/1.1");
 
-        String testData = XacmlContentHandlerService.getResourceContents(testAuthzDecisionQuery_ResourceName);
+        String testData = XACML3Utils.getResourceContents(testAuthzDecisionQuery_ResourceName);
         assertNotNull(testData);
         request.setContent(testData);
 

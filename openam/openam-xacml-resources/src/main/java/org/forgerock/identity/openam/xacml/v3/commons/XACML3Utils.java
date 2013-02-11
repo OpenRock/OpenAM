@@ -42,10 +42,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * XACML
@@ -65,6 +64,53 @@ public class XACML3Utils implements XACML3Constants {
     public static final String BUNDLE_NAME = "amXACML";
     // The resource bundle for XACML 3.0 implementation.
     public static ResourceBundle bundle = Locale.getInstallResourceBundle(BUNDLE_NAME);
+
+    /**
+     * Simple Helper Method to read in Resources as a Stream
+     *
+     * @param resourceName
+     * @return String containing the Resource Contents or null if issue.
+     */
+    public static String getResourceContents(final String resourceName) {
+        InputStream inputStream = null;
+        try {
+            if (resourceName != null) {
+                inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
+            }
+        } catch (Exception e) {
+            // TODO
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+
+                }
+            }
+        } // End of Finally Clause.
+        // Catch All.
+        return null;
+    }
+
+    /**
+     * Simple Helper Method to read in Resources as a Stream
+     *
+     * @param resourceName
+     * @return InputStream containing the Resource Contents or null if issue.
+     */
+    public static InputStream getResourceContentStream(final String resourceName) {
+        try {
+            if (resourceName != null) {
+                return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+            }
+        } catch (Exception e) {
+            // TODO
+        }
+        // Catch All.
+        return null;
+    }
+
 
     /**
      * Returns metaAlias embedded in uri.

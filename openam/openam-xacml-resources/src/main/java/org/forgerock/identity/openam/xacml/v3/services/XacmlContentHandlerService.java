@@ -178,8 +178,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             SchemaFactory constraintFactory =
                     SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             // Create Streams for every applicable schema.
-            InputStream xmlCoreSchemaResourceContentStream = getResourceContentStream(xmlCoreSchemaResourceName);
-            InputStream resourceContentStream = getResourceContentStream(xacmlCoreSchemaResourceName);
+            InputStream xmlCoreSchemaResourceContentStream = XACML3Utils.getResourceContentStream
+                    (xmlCoreSchemaResourceName);
+            InputStream resourceContentStream = XACML3Utils.getResourceContentStream(xacmlCoreSchemaResourceName);
             // Create the schema object from our Input Source Streams.
             if ((xmlCoreSchemaResourceContentStream != null) && (resourceContentStream != null)) {
                 xacmlSchema = constraintFactory.newSchema(new StreamSource[]{new StreamSource
@@ -1195,52 +1196,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      */
     public static HashMap getHandlers() {
         return handlers;
-    }
-
-    /**
-     * Simple Helper Method to read in Test Files.
-     *
-     * @param resourceName
-     * @return String containing the Resource Contents.
-     */
-    protected static String getResourceContents(final String resourceName) {
-        InputStream inputStream = null;
-        try {
-            if (resourceName != null) {
-                inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
-            }
-        } catch (Exception e) {
-            // TODO
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ioe) {
-
-                }
-            }
-        } // End of Finally Clause.
-        // Catch All.
-        return null;
-    }
-
-    /**
-     * Simple Helper Method to read in Test Files.
-     *
-     * @param resourceName
-     * @return InputStream containing the Resource Contents.
-     */
-    protected static InputStream getResourceContentStream(final String resourceName) {
-        try {
-            if (resourceName != null) {
-                return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-            }
-        } catch (Exception e) {
-            // TODO
-        }
-        // Catch All.
-        return null;
     }
 
 }
