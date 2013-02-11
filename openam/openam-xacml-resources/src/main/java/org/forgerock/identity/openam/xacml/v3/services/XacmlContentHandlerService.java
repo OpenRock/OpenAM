@@ -34,10 +34,7 @@ import com.sun.identity.xacml.common.XACMLException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 
-import org.forgerock.identity.openam.xacml.v3.commons.AuthenticationDigest;
-import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
-import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
+import org.forgerock.identity.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlHomeResource;
@@ -1004,6 +1001,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param xacmlRequestInformation To indicate the XACMLRequestInformation's request Node
      *                                does not exist, the XACMLRequestInformation.isRequestNodePresent() will
      *                                return false, which indicates an Invalid XACML Request.
+     *
+     *
      */
     private void parseXMLRequest(XACMLRequestInformation xacmlRequestInformation) {
         if ( (xacmlRequestInformation.getOriginalContent()==null)||
@@ -1103,8 +1102,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
                     debug.error("Node: " + requestNode.getAttributes().item(i).getNodeName() + " attribute: " + requestNode
                             .getAttributes().item(i));
+
                     // TODO Verify....
                     // TODO
+
                 }
             }
         } catch (XPathExpressionException xee) {
@@ -1112,6 +1113,28 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // This could be a maintenance which has no request, but not part of specification yet...
             // Document could be bad or suspect.
             debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
+            return;
+        }
+        // Valid Request to Process.
+        xacmlRequestInformation.setParsedCorrectly(true);
+    }
+
+    /**
+     * Private Helper to Parse the JSON Request Body.
+     *
+     * @param xacmlRequestInformation
+     *
+     */
+    private void parseJSONRequest(XACMLRequestInformation xacmlRequestInformation) {
+        if ( (xacmlRequestInformation.getOriginalContent()==null)||
+                (xacmlRequestInformation.getOriginalContent().isEmpty()) ) {
+            return;
+        }
+        try {
+            xacmlRequestInformation.setContent(JsonToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
+            xacmlRequestInformation.setParsedCorrectly(true);
+        } catch(IOException ioe) {
+            debug.error("parseJSONRequest Exception: " + ioe.getMessage() + "], content will be ignored!");
         }
     }
 
@@ -1125,71 +1148,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
-     * Private Helper to Parse the JSON Request Body.
-     *
-     * @param xacmlRequestInformation -- String JSON Data
-     * @return
-     */
-    private void parseJSONRequest(XACMLRequestInformation xacmlRequestInformation) {
-        // TODO ...
-
-
-
-
-    }
-
-
-    /**
-     * Marshal information into an xml string represented document.
-     */
-    private static String responseToXML(com.sun.identity.entitlement.xacml3.core.Response xacmlResponse) {
-        StringWriter stringWriter = new StringWriter();
-        try {
-            JAXBContext jc = JAXBContext.newInstance("com.sun.identity.entitlement.xacml3.core");
-            Marshaller marshaller = jc.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(xacmlResponse, stringWriter);
-            if (stringWriter != null) {
-                return stringWriter.toString();
-            }
-        } catch (JAXBException jbe) {
-            debug.error("JAXBException Occurred Marshaling Response Object to XML!", jbe);
-        }
-        return "<xacml-ctx:response xmlns:xacml-ctx=\""+XACML3_NAMESPACE+"\">" +
-                "</xacml-ctx:response>";
-    }
-
-
-    private static com.sun.identity.entitlement.xacml3.core.Request xmlToRequestObject(Document xmlDocument) throws Exception {
-        if (xmlDocument == null) {
-            return null;
-        }
-        com.sun.identity.entitlement.xacml3.core.Request request = null;
-
-        /**
-
-         // Provide the package name where our ObjectFactory can be found for unMarshaling.
-         JAXBContext jaxbContext = JAXBContext.newInstance("com.sun.identity.entitlement.xacml3.core");
-         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-         unmarshaller.setSchema(xacmlSchema);
-
-         // TODO -- This below fails!
-         com.sun.identity.entitlement.xacml3.core.Request request =
-         (com.sun.identity.entitlement.xacml3.core.Request) unmarshaller.unmarshal(xmlDocument);
-         debug.error("************ xacml Request Object: " + request);
-
-         **/
-
-        /**
-         * javax.xml.bind.UnmarshalException
-         - with linked exception:
-         [org.xml.sax.SAXParseException; cvc-elt.1.a: Cannot find the declaration of element 'xacml-ctx:request'.]
-         */
-
-        return request;
-    }
-
-    /**
      * Public Helper Method for accessing handlers.
      *
      * @return
@@ -1199,4 +1157,3 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
 }
-

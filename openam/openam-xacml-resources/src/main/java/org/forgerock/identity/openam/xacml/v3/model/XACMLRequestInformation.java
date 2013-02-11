@@ -37,7 +37,10 @@ import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
  * @author jeff.schenk@forgerock.com
  */
 public class XACMLRequestInformation {
-
+    /**
+     * Request Parsed correctly for either XML or JSON Data.
+     */
+    private boolean parsedCorrectly;
     /**
      * Requested URI
      */
@@ -67,7 +70,7 @@ public class XACMLRequestInformation {
      */
     private String originalContent;
     /**
-     * Content, can be either XML or JSON Object depending upon the specified ContentType.
+     * Content, can be either XML DOM or a JSON Object in form of a Map depending upon the specified ContentType.
      */
     private Object content;
     /**
@@ -343,6 +346,14 @@ public class XACMLRequestInformation {
     // Response Fields for Request
     // **********************************************
 
+    public boolean isParsedCorrectly() {
+        return parsedCorrectly;
+    }
+
+    public void setParsedCorrectly(boolean parsedCorrectly) {
+        this.parsedCorrectly = parsedCorrectly;
+    }
+
     public boolean isDigestValid() {
         return digestValid;
     }
@@ -363,7 +374,8 @@ public class XACMLRequestInformation {
     public String toString() {
         final StringBuffer sb = new StringBuffer();
         sb.append("XACMLRequestInformation");
-        sb.append("{requestURI='").append(requestURI).append('\'');
+        sb.append("{parsedCorrectly=").append(parsedCorrectly);
+        sb.append(", requestURI='").append(requestURI).append('\'');
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
         sb.append(", realm='").append(realm).append('\'');
