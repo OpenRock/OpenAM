@@ -28,6 +28,10 @@
  */
 
 /*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
+/*
  * iws_agent.c:
  *
  * This file implements functions required to do session validation and user's
@@ -848,84 +852,6 @@ char * get_post_data(Session *sn, Request *rq, char *url)
     return body;
 }
 
-int getISCookie(const char *cookie, char **dpro_cookie,
-                void* agent_config) {
-    char *loc = NULL;
-    char *marker = NULL;
-    int length = 0;
-    char *search_cookie = NULL;
-
-
-    if (cookie != NULL) {
-	const char* cookieName = am_web_get_cookie_name(agent_config);
-	if (cookieName != NULL && cookieName[0] != '\0') {
-		length = 2+strlen(cookieName);
-		search_cookie = (char *)malloc(length);
-		if (search_cookie !=NULL) {
-	    	search_cookie = strcpy(search_cookie,cookieName);
-	    	search_cookie = strcat(search_cookie,"=");
-	    	length = 0;
-		} else {
-			am_web_log_error("iws_agent::getISCookie "
-			"unable to allocate, size = %u", length);
-		    return REQ_ABORTED;
-		}
-    }
-
-	loc = strstr(cookie, search_cookie);
-
-	// look for last cookie
-	while (loc) {
-	    char *tmp = strstr(loc+1, search_cookie);
-	    if (tmp) {
-		loc = tmp;
-	    } else {
-		break;
-	    }
-	}
-
-	if (search_cookie !=NULL) {
-		free(search_cookie);
-	}
-
-	if (loc) {
-	    loc = loc + am_web_get_cookie_name_len(agent_config) + 1;
-	    while (*loc == ' ') {
-		++loc;
-	    }
-
-	    // skip leading space
-	    while (*loc == ' ') {
-		++loc;
-	    }
-
-	    // look for end of cookie
-	    marker = loc;
-	    while ((*loc != '\0') && (*loc != ';')) {
-		++loc;
-	    }
-	    length = loc - marker;
-
-	    if (length > 0) {
-		*dpro_cookie = malloc(length+1);
-		if (*dpro_cookie == NULL) {
-		    am_web_log_error("iws_agent::getISCookie "
-			"unable to allocate, size = %u", length);
-		    return REQ_ABORTED;
-		}
-		memcpy(*dpro_cookie, marker, length);
-		(*dpro_cookie)[length] = '\0';
-	    }
-
-	} else {
-	    am_web_log_warning("OpenSSO Server Cookie not found.");
-	}
-    }
-
-    return REQ_PROCEED;
-}
-
-
 static void set_method(void ** args, char * orig_req){
     Request *rq = (Request *)args[0];
     if (rq != NULL) {
@@ -1164,12 +1090,11 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     }
     // Check if the SSO token is in the cookie header
     if (status == AM_SUCCESS) {
-        requestResult = getISCookie(pblock_findval(COOKIE_HDR, rq->headers),
-                                    &dpro_cookie, agent_config);
-        if (requestResult == REQ_ABORTED) {
+        status_tmp = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),
+                pblock_findval(COOKIE_HDR, rq->headers), &dpro_cookie);
+        am_web_log_debug("%s: sso token %s, status - %s", thisfunc, dpro_cookie, am_status_to_string(status_tmp));
+        if (status_tmp == AM_INVALID_ARGUMENT || status_tmp == AM_NO_MEMORY) {
             status = AM_FAILURE;
-        } else if(dpro_cookie != NULL) {
-            am_web_log_debug("%s: SSO token found in cookie header.", thisfunc);
         }
     }
     // Create the environment map
