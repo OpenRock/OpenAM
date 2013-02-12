@@ -284,8 +284,10 @@ public class XacmlPDPResource implements XACML3Constants {
         if ( (reqAbs != null) && (reqAbs.hasAttributes()) ) {
              RequestAbstract samlRequest =
                         createXACML3AuthzDecisionQuery(reqAbs);
-
-
+               if (samlRequest == null) {
+                   debug.error("Unable to Obtain SAML4XACML XacmlAuthzDecisionQuery!");
+                   return null;
+               }
 
                 // TODO Verify
                 String requestStr = samlRequest.toXMLString(true, true);

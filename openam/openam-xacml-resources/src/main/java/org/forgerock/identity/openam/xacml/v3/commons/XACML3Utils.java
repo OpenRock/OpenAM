@@ -80,15 +80,7 @@ public class XACML3Utils implements XACML3Constants {
             }
         } catch (Exception e) {
             // TODO
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ioe) {
-
-                }
-            }
-        } // End of Finally Clause.
+        }
         // Catch All.
         return null;
     }

@@ -26,15 +26,15 @@
 package org.forgerock.identity.openam.xacml.v3.commons;
 
 
+import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+
+import static org.testng.Assert.*;
 
 
 /**
@@ -42,15 +42,15 @@ import java.util.Map;
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
-public class TestJsonToMapUtility {
+public class TestXmlToMapUtility {
 
-    private final static String testJSONContent_ResourceName = "test_data/request-curtiss.json";
+    private final static String testXMLContent_ResourceName = "test_data/xacml3_request_test1.xml";
 
     private static String testData;
 
     @BeforeClass
     public void before() throws Exception {
-        testData = XACML3Utils.getResourceContents(testJSONContent_ResourceName);
+        testData = XACML3Utils.getResourceContents(testXMLContent_ResourceName);
         assertNotNull(testData);
     }
 
@@ -59,23 +59,17 @@ public class TestJsonToMapUtility {
     }
 
     @Test
-    public void testFromFile() throws IOException {
+    public void testFromFile() throws IOException, JSONException {
 
-        Map<String,Object> aMap = JsonToMapUtility.fromString(testData);
+
+        Map<String,Object> aMap = XmlToMapUtility.fromString(testData);
         assertNotNull(aMap);
-        assertTrue(aMap.containsKey("Request"));
+        assertTrue(aMap.containsKey("xacml-ctx:request"));
 
         assertFalse(aMap.containsKey("Action"));
         assertFalse(aMap.containsKey("Environment"));
         assertFalse(aMap.containsKey("Resource"));
         assertFalse(aMap.containsKey("Subject"));
-
-        Object object = aMap.get("Request");
-        Map innerMap = (Map) object; // Cast our Object.
-        assertTrue( (object instanceof java.util.Map));
-        assertTrue(innerMap.containsKey("Environment"));
-        assertTrue(innerMap.containsKey("Resource"));
-        assertTrue(innerMap.containsKey("Subject"));
 
     }
 
