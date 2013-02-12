@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2012 ForgeRock Inc
+    Portions Copyrighted 2010-2013 ForgeRock Inc
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -45,10 +45,7 @@
     <tstamp>
         <format property="nightly.date" pattern="yyyyMMdd" offset="-1" unit="day"/>
     </tstamp>
-    <tstamp>
-        <format property="build.date" pattern="yyyyMMdd"/>
-    </tstamp>
-   
+       
     <condition property="build.debug32">
         <and>
             <equals arg1="${build.debug}" arg2="1"/> 
@@ -317,7 +314,6 @@
                     <token key="AGENT_ER_VER" value=""/>
                     <token key="AGENT_FVB_MARKER" value=""/>
                     <token key="SVN_REVISION" value="${svn.Revision}"/>
-                    <token key="BUILD_DATE" value="${build.date}"/>
                     <token key="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
                 </replacetokens>
             </filterchain>

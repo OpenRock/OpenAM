@@ -30,12 +30,14 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #ifndef _VERSION_H_
 #define _VERSION_H_
 #include "internal_macros.h"
+
+#define BUILD_TS __DATE__" "__TIME__
 
 BEGIN_PRIVATE_NAMESPACE
 
@@ -59,7 +61,7 @@ public:
         }
     }
     static const char* getBuildRev() {return "SVN_REVISION";}
-    static const char* getBuildDate() {return "BUILD_DATE";}
+    static const char* getBuildDate() {return BUILD_TS;}
     static const char* getBuildMachine() {return "BUILD_MACHINE";}
 };
 
