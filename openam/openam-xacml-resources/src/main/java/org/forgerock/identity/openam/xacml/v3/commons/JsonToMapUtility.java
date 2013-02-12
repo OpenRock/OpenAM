@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +51,15 @@ public class JsonToMapUtility {
     /**
      * Thread-safe Object Mapper Instance.
      */
-    private static ObjectMapper mapper = mapper = new ObjectMapper();
+    private static ObjectMapper mapper = null;
+
+    static {
+        mapper = new ObjectMapper();
+        // to allow serialization of "empty" POJOs (no properties to serialize)
+        // (without this setting, an exception is thrown in those cases)
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        // Enable or Disable Additional Features Here...
+    };
 
     /**
      * JSON to Map from an InputStream

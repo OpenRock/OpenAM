@@ -23,7 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.v3.commons;
+package org.forgerock.identity.openam.xacml.v3.model;
 
 import java.io.Serializable;
 

@@ -35,6 +35,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 
 import org.forgerock.identity.openam.xacml.v3.commons.*;
+import org.forgerock.identity.openam.xacml.v3.model.AuthenticationDigest;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlHomeResource;
@@ -448,7 +449,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      */
     @Override
     public String getServletInfo() {
-        return "This ForgeRock OpenAM Servlet Implements the XACML 3.0 Standards per OASIS.";
+        return "This ForgeRock OpenAM XACML 3.0 Servlet/Restlet Implementation, Standards per OASIS, 2013.";
     }
 
     /**
@@ -606,7 +607,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          ￼
          Predicate
          ￼
-         The home document in the [response] body contains a resource with link relation http://docs.oasis-open.org/ns/xacml/relation/pdp and a valid URL
+         The home document in the [response] body contains a resource with link relation
+         http://docs.oasis-open.org/ns/xacml/relation/pdp and a valid URL
          ￼
          Prescription Level
          ￼
@@ -901,7 +903,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          ￼
          Target
          ￼
-         Response to POST request on the PDP location with invalid XACML request wrapped in a xacml-samlp:XACMLAuthzDecisionQuery in the body
+         Response to POST request on the PDP location with invalid XACML request
+         wrapped in a xacml-samlp:XACMLAuthzDecisionQuery in the body
          ￼
          Predicate
          ￼
@@ -957,7 +960,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             if (contentType.commonType().equals(CommonType.XML)) {
                 parseXMLRequest(xacmlRequestInformation);
             } else {
-                // Assume JSON, as no other content can get to this point.
+                // Only can be JSON at this point in Data FLow.
                 parseJSONRequest(xacmlRequestInformation);
             }
             // **************************************
@@ -1125,6 +1128,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return;
         }
         try {
+            // The Original Content will be UnMarshalled into a Map Object stored in Content.
             xacmlRequestInformation.setContent(JsonToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
             xacmlRequestInformation.setParsedCorrectly(true);
         } catch (IOException ioe) {
