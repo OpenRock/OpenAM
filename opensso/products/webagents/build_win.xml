@@ -313,7 +313,7 @@
                     <token key="AGENT_VER" value="3.1.0-Xpress"/>
                     <token key="AGENT_ER_VER" value=""/>
                     <token key="AGENT_FVB_MARKER" value=""/>
-                    <token key="SVN_REVISION" value="${svn.Revision}"/>
+                    <token key="SVN_REVISION" value="Revision: ${svn.Revision}"/>
                     <token key="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
                 </replacetokens>
             </filterchain>
