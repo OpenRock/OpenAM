@@ -532,7 +532,7 @@ am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB, const char *original
                         am_web_log_error("%s: Header %s not found.", thisfunc, header_name);
                         status = AM_FAILURE;
                     } else {
-                        am_web_log_debug("%s: %s: not found.", thisfunc, header_name);
+                        am_web_log_debug("%s: %s not found.", thisfunc, header_name);
                     }
                 }
             } else {
@@ -1195,11 +1195,11 @@ am_status_t get_request_url(EXTENSION_CONTROL_BLOCK *pECB,
                         thisfunc, requestProtocolType);
         // Get the host name
         status = get_header_value(pECB, "HEADER_Host",
-                                  &requestHostHeader, TRUE, FALSE);
+                                  &requestHostHeader, FALSE, FALSE);
     }
     // Get the port number
     if (status == AM_SUCCESS) {
-        CHAR *colon_ptr = strchr(requestHostHeader, ':');
+        CHAR *colon_ptr = requestHostHeader != NULL ? strchr(requestHostHeader, ':') : NULL;
         // Check if the port number is included in the host name
         if (colon_ptr != NULL) {
             requestPort = malloc(TCP_PORT_ASCII_SIZE_MAX + 1);
@@ -1832,7 +1832,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 
     // Check whether the url is a notification url
     if ((status == AM_SUCCESS) &&
-         (B_TRUE == am_web_is_notification(origRequestURL, agent_config))) {
+         (B_TRUE == am_web_is_notification(requestURL, agent_config))) {
           const char* data = NULL;
           if (pECB->cbTotalBytes > 0) {
              data =  pECB->lpbData;
@@ -1853,7 +1853,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     // and dummy urls as those cases are handled by the agent.
     if (status == AM_SUCCESS) {
         char *dummyPtr = strstr(requestURL, POST_PRESERVE_URI);
-        if ((am_web_is_notification(origRequestURL, agent_config) != B_TRUE) &&
+        if ((am_web_is_notification(requestURL, agent_config) != B_TRUE) &&
             ( dummyPtr == NULL))
         {
             pECB->dwHttpStatusCode = getHttpStatusCode(pECB);
