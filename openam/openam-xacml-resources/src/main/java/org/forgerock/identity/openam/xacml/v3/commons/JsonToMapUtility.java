@@ -39,7 +39,7 @@ import java.util.Map;
  * <p/>
  * Very simple JSON Parser to place any JSON Stream, File or String Object into a
  * usable Map for later transformation into a POJO or direct interrogation of the map.
- *
+ * <p/>
  * All Map Objects generated here are Final to protect integrity of Map.
  *
  * @author Jeff.Schenk@forgerock.com
@@ -50,7 +50,7 @@ public class JsonToMapUtility {
     /**
      * Thread-safe Object Mapper Instance.
      */
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper mapper = mapper = new ObjectMapper();
 
     /**
      * JSON to Map from an InputStream
@@ -67,6 +67,7 @@ public class JsonToMapUtility {
 
     /**
      * JSON to Map from Input File.
+     *
      * @param fileContent
      * @return
      * @throws IOException
@@ -79,6 +80,7 @@ public class JsonToMapUtility {
 
     /**
      * JSON to Map from String Content.
+     *
      * @param rawContent
      * @return
      * @throws IOException
@@ -91,6 +93,7 @@ public class JsonToMapUtility {
 
     /**
      * JSON to Mao from byte[] Array.
+     *
      * @param byteData
      * @return
      * @throws IOException
@@ -111,11 +114,20 @@ public class JsonToMapUtility {
      */
     private static Map<String, Object> performParsing(JsonParser jsonParser)
             throws IOException {
+        // to allow auto-close of our source
+        jsonParser.enable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+        // to ensure we disallow C/C++ style comments in JSON (non-standard, disabled by default)
+        jsonParser.disable(JsonParser.Feature.ALLOW_COMMENTS);
+        // to allow (non-standard) unquoted field names in JSON:
+        jsonParser.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+        // to allow use of apostrophes (single quotes), non standard
+        jsonParser.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
         return mapper.readValue(jsonParser, Map.class);
     }
 
     /**
      * Main to Transform a JSON File to a Map Object output.
+     *
      * @param args
      * @throws Exception
      */

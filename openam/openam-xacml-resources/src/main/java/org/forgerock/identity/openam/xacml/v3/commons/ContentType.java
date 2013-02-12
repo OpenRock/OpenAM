@@ -41,7 +41,7 @@ public enum ContentType {
     XML(MediaType.APPLICATION_XML, CommonType.XML),
     XACML_PLUS_JSON("application/xacml+json", CommonType.JSON),
     XACML_PLUS_XML("application/xacml+xml", CommonType.XML),
-    NONE(null,null);
+    NONE(null, null);
 
     private final String applicationType;
     private final CommonType commonType;
@@ -54,26 +54,29 @@ public enum ContentType {
     public String applicationType() {
         return applicationType;
     }
+
     public CommonType commonType() {
         return commonType;
     }
 
     /**
      * Normalize the Content Received from the actual HTTP Request.
+     *
      * @param contentTypeStringValue
      * @return
      */
     public static ContentType getNormalizedContentType(final String contentTypeStringValue) {
-        if ( (contentTypeStringValue == null) || (contentTypeStringValue.isEmpty()) ) {
+        if ((contentTypeStringValue == null) || (contentTypeStringValue.isEmpty())) {
             return null;
         }
         String toCompare = contentTypeStringValue;
         if (toCompare.contains(";")) {
-              toCompare = toCompare.substring(0, toCompare.indexOf(";"));
+            toCompare = toCompare.substring(0, toCompare.indexOf(";"));
         }
         for (ContentType contentType : ContentType.values()) {
-            if (contentType.equals(ContentType.NONE))
-                { continue; }
+            if (contentType.equals(ContentType.NONE)) {
+                continue;
+            }
             if (contentType.applicationType().equalsIgnoreCase(toCompare)) {
                 return contentType;
             }

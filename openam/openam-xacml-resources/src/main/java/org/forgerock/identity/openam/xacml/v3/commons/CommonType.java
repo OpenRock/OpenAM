@@ -28,9 +28,9 @@ package org.forgerock.identity.openam.xacml.v3.commons;
 /**
  * Normalized Content Types which are dealt with using XACML 3 via HTTP/REST.
  * <p/>
- * @see org.forgerock.identity.openam.xacml.v3.commons.ContentType
  *
  * @author jeff.schenk@forgerock.com
+ * @see org.forgerock.identity.openam.xacml.v3.commons.ContentType
  */
 public enum CommonType {
 

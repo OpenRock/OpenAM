@@ -36,9 +36,7 @@ import org.json.JSONObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * XACML Resource for Home Documents
@@ -71,21 +69,21 @@ public class XacmlHomeResource implements XACML3Constants {
     public static String getHome(XACMLRequestInformation xacmlRequestInformation, HttpServletRequest request) throws ServletException,
             JSONException, IOException {
         String classMethod = "XacmlHomeResource:resourceHomeRequested";
-        debug.error(classMethod + " processing URI:[" + request.getRequestURI() + "], Content Type:["+request.getContentType()+"]");
+        debug.error(classMethod + " processing URI:[" + request.getRequestURI() + "], Content Type:[" + request.getContentType() + "]");
         StringBuilder sb = new StringBuilder();
 
         // ************************************************************
         // Determine how to respond based upon Content Type.
-        if ( (request.getContentType()==ContentType.NONE.applicationType()) ||
-             (request.getContentType().equalsIgnoreCase(ContentType.JSON_HOME.applicationType())) ||
-             (request.getContentType().equalsIgnoreCase(ContentType.JSON.applicationType())) ) {
+        if ((request.getContentType() == ContentType.NONE.applicationType()) ||
+                (request.getContentType().equalsIgnoreCase(ContentType.JSON_HOME.applicationType())) ||
+                (request.getContentType().equalsIgnoreCase(ContentType.JSON.applicationType()))) {
             sb.append(getJSONHomeDocument().toString());  // TODO -- Cache the Default Home JSON Document Object.
         } else {
             // Formulate the Home Document for XML Consumption.
             sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
             sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
             sb.append("<resource rel=\042http://openam.example.org/openam/xacml/authorization/pdp\042>");  // TODO, Link needs to be real!
-            sb.append("<atom:link href=\042/authorization/pdp\042/>");  // TODO Static?
+            sb.append("<atom:link href=\042/xacml/authorization/pdp\042/>");  // TODO Static?
             sb.append("</resource>");
             sb.append("</resources>");
         } // End of Check for Content Type.

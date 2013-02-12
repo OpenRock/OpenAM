@@ -66,10 +66,13 @@ public class TestXmlToMapUtility {
         assertNotNull(aMap);
         assertTrue(aMap.containsKey("xacml-ctx:request"));
 
-        assertFalse(aMap.containsKey("Action"));
-        assertFalse(aMap.containsKey("Environment"));
-        assertFalse(aMap.containsKey("Resource"));
-        assertFalse(aMap.containsKey("Subject"));
+        Object object = aMap.get("xacml-ctx:request");
+        assertNotNull(object);
+        assertTrue(object instanceof Map);
+        Map<String,Object> rMap = (Map) object; // Cast
+        assertTrue(rMap.containsKey("xacml-ctx:attributes"));
+        assertTrue(rMap.size() == 4);
+
 
     }
 

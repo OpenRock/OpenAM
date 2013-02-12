@@ -31,7 +31,6 @@ import java.io.Serializable;
  * Provides simple POJO for handling Incoming Digest Response for Authentication.
  *
  * @author jeff.schenk@forgerock.com
- *
  */
 public class AuthenticationDigest implements Serializable {
 
@@ -50,7 +49,7 @@ public class AuthenticationDigest implements Serializable {
 
 
     public AuthenticationDigest(String method, String ha1, String qop, String ha2, String requestURI,
-                                   String realm) {
+                                String realm) {
         this.method = method;
         this.ha1 = ha1;
         this.qop = qop;

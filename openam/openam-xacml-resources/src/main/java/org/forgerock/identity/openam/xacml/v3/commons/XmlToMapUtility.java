@@ -24,14 +24,6 @@
  */
 package org.forgerock.identity.openam.xacml.v3.commons;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.xml.JacksonXmlModule;
-import com.fasterxml.jackson.xml.XmlMapper;
-import org.forgerock.json.fluent.JsonException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -48,7 +40,7 @@ import java.util.Scanner;
  * <p/>
  * Very simple XML Parser to place any XML Stream, File or String Object into a
  * usable Map for later transformation into a POJO or direct interrogation of the map.
- *
+ * <p/>
  * All Map Objects generated here are Final to protect integrity of Map.
  *
  * @author Jeff.Schenk@forgerock.com
@@ -57,17 +49,8 @@ import java.util.Scanner;
 public class XmlToMapUtility {
 
     /**
-     * Static Thread-safe XML Mapper
-     */
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    /**
-     * Global Pretty Printing Designation for Indentations.
-     */
-    private static int PRETTY_PRINT_INDENTATION_FACTOR = 4;
-
-    /**
      * JSON to Map from String Content.
+     *
      * @param rawContent
      * @return
      * @throws java.io.IOException
@@ -84,9 +67,9 @@ public class XmlToMapUtility {
      * @return
      * @throws JSONException, java.io.IOException
      */
-    private static Map<String, Object> toMAP(String xmlData)
+    private static final Map<String, Object> toMAP(String xmlData)
             throws JSONException, IOException {
-        if ( (xmlData == null) || (xmlData.isEmpty()) ) {
+        if ((xmlData == null) || (xmlData.isEmpty())) {
             return null;
         }
         // Convert XML to a JSON Object.
@@ -100,18 +83,19 @@ public class XmlToMapUtility {
      * @return
      * @throws JSONException
      */
-    public static String toJSON(String xmlData)
+    public final static String toJSON(String xmlData)
             throws JSONException {
-        if ( (xmlData == null) || (xmlData.isEmpty()) ) {
+        if ((xmlData == null) || (xmlData.isEmpty())) {
             return null;
         }
         // Convert XML to a JSON Object.
         JSONObject xmlJsonObject = XML.toJSONObject(xmlData);
-        return xmlJsonObject.toString((PRETTY_PRINT_INDENTATION_FACTOR));
+        return xmlJsonObject.toString();
     }
 
     /**
      * Main to Transform a XML File Content to a JSON Representation.
+     *
      * @param args
      * @throws Exception
      */
@@ -119,13 +103,13 @@ public class XmlToMapUtility {
         if ((args == null) || (args.length < 1)) {
             return;
         }
-            for (int i = 0; i < args.length; i++) {
-                InputStream inputStream = new FileInputStream(new File(args[i]));
-                String rawContent = new Scanner(inputStream).useDelimiter("\\A").next();
+        for (int i = 0; i < args.length; i++) {
+            InputStream inputStream = new FileInputStream(new File(args[i]));
+            String rawContent = new Scanner(inputStream).useDelimiter("\\A").next();
 
-                Map<String, Object> mapObjects = fromString(rawContent);
-                System.out.println("XML to JSON Value: "+mapObjects);
-            }
+            Map<String, Object> mapObjects = fromString(rawContent);
+            System.out.println("XML to JSON Value: " + mapObjects);
+        }
     }
 
 }

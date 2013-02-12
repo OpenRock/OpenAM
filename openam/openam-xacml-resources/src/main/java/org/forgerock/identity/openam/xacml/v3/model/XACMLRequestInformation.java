@@ -27,12 +27,11 @@ package org.forgerock.identity.openam.xacml.v3.model;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 
-
 /**
  * XACMLRequestInformation
- *
+ * <p/>
  * Simple POJO to hold all relevant information related to a
- * XACML Request.
+ * XACML Operation Request.
  *
  * @author jeff.schenk@forgerock.com
  */
@@ -78,7 +77,7 @@ public class XACMLRequestInformation {
      */
     private String authenticationHeader;
     /**
-     *  Indicates if this Request has been authenticated or not.
+     * Indicates if this Request has been authenticated or not.
      */
     private boolean authenticated;
     /**
@@ -86,23 +85,22 @@ public class XACMLRequestInformation {
      * If this object is Null, we have an Anonymous/Guest Request.
      */
     private Object authenticationContent;
+
     /**
      * XACMLAuthzDecisionQuery Fields.
-     *
+     * <p/>
      * If this is an XACMLAuthzDecisionQuery, then the following fields
      * will be populated during Parsing of the XACMLAuthzDecisionQuery wrapper Document.
-     *
+     * <p/>
      * These fields are:
-     *      &lt;attribute name="ID" type="ID" use="required"/>
-     *          example: ID="ID_1e469be0-ecc4-11da-8ad9-0800200c9a66"
-     *      &lt;attribute name="Version" type="string" use="required"/>
-     *          example: Version="2.0"
-     *      &lt;attribute name="IssueInstant" type="dateTime" use="required"/>
-     *          example: IssueInstant="2001-12-17T09:30:47.0Z"
-     *      &lt;attribute name="Destination" type="anyURI" use="optional"/>
-     *  	&lt;attribute name="Consent" type="anyURI" use="optional"/>
-     *
-     *
+     * &lt;attribute name="ID" type="ID" use="required"/>
+     * example: ID="ID_1e469be0-ecc4-11da-8ad9-0800200c9a66"
+     * &lt;attribute name="Version" type="string" use="required"/>
+     * example: Version="2.0"
+     * &lt;attribute name="IssueInstant" type="dateTime" use="required"/>
+     * example: IssueInstant="2001-12-17T09:30:47.0Z"
+     * &lt;attribute name="Destination" type="anyURI" use="optional"/>
+     * &lt;attribute name="Consent" type="anyURI" use="optional"/>
      */
     public class XACMLAuthzDecisionQuery {
         private static final String ID_NAME = "id";
@@ -212,7 +210,7 @@ public class XACMLRequestInformation {
      * Wrapper Object for the XACMLAuthzDecisionQuery Element Attributes
      */
     XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery;
-     /**
+    /**
      * Response Field for Request,
      * Digest Valid Indicator.
      * Can be False, if a XACMLAuthzDecisionQuery is performed.
@@ -236,14 +234,13 @@ public class XACMLRequestInformation {
      */
     public XACMLRequestInformation(ContentType contentType, String requestURI, String metaAlias, String pdpEntityID,
                                    String realm) {
-              this.contentType = contentType;
-              this.requestURI = requestURI;
-              this.metaAlias = metaAlias;
-              this.pdpEntityID = pdpEntityID;
-              this.realm = realm;
-              this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
+        this.contentType = contentType;
+        this.requestURI = requestURI;
+        this.metaAlias = metaAlias;
+        this.pdpEntityID = pdpEntityID;
+        this.realm = realm;
+        this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
     }
-
 
 
     public ContentType getContentType() {

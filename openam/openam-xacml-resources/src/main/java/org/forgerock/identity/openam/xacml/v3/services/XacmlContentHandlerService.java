@@ -52,9 +52,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.parsers.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -72,7 +69,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Provides main end-point for all XACML v3.0 requests,
  * either XML or JSON based over HTTP/HTTPS REST based protocol flow.
- *
+ * <p/>
  * This ForgeRock developed XACML Resource Router complies with the following OASIS Specifications:
  * <ul/>
  * <ul/>
@@ -699,7 +696,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Obtain our Request Content Data.
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
-            (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
+                (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
             AuthenticationDigest authenticationDigestResponse =
                     preAuthenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
                             xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
@@ -1001,12 +998,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param xacmlRequestInformation To indicate the XACMLRequestInformation's request Node
      *                                does not exist, the XACMLRequestInformation.isRequestNodePresent() will
      *                                return false, which indicates an Invalid XACML Request.
-     *
-     *
      */
     private void parseXMLRequest(XACMLRequestInformation xacmlRequestInformation) {
-        if ( (xacmlRequestInformation.getOriginalContent()==null)||
-             (xacmlRequestInformation.getOriginalContent().isEmpty()) ) {
+        if ((xacmlRequestInformation.getOriginalContent() == null) ||
+                (xacmlRequestInformation.getOriginalContent().isEmpty())) {
             return;
         }
         // Get Document Builder Factory
@@ -1025,7 +1020,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     new ByteArrayInputStream(
                             (xacmlRequestInformation.getOriginalContent().startsWith("<?") ?
                                     xacmlRequestInformation.getOriginalContent().getBytes() :
-                                    (XML_HEADER + xacmlRequestInformation.getOriginalContent()).getBytes() ));
+                                    (XML_HEADER + xacmlRequestInformation.getOriginalContent()).getBytes()));
             document = builder.parse(inputStream);
         } catch (SAXException se) {
             debug.error("SAXException: " + se.getMessage());
@@ -1073,11 +1068,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // They Must contain an ID, IssueInstant and Version fields are Required.
                 // Destination and Consent Fields are Optional.
                 //
-                if ( (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId())) ||
-                     (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getIssueInstant())) ||
-                     (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getVersion())) ) {
+                if ((!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId())) ||
+                        (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getIssueInstant())) ||
+                        (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getVersion()))) {
                     // Indicate Error in Request.
-                    debug.error(XACML_AUTHZ_QUERY+" Required Field Missing, must contain ID, " +
+                    debug.error(XACML_AUTHZ_QUERY + " Required Field Missing, must contain ID, " +
                             "IssueInstant and Version.");
                     return;
                 }
@@ -1123,28 +1118,28 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * Private Helper to Parse the JSON Request Body.
      *
      * @param xacmlRequestInformation
-     *
      */
     private void parseJSONRequest(XACMLRequestInformation xacmlRequestInformation) {
-        if ( (xacmlRequestInformation.getOriginalContent()==null)||
-                (xacmlRequestInformation.getOriginalContent().isEmpty()) ) {
+        if ((xacmlRequestInformation.getOriginalContent() == null) ||
+                (xacmlRequestInformation.getOriginalContent().isEmpty())) {
             return;
         }
         try {
             xacmlRequestInformation.setContent(JsonToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
             xacmlRequestInformation.setParsedCorrectly(true);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             debug.error("parseJSONRequest Exception: " + ioe.getMessage() + "], content will be ignored!");
         }
     }
 
     /**
      * Simple helper for checking required field is present or not.
+     *
      * @param value
      * @return boolean - indicator True if Field Present and False if not.
      */
     private static boolean isRequiredFieldPresent(String value) {
-        return  ( (value!=null)&&(!value.isEmpty()) );
+        return ((value != null) && (!value.isEmpty()));
     }
 
     /**

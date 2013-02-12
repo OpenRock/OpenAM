@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
  * RFC2169, HTTP in URN Resolution @see http://tools.ietf.org/html/rfc2169
  *
  * @author jeff.schenk@forgerock.com
- *
  */
 public class URN implements Serializable {
 
@@ -52,6 +51,7 @@ public class URN implements Serializable {
 
     /**
      * Constructor with single parameter
+     *
      * @param urn
      */
     public URN(String urn) {
@@ -69,6 +69,7 @@ public class URN implements Serializable {
 
     /**
      * Get the original URN.
+     *
      * @return
      */
     public String getURN() {

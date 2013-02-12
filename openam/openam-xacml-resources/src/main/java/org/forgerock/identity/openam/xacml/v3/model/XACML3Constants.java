@@ -31,7 +31,6 @@ import com.sun.identity.entitlement.xacml3.XACMLConstants;
  * Model XACML3 Constants
  *
  * @author jeff.schenk@forgerock.com
- *
  */
 public interface XACML3Constants extends XACMLConstants {
 
@@ -60,7 +59,7 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String REQUEST_ABSTRACT = "RequestAbstract";
     public static final String XSI_TYPE_ATTR = "xsi:type";
     public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
-    public static final String METAALIAS_KEY = "/metaAlias" ;
+    public static final String METAALIAS_KEY = "/metaAlias";
 
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
 
@@ -69,7 +68,7 @@ public interface XACML3Constants extends XACMLConstants {
      * Default Response
      */
     public static final String DEFAULT_RESPONSE = XML_HEADER + "<xacml-ctx:response " +
-            "xmlns:xacml-ctx=\""+XACML3_NAMESPACE+"\">" +
+            "xmlns:xacml-ctx=\"" + XACML3_NAMESPACE + "\">" +
             "</xacml-ctx:response>";
 
     /**
@@ -106,15 +105,14 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String URN_ENTRY_POINT = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:documentation";
 
     /**
-     *  ￼
+     * ￼
      * Normative Source: GET on the home location MUST return status code 200
      * ￼
      * Target: Response to GET request on the home location
-     *￼
+     * ￼
      * Predicate: The HTTP status code in the [response] is 200
-     *￼
+     * ￼
      * Prescription Level: mandatory
-     *
      */
     public static final String URN_HOME_STATUS = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status";
 
