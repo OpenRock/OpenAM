@@ -34,6 +34,14 @@
                 
     <description>Open Web Single Sign-On Web Agents for Windows</description>
 
+    <tstamp>
+        <format property="build.date" pattern="MMM dd yyyy HH:mm:ss"/>
+    </tstamp>
+    <property name="AGENT_VER" value="3.1.0-Xpress"/>
+    <property name="AGENT_ER_VER" value=""/>
+    <property name="AGENT_FVB_MARKER" value=""/>
+    <property name="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
+    <property name="BUILD_DATE" value="${build.date}"/>
   
     <property name="build.debug" value=""/>
     <property name="build.type" value="32"/>
@@ -45,7 +53,7 @@
     <tstamp>
         <format property="nightly.date" pattern="yyyyMMdd" offset="-1" unit="day"/>
     </tstamp>
-       
+    
     <condition property="build.debug32">
         <and>
             <equals arg1="${build.debug}" arg2="1"/> 
@@ -310,14 +318,16 @@
               tofile="${webagents.basedir}/am/source/version.h" >
             <filterchain>
                 <replacetokens>
-                    <token key="AGENT_VER" value="3.1.0-Xpress"/>
-                    <token key="AGENT_ER_VER" value=""/>
-                    <token key="AGENT_FVB_MARKER" value=""/>
+                    <token key="AGENT_VER" value="${AGENT_VER}"/>
+                    <token key="AGENT_ER_VER" value="${AGENT_ER_VER}"/>
+                    <token key="AGENT_FVB_MARKER" value="${AGENT_FVB_MARKER}"/>
                     <token key="SVN_REVISION" value="Revision: ${svn.Revision}"/>
-                    <token key="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
+                    <token key="BUILD_MACHINE" value="${BUILD_MACHINE}"/>
                 </replacetokens>
             </filterchain>
         </copy>
+        <delete file="${webagents.basedir}/.version" quiet="true"/>
+        <echo file="${webagents.basedir}/.version">Version: ${AGENT_VER}${line.separator}Revision: ${svn.Revision}${line.separator}Build date: ${BUILD_DATE}${line.separator}Build platform: ${BUILD_MACHINE}${line.separator}${AGENT_ER_VER}${line.separator}${AGENT_FVB_MARKER}</echo>
     </target>
     
     <target name="arch_sdk">
