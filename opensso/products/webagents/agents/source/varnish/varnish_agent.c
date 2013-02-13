@@ -229,27 +229,33 @@ static am_status_t content_read(void **args, char **rbuf) {
         sts = AM_INVALID_ARGUMENT;
     } else if ((ptr = VRT_GetHdr(r->s, HDR_REQ, cl))) {
         content_length = strtoul(ptr, &endp, 10);
-        *rbuf = apr_pcalloc(r->pool, content_length + 1);
-        if (*rbuf == NULL) {
-            am_web_log_error("%s: memory failure", thisfunc);
-            return AM_FAILURE;
-        }
-        while (content_length) {
-            bytes_read = content_length > buf_length ? buf_length : content_length;
-#ifdef VARNISH303
-            bytes_read = HTC_Read(r->s->wrk, r->s->htc, buf, bytes_read);
-#else
-            bytes_read = HTC_Read(r->s->htc, buf, bytes_read);
-#endif
-            if (bytes_read <= 0) {
-                sts = AM_FAILURE;
-                break;
+        if (content_length == 0 || errno == ERANGE) {
+            *rbuf = NULL;
+            am_web_log_warning("%s: post data is empty", thisfunc);
+            sts = AM_NOT_FOUND;
+        } else {
+            *rbuf = apr_pcalloc(r->pool, content_length + 1);
+            if (*rbuf == NULL) {
+                am_web_log_error("%s: memory failure", thisfunc);
+                return AM_FAILURE;
             }
-            content_length -= bytes_read;
-            memcpy((*rbuf) + total_read, buf, bytes_read);
-            total_read += bytes_read;
+            while (content_length) {
+                bytes_read = content_length > buf_length ? buf_length : content_length;
+#ifdef VARNISH303
+                bytes_read = HTC_Read(r->s->wrk, r->s->htc, buf, bytes_read);
+#else
+                bytes_read = HTC_Read(r->s->htc, buf, bytes_read);
+#endif
+                if (bytes_read <= 0) {
+                    sts = AM_FAILURE;
+                    break;
+                }
+                content_length -= bytes_read;
+                memcpy((*rbuf) + total_read, buf, bytes_read);
+                total_read += bytes_read;
+            }
+            sts = AM_SUCCESS;
         }
-        sts = AM_SUCCESS;
     }
 
     if (AM_SUCCESS == sts) {
