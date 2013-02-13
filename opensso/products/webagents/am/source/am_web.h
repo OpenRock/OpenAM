@@ -213,6 +213,7 @@ AM_BEGIN_EXTERN_C
 #define AM_WEB_CLIENT_IP_HEADER_PROPERTY AM_COMMON_PROPERTY_PREFIX "client.ip.header"
 #define AM_WEB_CLIENT_HOSTNAME_HEADER_PROPERTY AM_COMMON_PROPERTY_PREFIX "client.hostname.header"
 
+#define AM_WEB_EMPTY_POST "EMPTY"
 /*
  * Enough space to hold PRTime key in a string
  */

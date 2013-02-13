@@ -751,6 +751,10 @@ static am_status_t content_read(void **args, char **rbuf) {
         }
         am_web_log_debug("%s: Read %d bytes", thisfunc, rpos);
         sts = AM_SUCCESS;
+    } else {
+        *rbuf = NULL;
+        am_web_log_warning("%s: post data is empty", thisfunc);
+        sts = AM_NOT_FOUND;
     }
 
     // Remove the content length since the body has been read.

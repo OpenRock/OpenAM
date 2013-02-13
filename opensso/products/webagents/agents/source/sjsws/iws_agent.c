@@ -284,69 +284,6 @@ static am_status_t register_post_data(Session *sn, Request *rq, char *url,
 }
 
 /**
-  * Method to register POST data in agent cache
-*/
-
-static void register_post_data_orig(Session *sn, Request *rq,char *url,
-			       const char *key, void* agent_config)
-{
-    int i = 0;
-    char *body = NULL;
-    int cl = 0;
-    char *cl_str = NULL;
-    am_web_postcache_data_t post_data;
-
-    /**
-    * content length and body
-    *
-    * note: memory allocated in here should be released by
-    * other function such as: "policy_unregister_post"
-    */
-
-    request_header("content-length", &cl_str, sn, rq);
-    cl = atoi(cl_str);
-    if ((cl_str != NULL) && (cl > 0)){
-	body =  system_malloc(cl + 1);
-	if(body != NULL){
-	    for (i = 0; i < cl; i++) {
-		int ch = netbuf_getc(sn->inbuf);
-		if (ch==IO_ERROR || ch == IO_EOF) {
-		    break;
-		}
-		body[i] = ch;
-	    }
-
-	    body[i] = '\0';
-	}
-    } else {
-	am_web_log_error("Error Registering POST content body");
-    }
-
-    am_web_log_max_debug("Register POST content body : %s", body);
-
-    post_data.value = body;
-    post_data.url = url;
-
-    am_web_log_debug("Register POST data key :%s",key);
-
-    if(am_web_postcache_insert(key,&post_data, agent_config) == B_FALSE){
-	am_web_log_warning("Register POST data insert into"
-			  " hash table failed:%s",key);
-    }
-
-    system_free(body);
-
-    /**
-    * need to reset content length before redirect,
-    * otherwise, web server will wait for serveral minutes
-    * for non existant data
-    */
-    param_free(pblock_remove("content-length", rq->headers));
-    pblock_nvinsert("content-length", "0", rq->headers);
-
-}
-
-/**
   * Create the html form with the javascript that does the post with the
   * invisible name value pairs
 */
@@ -826,9 +763,9 @@ static am_status_t set_cookie(const char *header, void **args)
 
 char * get_post_data(Session *sn, Request *rq, char *url)
 {
-    const char *thisfunc = "get_post_data()";int i = 0;
+    const char *thisfunc = "get_post_data()";
+    long cl = 0, i = 0;
     char *body = NULL;
-    int cl = 0;
     char *cl_str = NULL;
 
     request_header("content-length", &cl_str, sn, rq);
@@ -837,7 +774,7 @@ char * get_post_data(Session *sn, Request *rq, char *url)
         if(cl_str == NULL) {
             return body;
         }
-        if(PR_sscanf(cl_str, "%ld", &cl) == 1) {
+        if((cl = strtol(cl_str, NULL, 10)) > 0 && errno != ERANGE) {
             body =  (char *)malloc(cl + 1);
             if(body != NULL){
                 for (i = 0; i < cl; i++) {
@@ -852,7 +789,7 @@ char * get_post_data(Session *sn, Request *rq, char *url)
     } else {
         am_web_log_error("%s: Error reading POST content body", thisfunc);
     }
-    am_web_log_max_debug("%s: Read POST content body : %s", body, thisfunc);
+    am_web_log_max_debug("%s: Read POST content length: %ld, body: %s", thisfunc, cl, body);
 
     // Need to reset content length before redirect,
     // otherwise, web server will wait for several minutes
@@ -883,9 +820,11 @@ int process_request_with_post_data_preservation(Session *sn, Request *rq,
     int requestResult = REQ_PROCEED;
     post_urls_t *post_urls;
     char *response = NULL;
+    int local_alloc = 1;
 
     if (*resp != NULL) {
         response = *resp;
+        local_alloc = 0;
     }
     // Create the magic URI, actionurl
     status = am_web_create_post_preserve_urls(requestURL, &post_urls,
@@ -902,6 +841,11 @@ int process_request_with_post_data_preservation(Session *sn, Request *rq,
         }
     }
     if (status == AM_SUCCESS) {
+        if (response == NULL || strlen(response) == 0) {
+            // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
+            if ((response = realloc(response, strlen(AM_WEB_EMPTY_POST) + 1)) != NULL)
+                strcpy(response, AM_WEB_EMPTY_POST);
+        }
         if (response != NULL && strlen(response) > 0) {
             if (AM_SUCCESS == register_post_data(sn, rq,
                                 post_urls->action_url,
@@ -956,7 +900,11 @@ int process_request_with_post_data_preservation(Session *sn, Request *rq,
         am_web_clean_post_urls(post_urls);
         post_urls = NULL;
     }
-
+    if (response != NULL && local_alloc == 1) {
+        free(response);
+        response = NULL;
+    }
+    
     return requestResult;
 }
 

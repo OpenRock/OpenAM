@@ -239,6 +239,10 @@ am_status_t process_request_with_post_data_preservation(IHttpContext* pHttpConte
     if ((status == AM_SUCCESS) && (response.size() == 0)) {
         GetEntity(pHttpContext, response);
     }
+    if ((status == AM_SUCCESS) && (response.size() == 0)) {
+        // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
+        response.assign(AM_WEB_EMPTY_POST);
+    }
     if ((status == AM_SUCCESS) && (response.size()) > 0) {
         if (AM_SUCCESS == register_post_data(pHttpContext, post_urls->action_url,
                 post_urls->post_time_key, (char *) response.c_str(),

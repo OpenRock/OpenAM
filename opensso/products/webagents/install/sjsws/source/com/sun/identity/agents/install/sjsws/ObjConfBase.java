@@ -70,7 +70,7 @@ public class ObjConfBase implements
             FileUtils.appendDataToFile(objFile,
                 "<Object ppath=\"*/dummypost/sunpostpreserve*\">");
             FileUtils.appendDataToFile(objFile,
-                "Service type=text/* method=(GET) fn=append_post_data");
+                "Service type=text/* method=(GET|POST) fn=append_post_data");
             FileUtils.appendDataToFile(objFile,"</Object>");
 
             FileUtils.appendDataToFile(objFile,

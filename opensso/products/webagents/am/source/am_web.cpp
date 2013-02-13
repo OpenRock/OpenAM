@@ -4271,50 +4271,61 @@ am_web_create_post_page(const char *key,
     const char *thisfunc = "am_web_create_post_page()";
     char *buffer_page = NULL;
     int num_sectors = 0;
-    int i =0;
+    int i = 0;
     size_t totalchars = 0;
-    Utils::post_struct_t *post_data = split_post_data(postdata);
-    num_sectors = post_data->count;
 
-    // Find the total length required to construct the name value fragment
-    // of the page
-    for(i = 0; i < num_sectors; ++i){
-        totalchars += strlen(post_data->namevalue[i].name);
-        totalchars += strlen(post_data->namevalue[i].value);
-        totalchars += strlen(sector_two) + strlen(sector_three)
-                      + strlen(sector_four);
+    if (postdata != NULL && strcmp(postdata, AM_WEB_EMPTY_POST) == 0) {
+        /* empty post body handler */
+        buffer_page = (char *) malloc(strlen(sector_one) + strlen(actionurl) +
+                strlen(sector_two) + strlen(sector_five) + 1);
+        strcpy(buffer_page, sector_one);
+        strcat(buffer_page, actionurl);
+        strcat(buffer_page, sector_two);
+        strcat(buffer_page, sector_five);
+    } else {
+        Utils::post_struct_t *post_data = split_post_data(postdata);
+        num_sectors = post_data->count;
+
+        // Find the total length required to construct the name value fragment
+        // of the page
+        for (i = 0; i < num_sectors; ++i) {
+            totalchars += strlen(post_data->namevalue[i].name);
+            totalchars += strlen(post_data->namevalue[i].value);
+            totalchars += strlen(sector_two) + strlen(sector_three)
+                    + strlen(sector_four);
+        }
+        // Allocate the length of the buffer
+        buffer_page = (char *) malloc(strlen(sector_one) + strlen(actionurl) +
+                strlen(sector_two) +
+                totalchars + strlen(sector_five) + 1);
+        strcpy(buffer_page, sector_one);
+        strcat(buffer_page, actionurl);
+        strcat(buffer_page, sector_two);
+        // Copy in the variable part, the name value pair..
+        for (i = 0; i < num_sectors; i++) {
+            strcat(buffer_page, sector_three);
+            strcat(buffer_page, post_data->namevalue[i].name);
+            strcat(buffer_page, sector_four);
+            strcat(buffer_page, post_data->namevalue[i].value);
+            strcat(buffer_page, sector_two);
+        }
+        strcat(buffer_page, sector_five);
+        if (post_data->namevalue != NULL) {
+            free(post_data->namevalue);
+        }
+        if (post_data->buffer != NULL) {
+            free(post_data->buffer);
+        }
+        if (post_data != NULL) {
+            free(post_data);
+        }
     }
-    // Allocate the length of the buffer
-    buffer_page = (char *)malloc(strlen(sector_one) + strlen(actionurl) +
-                  strlen(sector_two) +
-                  totalchars + strlen(sector_five) + 1);
-    strcpy(buffer_page,sector_one);
-    strcat(buffer_page,actionurl);
-    strcat(buffer_page,sector_two);
-    // Copy in the variable part, the name value pair..
-    for(i = 0; i < num_sectors; i++){
-        strcat(buffer_page,sector_three);
-        strcat(buffer_page,post_data->namevalue[i].name);
-        strcat(buffer_page,sector_four);
-        strcat(buffer_page,post_data->namevalue[i].value);
-        strcat(buffer_page,sector_two);
-    }
-    strcat(buffer_page, sector_five);
     // Now remove the entry from the hashtable
-    if(key != NULL){
+    if (key != NULL) {
         am_web_postcache_remove(key, agent_config);
     }
     Log::log(boot_info.log_module, Log::LOG_DEBUG,
-             "%s: HTML page for post %s :", thisfunc, buffer_page);
-    if(post_data->namevalue != NULL){
-        free(post_data->namevalue);
-    }
-    if(post_data->buffer != NULL){
-        free(post_data->buffer);
-    }
-    if(post_data != NULL){
-        free(post_data);
-    }
+            "%s: HTML page for post: %s", thisfunc, buffer_page);
 
     return buffer_page;
 }
@@ -5973,6 +5984,7 @@ process_request(am_web_request_params_t *req_params,
     char *advice_response = NULL;
     std::string request_url_str;
     void *args[1];
+    int local_alloc = 0;
     boolean_t cdsso_enabled = am_web_is_cdsso_enabled(agent_config);
     // initialize reserved field to NULL
     req_params->reserved = NULL;
@@ -6098,6 +6110,12 @@ process_request(am_web_request_params_t *req_params,
                     if (post_data == NULL) {
                         am_web_log_debug("%s: post_data is empty, trying to read it here...", thisfunc);
                         pds = req_func->get_post_data.func(req_func->get_post_data.args, &post_data);
+                        if (pds == AM_NOT_FOUND) {
+                            // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
+                            post_data = strdup(AM_WEB_EMPTY_POST);
+                            local_alloc = 1;
+                            pds = AM_SUCCESS;
+                        }
                         if (post_data == NULL) {
                             am_web_log_warning("%s: this is a POST request with no post data. Redirecting as a GET request.", thisfunc);
                             pds = AM_FAILURE;
@@ -6107,7 +6125,7 @@ process_request(am_web_request_params_t *req_params,
                     }
                     /*do not store LARES post data in a shared cache*/
                     if (post_data != NULL && strncmp(post_data, "LARES", 5) == 0) {
-                        if (post_data != NULL) {
+                        if (post_data != NULL && local_alloc == 0) {
                             if (req_func->free_post_data.func != NULL) {
                                 req_func->free_post_data.func(req_func->free_post_data.args, post_data);
                             }
@@ -6233,7 +6251,10 @@ process_request(am_web_request_params_t *req_params,
             post_data_cache = NULL;
         }
         if (post_data != NULL) {
-            if (req_func->free_post_data.func != NULL) {
+            if (local_alloc == 1) {
+                free(post_data);
+            }
+            if (local_alloc == 0 && req_func->free_post_data.func != NULL) {
                 req_func->free_post_data.func(req_func->free_post_data.args, post_data);
             }
             post_data = NULL;

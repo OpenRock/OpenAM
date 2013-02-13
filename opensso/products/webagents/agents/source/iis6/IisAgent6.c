@@ -1583,9 +1583,11 @@ DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
     DWORD returnValue = HSE_STATUS_SUCCESS;
     post_urls_t *post_urls = NULL;
     char *response = NULL;
+    int local_alloc = 1;
 
     if (*resp != NULL) {
         response = *resp;
+        local_alloc = 0;
     }
     status = am_web_create_post_preserve_urls(requestURL, &post_urls,
                                               agent_config);
@@ -1604,6 +1606,11 @@ DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
         }
     }
     if (status == AM_SUCCESS) {
+        if (response == NULL || strlen(response) == 0) {
+            // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
+            if ((response = realloc(response, strlen(AM_WEB_EMPTY_POST) + 1)) != NULL)
+                strcpy(response, AM_WEB_EMPTY_POST);
+        }
         if (response != NULL && strlen(response) > 0) {
             if (AM_SUCCESS == register_post_data(pECB,post_urls->action_url,
                                        post_urls->post_time_key, response, 
@@ -1656,6 +1663,10 @@ DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
         am_web_clean_post_urls(post_urls);
         post_urls = NULL;
     }
+    if (response != NULL && local_alloc == 1) {
+        free(response);
+        response = NULL;
+    } 
 
     return returnValue;
 }
