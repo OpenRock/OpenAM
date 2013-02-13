@@ -507,8 +507,8 @@ unsigned long Properties::getUnsigned(const std::string& key,
     if (iter == end()) {
         if (terse) {
 	    Log::log(logID, Log::LOG_MAX_DEBUG,
-	         "No value specified for key %s, using default value.", 
-			key.c_str());
+	         "No value specified for key %s, using default value %ld.", 
+			key.c_str(), defaultValue);
         }
 	result = defaultValue;
     } else {
@@ -517,8 +517,8 @@ unsigned long Properties::getUnsigned(const std::string& key,
         } catch (...) {
            if (terse) {
 	       Log::log(logID, Log::LOG_MAX_DEBUG,
-	         "Invalid value specified for key %s, using default value.", 
-	               key.c_str());
+	         "Invalid value specified for key %s, using default value %ld.", 
+	               key.c_str(), defaultValue);
            }
            result = defaultValue;
 	}
@@ -573,8 +573,8 @@ long Properties::getSigned(const std::string& key, long defaultValue,
     if (iter == end()) {
         if (terse) {
 	    Log::log(logID, Log::LOG_MAX_DEBUG, 
-	         "No value specified for key %s, using default value.", 
-			key.c_str());
+	         "No value specified for key %s, using default value %ld.", 
+			key.c_str(), defaultValue);
         }
 	result =  defaultValue;
     } else {
@@ -583,8 +583,8 @@ long Properties::getSigned(const std::string& key, long defaultValue,
         } catch (...) {
            if (terse) {
 	       Log::log(logID, Log::LOG_MAX_DEBUG,
-	         "Invalid value specified for key %s, using default value.", 
-		    key.c_str());
+	         "Invalid value specified for key %s, using default value %ld.", 
+		    key.c_str(), defaultValue);
            }
            result = defaultValue;
         }
@@ -645,8 +645,8 @@ bool Properties::getBool(const std::string& key, bool defaultValue,
     if (iter == end()) {
         if (terse) {
 	    Log::log(logID, Log::LOG_MAX_DEBUG,
-	         "No value specified for key %s, using default value.", 
-			key.c_str());
+	         "No value specified for key %s, using default value %s.", 
+			key.c_str(), defaultValue ? "TRUE" : "FALSE");
         }
 	result = defaultValue;
     } else {
@@ -655,8 +655,8 @@ bool Properties::getBool(const std::string& key, bool defaultValue,
         } catch (...) {
             if (terse) {
 	        Log::log(logID, Log::LOG_MAX_DEBUG,
-		  "Invalid value specified for key %s, using default value.", 
-		      key.c_str());
+		  "Invalid value specified for key %s, using default value %s.", 
+		      key.c_str(), defaultValue ? "TRUE" : "FALSE");
             }
             result = defaultValue;
 	}
