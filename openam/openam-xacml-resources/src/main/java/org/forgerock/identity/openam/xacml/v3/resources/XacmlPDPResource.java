@@ -170,7 +170,7 @@ public class XacmlPDPResource implements XACML3Constants {
     }
 
     /**
-     * Processes XML Requests from the PEP Request for the PDP.
+     * Processes JSON Requests from the PEP Request for the PDP.
      *
      * @param request
      * @param response

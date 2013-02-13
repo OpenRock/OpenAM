@@ -26,6 +26,7 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
@@ -74,16 +75,15 @@ public class XacmlHomeResource implements XACML3Constants {
 
         // ************************************************************
         // Determine how to respond based upon Content Type.
-        if ((request.getContentType() == ContentType.NONE.applicationType()) ||
-                (request.getContentType().equalsIgnoreCase(ContentType.JSON_HOME.applicationType())) ||
-                (request.getContentType().equalsIgnoreCase(ContentType.JSON.applicationType()))) {
-            sb.append(getJSONHomeDocument().toString());  // TODO -- Cache the Default Home JSON Document Object.
+        if ( (xacmlRequestInformation.getContentType().equals(ContentType.NONE.applicationType())) ||
+             (xacmlRequestInformation.getContentType().commonType() == CommonType.JSON) ) {
+                sb.append(getJSONHomeDocument(xacmlRequestInformation));
         } else {
-            // Formulate the Home Document for XML Consumption.
+            // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
             sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
             sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
-            sb.append("<resource rel=\042http://openam.example.org/openam/xacml/authorization/pdp\042>");  // TODO, Link needs to be real!
-            sb.append("<atom:link href=\042/xacml/authorization/pdp\042/>");  // TODO Static?
+            sb.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
+            sb.append("<atom:link href=\042/xacml/pdp/authorization\042/>");
             sb.append("</resource>");
             sb.append("</resources>");
         } // End of Check for Content Type.
@@ -100,20 +100,20 @@ public class XacmlHomeResource implements XACML3Constants {
      * @return JSONObject
      * @throws org.json.JSONException
      */
-    public static JSONObject getJSONHomeDocument() throws JSONException {
+    public static JSONObject getJSONHomeDocument(XACMLRequestInformation xacmlRequestInformation) throws JSONException {
         JSONObject resources = new JSONObject();
         JSONArray resourceArray = new JSONArray();
 
         JSONObject resource_1 = new JSONObject();
         resource_1.append("href", "/xacml/");
         JSONObject resource_1A = new JSONObject();
-        resource_1A.append("http://openam.example.org/openam/xacml", resource_1);           // TODO Verify!
+        resource_1A.append(xacmlRequestInformation.getXacmlHome(), resource_1);
 
         JSONObject resource_2 = new JSONObject();
         resource_2.append("href-template", "/xacml/");
-        resource_2.append("hints", getHomeHints());
+        resource_2.append("hints", getHomeHints(xacmlRequestInformation));
         JSONObject resource_2A = new JSONObject();
-        resource_2A.append("http://openam.example.org/openam/xacml", resource_2);           // TODO Verify!
+        resource_2A.append(xacmlRequestInformation.getXacmlHome(), resource_2);
 
         resourceArray.put(resource_1A);
         resourceArray.put(resource_2A);
@@ -130,7 +130,7 @@ public class XacmlHomeResource implements XACML3Constants {
      * @return JSONObject - Containing Hints for our Home Application.
      * @throws org.json.JSONException
      */
-    private static JSONObject getHomeHints() throws JSONException {
+    private static JSONObject getHomeHints(XACMLRequestInformation xacmlRequestInformation) throws JSONException {
         JSONObject hints = new JSONObject();
 
         /**

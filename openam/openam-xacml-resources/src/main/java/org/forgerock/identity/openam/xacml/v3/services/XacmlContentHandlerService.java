@@ -66,15 +66,44 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * XACML Resource Router
- * <p/>
- * Provides main end-point for all XACML v3.0 requests,
- * either XML or JSON based over HTTP/HTTPS REST based protocol flow.
- * <p/>
- * This ForgeRock developed XACML Resource Router complies with the following OASIS Specifications:
- * <ul/>
- * <ul/>
- * <ul/>
+ * XACML v3 Resource Router
+ <p/>
+ Provides main end-point for all XACML v3.0 requests,
+ either XML or JSON based over HTTP/HTTPS REST based protocol flow.
+ <p/>
+ This ForgeRock developed XACML Resource Router complies with the following OASIS Specifications:
+ <ul>
+ <li>xacml-3.0-core-spec-cs-01-en.pdf</li>
+ <li>xacml-rest-v1.0-csprd01.pdf</li>
+ <li>xacml-json-http-v1-1.0-wd09.doc</li>
+ <li>...</li>
+ </ul>
+
+ <b>The following XACML v3 End Points are currently viable:</b>
+ <table>
+ <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
+ <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Provides Home Document</em></td></tr>
+ <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;home&#47;</li></ul></td><td><em>Provides Home Document</em></td></tr>
+ <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;status&#47;</li></ul></td><td><em>Provides Status and Home
+ Document</em></td></tr>
+
+ <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
+ <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;pdp&#47;</li></ul></td><td><em>Request from PEP</em></td></tr>
+ </table>
+ <b><i>Future intended EndPoints which are not Implemented yet:</i></b>
+ <table>
+ <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
+
+ <tr><td>GET
+ </td><td><ul><li>&#47;openam&#47;xacml&#47;pip&#47;&lt;query&gt;</li></ul></td><td><em>Policy Information Point
+ Query</em></td></tr>
+ <tr><td>GET &amp; POST
+ </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;*</li></ul></td><td><em>Policy Administration Point</em></td></tr>
+ <tr><td>POST
+ </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;import&#47</li></ul></td><td><em>PAP Import Policy</em></td></tr>
+ <tr><td>POST
+ </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;export&#47</li></ul></td><td><em>PAP Export Policy</em></td></tr>
+ </table>
  *
  * @author Jeff.Schenk@forgerock.com
  */
@@ -443,6 +472,20 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
+     * Simple Helper Method to provide common OK for Server PDP Status.
+     *
+     * @param requestContentType
+     * @param response
+     */
+    private void renderServerOKRequest(final ContentType requestContentType, HttpServletResponse response) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentLength(0);
+        response.setStatus(HttpServletResponse.SC_OK);  // 200
+        renderResponse(requestContentType, null, response);
+        return;
+    }
+
+    /**
      * Returns a short description of the servlet.
      *
      * @return a String containing servlet description
@@ -476,13 +519,30 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Parse our Request...
         XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
+        if (xacmlRequestInformation == null) {
+            // This Starts the Authorization via Digest Flow...
+            this.renderUnAuthorized("", requestContentType, response);
+            return;
+        }
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
         if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
-            // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-            return;
+            (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
+
+            // Knowing we have no Authentication at this point check the Request Path Information, provide the
+            // Home Document to the Requester.
+            // *****************************************************************
+            // Render our Response
+            try {
+                renderResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation, request), response);
+                return;
+            } catch(JSONException jsonException) {
+                // Force Unauthorized and show exception for debugging.
+                debug.error(classMethod+" JSON Exception Occurred: "+jsonException.getMessage(),jsonException);
+                // This Starts the Authorization via Digest Flow...
+                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                return;
+            }
         }
         // ******************************************************************
         // Obtain our Request Content Data.
@@ -518,19 +578,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if (xacmlRequestInformation.isDigestValid()) {
             // TODO -- Continue Validation of UserId and Password.
         }
-
-        // ******************************************************************
-        // Determine our Content Type Language, XML or JSON for now.
-        if (requestContentType.commonType() == CommonType.XML) {
-            // If Content is XML,
-
-
-        } else {
-            // Else, our Content is assumed to be JSON.
-
-
-        }
-
 
         // ************************************************************
         // Accept a pre-determined entry point for the Home Documents
@@ -615,34 +662,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          mandatory
          */
 
-        /**
-
-         // Check our query string.
-         String queryParam = request.getQueryString();
-
-         // Formulate Response.
-         StringBuilder xacmlStringBuilderResponse = new StringBuilder();
-         if ((request.getContentType() == ContentType.NONE.applicationType()) ||
-         (request.getContentType().equalsIgnoreCase(ContentType.JSON_HOME.applicationType())) ||
-         (request.getContentType().equalsIgnoreCase(ContentType.JSON.applicationType()))) {
-         try {
-         xacmlStringBuilderResponse.append(XACMLHomeResource.getHome(xacmlRequestInformation, request)); // TODO -- Cache the Default Home JSON Document Object.
-         } catch (JSONException jsonException) {
-         // TODO
-         }
-         } else {
-         // Formulate the Home Document in XML.
-         // TODO
-
-         xacmlStringBuilderResponse.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
-         xacmlStringBuilderResponse.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
-         xacmlStringBuilderResponse.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
-         xacmlStringBuilderResponse.append("<atom:link href=\042/authorization/pdp\042/>");  // TODO Static?
-         xacmlStringBuilderResponse.append("</resource>");
-         xacmlStringBuilderResponse.append(" </resources>");
-         }
-
-         **/
         // TODO Determine if there are any other Get Request Types we need to deal with,
         // TODO otherwise pass along.
 
@@ -680,6 +699,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Parse our Request...
         XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
+        if (xacmlRequestInformation == null) {
+            // This Starts the Authorization via Digest Flow...
+            this.renderUnAuthorized("", requestContentType, response);
+            return;
+        }
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
         if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
@@ -951,11 +975,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             String pdpEntityID =
                     XACML3Utils.getEntityByMetaAlias(queryMetaAlias);
             // Bootstrap our Request Information Object for this Request.
-            XACMLRequestInformation xacmlRequestInformation = new XACMLRequestInformation(contentType, requestURI,
-                    queryMetaAlias, pdpEntityID, realm);
+            XACMLRequestInformation xacmlRequestInformation = new XACMLRequestInformation(contentType,
+                    queryMetaAlias, pdpEntityID, realm, request);
             // Consume the Request Content, by parsing
-            // Get Raw Content.
-            xacmlRequestInformation.setOriginalContent(getRequestBody(request));
             // the Content Depending upon the Content Type.
             if (contentType.commonType().equals(CommonType.XML)) {
                 parseXMLRequest(xacmlRequestInformation);
@@ -969,30 +991,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return xacmlRequestInformation;
         } catch (SAML2Exception xe) {
             debug.error(classMethod + " XACML MetaException: " + xe.getMessage(), xe);
-            // TODO
+            // Pass back no XACMLRequestInformation Object to indicate we have an issue.
             return null;
         }
-    }
-
-    /**
-     * Return the Request Body Content.
-     *
-     * @param request
-     * @return String - Request Content Body.
-     */
-    private final String getRequestBody(final HttpServletRequest request) {
-        // Get the body content of the HTTP request,
-        // remember we have no normal WS* SOAP Body, just String
-        // data either XML or JSON.
-        try {
-            InputStream inputStream = request.getInputStream();
-            return new Scanner(inputStream).useDelimiter("\\A").next();
-        } catch (IOException ioe) {
-            // TODO
-        } catch (NoSuchElementException nse) {   // runtime exception.
-            // TODO
-        }
-        return null;
     }
 
     /**
@@ -1148,6 +1149,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
     /**
      * Public Helper Method for accessing handlers.
+     *
+     * TODO Remove!!!!
      *
      * @return
      */

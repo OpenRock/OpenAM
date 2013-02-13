@@ -58,9 +58,11 @@ public class TestXACMLInterOperability {
 
         servletTester = new ServletTester();
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/authorization");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp/authorization");
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/relation/pdp");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pip");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pap");
+
         servletTester.start();
     }
 

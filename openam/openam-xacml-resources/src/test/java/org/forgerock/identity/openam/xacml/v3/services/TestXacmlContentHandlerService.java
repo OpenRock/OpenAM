@@ -59,9 +59,11 @@ public class TestXacmlContentHandlerService {
 
         servletTester = new ServletTester();
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/authorization");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp/authorization");
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/relation/pdp");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pip");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pap");
+
         servletTester.start();
     }
 
@@ -122,7 +124,7 @@ public class TestXacmlContentHandlerService {
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
-        request.setURI("/xacml/authorization");
+        request.setURI("/xacml/pdp/authorization");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
 
@@ -146,7 +148,7 @@ public class TestXacmlContentHandlerService {
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
-        request.setURI("/xacml/authorization");
+        request.setURI("/xacml/pdp/authorization");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
 

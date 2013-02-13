@@ -27,6 +27,12 @@ package org.forgerock.identity.openam.xacml.v3.model;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
 /**
  * XACMLRequestInformation
  * <p/>
@@ -40,10 +46,6 @@ public class XACMLRequestInformation {
      * Request Parsed correctly for either XML or JSON Data.
      */
     private boolean parsedCorrectly;
-    /**
-     * Requested URI
-     */
-    private String requestURI;
     /**
      * Meta Alias Information.
      */
@@ -85,9 +87,23 @@ public class XACMLRequestInformation {
      * If this object is Null, we have an Anonymous/Guest Request.
      */
     private Object authenticationContent;
+    /**
+     *  Information obtained from actual HTTPServletRequest Object.
+     */
+    private String requestAuthenticationType;
+    private Object requestUserPrincipal;
+    private String requestContextPath;
+    private String requestPathInfo;
+    private String requestQueryString;
+    private String requestURI;
+    private String requestServletPath;
+    private String requestProtocol;
+    private String requestScheme;
+    private String requestServerName;
+    private int requestLocalPort;
 
     /**
-     * XACMLAuthzDecisionQuery Fields.
+     * XACMLAuthzDecisionQuery Inner Class.
      * <p/>
      * If this is an XACMLAuthzDecisionQuery, then the following fields
      * will be populated during Parsing of the XACMLAuthzDecisionQuery wrapper Document.
@@ -227,19 +243,36 @@ public class XACMLRequestInformation {
     /**
      * Default Constructor.
      *
-     * @param requestURI
+     * @param contentType
      * @param metaAlias
      * @param pdpEntityID
      * @param realm
+     * @param request
      */
-    public XACMLRequestInformation(ContentType contentType, String requestURI, String metaAlias, String pdpEntityID,
-                                   String realm) {
+    public XACMLRequestInformation(ContentType contentType, String metaAlias, String pdpEntityID,
+                                   String realm, HttpServletRequest request) {
         this.contentType = contentType;
-        this.requestURI = requestURI;
         this.metaAlias = metaAlias;
         this.pdpEntityID = pdpEntityID;
         this.realm = realm;
         this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
+        // Save our Request Information.
+        this.requestAuthenticationType = request.getAuthType();
+        this.requestUserPrincipal = request.getUserPrincipal();
+        this.requestContextPath = request.getContextPath();
+        this.requestPathInfo = request.getPathInfo();
+        this.requestQueryString = request.getQueryString();
+        this.requestURI = request.getRequestURI();
+        this.requestServletPath = request.getServletPath();
+        this.requestProtocol = request.getProtocol();
+        this.requestScheme = request.getScheme();
+        this.requestServerName = request.getServerName();
+        this.requestLocalPort = request.getLocalPort();
+        // Save our Original Content...
+        // Get Raw Content Body.
+        if (request.getContentLength() > 0) {
+            this.originalContent = this.getRequestBody(request);
+        }
     }
 
 
@@ -339,6 +372,86 @@ public class XACMLRequestInformation {
         this.requestNodePresent = requestNodePresent;
     }
 
+    public String getRequestAuthenticationType() {
+        return requestAuthenticationType;
+    }
+
+    public void setRequestAuthenticationType(String requestAuthenticationType) {
+        this.requestAuthenticationType = requestAuthenticationType;
+    }
+
+    public Object getRequestUserPrincipal() {
+        return requestUserPrincipal;
+    }
+
+    public void setRequestUserPrincipal(Object requestUserPrincipal) {
+        this.requestUserPrincipal = requestUserPrincipal;
+    }
+
+    public String getRequestContextPath() {
+        return requestContextPath;
+    }
+
+    public void setRequestContextPath(String requestContextPath) {
+        this.requestContextPath = requestContextPath;
+    }
+
+    public String getRequestPathInfo() {
+        return requestPathInfo;
+    }
+
+    public void setRequestPathInfo(String requestPathInfo) {
+        this.requestPathInfo = requestPathInfo;
+    }
+
+    public String getRequestQueryString() {
+        return requestQueryString;
+    }
+
+    public void setRequestQueryString(String requestQueryString) {
+        this.requestQueryString = requestQueryString;
+    }
+
+    public String getRequestServletPath() {
+        return requestServletPath;
+    }
+
+    public void setRequestServletPath(String requestServletPath) {
+        this.requestServletPath = requestServletPath;
+    }
+
+    public String getRequestProtocol() {
+        return requestProtocol;
+    }
+
+    public void setRequestProtocol(String requestProtocol) {
+        this.requestProtocol = requestProtocol;
+    }
+
+    public String getRequestScheme() {
+        return requestScheme;
+    }
+
+    public void setRequestScheme(String requestScheme) {
+        this.requestScheme = requestScheme;
+    }
+
+    public String getRequestServerName() {
+        return requestServerName;
+    }
+
+    public void setRequestServerName(String requestServerName) {
+        this.requestServerName = requestServerName;
+    }
+
+    public int getRequestLocalPort() {
+        return requestLocalPort;
+    }
+
+    public void setRequestLocalPort(int requestLocalPort) {
+        this.requestLocalPort = requestLocalPort;
+    }
+
     // **********************************************
     // Response Fields for Request
     // **********************************************
@@ -372,7 +485,6 @@ public class XACMLRequestInformation {
         final StringBuffer sb = new StringBuffer();
         sb.append("XACMLRequestInformation");
         sb.append("{parsedCorrectly=").append(parsedCorrectly);
-        sb.append(", requestURI='").append(requestURI).append('\'');
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
         sb.append(", realm='").append(realm).append('\'');
@@ -383,10 +495,61 @@ public class XACMLRequestInformation {
         sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
         sb.append(", authenticated=").append(authenticated);
         sb.append(", authenticationContent=").append(authenticationContent);
+        sb.append(", requestAuthenticationType='").append(requestAuthenticationType).append('\'');
+        sb.append(", requestUserPrincipal=").append(requestUserPrincipal);
+        sb.append(", requestContextPath='").append(requestContextPath).append('\'');
+        sb.append(", requestPathInfo='").append(requestPathInfo).append('\'');
+        sb.append(", requestQueryString='").append(requestQueryString).append('\'');
+        sb.append(", requestURI='").append(requestURI).append('\'');
+        sb.append(", requestServletPath='").append(requestServletPath).append('\'');
+        sb.append(", requestProtocol='").append(requestProtocol).append('\'');
+        sb.append(", requestScheme='").append(requestScheme).append('\'');
+        sb.append(", requestServerName='").append(requestServerName).append('\'');
+        sb.append(", requestLocalPort=").append(requestLocalPort);
         sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
         sb.append(", digestValid=").append(digestValid);
         sb.append(", xacmlStringResponse='").append(xacmlStringResponse).append('\'');
         sb.append('}');
         return sb.toString();
     }
+
+    /**
+     * Return the Request Body Content.
+     *
+     * @param request
+     * @return String - Request Content Body.
+     */
+    private final String getRequestBody(final HttpServletRequest request) {
+        // Get the body content of the HTTP request,
+        // remember we have no normal WS* SOAP Body, just String
+        // data either XML or JSON.
+        try {
+            InputStream inputStream = request.getInputStream();
+            return new Scanner(inputStream).useDelimiter("\\A").next();
+        } catch (IOException ioe) {
+            // Do Nothing...
+        } catch (NoSuchElementException nse) {   // runtime exception.
+            //Do Nothing...
+        }
+        return null;
+    }
+
+    /**
+     * Get our Server URL construct from our incoming Request.
+     *
+     * @return - Base XACML URL yields "schema://serverName:LocalPort/contextPath/servletPath"
+     */
+    public final String getXacmlHome() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getRequestScheme());
+        sb.append("://");
+        sb.append(this.getRequestServerName());
+        sb.append(":");
+        sb.append(this.getRequestLocalPort());
+        sb.append(this.getRequestContextPath());
+        sb.append("/").append(this.getRequestServletPath());
+        return sb.toString();
+    }
+
+
 }

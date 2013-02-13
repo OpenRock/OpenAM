@@ -28,6 +28,7 @@ package org.forgerock.identity.openam.xacml.v3.model;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -35,8 +36,18 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -65,9 +76,12 @@ public class TestXacmlRequestInformationObject {
     private static final String testDestination = "/openam/xacml/pdp/consent/ID_1e469be0-ecc4-11da-8ad9-0800200c9a66/";
     private static final String testVersion = "2.0";
 
+    private HttpServletRequest mockedTestRequest = Mockito.mock(HttpServletRequest.class);
+
 
     @BeforeClass
     public void before() throws Exception {
+        assertNotNull(mockedTestRequest);
     }
 
     @AfterClass
@@ -77,10 +91,10 @@ public class TestXacmlRequestInformationObject {
     @Test
     public void testUseCase_SettingAttributesInInnerClass() {
 
+
         XACMLRequestInformation xacmlRequestInformation = new XACMLRequestInformation(ContentType.XACML_PLUS_XML,
-                testRequestURI,
                 testQueryMetaAlias, testPDPEntityID,
-                testRealm);
+                testRealm, mockedTestRequest);
 
         assertNotNull(xacmlRequestInformation);
         assertNotNull(xacmlRequestInformation.getXacmlAuthzDecisionQuery());
