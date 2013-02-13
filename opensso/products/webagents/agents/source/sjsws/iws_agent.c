@@ -482,12 +482,16 @@ NSAPI_PUBLIC int append_post_data(pblock *param, Session *sn, Request *rq)
             requestResult = create_buffer_withpost(post_data_query,
                         get_data,sn, rq, agent_config);
         } else {
-            am_web_log_debug("%s: Found magic URI but entry not in POST"
+            am_web_log_error("%s: Found magic URI but entry not in POST"
                              " Hash table :%s", thisfunc, post_data_query);
+            protocol_status(sn, rq, PROTOCOL_NOT_FOUND, NULL);
+            param_free(pblock_remove("referer", rq->headers));
             requestResult = REQ_ABORTED;
         }
     } else {
         am_web_log_error("%s: Magic URL value not found in POST cache", thisfunc);
+        protocol_status(sn, rq, PROTOCOL_NOT_FOUND, NULL);
+        param_free(pblock_remove("referer", rq->headers));
         requestResult = REQ_ABORTED;
     }
     if (temp_uri != NULL) {
