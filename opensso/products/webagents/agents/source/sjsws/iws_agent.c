@@ -53,11 +53,12 @@
 
 #include "am_properties.h"
 #include "am_web.h"
-//#include <prlock.h>
 
 #include <stdio.h>
-#if     defined(WINNT)
+#if defined(WINNT)
 #define snprintf        _snprintf
+#else
+#include <unistd.h>
 #endif
 
 #define AGENT_BOOTSTRAP_FILE "/OpenSSOAgentBootstrap.properties"
@@ -619,76 +620,82 @@ NSAPI_PUBLIC int web_agent_init(pblock *param, Session *sn, Request *rq)
     int nsapi_status = REQ_PROCEED;
     char *temp_buf = NULL;
     char *agent_bootstrap_file = NULL;
-    char *agent_config_file = NULL;    
+    char *agent_config_file = NULL;
 
     initLock = crit_init();
 
     temp_buf = pblock_findval(DSAME_CONF_DIR, param);
 
     if (temp_buf != NULL) {
-        agent_bootstrap_file = 
-            system_malloc(strlen(temp_buf) + sizeof(AGENT_BOOTSTRAP_FILE));
-        agent_config_file = 
-            system_malloc(strlen(temp_buf) + sizeof(AGENT_CONFIG_FILE));
-	if (agent_bootstrap_file != NULL) {
-	    strcpy(agent_bootstrap_file, temp_buf);
-	    strcat(agent_bootstrap_file, AGENT_BOOTSTRAP_FILE);
-	} else {
-	    log_error(LOG_FAILURE, "URL Access Agent: ", sn, rq,
-		      "web_agent_init() unable to allocate memory for bootstrap "
-		      "file name", DSAME_CONF_DIR);
-	    nsapi_status = REQ_ABORTED;
-	}
+        agent_bootstrap_file =
+                system_malloc(strlen(temp_buf) + sizeof (AGENT_BOOTSTRAP_FILE));
+        agent_config_file =
+                system_malloc(strlen(temp_buf) + sizeof (AGENT_CONFIG_FILE));
+        if (agent_bootstrap_file != NULL) {
+            strcpy(agent_bootstrap_file, temp_buf);
+            strcat(agent_bootstrap_file, AGENT_BOOTSTRAP_FILE);
+        } else {
+            log_error(LOG_FAILURE, "Web Policy Agent: ", sn, rq,
+                    "web_agent_init() unable to allocate memory for bootstrap "
+                    "file name", DSAME_CONF_DIR);
+            nsapi_status = REQ_ABORTED;
+        }
 
-	if (agent_config_file != NULL) {
-	    strcpy(agent_config_file, temp_buf);
-	    strcat(agent_config_file, AGENT_CONFIG_FILE);
-	} else {
-	    log_error(LOG_FAILURE, "URL Access Agent: ", sn, rq,
-		      "web_agent_init() unable to allocate memory for local config "
-		      "file name", DSAME_CONF_DIR);
-	    nsapi_status = REQ_ABORTED;
-	}
+        if (agent_config_file != NULL) {
+            strcpy(agent_config_file, temp_buf);
+            strcat(agent_config_file, AGENT_CONFIG_FILE);
+        } else {
+            log_error(LOG_FAILURE, "Web Policy Agent: ", sn, rq,
+                    "web_agent_init() unable to allocate memory for local config "
+                    "file name", DSAME_CONF_DIR);
+            nsapi_status = REQ_ABORTED;
+        }
 
-	status = am_properties_create(&agent_props.agent_bootstrap_props);
-	if(status == AM_SUCCESS) {
-	    status = am_properties_load(agent_props.agent_bootstrap_props, 
-                                    agent_bootstrap_file);
-	    if(status == AM_SUCCESS) {
-                //this is where the agent config info is passed from filter code
-                //to amsdk. Not sure why agent_props is required.
-		status = am_web_init(agent_bootstrap_file, 
-                                         agent_config_file);
-		system_free(agent_bootstrap_file);
-		system_free(agent_config_file);
-		if (AM_SUCCESS != status) {
-		    log_error(LOG_FAILURE, "URL Access Agent: ", sn, rq,
-			      "Initialization of the agent failed: "
-			      "status = %s (%d)", am_status_to_string(status),
-			      status);
-		    nsapi_status = REQ_ABORTED;
-		}
-	    } else {
-		log_error(LOG_FAILURE, "web_agent_init():", sn, rq,
-			  "Error while creating properties object= %s",
-			  am_status_to_string(status));
-		nsapi_status = REQ_ABORTED;
-	    }
-	} else {
-	    log_error(LOG_FAILURE, "web_agent_init():", sn, rq,
-		      "Error while creating properties object= %s",
-		      am_status_to_string(status));
-	    nsapi_status = REQ_ABORTED;
-	}
+        if (access(agent_bootstrap_file, R_OK) != 0 || access(agent_config_file, R_OK) != 0) {
+            log_error(LOG_FAILURE, "Web Policy Agent: ", sn, rq,
+                    "web_agent_init() unable to access bootstrap and/or local config file", DSAME_CONF_DIR);
+            nsapi_status = REQ_ABORTED;
+        } else {
+            status = am_properties_create(&agent_props.agent_bootstrap_props);
+            if (status == AM_SUCCESS) {
+                status = am_properties_load(agent_props.agent_bootstrap_props,
+                        agent_bootstrap_file);
+                if (status == AM_SUCCESS) {
+                    //this is where the agent config info is passed from filter code
+                    //to amsdk. Not sure why agent_props is required.
+                    status = am_web_init(agent_bootstrap_file,
+                            agent_config_file);
+                    system_free(agent_bootstrap_file);
+                    system_free(agent_config_file);
+                    if (AM_SUCCESS != status) {
+                        log_error(LOG_FAILURE, "Web Policy Agent: ", sn, rq,
+                                "Initialization of the agent failed: "
+                                "status = %s (%d)", am_status_to_string(status),
+                                status);
+                        nsapi_status = REQ_ABORTED;
+                    }
+                } else {
+                    log_error(LOG_FAILURE, "web_agent_init():", sn, rq,
+                            "Error while creating properties object= %s",
+                            am_status_to_string(status));
+                    nsapi_status = REQ_ABORTED;
+                }
+            } else {
+                log_error(LOG_FAILURE, "web_agent_init():", sn, rq,
+                        "Error while creating properties object= %s",
+                        am_status_to_string(status));
+                nsapi_status = REQ_ABORTED;
+            }
+        }
     } else {
-	log_error(LOG_FAILURE, "URL Access Agent: ", sn, rq,
-		  "web_agent_init() %s variable not defined in magnus.conf",
-		  DSAME_CONF_DIR);
-	nsapi_status = REQ_ABORTED;
+        log_error(LOG_FAILURE, "Web Policy Agent: ", sn, rq,
+                "web_agent_init() %s variable not defined in magnus.conf",
+                DSAME_CONF_DIR);
+        nsapi_status = REQ_ABORTED;
     }
 
-    if(nsapi_status == REQ_PROCEED) {
-	daemon_atrestart(&agent_cleanup, NULL);
+    if (nsapi_status == REQ_PROCEED) {
+        daemon_atrestart(&agent_cleanup, NULL);
     }
 
     return nsapi_status;
@@ -1393,7 +1400,7 @@ void init_at_request()
     am_status_t status;
     status = am_agent_init(&agentInitialized);
     if (status != AM_SUCCESS) {
-        log_error(LOG_FAILURE, "URL Access Agent: ", NULL, NULL,
+        log_error(LOG_FAILURE, "Web Policy Agent: ", NULL, NULL,
             "Initialization of the agent failed: "
             "status = %s (%d)", am_status_to_string(status), status);
     } 
