@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010 - 2012 ForgeRock AS
+ * Portions Copyrighted 2010 - 2013 ForgeRock Inc
  */
 
 #include <ctype.h>
@@ -6098,10 +6098,15 @@ process_request(am_web_request_params_t *req_params,
                     if (post_data == NULL) {
                         am_web_log_debug("%s: post_data is empty, trying to read it here...", thisfunc);
                         pds = req_func->get_post_data.func(req_func->get_post_data.args, &post_data);
-                        am_web_log_debug("%s: post data: %s", thisfunc, post_data);
+                        if (post_data == NULL) {
+                            am_web_log_warning("%s: this is a POST request with no post data. Redirecting as a GET request.", thisfunc);
+                            pds = AM_FAILURE;
+                        } else {
+                            am_web_log_debug("%s: post data: %s", thisfunc, post_data);
+                        }
                     }
                     /*do not store LARES post data in a shared cache*/
-                    if (strncmp(post_data, "LARES", 5) == 0) {
+                    if (post_data != NULL && strncmp(post_data, "LARES", 5) == 0) {
                         if (post_data != NULL) {
                             if (req_func->free_post_data.func != NULL) {
                                 req_func->free_post_data.func(req_func->free_post_data.args, post_data);

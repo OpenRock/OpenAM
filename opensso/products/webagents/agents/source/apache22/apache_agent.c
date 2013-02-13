@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 
 #include <limits.h>
@@ -65,8 +65,7 @@
 
 #include "am_web.h"
 
-#define DSAME                   "DSAME"
-#define OpenSSO                 "OpenSSO"
+#define OpenAM                 "OpenAM"
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
 #define MAX_NOTIF_MSG_SIZE      8192
@@ -414,7 +413,7 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
         }
         apr_sleep(apr_time_from_sec(am_watchdog_interval));
     }
-    am_web_log_info("Shutting down policy web agent notification listener thread for pid: %d", pid);
+    am_web_log_info("Shutting down Web Policy Agent notification listener thread for pid: %d", pid);
     deregister_process(pid, s);
     return NULL;
 }
@@ -424,7 +423,7 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
     agent_server_config *cfg = apr_pcalloc(p, sizeof (agent_server_config));
     if (apr_temp_dir_get((const char**) &tmpdir, p) != APR_SUCCESS) {
         ap_log_error(__FILE__, __LINE__, APLOG_ALERT, 0, s,
-                "Policy web agent failed to locate temporary storage directory");
+                "Web Policy Agent failed to locate temporary storage directory");
     }
     /*default values*/
     ((agent_server_config *) cfg)->notification_lockfile = apr_pstrcat(p, tmpdir,
@@ -449,7 +448,7 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
 /*
  * This routine is called by the Apache server when the module is first
  * loaded.  It handles loading all of the shared libraries that are needed
- * to instantiate the DSAME Policy Agent.  If all of the libraries can
+ * to instantiate the Web Policy Agent.  If all of the libraries can
  * successfully be loaded, then the routine looks up the two entry points
  * in the actual policy agent: am_web_init and dsame_check_access.  The
  * first routine is invoked directly and an error is logged if it returns
@@ -472,7 +471,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
 
     if (!(version.major >= 1 && version.minor >= 3 && version.patch >= 0)) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, 0, server_ptr,
-                "Policy web agent initialization failed (need APR library version 1.3.0 or newer)");
+                "Web Policy Agent initialization failed (need APR library version 1.3.0 or newer)");
         return HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -517,12 +516,12 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     if (status == AM_SUCCESS) {
         am_web_log_debug("Process initialization result:%s", am_status_to_string(status));
 
-        ap_add_version_component(pconf, "DSAME/3.0");
+        ap_add_version_component(pconf, "Web Policy Agent/3.0");
 
         if ((apr_thread_mutex_create(&init_mutex, APR_THREAD_MUTEX_UNNESTED,
                 pconf)) != APR_SUCCESS) {
             ap_log_error(__FILE__, __LINE__, APLOG_ALERT, 0, server_ptr,
-                    "Policy web agent configuration failed: %s",
+                    "Web Policy Agent configuration failed: %s",
                     am_status_to_string(status));
             ret = HTTP_BAD_REQUEST;
         }
@@ -530,7 +529,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         rv = apr_global_mutex_create(&(scfg->notification_lock), scfg->notification_lockfile, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                    "policy web agent notification global mutex file '%s'",
+                    "Web Policy Agent notification global mutex file '%s'",
                     scfg->notification_lockfile);
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -539,7 +538,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         rv = unixd_set_global_mutex_perms(scfg->notification_lock);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr,
-                    "Policy web agent could not set permissions "
+                    "Web Policy Agent could not set permissions "
                     "on notifications global lock; check User and Group directives");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -547,7 +546,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         rv = apr_global_mutex_create(&(scfg->pdp_lock), scfg->postdata_lockfile, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                    "policy web agent postdata global mutex file '%s'",
+                    "Web Policy Agent postdata global mutex file '%s'",
                     scfg->postdata_lockfile);
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -556,7 +555,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         rv = unixd_set_global_mutex_perms(scfg->pdp_lock);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr,
-                    "Policy web agent could not set permissions "
+                    "Web Policy Agent could not set permissions "
                     "on PDP global lock; check User and Group directives");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -567,14 +566,14 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         rv = apr_shm_create(&(scfg->notification_cache), shm_size, NULL, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                    "policy web agent notification anonymous shared segment");
+                    "Web Policy Agent notification anonymous shared segment");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
         rv = apr_shm_create(&(scfg->pdp_cache), pd_shm_size, NULL, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                    "policy web agent postdata anonymous shared segment");
+                    "Web Policy Agent postdata anonymous shared segment");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -594,10 +593,10 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         }
 
         ap_log_error(__FILE__, __LINE__, APLOG_NOTICE, 0, server_ptr,
-                "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d], max_pdp_count[%d]",
+                "Web Policy Agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d], max_pdp_count[%d]",
                 shm_size, pd_shm_size, scfg->max_pid_count, scfg->max_pdp_count);
     } else {
-        ap_log_error(APLOG_MARK, APLOG_CRIT, 0, server_ptr, "Failed to initialize policy web agent");
+        ap_log_error(APLOG_MARK, APLOG_CRIT, 0, server_ptr, "Failed to initialize Web Policy Agent");
         ret = HTTP_INTERNAL_SERVER_ERROR;
     }
     return ret;
@@ -621,7 +620,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     rv = apr_global_mutex_child_init(&(scfg->notification_lock), scfg->notification_lockfile, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
-                "policy web agent notification global mutex file '%s'",
+                "Web Policy Agent notification global mutex file '%s'",
                 scfg->notification_lockfile);
         return;
     }
@@ -629,7 +628,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     rv = apr_global_mutex_child_init(&(scfg->pdp_lock), scfg->postdata_lockfile, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
-                "policy web agent postdata global mutex file '%s'",
+                "Web Policy Agent postdata global mutex file '%s'",
                 scfg->postdata_lockfile);
         return;
     }
@@ -641,7 +640,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     rv = apr_thread_create(&notification_listener_t, NULL, notification_listener, (void *) server_ptr, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                "policy web agent notification changes listener");
+                "Web Policy Agent notification changes listener");
         return;
     }
 }
@@ -862,7 +861,7 @@ static am_status_t set_user(void **args, const char *user) {
             user = "";
         }
         r->user = apr_pstrdup(r->pool, user);
-        r->ap_auth_type = apr_pstrdup(r->pool, OpenSSO);
+        r->ap_auth_type = apr_pstrdup(r->pool, OpenAM);
         am_web_log_debug("%s: user set to %s", thisfunc, user);
         sts = AM_SUCCESS;
     }
