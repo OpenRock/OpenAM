@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 package com.sun.identity.cli.definition;
 
@@ -1450,7 +1450,8 @@ public class AccessManager {
 
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.idrepo.AddPrivileges",
-        description="Add privileges to an identity",
+        description="Add privileges to an identity. To add a privilege to all authenticated users, use the "
+            + "\"All Authenticated Users\" idname with \"role\" idtype.",
         webSupport="true",
         mandatoryOptions={
             "realm|e|s|Name of realm.",
@@ -2094,7 +2095,7 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
+            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and WebAgent.",
             "attributevalues|a|m|Properties e.g. homeaddress=here.",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={

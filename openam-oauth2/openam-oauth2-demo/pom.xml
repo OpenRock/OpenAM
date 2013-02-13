@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.2.0-SNAPSHOT</version>
     </parent>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-oauth2-demo</artifactId>
@@ -56,6 +56,10 @@
         </dependency>
 
         <!-- OpenAM -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-locale</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
@@ -161,7 +165,7 @@
                     <configuration>
                         <webResources>
                             <webResource>
-                            <directory>${project.basedir}/../../openam-server-only/src/main/resources/config
+                            <directory>${project.basedir}/../../openam-core/src/main/resources
                             </directory>
                             <includes>
                                 <include>serverAttributeMap.properties</include>
@@ -170,7 +174,7 @@
                             <filtering>false</filtering>
                         </webResource>
                             <webResource>
-                                <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale
+                                <directory>${project.basedir}/../../openam-locale/src/main/resources/locale
                                 </directory>
                                 <includes>
                                     <include>*.*</include>

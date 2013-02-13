@@ -19,8 +19,12 @@ import java.lang.Exception;
 import java.lang.String;
 import java.security.AccessController;
 import java.text.MessageFormat;
-import java.util.*;
 import java.util.logging.Level;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.realm.RealmUtils;
@@ -30,12 +34,33 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-
-
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ConflictException;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.UpdateRequest;
 import com.sun.identity.idsvcs.*;
+
+import com.sun.identity.idsvcs.*;
+import java.util.Set;
 
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;

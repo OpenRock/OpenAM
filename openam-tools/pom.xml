@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -42,6 +42,7 @@
     <!-- Child Modules -->
     <modules>
         <module>build-helper-plugin</module>
+        <module>openam-build-tools</module>
         <module>openam-installtools</module>
         <module>openam-installtools-launcher</module>
         <module>openam-diagnostics</module>

@@ -88,10 +88,6 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/resources/config/serverAttributeMap.properties</source>
-            <outputDirectory>resources</outputDirectory>
-        </file>
-        <file>
             <source>${project.basedir}/../../openam-server-only/src/main/resources/config/validserverconfig.properties</source>
             <outputDirectory>resources</outputDirectory>
         </file>
@@ -104,7 +100,7 @@
             <outputDirectory>resources</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/resources/locale/amUtilMsgs.properties</source>
+            <source>${project.basedir}/../../openam-locale/src/main/resources/locale/amUtilMsgs.properties</source>
             <outputDirectory>resources</outputDirectory>
         </file>
     </files>

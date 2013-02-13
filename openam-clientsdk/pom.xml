@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+* Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -80,7 +80,6 @@
                     <include>libSOAPBinding.properties</include>
                     <include>libSessionProvider.properties</include>
                     <include>libXACML.properties</include>
-                    <include>serverAttributeMap.properties</include>
                     <include>META-INF/**</include>
                 </includes>
             </resource>
@@ -158,6 +157,7 @@
                         <filter>
                             <artifact>org.forgerock.openam:openam-core</artifact>
                             <includes>
+                                <include>serverAttributeMap.properties</include>
                                 <include>com/iplanet/am/sdk/**</include>
                                 <include>com/iplanet/am/util/**</include>
                                 <include>com/iplanet/dpro/session/service/InternalSession*</include>
@@ -480,6 +480,7 @@
                         </transformer>
                     </transformers>
                     <createSourcesJar>${generate.clientsdk.sources}</createSourcesJar>
+                    <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                 </configuration>
             </plugin>
         </plugins>
