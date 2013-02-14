@@ -1777,7 +1777,7 @@ Service::invalidate_session(const char *ssoTokenId) {
                             cookieEncoded?ssoTokenId:Http::encode(ssoTokenId));
 
     //the call to destroySession in SSOTokenService is removed as 
-    //we are redirecting to OpenSSO logout page (Issue3724).
+    //we are redirecting to OpenAM logout page (Issue3724).
     //Instead we remove the SSOToken table entry.
     mSSOTokenSvc.removeSSOTokenTableEntry(ssoToken.getString());
     status = AM_SUCCESS;

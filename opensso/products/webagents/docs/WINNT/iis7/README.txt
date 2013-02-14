@@ -40,7 +40,7 @@ README file for Open Web Single Sign-On - Web Agents
 
 %% 1. Build requirements
 
-The OpenSSO - Web Agents workspace uses GNU Make as the build tool. You must have GNU Make version 3.80 or above installed and available in your system path.
+The OpenAM - Web Agents workspace uses GNU Make as the build tool. You must have GNU Make version 3.80 or above installed and available in your system path.
 
 Also make sure that the gcc version is above 3.2.1 (you can find this thru 
 gcc --version)
@@ -59,11 +59,11 @@ environment variable is setup correctly pointing to its location.
 
 %% 2. Library dependencies
 
-The OpenSSO sources depend upon a few third-party libraries that are not
+The OpenAM sources depend upon a few third-party libraries that are not
 included as a part of the workspace and must be obtained directly from 
 the library vendor or distributor. Some of these libraries are available in 
 source distribution form and must be built locally before they can be used. 
-The libraries needed for compiling OpenSSO sources are:
+The libraries needed for compiling OpenAM sources are:
 
         - Visual Studio 6 or 7, MKS Tool Kit
         - LIBXML2 2.6.23

@@ -26,9 +26,12 @@
  *
  * Abstract:
  *
- * Types and functions for using OpenSSO Access 
+ * Types and functions for using OpenAM Access 
  * Management SDK policy objects.
  *
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
  */
 
 #ifndef AM_POLICY_H

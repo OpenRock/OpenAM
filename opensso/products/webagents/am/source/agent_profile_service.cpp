@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010 - 2012 ForgeRock AS
+ * Portions Copyrighted 2010 - 2013 ForgeRock Inc
  */
 
 /*
@@ -313,7 +313,7 @@ load_bootinfo_to_properties(Utils::boot_info_t *boot_ptr, am_properties_t proper
 
 /*
  * This function fetches the agent configuration data from either the flat file
- * or OpenSSO REST server and updates the AgentConfigCache with the latest object of
+ * or OpenAM REST server and updates the AgentConfigCache with the latest object of
  * AgentConfiguration object. This function is invoked once by the constructor
  * of this class and periodically by the polling and notification thread.
  */
@@ -776,7 +776,7 @@ AgentProfileService::setRestSvcInfo(std::string restURL)
 
 /**
  * This function performs Agent authentication to retrieve the agent
- * agent configuration data from the OpenSSO server
+ * agent configuration data from the OpenAM server
  */
 am_status_t AgentProfileService::agentLogin()
 {
@@ -872,14 +872,14 @@ am_status_t AgentProfileService::agentLogin()
                 default:
                     status =  AM_AUTH_FAILURE;
                     Log::log(logModule, Log::LOG_ERROR,
-                     "Agent failed to login to OpenSSO server, auth status %d.",
+                     "Agent failed to login to OpenAM server, auth status %d.",
                      auth_sts);
                     break;
             }
         }
         else {
             Log::log(logModule, Log::LOG_ERROR,
-                 "%s: Agent cannot login to OpenSSO server: Expected auth callbacks "
+                 "%s: Agent cannot login to OpenAM server: Expected auth callbacks "
                  "for agent login not found.", thisfunc);
             status =  AM_AUTH_FAILURE;
         }
@@ -908,7 +908,7 @@ am_status_t AgentProfileService::agentLogin()
 /**
  * This fnunction checks whether the incoming naming response has the 
  * REST service url in it. If it has then the agent determines that it is
- * interacting with the OpenSSO server. If not present then the agent is interacting 
+ * interacting with the OpenAM server. If not present then the agent is interacting 
  * with the old AM server
  */
 am_status_t AgentProfileService::isRESTServiceAvailable()

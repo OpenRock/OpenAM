@@ -25,11 +25,14 @@
  * $Id: am.h,v 1.23 2010/01/26 00:54:46 dknab Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 /*
  * Abstract:
  *
- * General utility routines provided by the OpenSSO 
+ * General utility routines provided by the OpenAM 
  * Access Management library.
  *
  */

@@ -25,12 +25,15 @@
  * $Id: am_map.h,v 1.7 2008/08/19 19:15:04 veiming Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 /*
  * Abstract:
  *
  * Types and functions for creating, destroying, and manipulating the
- * map objects used by the OpenSSO Access Management 
+ * map objects used by the OpenAM Access Management 
  * SDK.
  *
  */

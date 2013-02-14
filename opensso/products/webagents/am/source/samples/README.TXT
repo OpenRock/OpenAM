@@ -1,7 +1,7 @@
 README.TXT
 
 --------------------------------------------------------------------
-OpenSSO Policy Agent 3.0
+OpenAM Policy Agent 3.0
 --------------------------------------------------------------------
 
 DISCLAIMER
@@ -37,13 +37,13 @@ What is provided
    that can be used to evaluate policy for specified resources.
    
    The file am_auth_test.c demonstrates the basic usage of Authentication SDK 
-   APIs that can be used to login to an OpenSSO server.
+   APIs that can be used to login to an OpenAM server.
 
    The file am_sso_test.c demonstrates the basic usage of SSO SDK APIs 
    that can be used to perform session operations.
 
    The file am_log_test.c demonstrates the basic usage of Logging SDK APIs 
-   that can be used to log a message to the OpenSSO server logs.
+   that can be used to log a message to the OpenAM server logs.
 
    The file apache_agent.c demonstrates how the Policy SDK APIs can be used
    to build a Web Agent for the Apache Web Server. Please note that this
@@ -184,8 +184,8 @@ am_policy_test
        For example: ../config/OpenSSOAgentConfiguration.properties
 
    <ssoToken> 
-       is a valid SSO Token issued by OpenSSO server. You can get this
-       value out of your browser after logging into OpenSSO server. Please
+       is a valid SSO Token issued by OpenAM server. You can get this
+       value out of your browser after logging into OpenAM server. Please
        refer to the documentation for your browser on how to find out the
        cookie values. Once you have that information, you can use the value
        of the cookie iPlanetDirectoryPro as the value for this argument.
@@ -206,7 +206,7 @@ am_policy_test
 
 am_auth_test
 
-   Note: You must have an OpenSSO server with a user profile set up with the 
+   Note: You must have an OpenAM server with a user profile set up with the 
    corresponding authentication module before running this program.
 
    Description: am_auth_test authenticates to the specified org (if any) using 
@@ -236,10 +236,10 @@ am_auth_test
 
 am_sso_test
 
-   Note: You must have an OpenSSO server with a user profile set up with the 
+   Note: You must have an OpenAM server with a user profile set up with the 
    LDAP authentication module before running this program.
 
-   Description: am_sso_test logs into an OpenSSO server using the given user 
+   Description: am_sso_test logs into an OpenAM server using the given user 
    and password using the LDAP authentication module, and performs sso token 
    operations on the session. Also please note that the internal ldap password
    should not be encrypted in OpenSSOAgentBootstrap.properties.
@@ -252,7 +252,7 @@ am_sso_test
 
    <user> 
    <password> 
-       user and password to login to OpenSSO server using the LDAP 
+       user and password to login to OpenAM server using the LDAP 
        authentication module.
 
    <bootstrap_properties_file> 
@@ -283,7 +283,7 @@ am_sso_test
 am_log_test
 
    Description: am_log_test logs a message to the given log file on the 
-   OpenSSO server using the given sso token.  
+   OpenAM server using the given sso token.  
 
    Usage: 
        ./am_log_test -u <user_token_id> -n <log_name> -l <logged_by_token_id> -m <log_message> [-d <log_module>] [-f <bootstrap_properties_file>]
@@ -293,10 +293,10 @@ am_log_test
       or something else. 
 
    <log_name> 
-      Name of Log file on OpenSSO server.
+      Name of Log file on OpenAM server.
 
    <logged_by_token_id> 
-      SSO token ID with access the Logging Service on OpenSSO server.
+      SSO token ID with access the Logging Service on OpenAM server.
 
    <log_message> 
       The log message.

@@ -26,9 +26,12 @@
  *
  * Abstract:
  *
- * Properties map for use by clients of the OpenSSO 
+ * Properties map for use by clients of the OpenAM 
  * Remote Client SDK.
  *
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
  */
 
 #ifndef AM_PROPERTIES_H

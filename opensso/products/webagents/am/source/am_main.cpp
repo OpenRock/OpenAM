@@ -25,9 +25,8 @@
  * $Id: am_main.cpp,v 1.12 2010/01/26 00:54:46 dknab Exp $
  *
  */
-
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #include <cstring>
@@ -211,19 +210,19 @@ void get_status_info(am_status_t status, const char ** name, const char ** msg)
 	    break;
         case AM_AUTH_FAILURE:
             if (name) *name = "AM_AUTH_FAILURE";
-	    if (msg) *msg = "OpenSSO authentication service failure";
+	    if (msg) *msg = "OpenAM authentication service failure";
 	    break;
         case AM_NAMING_FAILURE:
             if (name) *name = "AM_NAMING_FAILURE";
-	    if (msg) *msg = "OpenSSO naming service failure";
+	    if (msg) *msg = "OpenAM naming service failure";
 	    break;
         case AM_SESSION_FAILURE:
             if (name) *name = "AM_SESSION_FAILURE";
-	    if (msg) *msg = "OpenSSO session service failure";
+	    if (msg) *msg = "OpenAM session service failure";
 	    break;
         case AM_POLICY_FAILURE:
             if (name) *name = "AM_POLICY_FAILURE";
-	    if (msg) *msg = "OpenSSO policy service failure";
+	    if (msg) *msg = "OpenAM policy service failure";
 	    break;
         case AM_NO_POLICY:
             if (name) *name = "AM_NO_POLICY";

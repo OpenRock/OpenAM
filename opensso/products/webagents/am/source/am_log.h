@@ -25,11 +25,14 @@
  * $Id: am_log.h,v 1.8 2008/08/19 19:15:04 veiming Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 /*
  * Abstract:
  *
- * Types and functions for using OpenSSO Access 
+ * Types and functions for using OpenAM Access 
  * Management SDK log objects.
  *
  */
@@ -67,7 +70,7 @@ typedef enum am_log_record_log_level {
     AM_LOG_LEVEL_FINER = 400,
     AM_LOG_LEVEL_FINEST = 300,
 
-    /* Log Levels defined by OpenSSO */
+    /* Log Levels defined by OpenAM */
 
     AM_LOG_LEVEL_SECURITY = 950,
     AM_LOG_LEVEL_CATASTROPHE = 850,

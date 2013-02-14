@@ -54,10 +54,10 @@ Installation does the following:
 1.1.5 Follow the installation interactions and provide these details:
 
     - Sun Proxy Server Config Directory
-    - OpenSSO Services Hos
-    - OpenSSO Services port
-    - OpenSSO Services Protocol
-    - OpenSSO Services Deployment URI
+    - OpenAM Services Hos
+    - OpenAM Services port
+    - OpenAM Services Protocol
+    - OpenAM Services Deployment URI
     - Agent Host name
     - Agent Host port
     - Agent Host protocol
@@ -134,11 +134,11 @@ Enter the Sun Java System Proxy Server Config Directory Path
 [/var/opt/SUNWpxysvr4/https-shaula/config]:/var/opt/SUNWpxysvr4/https-agent_hostname/config
 
 
-Enter the URL where the OpenSSO server is running. Please include the
+Enter the URL where the OpenAM server is running. Please include the
 deployment URI also as shown below:
 (http://opensso.sample.com:58080/opensso)
 [ ? : Help, < : Back, ! : Exit ]
-OpenSSO server URL: http://am.host.com:58080/opensso
+OpenAM server URL: http://am.host.com:58080/opensso
 
 Enter the Agent URL as shown below: (http://agent1.sample.com:1234)
 [ ? : Help, < : Back, ! : Exit ]
@@ -156,12 +156,12 @@ Enter the path to the password file: /opt/password
 
 
 WARNING:
-Agent profile/User: webagent-1 does not exist in OpenSSO server! Either
+Agent profile/User: webagent-1 does not exist in OpenAM server! Either
 "Hit the Back button, and re-enter the correct agent profile name/user
 name", or "Create this agent profile when asked(available only in
 custom-install)", or "Continue without validating it because agent
 profile is in sub realm", or "Continue without validating/creating it, and
-manually validate/create it in OpenSSO server after installation".
+manually validate/create it in OpenAM server after installation".
 
 
 -----------------------------------------------
@@ -170,7 +170,7 @@ SUMMARY OF YOUR RESPONSES
 Sun Java System Proxy Server Config Directory :
 /var/opt/SUNWpxysvr4/https-agent_hostname/config
 
-OpenSSO server URL : http://am.host.com:58080/opensso 
+OpenAM server URL : http://am.host.com:58080/opensso 
 Agent URL : http://agent.host.com:1234 
 Agent Profile name : webagent-1 
 Agent Profile Password file name :
@@ -221,7 +221,7 @@ Agent Debug directory location:
 Install log file location:
 /opt/web_agents/proxy40_agent/logs/audit/install.log
 
-Thank you for using OpenSSO Policy Agent. INSTALL NOTE: Installer modifies
+Thank you for using OpenAM Policy Agent. INSTALL NOTE: Installer modifies
 obj.conf file in the config directory you specified. UNINSTALL NOTE:
 Uninstall removes agent settings from obj.conf file in the config directory
 you specified. If there are multiple obj.conf files configured manually in
@@ -248,7 +248,7 @@ Here is the sample:
 
 
 ************************************************************************
-Welcome to the OpenSSO Policy Agent for Sun Java System Proxy Server.
+Welcome to the OpenAM Policy Agent for Sun Java System Proxy Server.
 
 ************************************************************************
 
@@ -292,7 +292,7 @@ file ...DONE.
 Uninstall log file location:
 /opt/web_agents/proxy40_agent/logs/audit/uninstall.log
 
-Thank you for using OpenSSO Policy Agent. INSTALL NOTE: Installer modifies
+Thank you for using OpenAM Policy Agent. INSTALL NOTE: Installer modifies
 obj.conf file in the config directory you specified. UNINSTALL NOTE:
 Uninstall removes agent settings from obj.conf file in the config directory
 you specified. If there are multiple obj.conf files configured manually in

@@ -26,12 +26,12 @@
  *
  * Abstract:
  *
- * Common types and macros provided by the OpenSSO 
+ * Common types and macros provided by the OpenAM 
  * Access Management SDK.
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 
 #ifndef AM_TYPES_H

@@ -54,10 +54,10 @@ Installation does the following:
 1.1.5 Follow the installation interactions and provide these details:
 
     - SJS Web Server Config Directory
-    - OpenSSO Services Hos
-    - OpenSSO Services port
-    - OpenSSO Services Protocol
-    - OpenSSO Services Deployment URI
+    - OpenAM Services Hos
+    - OpenAM Services port
+    - OpenAM Services Protocol
+    - OpenAM Services Deployment URI
     - Agent Host name
     - Agent Host port
     - Agent Host protocol
@@ -116,25 +116,25 @@ SJS Web Server instance that is secured by this Agent.
 Enter the SJS Web Server Config Directory Path []: /var/opt/sun/webserver7/https-agent_hostname/config
 
 
-Enter the fully qualified host name of the server where OpenSSO
+Enter the fully qualified host name of the server where OpenAM
 Services are installed.
 [ ? : Help, < : Back, ! : Exit ]
-OpenSSO Services Host: am.host.com
+OpenAM Services Host: am.host.com
 
 
-Enter the port number of the Server that runs OpenSSO Services.
+Enter the port number of the Server that runs OpenAM Services.
 [ ? : Help, < : Back, ! : Exit ]
-OpenSSO Services port [80]: 8080
+OpenAM Services port [80]: 8080
 
 
-Enter http/https to specify the protocol used by the Server that runs OpenSSO services.
+Enter http/https to specify the protocol used by the Server that runs OpenAM services.
 [ ? : Help, < : Back, ! : Exit ]
-OpenSSO Services Protocol [http]:
+OpenAM Services Protocol [http]:
 
 
-Enter the Deployment URI for OpenSSO Services.
+Enter the Deployment URI for OpenAM Services.
 [ ? : Help, < : Back, ! : Exit ]
-OpenSSO Services Deployment URI [/amserver]:
+OpenAM Services Deployment URI [/amserver]:
 
 
 Enter the fully qualified host name on which the Web Server protected by the
@@ -150,13 +150,13 @@ Enter the port number for Web Server instance [80]: 7000
 
 
 Select http or https to specify the protocol used by the Web server instance
-that will be protected by OpenSSO Policy Agent.
+that will be protected by OpenAM Policy Agent.
 [ ? : Help, < : Back, ! : Exit ]
 Enter the Preferred Protocol for Web Server instance [http]:
 
 
 Enter a valid Agent profile name. Before proceeding with the agent
-installation, please ensure that a valid Agent profile exists in OpenSSO server. 
+installation, please ensure that a valid Agent profile exists in OpenAM server. 
 [ ? : Help, < : Back, ! : Exit ]
 Enter the Agent Profile name [UrlAccessAgent]:
 
@@ -171,10 +171,10 @@ Enter the path to the password file: /opt/password
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 SJS Web Server Config Directory : /var/opt/sun/webserver7/https-agent_hostname/config
-OpenSSO Services Host : am.host.com
-OpenSSO Services Port : 8080
-OpenSSO Services Protocol : http
-OpenSSO Services Deployment URI : /amserver
+OpenAM Services Host : am.host.com
+OpenAM Services Port : 8080
+OpenAM Services Protocol : http
+OpenAM Services Deployment URI : /amserver
 Agent Host name : agent.host.com
 Web Server Instance Port number : 7000
 Protocol for Web Server instance : http
@@ -220,7 +220,7 @@ Agent Debug directory location:
 Install log file location:
 /opt/web_agents/sjsws_agent/logs/audit/install.log
 
-Thank you for using OpenSSO Policy Agent
+Thank you for using OpenAM Policy Agent
 
 
 %% 2. Agent Uninstallation
@@ -243,9 +243,9 @@ Here is the sample:
 
 
 ************************************************************************
-Welcome to the OpenSSO Policy Agent for SJS Web Server If the Policy
-Agent is used with OpenSSO services, User needs to enter
-information relevant to OpenSSO server.
+Welcome to the OpenAM Policy Agent for SJS Web Server If the Policy
+Agent is used with OpenAM services, User needs to enter
+information relevant to OpenAM server.
 
 ************************************************************************
 
@@ -279,4 +279,4 @@ Removing Agent parameters from /var/opt/sun/webserver7/https-agent_hostname/conf
 Uninstall log file location:
 /opt/web_agents/sjsws_agent/logs/audit/uninstall.log
 
-Thank you for using OpenSSO Policy Agent
+Thank you for using OpenAM Policy Agent

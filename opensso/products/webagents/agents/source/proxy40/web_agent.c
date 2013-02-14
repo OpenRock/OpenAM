@@ -26,7 +26,9 @@
  *
  *
  */
-
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 /*
  * web_agent.c: 
@@ -741,7 +743,7 @@ int getISCookie(const char *cookie, char **dpro_cookie,
             }
 
         } else {
-            am_web_log_warning("OpenSSO Server Cookie not found.");
+            am_web_log_warning("OpenAM Server Cookie not found.");
         }
     }
 

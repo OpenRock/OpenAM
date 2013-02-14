@@ -71,7 +71,7 @@ init_common_pkg_variables() {
     AGENT_DEPLOY_URI=/amagent
     AGENT_CERT_PREFIX=
 
-    #OpenSSO Server info
+    #OpenAM Server info
     PRIMARY_SERVER_PROTOCOL=http
     PRIMARY_SERVER_HOST=$localhost
     PRIMARY_SERVER_PORT=$def_id_server_port
@@ -457,13 +457,13 @@ get_agent_uri() {
 
 get_failover_server_host() {
     typeset value=
-    get_value "Enter the Failover OpenSSO Server Hostname:" "Invalid failover OpenSSO server hostname !" "$FAILOVER_SERVER_HOST" is_valid_host
+    get_value "Enter the Failover OpenAM Server Hostname:" "Invalid failover OpenAM server hostname !" "$FAILOVER_SERVER_HOST" is_valid_host
     FAILOVER_SERVER_HOST=$value
 }
 
 get_failover_server_port() {
     typeset value=
-    get_value "Enter the Failover OpenSSO Server Port:" "Invalid failover OpenSSO server port number !" "$FAILOVER_SERVER_PORT" is_valid_port
+    get_value "Enter the Failover OpenAM Server Port:" "Invalid failover OpenAM server port number !" "$FAILOVER_SERVER_PORT" is_valid_port
     FAILOVER_SERVER_PORT=$value
 }
 
@@ -498,31 +498,31 @@ is_failover_server_present() {
 
 get_failover_server_uri() {
     typeset value=
-    get_value "Enter the OpenSSO Server Deployment URI" "Invalid OpenSSO server deployment URI !" "$PRIMARY_SERVER_DEPLOY_URI" is_valid_uri
+    get_value "Enter the OpenAM Server Deployment URI" "Invalid OpenAM server deployment URI !" "$PRIMARY_SERVER_DEPLOY_URI" is_valid_uri
     FAILOVER_SERVER_DEPLOY_URI=$value
 }
 
 get_failover_console_uri() {
     typeset value=
-    get_value "Enter the OpenSSO Server's Console Deployment URI" "Invalid OpenSSO server's console deployment URI !" "$PRIMARY_CONSOLE_DEPLOY_URI" is_valid_uri
+    get_value "Enter the OpenAM Server's Console Deployment URI" "Invalid OpenAM server's console deployment URI !" "$PRIMARY_CONSOLE_DEPLOY_URI" is_valid_uri
     FAILOVER_CONSOLE_DEPLOY_URI=$value
 }
 
 get_primary_server_host() {
     typeset value=
-    get_value "Enter the OpenSSO Server Hostname:" "Invalid OpenSSO server hostname !" "$PRIMARY_SERVER_HOST" is_valid_host
+    get_value "Enter the OpenAM Server Hostname:" "Invalid OpenAM server hostname !" "$PRIMARY_SERVER_HOST" is_valid_host
     PRIMARY_SERVER_HOST=$value
 }
 
 get_primary_server_port() {
     typeset value=
-    get_value "Enter the OpenSSO Server Port:" "Invalid OpenSSO server port number !" "$PRIMARY_SERVER_PORT" is_valid_port
+    get_value "Enter the OpenAM Server Port:" "Invalid OpenAM server port number !" "$PRIMARY_SERVER_PORT" is_valid_port
     PRIMARY_SERVER_PORT=$value
 }
 
 get_primary_server_protocol() {
     typeset value=
-    get_value "Select OpenSSO Server Protocol: [1] http [2] https -->" "Invalid OpenSSO server protocol !" "1" is_valid_protocol
+    get_value "Select OpenAM Server Protocol: [1] http [2] https -->" "Invalid OpenAM server protocol !" "1" is_valid_protocol
     if [ "$value" = "1" ]; then
 	PRIMARY_SERVER_PROTOCOL=http
     elif [ "$value" = "2" ]; then
@@ -532,13 +532,13 @@ get_primary_server_protocol() {
 
 get_primary_server_uri() {
     typeset value=
-    get_value "Enter the OpenSSO Server Deployment URI" "Invalid OpenSSO server deployment URI !" "$PRIMARY_SERVER_DEPLOY_URI" is_valid_uri
+    get_value "Enter the OpenAM Server Deployment URI" "Invalid OpenAM server deployment URI !" "$PRIMARY_SERVER_DEPLOY_URI" is_valid_uri
     PRIMARY_SERVER_DEPLOY_URI=$value
 }
 
 get_primary_console_uri() {
     typeset value=
-    get_value "Enter the OpenSSO Server's Console Deployment URI" "Invalid OpenSSO server's console deployment URI !" "$PRIMARY_CONSOLE_DEPLOY_URI" is_valid_uri
+    get_value "Enter the OpenAM Server's Console Deployment URI" "Invalid OpenAM server's console deployment URI !" "$PRIMARY_CONSOLE_DEPLOY_URI" is_valid_uri
     PRIMARY_CONSOLE_DEPLOY_URI=$value
 }
 
@@ -553,10 +553,10 @@ get_shared_secret() {
     typeset error_msg="Shared secret may not be empty or contain spaces!"
 
     while true; do
-	get_value "Enter Agent-OpenSSO Server shared secret:" "$error_msg" "" is_valid_shared_secret noecho
+	get_value "Enter Agent-OpenAM Server shared secret:" "$error_msg" "" is_valid_shared_secret noecho
 	SHARED_SECRET=$value
 	$ECHO "\a"
-	get_value "Re-enter Agent-OpenSSO Server shared secret:" "$error_msg" "" is_valid_shared_secret noecho
+	get_value "Re-enter Agent-OpenAM Server shared secret:" "$error_msg" "" is_valid_shared_secret noecho
 	$ECHO "\a"
 	if [[ "$SHARED_SECRET" = "$value" ]]; then
 	    return 0;

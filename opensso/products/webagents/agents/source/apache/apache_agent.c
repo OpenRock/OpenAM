@@ -24,6 +24,9 @@
  *
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <limits.h>
 #include <signal.h>
@@ -55,7 +58,7 @@ typedef void (*sighandler_t)(int);
 
 #include "am_web.h"
 
-#define  OpenSSO   "OpenSSO"
+#define  OpenAM   "OpenAM"
 
 boolean_t agentInitialized = B_FALSE;
 
@@ -713,10 +716,10 @@ set_user(void **args, const char *user)
 	}
 #if defined(APACHE2)
 	r->user = ap_pstrdup(r->pool, user);
-	r->ap_auth_type = ap_pstrdup(r->pool, OpenSSO);
+	r->ap_auth_type = ap_pstrdup(r->pool, OpenAM);
 #else
 	r->connection->user = ap_pstrdup(r->pool, user);
-	r->connection->ap_auth_type = ap_pstrdup(r->pool, OpenSSO);
+	r->connection->ap_auth_type = ap_pstrdup(r->pool, OpenAM);
 #endif
 	am_web_log_debug("%s: user set to %s", thisfunc, user);
 	sts = AM_SUCCESS;

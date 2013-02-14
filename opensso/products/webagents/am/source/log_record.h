@@ -50,7 +50,7 @@ public:
         L_FINER = 400,
         L_FINEST = 300,
 
-	/* Log Levels defined by OpenSSO
+	/* Log Levels defined by OpenAM
 	 * keeping names consistent with IS LogLevel names */
 	LL_SECURITY = 950,
 	LL_CATASTROPHE = 850,

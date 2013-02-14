@@ -56,11 +56,11 @@ Follow the installation interactions and provide these details:
     - Agent Host protocol
     - Agent Host port
     - Agent deployment URI
-    - OpenSSO Services Host
-    - OpenSSO Services Protocol
-    - OpenSSO Services port
-    - OpenSSO Services Deployment URI
-    - OpenSSO Services Console URI
+    - OpenAM Services Host
+    - OpenAM Services Protocol
+    - OpenAM Services port
+    - OpenAM Services Deployment URI
+    - OpenAM Services Console URI
     - Agent Profile name
     - Password file which contains the Agent Profile password.
 
@@ -146,7 +146,7 @@ Agent Port Number [80] :
 Agent Deployment URI [/amagent] :
 
 ------------------------------------------------
-Sun OpenSSO Enterprise 8.0
+Sun OpenAM Enterprise 8.0
 ------------------------------------------------
 Primary Server Host :
 opensso.host.com

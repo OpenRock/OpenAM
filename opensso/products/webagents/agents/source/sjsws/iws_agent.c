@@ -492,7 +492,7 @@ static int handle_notification(Session *sn,
 /**
   * Function Name: process_notification
   *
-  * Processes both session and policy notifications coming from OpenSSO server.
+  * Processes both session and policy notifications coming from OpenAM server.
   * Implemented as a NSAPI SAF. Works together with Service directive.
   *
   * Input:  As defined by a SAF

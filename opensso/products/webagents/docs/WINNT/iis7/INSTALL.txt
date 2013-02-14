@@ -55,7 +55,7 @@ Follow the installation interactions and provide these details:
 
     - Agent URL 
     - IIS7 Web site ID
-    - OpenSSO Server URL
+    - OpenAM Server URL
     - Agent Profile name
     - Agent Profile's password file. 
 

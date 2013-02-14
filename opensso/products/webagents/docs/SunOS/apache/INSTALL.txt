@@ -243,9 +243,9 @@ Here is the sample:
 
 
 ************************************************************************
-Welcome to the OpenSSO Policy Agent for Apache Server If the Policy
-Agent is used with OpenSSO services, User needs to enter
-information relevant to OpenSSO server.
+Welcome to the OpenAM Policy Agent for Apache Server If the Policy
+Agent is used with OpenAM services, User needs to enter
+information relevant to OpenAM server.
 
 ************************************************************************
 

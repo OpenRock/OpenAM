@@ -38,13 +38,13 @@ README file for Open Web Single Sign-On - Web Agents
         %% 2.4 Obtaining NSPR 4.6.1
 	%% 2.5 Obtaining libpthread, libCstd, and libCrun
 	%% 2.6 Download Apache Header files (if using Apache Agent)
-        %% 2.7 Obtaining OpenSSO Agents Common Installer libraries
+        %% 2.7 Obtaining OpenAM Agents Common Installer libraries
     %% 3. Building the workspace - builds 32-bit agent by default.
     %% 4. Building the 64-bit agent (Optional)
 
 %% 1. Build requirements
 
-The OpenSSO - Web Agents workspace uses GNU Make as the build tool. You must have GNU Make version 3.80 or above installed and available in your system path.
+The OpenAM - Web Agents workspace uses GNU Make as the build tool. You must have GNU Make version 3.80 or above installed and available in your system path.
 
 Also make sure that the gcc version is above 3.2.1 (you can find this thru 
 gcc --version)
@@ -63,17 +63,17 @@ environment variable is setup correctly pointing to its location.
 
 %% 2. Library dependencies
 
-The OpenSSO sources depend upon a few third-party libraries that are not
+The OpenAM sources depend upon a few third-party libraries that are not
 included as a part of the workspace and must be obtained directly from 
 the library vendor or distributor. Some of these libraries are available in 
 source distribution form and must be built locally before they can be used. 
-The libraries needed for compiling OpenSSO sources are:
+The libraries needed for compiling OpenAM sources are:
 
         - make 3.80
         - LIBXML2 2.6.23
         - NSS 3.11
 	- NSPR 4.6.1
-        - OpenSSO Agents Common Installer libraries
+        - OpenAM Agents Common Installer libraries
 
 The following subsections briefly describe how these libraries may be 
 obtained. These instructions are provided for your convenience only and
@@ -168,18 +168,18 @@ These will be available in /usr/lib in Solaris.
     2.6.2.8 cp <apache-install-dir>/include/* <opensso_webagent>/extlib/Linux/apache22/include
 
 
-%% 2.7 Obtaining OpenSSO Agents Common Installer libraries
+%% 2.7 Obtaining OpenAM Agents Common Installer libraries
 
-The OpenSSO Agents Common installer libraries opensso-installtools.jar and
-opensso-installtools-launcher.jar can be built from the OpenSSO Agents Common
+The OpenAM Agents Common installer libraries opensso-installtools.jar and
+opensso-installtools-launcher.jar can be built from the OpenAM Agents Common
 Installer workspace.
 
 Follow these steps to obtain the libraries:
-2.7.1 Check out the OpenSSO Agents Common installer workspace.
+2.7.1 Check out the OpenAM Agents Common installer workspace.
 2.7.2 Set JAVA_HOME to the location of JDK 1.5.
 2.7.3 At the root of the workspace, run: ant
 2.7.4 Copy the libraries opensso-installtools.jar, and opensso-installtools-launcher.jar
-from the dist directory of the OpenSSO Agents Common installer workspace
+from the dist directory of the OpenAM Agents Common installer workspace
 into extlib directory
 
 

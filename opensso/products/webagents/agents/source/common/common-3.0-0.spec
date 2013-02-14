@@ -1,4 +1,4 @@
-Summary: BASE_PRODUCT_NAME OpenSSO C Development Kit
+Summary: BASE_PRODUCT_NAME OpenAM C Development Kit
 Name: common
 Version: 3.0
 Release: 0
@@ -8,7 +8,7 @@ Prefix: /opt
 AutoReqProv: no 
 
 %description
-BASE_PRODUCT_NAME OpenSSO C Development Kit
+BASE_PRODUCT_NAME OpenAM C Development Kit
 
 %files
 /opt/agents/THIRD_PARTY_LICENSE.TXT

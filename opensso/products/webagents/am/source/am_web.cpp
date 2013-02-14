@@ -5959,7 +5959,7 @@ get_sso_token(am_web_request_params_t *req_params,
  *
  * render_data is a buffer to store any data needed for rendering
  * HTTP response, such as a redirect url or a notification message response
- * to the OpenSSO server. It will be null terminated, so it will not
+ * to the OpenAM server. It will be null terminated, so it will not
  * fill the buffer beyond render_data_size-1 bytes.
  * If the buffer is not big enough, an error message will be logged and
  * an internal error result will be returned.

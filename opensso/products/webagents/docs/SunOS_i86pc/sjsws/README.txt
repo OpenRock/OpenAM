@@ -39,13 +39,13 @@ README file for Open Web Single Sign-On - Web Agents
         %% 2.5 Obtaining NSPR 4.6.1
 	%% 2.6 Obtaining libpthread, libCstd, and libCrun
 	%% 2.7 Download SJS Web Server 7.0 Header files 
-        %% 2.8 Obtaining OpenSSO Agents Common Installer libraries
+        %% 2.8 Obtaining OpenAM Agents Common Installer libraries
     %% 3. Building the workspace
     %% 4. Building 64-bit agent (optional)
 
 %% 1. Build requirements
 
-The OpenSSO - Web Agents workspace uses GNU Make as the build tool. You must 
+The OpenAM - Web Agents workspace uses GNU Make as the build tool. You must 
 have GNU Make version 3.80 or above installed and available in your system path.
 
 Also Apache Ant is required to build the agent installer.
@@ -62,18 +62,18 @@ environment variable is setup correctly pointing to its location.
 
 %% 2. Library dependencies
 
-The OpenSSO sources depend upon a few third-party libraries that are not
+The OpenAM sources depend upon a few third-party libraries that are not
 included as a part of the workspace and must be obtained directly from 
 the library vendor or distributor. Some of these libraries are available in 
 source distribution form and must be built locally before they can be used. 
-The libraries needed for compiling OpenSSO sources are:
+The libraries needed for compiling OpenAM sources are:
 
         - Sun Studio 11 Compiler for Solaris x86
         - make 3.80
         - LIBXML2 2.6.23
         - NSS 3.11
 	- NSPR 4.6.1
-        - OpenSSO Agents Common Installer libraries
+        - OpenAM Agents Common Installer libraries
 
 The following subsections briefly describe how these libraries may be 
 obtained. These instructions are provided for your convenience only and
@@ -162,10 +162,10 @@ These will be available in /usr/lib in Solaris.
 2.7.5 Goto server install directory.
 2.7.6 cp <webserver-install-dir>/include/* <opensso_webagent>/extlib/SunOS_i86pc/sjsws/include
 
-%% 2.8 Obtaining OpenSSO Agents Common Installer libraries
+%% 2.8 Obtaining OpenAM Agents Common Installer libraries
 
 opensso/products/installtools source code needs to be available in the same workspace.
-Building of OpenSSO Agents Common installer libraries opensso-installtools.jar and
+Building of OpenAM Agents Common installer libraries opensso-installtools.jar and
 opensso-installtools-launcher.jar is integrated in the webagents/build.xml.
 So no separate copy/build is required.
 
