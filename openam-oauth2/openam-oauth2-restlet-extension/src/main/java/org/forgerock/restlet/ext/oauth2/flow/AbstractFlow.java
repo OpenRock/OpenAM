@@ -28,6 +28,7 @@ import java.security.AccessController;
 import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -665,6 +666,27 @@ public abstract class AbstractFlow extends ServerResource {
         }
 
         return checkedScope;
+    }
+
+    protected Map<String, Object> executeExtraDataScopePlugin(Set<String> data, CoreToken token){
+        Map<String, Object> jsonData = null;
+        String pluginClass = null;
+        Scope scopeClass = null;
+        try {
+            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
+            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
+            jsonData = null;
+            scopeClass = null;
+        }
+
+        // Validate the granted scope
+        if (scopeClass != null && pluginClass != null){
+            jsonData = scopeClass.extraDataToReturnForTokenEndpoint(data, token);
+        }
+
+        return jsonData;
     }
 
     protected Map<String,String> getResponseTypes(String realm){

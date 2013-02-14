@@ -165,4 +165,20 @@ public class ScopeImpl implements Scope {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Object> extraDataToReturnForTokenEndpoint(Set<String> parameters, CoreToken token){
+        Map<String, Object> map = new HashMap<String, Object>();
+        String scope = token.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
+        Set<String> scopeSet = OAuth2Utils.stringToSet(scope);
+
+        //if an openid scope return the id_token
+        if (scopeSet.contains("openid")){
+            //TODO create a real id token
+            map.put("id_token", "XXXX");
+        }
+        return map;
+    }
+
 }

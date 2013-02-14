@@ -25,6 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,6 +120,11 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             code.put(OAuth2Constants.CoreTokenParams.ISSUED, "true");
             getTokenStore().updateAuthorizationCode(code_p, code);
             Map<String, Object> response = token.convertToMap();
+
+            //execute post token creation pre return scope plugin for extra return data.
+            Set<String> data = new HashSet<String>();
+            response.putAll(executeExtraDataScopePlugin(data ,token));
+
             if (checkIfRefreshTokenIsRequired(getRequest())){
                 //response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN));
             }

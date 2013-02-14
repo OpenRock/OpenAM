@@ -76,4 +76,13 @@ public interface Scope {
      */
     public Map<String, Object> evaluateScope(CoreToken token);
 
+    /**
+     * This method is called before the access_token end point returns an access token. Whatever is returned by this
+     * method will be added to the json object returned by the access_token endpoint.
+     * @param parameters set of data to pass into the method to use in the method
+     * @param token the token created that will be returned with the extra data from this method
+     * @return
+     */
+    public Map<String, Object> extraDataToReturnForTokenEndpoint(Set<String> parameters, CoreToken token);
+
 }

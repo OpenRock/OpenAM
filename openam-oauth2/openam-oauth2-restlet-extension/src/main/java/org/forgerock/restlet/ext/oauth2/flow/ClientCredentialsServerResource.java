@@ -24,6 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,7 +56,13 @@ public class ClientCredentialsServerResource extends AbstractFlow {
 
         CoreToken token = createAccessToken(checkedScope);
 
-        return new JacksonRepresentation<Map>(token.convertToMap());
+        Map<String, Object> response = token.convertToMap();
+
+        //execute post token creation pre return scope plugin for extra return data.
+        Set<String> data = new HashSet<String>();
+        response.putAll(executeExtraDataScopePlugin(data ,token));
+
+        return new JacksonRepresentation<Map>(response);
     }
 
     @Override
