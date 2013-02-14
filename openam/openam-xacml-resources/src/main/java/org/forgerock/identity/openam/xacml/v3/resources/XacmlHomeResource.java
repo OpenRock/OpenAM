@@ -78,8 +78,8 @@ public class XacmlHomeResource implements XACML3Constants {
              (xacmlRequestInformation.getContentType().commonType() == CommonType.JSON) ) {
                 sb.append(getJSONHomeDocument(xacmlRequestInformation));
         } else {
-               // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
-               sb.append(getXMLHomeDocument(xacmlRequestInformation));
+                // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
+                sb.append(getXMLHomeDocument(xacmlRequestInformation));
         } // End of Check for Content Type.
 
         // *******************************************************
@@ -90,13 +90,13 @@ public class XacmlHomeResource implements XACML3Constants {
     public static String getXMLHomeDocument(XACMLRequestInformation xacmlRequestInformation) {
         StringBuilder sb = new StringBuilder();
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
+        sb.append(XML_HEADER);
         sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
         sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
         sb.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
         sb.append("<atom:link href=\042/xacml/pdp/authorization\042/>");
         sb.append("</resource>");
         sb.append("</resources>");
-        sb.append(" ");
         return sb.toString();
     }
 
