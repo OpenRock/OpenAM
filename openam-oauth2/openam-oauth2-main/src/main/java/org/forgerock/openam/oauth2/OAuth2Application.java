@@ -29,7 +29,7 @@ import java.net.URI;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
-import org.forgerock.openam.oauth2.store.impl.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.provider.*;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;

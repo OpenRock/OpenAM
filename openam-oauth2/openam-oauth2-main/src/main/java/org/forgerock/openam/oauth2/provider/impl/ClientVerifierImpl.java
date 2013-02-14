@@ -81,13 +81,13 @@ public class ClientVerifierImpl implements ClientVerifier{
         String realm = OAuth2Utils.getRealm(request);
         if (request.getChallengeResponse() != null && clientId != null){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Client (" + clientId + ") using multiple authentication methods");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
         } else if (request.getChallengeResponse() != null) {
             client = verify(request.getChallengeResponse(), realm);
         } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret, realm);
         } else {
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
@@ -194,7 +194,7 @@ public class ClientVerifierImpl implements ClientVerifier{
     public ClientApplication findClient(String clientId, Request request){
 
         if (clientId == null || clientId.isEmpty()){
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
         }
         String realm = OAuth2Utils.getRealm(request);
         ClientApplication user = null;
@@ -202,7 +202,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             AMIdentity id = getIdentity(clientId, realm);
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null);
         }
         return user;
     }

@@ -185,11 +185,29 @@ public class OAuth2Constants {
 
     }
 
+    public class CoreTokenParams{
+
+        public static final String EXPIRE_TIME = "expireTime";
+        public static final String SCOPE = "scope";
+        public static final String PARENT = "parent";
+        public static final String USERNAME= "userName";
+        public static final String REDIRECT_URI = "redirectURI";
+        public static final String REFRESH_TOKEN = "refreshToken";
+        public static final String ISSUED = "issued";
+        public static final String TOKEN_TYPE = "tokenType";
+        public static final String REALM = "realm";
+        public static final String ID = "id";
+        public static final String CLIENT_ID = "clientID";
+        public static final String TOKEN_NAME = "tokenName";
+
+    }
+
     public class Token {
         public static final String OAUTH_ACCESS_TOKEN = "access_token";
         public static final String OAUTH_EXPIRES_IN = "expires_in";
         public static final String OAUTH_REFRESH_TOKEN = "refresh_token";
         public static final String OAUTH_TOKEN_TYPE = "token_type";
+        public static final String OAUTH_CODE_TYPE = "access_code";
     }
 
     public class StoredToken {
@@ -675,6 +693,7 @@ public class OAuth2Constants {
         public static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
         public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
+        public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
     }
 
     /**

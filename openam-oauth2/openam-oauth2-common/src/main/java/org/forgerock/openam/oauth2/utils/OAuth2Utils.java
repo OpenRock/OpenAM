@@ -666,6 +666,10 @@ public class OAuth2Utils {
         return cleanScopes;
     }
 
+    public static Set<String> stringToSet(String string){
+        return OAuth2Utils.split(string, " ");
+    }
+
     /**
      * Constructor.
      */

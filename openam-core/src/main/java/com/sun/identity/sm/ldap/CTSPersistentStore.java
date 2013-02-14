@@ -1863,7 +1863,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
         // Establish our DN
-        String dn = request.get("id").required().asString();
+        String dn = request.get(OAuth2Constants.CoreTokenParams.ID).required().asString();
         String baseDN = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, dn);
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
@@ -1928,7 +1928,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
 
-        String id = request.get("id").required().asString();
+        String id = request.get(OAuth2Constants.CoreTokenParams.ID).required().asString();
         String dn = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, id);
 
         String messageTag = "CTSPersistenceStore.oauth2Delete: ";

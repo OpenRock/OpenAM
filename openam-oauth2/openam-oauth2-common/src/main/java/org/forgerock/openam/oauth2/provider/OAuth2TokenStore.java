@@ -27,10 +27,7 @@ import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.AccessToken;
-import org.forgerock.openam.oauth2.model.AuthorizationCode;
-import org.forgerock.openam.oauth2.model.RefreshToken;
-import org.forgerock.openam.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.model.*;
 
 /**
  * Interface to govern the high level store interactions, applying configuration
@@ -53,7 +50,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    AuthorizationCode createAuthorizationCode(Set<String> scopes, String realm, String uuid,
+    public CoreToken createAuthorizationCode(Set<String> scopes, String realm, String uuid,
             SessionClient client) throws OAuthProblemException;
 
     /**
@@ -64,7 +61,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      *
      */
-    public void updateAuthorizationCode(String id, AuthorizationCode code) throws OAuthProblemException;
+    public void updateAuthorizationCode(String id, CoreToken code) throws OAuthProblemException;
 
     /**
      * Retrieves an authorization code from store.
@@ -75,7 +72,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    AuthorizationCode readAuthorizationCode(String id) throws OAuthProblemException;
+    public CoreToken readAuthorizationCode(String id) throws OAuthProblemException;
 
     /**
      * Invalidates an authorization code, ensuring that it cannot be used to
@@ -89,118 +86,25 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    void deleteAuthorizationCode(String id) throws OAuthProblemException;
+    public void deleteAuthorizationCode(String id) throws OAuthProblemException;
 
     /**
-     * Creates and stores an access token using an authorization code
-     * (authentication code flow). The authorization code can only be used once,
-     * and will be updated as a result of calling this method to indicate that
-     * it has been used; attempts to reuse the same authorization code will
-     * result in all related tokens being invalidated. The implementation may
-     * issue a refresh token at the same time (referenced by the access token)
-     * with the same parent. TODO: should the interface include a boolean
-     * "createRefreshToken" or is this purely down to pre-config
-     * 
+     * Creates and stores a access token.
      * @param accessTokenType
-     *            MAC, Bearer or an extended access token type
      * @param scopes
-     *            the scope(s) for which to issue the token, must be identical
-     *            to or a subset of authz code scopes
-     * @param code
-     *            the authorization code that will be the parent of this access
-     *            token
      * @param realm
-     *            the realm of this token
-     * @return a newly created and stored access token
-     */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, AuthorizationCode code, String realm);
-
-    /**
-     * Creates and stores an access token using a refresh token (refresh token
-     * flow). The refresh token may be used multiple times and for different
-     * scope subsets.
-     * 
-     * @param accessTokenType
-     *            MAC, Bearer or an extended access token type
-     * @param scopes
-     *            the scope(s) for which to issue the token, must be identical
-     *            to or a subset of authz code scopes
-     * @param refreshToken
-     *            the refresh token that will be the parent of this access token
-     * @param realm
-     *            the realm of this token
-     * @return a newly created and stored access token
-     */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes,
-            RefreshToken refreshToken, String realm);
-
-    /**
-     * Creates and stores an access token using the implicit flow where no
-     * client is identified. The resulting token will have no parent token.
-     * 
-     * @param accessTokenType
-     *            MAC, Bearer or an extended access token type
-     * @param scopes
-     *            the scope(s) for which to issue the token, must be identical
-     *            to or a subset of authz code scopes
-     * @param realm
-     *            the name of the realm where this token should be created
      * @param uuid
-     *            the user identifier (resource owner)
-     * @param client
-     *            the client making the request
-     * @return a newly created and stored access token
-     */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
-            String uuid, SessionClient client);
-
-    /**
-     * Creates and stores an access token using the resource owner password,
-     * where the client passes the credentials to the OAuth endpoint. The
-     * resulting token has no parent. There is no redirect UR in this case since
-     * the token is sent directly as a response to a POST.
-     * 
-     * @param accessTokenType
-     *            MAC, Bearer or an extended access token type
-     * @param scopes
-     *            the scope(s) for which to issue the token, must be identical
-     *            to or a subset of authz code scopes
-     * @param realm
-     *            the name of the realm where this token should be created
-     * @param uuid
-     *            the user identifier (resource owner)
-     * @param clientId
-     *            the client making the request
+     * @param clientID
+     * @param redirectURI
+     * @param parent
      * @param refreshToken
-     *            the optional refresh token. null if there is no refresh token
-     * @return a newly created and stored access token
+     * @return
      */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
-            String uuid, String clientId, RefreshToken refreshToken);
+    public CoreToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid,
+                                String clientID, String redirectURI, String parent, String refreshToken) throws OAuthProblemException;
 
     /**
-     * Creates and stores an access token using the client credential flow,
-     * where the client only is authenticated and identified. The resulting
-     * token will not be tied to the resource owner, and will have no parent
-     * token. There is no redirect URI in this case since the client is the same
-     * as the resource owner and redirection is not needed.
-     * 
-     * @param accessTokenType
-     *            MAC, Bearer or an extended access token type
-     * @param scopes
-     *            the scope(s) for which to issue the token, must be identical
-     *            to or a subset of authz code scopes
-     * @param realm
-     *            the name of the realm where this token should be created
-     * @param clientId
-     *            the client making the request
-     * @return a newly created and stored access token
-     */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
-            String clientId) throws OAuthProblemException;
-
-    /**
-     * Retrieves an access token from store. TODO: exception subclasses
+     * Retrieves an access token from store.
      * 
      * @param id
      *            the unique identifier of the token
@@ -208,7 +112,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    AccessToken readAccessToken(String id) throws OAuthProblemException;
+    public CoreToken readAccessToken(String id) throws OAuthProblemException;
 
     /**
      * Deletes an access token, ensuring that it cannot be used to access any
@@ -221,7 +125,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    void deleteAccessToken(String id) throws OAuthProblemException;
+    public void deleteAccessToken(String id) throws OAuthProblemException;
 
     /**
      * Creates and stores a refresh token in the resource owner password flow.
@@ -240,11 +144,11 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId, AuthorizationCode parent)
+    public CoreToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId, String redirect_uri)
             throws OAuthProblemException;
 
     /**
-     * Retrieves a refresh token from store. TODO: exception subclass
+     * Retrieves a refresh token from store.
      * 
      * @param id
      *            the unique identifier of the token
@@ -252,7 +156,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    RefreshToken readRefreshToken(String id) throws OAuthProblemException;
+    public CoreToken readRefreshToken(String id) throws OAuthProblemException;
 
     /**
      * Deletes a refresh token, ensuring that it cannot be used to issue any
@@ -264,7 +168,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    void deleteRefreshToken(String id) throws OAuthProblemException;
+    public void deleteRefreshToken(String id) throws OAuthProblemException;
 
     public JsonValue queryForToken(String id) throws OAuthProblemException;
 

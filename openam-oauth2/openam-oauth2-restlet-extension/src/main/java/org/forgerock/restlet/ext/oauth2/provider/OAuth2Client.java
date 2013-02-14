@@ -98,13 +98,11 @@ public class OAuth2Client extends User {
             URI request = URI.create(redirectionURI);
             if (request.getFragment() != null){
                 OAuth2Utils.DEBUG.error("OAuth2Client:: Redirect URI cannot contain a fragment");
-                throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
-                        request);
+                throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null);
             }
             if (!request.isAbsolute()){
                 OAuth2Utils.DEBUG.error("OAuth2Client:: Redirect URI must be absolute");
-                throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
-                        request);
+                throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null);
             }
             for (URI uri : getClient().getRedirectionURIs()) {
                 if (uri.equals(request)) {
@@ -112,8 +110,7 @@ public class OAuth2Client extends User {
                 }
             }
             OAuth2Utils.DEBUG.error("OAuth2Client:: Redirect URI mismatch");
-            throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
-                    request);
+            throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null);
         }
     }
 

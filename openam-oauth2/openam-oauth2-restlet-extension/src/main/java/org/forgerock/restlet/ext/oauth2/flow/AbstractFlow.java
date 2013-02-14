@@ -44,11 +44,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.CacheDirective;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Reference;
-import org.restlet.data.Status;
+import org.restlet.data.*;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.ext.freemarker.TemplateRepresentation;
@@ -71,6 +67,7 @@ public abstract class AbstractFlow extends ServerResource {
     protected User resourceOwner = null;
     protected SessionClient sessionClient = null;
     protected boolean issueRefreshToken = false;
+    protected boolean fragment = false;
 
     /**
      * If the {@link AbstractFlow#getCheckedScope} change the requested scope
@@ -153,6 +150,7 @@ public abstract class AbstractFlow extends ServerResource {
         validateRequiredParameters();
         validateOptionalParameters();
         validateNotAllowedParameters();
+        fragment = false;
         // -------------------------------------
         // Add Cache-Control: no-store
         // Pragma: no-cache
@@ -216,66 +214,27 @@ public abstract class AbstractFlow extends ServerResource {
                 break;
             }
             case AUTHORIZATION_ENDPOINT: {
-                if (this instanceof AuthorizationCodeServerResource) {
-                    Redirector dispatcher =
-                            OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(),
-                                    exception);
-
-                    //do not use the redirect if it is uri_mismatch or if missing client id
-                    if (null != dispatcher &&
-                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
-                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
-                          exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID)) &&
-                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_CLIENT))) {
-                        dispatcher.handle(getRequest(), getResponse());
-                    } else {
-                        // TODO Introduce new method
-                        Representation result = getPage("error.ftl", exception.getErrorMessage());
-                        if (null != result) {
-                            getResponse().setEntity(result);
-                        }
-                    }
-                    break;
-                } else if (this instanceof ImplicitGrantServerResource) {
-                    Redirector dispatcher =
+                Redirector dispatcher = null;
+                if (fragment){
+                    dispatcher =
                             OAuth2Utils.ParameterLocation.HTTP_FRAGMENT.getRedirector(getContext(),
                                     exception);
-
-                    //do not use the redirect if it is uri_mismatch or if missing client id
-                    if (null != dispatcher &&
-                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
-                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
-                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))  &&
-                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_CLIENT))) {
-                        dispatcher.handle(getRequest(), getResponse());
-                    } else {
-                        // TODO Introduce new method
-                        Representation result = getPage("error.ftl", exception.getErrorMessage());
-                        if (null != result) {
-                            getResponse().setEntity(result);
-                        }
-                    }
-                    break;
-                } else if (this instanceof ErrorServerResource) {
-                    Redirector dispatcher =
-                            OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(), exception);
-
-                    //do not use the redirect if it is uri_mismatch or if missing client id
-                    if (null != dispatcher &&
-                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
-                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
-                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))  &&
-                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_CLIENT))) {
-                        dispatcher.handle(getRequest(), getResponse());
-                    } else {
-                        // TODO Introduce new method
-                        Representation result = getPage("error.ftl", exception.getErrorMessage());
-                        if (null != result) {
-                            getResponse().setEntity(result);
-                        }
-                    }
-                    break;
+                } else {
+                    dispatcher =
+                            OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(),
+                                    exception);
                 }
+
+                if (null != dispatcher) {
+                    dispatcher.handle(getRequest(), getResponse());
+                } else {
+                    // TODO Introduce new method
+                    Representation result = getPage("error.ftl", exception.getErrorMessage());
+                    if (null != result) {
+                        getResponse().setEntity(result);
+                    }
+                }
+            break;
             }
             default: {
                 errorPage(exception);
@@ -396,7 +355,7 @@ public abstract class AbstractFlow extends ServerResource {
                     * an authorization code using this method.
                     */
                     OAuth2Utils.DEBUG.error("AbstractFlow::Unauthorized client accessing authorize endpoint");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null);
                 }
             }
             case TOKEN_ENDPOINT: {
@@ -565,7 +524,7 @@ public abstract class AbstractFlow extends ServerResource {
         if (required != null && required.length > 0) {
             StringBuilder sb = null;
             for (String s : required) {
-                if (!getRequest().getAttributes().containsKey(s)) {
+                if (OAuth2Utils.getRequestParameter(getRequest(), s, String.class) == null) {
                     if (null == sb) {
                         sb = new StringBuilder("Missing parameters: ");
                     }
@@ -706,6 +665,34 @@ public abstract class AbstractFlow extends ServerResource {
         }
 
         return checkedScope;
+    }
+
+    protected Map<String,String> getResponseTypes(String realm){
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            Set<String> responseTypeSet = attrs.get(OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST);
+            if (responseTypeSet == null || responseTypeSet.isEmpty()){
+                OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): No response types for realm: " + realm);
+                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invlaid Response Type");
+            }
+            Map<String, String> responseTypes = new HashMap<String, String>();
+            for (String responseType : responseTypeSet){
+                String[] parts = responseType.split("\\|");
+                if (parts.length != 2){
+                    OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): Response type wrong format for realm: " + realm);
+                    continue;
+                }
+                responseTypes.put(parts[0], parts[1]);
+            }
+            return responseTypes;
+        } catch (Exception e) {
+            OAuth2Utils.DEBUG.error("AbstractFlow::Unable response types", e);
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
     }
 
 }

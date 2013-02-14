@@ -21,38 +21,35 @@
  * your own identifying information:
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
-package org.forgerock.openam.oauth2.model;
+
+package org.forgerock.openam.oauth2.provider;
+
+import org.forgerock.openam.oauth2.model.CoreToken;
 
 import java.util.Map;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 /**
- * This implements the Access Token used in OAuth2. The Access Token is described in see
- * <a href="http://tools.ietf.org/html/rfc6749#section-1.4">http://tools.ietf.org/html/rfc6749#section-1.4</a>
+ * This class provides the functions that need to be implemented to create a response type for the authorize
+ * endpoint.
+ *
+ * @supported.all.api
  */
-public interface AccessToken extends Token {
+public interface ResponseType {
+    /**
+     * Creates a token for a response type
+     * @param data The data needed to create the token
+     * @return  the created token
+     */
+    public CoreToken createToken(Map<String, String> data);
 
     /**
-     * Gets the parent of the access token. Either the {@link RefreshToken}, or {@link AuthorizationCode}.
-     * 
-     * @return the parent token
+     * Returns the location in the HTTP response the token should be returned
+     * @return A string of either FRAGMENT or QUERY
      */
-    public String getParentToken();
+    public String getReturnLocation();
 
     /**
-     * Gets the {@link RefreshToken} associated with this AccessToken.
-     * <p/>
-     * 
-     * @return null if there is no RefreshToken associated
+     * The parameter in the URI to return the token as
      */
-    @JsonSerialize
-    public String getRefreshToken();
-
-
-    /**
-     * Gets information about the token for the tokeninfo end point
-     * @return
-     */
-    public Map<String, Object> getTokenInfo();
+    public String URIParamValue();
 }

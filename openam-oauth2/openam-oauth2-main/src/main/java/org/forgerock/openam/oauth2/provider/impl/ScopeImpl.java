@@ -27,8 +27,9 @@ package org.forgerock.openam.oauth2.provider.impl;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 
@@ -96,9 +97,9 @@ public class ScopeImpl implements Scope {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> evaluateScope(AccessToken token){
+    public Map<String, Object> evaluateScope(CoreToken token){
         Map<String, Object> map = new HashMap<String, Object>();
-        Set<String> scopes = token.getScope();
+        Set<String> scopes = OAuth2Utils.stringToSet(token.getParameter(OAuth2Constants.CoreTokenParams.SCOPE));
         String resourceOwner = token.getUserID();
 
         if (resourceOwner != null){

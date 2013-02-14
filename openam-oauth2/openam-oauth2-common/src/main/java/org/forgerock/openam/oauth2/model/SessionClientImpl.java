@@ -21,18 +21,49 @@
  * your own identifying information:
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
+
 package org.forgerock.openam.oauth2.model;
 
+import java.util.HashMap;
+
+import org.forgerock.json.fluent.JsonValue;
+
 /**
- * Implements the OAuth2 Refresh Token
- * @see <a href="http://tools.ietf.org/html/rfc6749#section-1.5">1.5.  Refresh Token</a>
+ * Implements a {@link SessionClient}
  */
-public interface RefreshToken extends Token {
+public class SessionClientImpl extends JsonValue implements SessionClient {
+
+    private String clientId;
+    private String redirectUri;
 
     /**
-     * Get parent token
+     * Creates a session client
      * 
-     * @return ID of parent token, will be null or an Access Code used to create this token
+     * @param clientId
+     *            The ID of the client
+     * @param redirectUri
+     *            The redirection URI of the client
      */
-    public String getParentToken();
+    public SessionClientImpl(String clientId, String redirectUri) {
+        super(new HashMap<String, Object>());
+        this.clientId = clientId;
+        this.redirectUri = redirectUri;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getClientId() {
+        return clientId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
 }

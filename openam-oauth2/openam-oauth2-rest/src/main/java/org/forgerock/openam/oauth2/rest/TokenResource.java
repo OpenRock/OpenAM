@@ -105,12 +105,12 @@ public class TokenResource implements CollectionResourceProvider {
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
                 response = accessor.read(resourceId);
-                Set<String> usernameSet = (Set<String>) response.get("username").getObject();
-                if(usernameSet == null || usernameSet.isEmpty()){
+                String username = response.get(OAuth2Constants.CoreTokenParams.USERNAME).asString();
+                if(username == null || username.isEmpty()){
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (uid.getName().equalsIgnoreCase(usernameSet.iterator().next()) || uid.equals(adminUserId)){
+                if (uid.getName().equalsIgnoreCase(username) || uid.equals(adminUserId)){
                     response = accessor.delete(resourceId, "1");
                 } else {
                     PermanentException ex = new PermanentException(401, "Unauthorized", null);
@@ -156,7 +156,7 @@ public class TokenResource implements CollectionResourceProvider {
                 AMIdentity uid = null;
                 try {
                     uid = getUid(context);
-                    query.put("username", uid.getName());
+                    query.put(OAuth2Constants.CoreTokenParams.USERNAME, uid.getName());
                 } catch (Exception e){
                     PermanentException ex = new PermanentException(401, "Unauthorized" ,e);
                     handler.handleError(ex);
@@ -167,7 +167,7 @@ public class TokenResource implements CollectionResourceProvider {
                 for (String q: queries){
                     String[] params = q.split("=");
                     if (params.length == 2){
-                        if (!params[0].equalsIgnoreCase("username")){
+                        if (!params[0].equalsIgnoreCase(OAuth2Constants.CoreTokenParams.USERNAME)){
                             query.put(params[0], params[1]);
                         } else {
                             if (uid != null && (uid.equals(adminUserId) || uid.getName().equalsIgnoreCase(params[1]))){
@@ -218,12 +218,11 @@ public class TokenResource implements CollectionResourceProvider {
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
                 response = accessor.read(resourceId);
-                Set<String> usernameSet = (Set<String>) response.get("username").getObject();
-                if(usernameSet == null || usernameSet.isEmpty()){
+                username = response.get(OAuth2Constants.CoreTokenParams.USERNAME).asString();
+                if(username == null || username.isEmpty()){
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                username = usernameSet.iterator().next();
 
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);

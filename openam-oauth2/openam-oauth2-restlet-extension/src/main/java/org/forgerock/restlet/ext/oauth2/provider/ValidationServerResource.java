@@ -37,13 +37,12 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerAuthenticatorHelper;
-import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
-import org.forgerock.openam.oauth2.model.AccessToken;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -87,7 +86,7 @@ import org.forgerock.openam.oauth2.provider.Scope;
  * @author Laszlo Hordos
  */
 public class ValidationServerResource extends ServerResource implements
-        AccessTokenValidator<BearerToken> {
+        AccessTokenValidator<org.forgerock.restlet.ext.oauth2.consumer.BearerToken> {
 
     private OAuth2TokenStore tokenStore = null;
     private Reference validationServerRef;
@@ -139,7 +138,7 @@ public class ValidationServerResource extends ServerResource implements
                         OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                                 "Missing access_token");
             } else {
-                AccessToken t = tokenStore.readAccessToken(token);
+                CoreToken t = tokenStore.readAccessToken(token);
 
                 if (t == null) {
                     OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to read token from token store for id: " + token);
@@ -162,7 +161,7 @@ public class ValidationServerResource extends ServerResource implements
                     if (error == null) {
                         //call plugin class.process
                         Map <String, Object> scopeEvaluation = scopeClass.evaluateScope(t);
-                        response.putAll(t.getTokenInfo());
+                        //response.putAll(t.getTokenInfo());
                         response.putAll(scopeEvaluation);
                     }
 
@@ -190,7 +189,7 @@ public class ValidationServerResource extends ServerResource implements
     }
 
     @Override
-    public BearerToken verify(BearerToken token) throws OAuthProblemException {
+    public org.forgerock.restlet.ext.oauth2.consumer.BearerToken verify(org.forgerock.restlet.ext.oauth2.consumer.BearerToken token) throws OAuthProblemException {
         Reference reference = new Reference(validationServerRef);
         reference.addQueryParameter(OAuth2Constants.Params.ACCESS_TOKEN, token.getAccessToken());
         ClientResource clientResource = new ClientResource(getContext(), reference);
@@ -228,7 +227,7 @@ public class ValidationServerResource extends ServerResource implements
                         Collections.unmodifiableSet(new HashSet<String>(
                                 (Collection<? extends String>) o));
             }
-            return new BearerToken(token, expires_in, client_id, username, scope);
+            return new org.forgerock.restlet.ext.oauth2.consumer.BearerToken(token, expires_in, client_id, username, scope);
         } catch (OAuthProblemException e) {
             OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during token verify", e);
             throw e;

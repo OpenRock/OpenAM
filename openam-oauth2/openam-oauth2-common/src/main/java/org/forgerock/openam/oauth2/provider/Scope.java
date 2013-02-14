@@ -24,7 +24,7 @@
 
 package org.forgerock.openam.oauth2.provider;
 
-import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
 
 import java.util.Map;
 import java.util.Set;
@@ -74,6 +74,6 @@ public interface Scope {
      * @return returns a map of data to be added to the token json object that will be returned to the client,
      *          can be null if no information needs to be returned.
      */
-    public Map<String, Object> evaluateScope(AccessToken token);
+    public Map<String, Object> evaluateScope(CoreToken token);
 
 }
