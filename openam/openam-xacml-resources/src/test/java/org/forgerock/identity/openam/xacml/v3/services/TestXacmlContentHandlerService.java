@@ -72,11 +72,135 @@ public class TestXacmlContentHandlerService {
         servletTester.stop();
     }
 
+    // *********************************************************
+    // GET Tests
+    // *********************************************************
+
+    @Test
+    public void testUseCase_GET_HOME() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.XML.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_HOME_PDP() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml/pdp");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.XACML_PLUS_XML.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_HOME_PIP() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml/pip");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.JSON.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_HOME_PAP() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml/pap");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.XACML_PLUS_JSON.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_UnsupportedMediaType() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml");
+        request.setContent(""); // Set content Length to zero.
+        request.setVersion("HTTP/1.1");
+
+        try {
+            // Check for a 415 Unsupported Media Type.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),415);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    // *********************************************************
+    // POST Tests
+    // *********************************************************
+
+
     @Test
     public void testUseCase_NoContentLengthSpecified() {
 
         HttpTester request = new HttpTester();
-        request.setMethod("GET");
+        request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.setURI("/xacml");
         request.setVersion("HTTP/1.1");
@@ -98,7 +222,7 @@ public class TestXacmlContentHandlerService {
     public void testUseCase_UnsupportedMediaType() {
 
         HttpTester request = new HttpTester();
-        request.setMethod("GET");
+        request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.setURI("/xacml");
         request.setContent(""); // Set content Length to zero.
@@ -121,7 +245,7 @@ public class TestXacmlContentHandlerService {
     public void testUseCase_JSON_NotAuthorized() {
 
         HttpTester request = new HttpTester();
-        request.setMethod("GET");
+        request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
         request.setURI("/xacml/pdp/authorization");
@@ -145,7 +269,7 @@ public class TestXacmlContentHandlerService {
     public void testUseCase_XML_NotAuthorized() {
 
         HttpTester request = new HttpTester();
-        request.setMethod("GET");
+        request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
         request.setURI("/xacml/pdp/authorization");

@@ -67,43 +67,43 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * XACML v3 Resource Router
- <p/>
- Provides main end-point for all XACML v3.0 requests,
- either XML or JSON based over HTTP/HTTPS REST based protocol flow.
- <p/>
- This ForgeRock developed XACML Resource Router complies with the following OASIS Specifications:
- <ul>
- <li>xacml-3.0-core-spec-cs-01-en.pdf</li>
- <li>xacml-rest-v1.0-csprd01.pdf</li>
- <li>xacml-json-http-v1-1.0-wd09.doc</li>
- <li>...</li>
- </ul>
-
- <b>The following XACML v3 End Points are currently viable:</b>
- <table>
- <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
- <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Provides Home Document</em></td></tr>
- <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;home&#47;</li></ul></td><td><em>Provides Home Document</em></td></tr>
- <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;status&#47;</li></ul></td><td><em>Provides Status and Home
- Document</em></td></tr>
-
- <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
- <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;pdp&#47;</li></ul></td><td><em>Request from PEP</em></td></tr>
- </table>
- <b><i>Future intended EndPoints which are not Implemented yet:</i></b>
- <table>
- <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
-
- <tr><td>GET
- </td><td><ul><li>&#47;openam&#47;xacml&#47;pip&#47;&lt;query&gt;</li></ul></td><td><em>Policy Information Point
- Query</em></td></tr>
- <tr><td>GET &amp; POST
- </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;*</li></ul></td><td><em>Policy Administration Point</em></td></tr>
- <tr><td>POST
- </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;import&#47</li></ul></td><td><em>PAP Import Policy</em></td></tr>
- <tr><td>POST
- </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;export&#47</li></ul></td><td><em>PAP Export Policy</em></td></tr>
- </table>
+ * <p/>
+ * Provides main end-point for all XACML v3.0 requests,
+ * either XML or JSON based over HTTP/HTTPS REST based protocol flow.
+ * <p/>
+ * This ForgeRock developed XACML Resource Router complies with the following OASIS Specifications:
+ * <ul>
+ * <li>xacml-3.0-core-spec-cs-01-en.pdf</li>
+ * <li>xacml-rest-v1.0-csprd01.pdf</li>
+ * <li>xacml-json-http-v1-1.0-wd09.doc</li>
+ * <li>...</li>
+ * </ul>
+ * <p/>
+ * <b>The following XACML v3 End Points are currently viable:</b>
+ * <table>
+ * <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
+ * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Provides Home Document</em></td></tr>
+ * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;home&#47;</li></ul></td><td><em>Provides Home Document</em></td></tr>
+ * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;status&#47;</li></ul></td><td><em>Provides Status and Home
+ * Document</em></td></tr>
+ * <p/>
+ * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
+ * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;pdp&#47;</li></ul></td><td><em>Request from PEP</em></td></tr>
+ * </table>
+ * <b><i>Future intended EndPoints which are not Implemented yet:</i></b>
+ * <table>
+ * <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
+ * <p/>
+ * <tr><td>GET
+ * </td><td><ul><li>&#47;openam&#47;xacml&#47;pip&#47;&lt;query&gt;</li></ul></td><td><em>Policy Information Point
+ * Query</em></td></tr>
+ * <tr><td>GET &amp; POST
+ * </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;*</li></ul></td><td><em>Policy Administration Point</em></td></tr>
+ * <tr><td>POST
+ * </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;import&#47</li></ul></td><td><em>PAP Import Policy</em></td></tr>
+ * <tr><td>POST
+ * </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;export&#47</li></ul></td><td><em>PAP Export Policy</em></td></tr>
+ * </table>
  *
  * @author Jeff.Schenk@forgerock.com
  */
@@ -380,7 +380,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Handle any DoS Attacks and Threats to the integrity of the PDP.
         if (maxContentLength != 0) {
-            if (request.getContentLength() < 0) {
+            if ((!request.getMethod().equalsIgnoreCase("GET")) && (request.getContentLength() < 0)) {
                 // We do not have any valid Content Length set.
                 response.setStatus(HttpServletResponse.SC_LENGTH_REQUIRED);  // 411
                 response.setCharacterEncoding("UTF-8");
@@ -411,7 +411,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Set up Method Logging Incoming Request.
         // TODO Make message level of info.
-        debug.error(classMethod + " processing Incoming Request MediaType:[" + request.getContentType() + "], Content Length:[" + request.getContentLength() + "]");
+        debug.error(classMethod + " processing Incoming Request MediaType:[" + request.getContentType() +
+                "], Content Length:[" + request.getContentLength() + "]");
         // ******************************************************************
         // Indicate preProcessing was completed with no Issues and Content
         // Type is valid with our derived ContentType.
@@ -450,8 +451,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private void renderUnAuthorized(final String realm, final ContentType requestContentType,
                                     HttpServletResponse response) {
         response.addHeader(WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader(realm));
-        response.setCharacterEncoding("UTF-8");
-        response.setContentLength(0);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401
         renderResponse(requestContentType, null, response);
         return;
@@ -464,8 +463,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param response
      */
     private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
-        response.setCharacterEncoding("UTF-8");
-        response.setContentLength(0);
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 400
         renderResponse(requestContentType, null, response);
         return;
@@ -475,15 +472,21 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * Simple Helper Method to provide common OK for Server PDP Status.
      *
      * @param requestContentType
+     * @param responseContent
      * @param response
      */
-    private void renderServerOKRequest(final ContentType requestContentType, HttpServletResponse response) {
+    private void renderServerOKResponse(final ContentType requestContentType,
+                                        String responseContent, HttpServletResponse response) {
         response.setCharacterEncoding("UTF-8");
-        response.setContentLength(0);
         response.setStatus(HttpServletResponse.SC_OK);  // 200
-        renderResponse(requestContentType, null, response);
+        renderResponse(requestContentType, responseContent, response);
         return;
     }
+
+
+    // ******************************************************************************************************
+    // Servlet/Restlet Processing Methods
+    // ******************************************************************************************************
 
     /**
      * Returns a short description of the servlet.
@@ -512,8 +515,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if ((requestContentType == null) || (requestContentType.equals(ContentType.NONE))) {
             // We do not have a valid Application Content Type or other issue.
             // Response Status set in preProcessingRequest method.
-            response.setCharacterEncoding("UTF-8");
-            response.setContentLength(0);
             return;
         }
         // ******************************************************************
@@ -526,24 +527,36 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
-        if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
-            (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
-
+        if ( (request.getContentLength() <= 0) &&
+                ( (xacmlRequestInformation.getAuthenticationHeader() == null) ||
+                  (xacmlRequestInformation.getAuthenticationHeader().isEmpty()) ) )  {
+            // ***********************************************************************************************
             // Knowing we have no Authentication at this point check the Request Path Information, provide the
-            // Home Document to the Requester.
-            // *****************************************************************
-            // Render our Response
+            // Home Document to the Requester by Rendering our Response.
+            if ( (xacmlRequestInformation.getRequestPathInfo() == null) ||
+                 (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
+                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("pdp")) ||
+                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("home")) ||
+                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("status")) ) {
+                 // All other EndPoints Require Authentication to obtain access.
             try {
-                renderResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation, request), response);
+                renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
+                        request), response);
                 return;
-            } catch(JSONException jsonException) {
-                // Force Unauthorized and show exception for debugging.
-                debug.error(classMethod+" JSON Exception Occurred: "+jsonException.getMessage(),jsonException);
+            } catch (JSONException jsonException) {
+                // If any Exceptions, Force Unauthorized and show exception for debugging.
+                debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
                 // This Starts the Authorization via Digest Flow...
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
                 return;
             }
-        }
+            } else {
+                // Is not the Correct Path, then indicated Unauthorized.
+                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                return;
+            }
+
+        } // End of outer if Check for content
         // ******************************************************************
         // Obtain our Request Content Data.
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
@@ -965,35 +978,39 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private XACMLRequestInformation parseRequestInformation(ContentType contentType, HttpServletRequest request)
             throws ServletException {
         final String classMethod = "XacmlContentHandlerService:parseRequestInformation: ";
+
+        // Get URI and MetaAlias Data.
+        String requestURI = request.getRequestURI();
+        String queryMetaAlias =
+                XACML3Utils.getMetaAliasByUri(requestURI);
+        String realm = XACML3Utils.getRealmByMetaAlias(queryMetaAlias);
+
+        // Attempt to get the PDP Entity ID...
+        String pdpEntityID = null;
         try {
-            // Get URI and MetaAlias Data.
-            String requestURI = request.getRequestURI();
-            String queryMetaAlias =
-                    XACML3Utils.getMetaAliasByUri(requestURI);
-            String realm = XACML3Utils.getRealmByMetaAlias(queryMetaAlias);
             // Get PDP entity ID
-            String pdpEntityID =
+            pdpEntityID =
                     XACML3Utils.getEntityByMetaAlias(queryMetaAlias);
-            // Bootstrap our Request Information Object for this Request.
-            XACMLRequestInformation xacmlRequestInformation = new XACMLRequestInformation(contentType,
-                    queryMetaAlias, pdpEntityID, realm, request);
-            // Consume the Request Content, by parsing
-            // the Content Depending upon the Content Type.
-            if (contentType.commonType().equals(CommonType.XML)) {
-                parseXMLRequest(xacmlRequestInformation);
-            } else {
-                // Only can be JSON at this point in Data FLow.
-                parseJSONRequest(xacmlRequestInformation);
-            }
-            // **************************************
-            // Return our Request Information for
-            // processing request.
-            return xacmlRequestInformation;
         } catch (SAML2Exception xe) {
-            debug.error(classMethod + " XACML MetaException: " + xe.getMessage(), xe);
-            // Pass back no XACMLRequestInformation Object to indicate we have an issue.
-            return null;
+            debug.error(classMethod + " SAML2 Exception obtaining PDP Entity ID: " + xe.getMessage(), xe);
+            // Absorb this issue and continue without our PDP Entity ID.
         }
+
+        // Bootstrap our Request Information Object for this Request.
+        XACMLRequestInformation xacmlRequestInformation = new XACMLRequestInformation(contentType,
+                queryMetaAlias, pdpEntityID, realm, request);
+        // Consume the Request Content, by parsing
+        // the Content Depending upon the Content Type.
+        if (contentType.commonType().equals(CommonType.XML)) {
+            parseXMLRequest(xacmlRequestInformation);
+        } else {
+            // Only can be JSON at this point in Data FLow.
+            parseJSONRequest(xacmlRequestInformation);
+        }
+        // **************************************
+        // Return our Request Information for
+        // processing request.
+        return xacmlRequestInformation;
     }
 
     /**
@@ -1149,7 +1166,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
     /**
      * Public Helper Method for accessing handlers.
-     *
+     * <p/>
      * TODO Remove!!!!
      *
      * @return
