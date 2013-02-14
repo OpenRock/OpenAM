@@ -111,14 +111,13 @@ public class XacmlPDPResource implements XACML3Constants {
         MimeHeaders headers = SAML2Utils.getHeaders(request);
 
         // Ready our Response Object...
-        com.sun.identity.entitlement.xacml3.core.Response xacmlResponse = new com.sun.identity.entitlement.xacml3.core.Response();
         com.sun.identity.entitlement.xacml3.core.Result xacmlResult = new com.sun.identity.entitlement.xacml3.core.Result();
-        xacmlResponse.getResult().add(xacmlResult);
-
-        xacmlRequestInformation.setXacmlStringResponse(null);
-
+        xacmlRequestInformation.getXacmlResponse().getResult().add(xacmlResult);
         // Check Original Content
-        if (xacmlRequestInformation.getOriginalContent() != null) {
+        if (xacmlRequestInformation.getOriginalContent() == null) {
+                // Bad or no content.
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
+        }
 
             debug.error("XACML Incoming Request:[" + xacmlRequestInformation.getOriginalContent() + "], " +
                     "Length:[" + xacmlRequestInformation.getOriginalContent().length() + "]");
@@ -136,19 +135,18 @@ public class XacmlPDPResource implements XACML3Constants {
                                 request,
                                 requestDocument.getDocumentElement());
                 if (samlResponse != null) {
-                    xacmlRequestInformation.setXacmlStringResponse(samlResponse.toXMLString(true, true));
+                    //xacmlRequestInformation.setXacmlStringResponse(samlResponse.toXMLString(true, true));
+                    // *******************************************
+                    // Set our Response Status per specification.
+                    response.setStatus(HttpServletResponse.SC_OK);   // 200
+
+                    return;
+
                 } else {
                     // Bad or no content.
                     xacmlRequestInformation.setAuthenticated(false);
                     response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
                 }
-
-
-                // TODO -- Render proper response.
-                // Set our Response Status per specification.
-                response.setStatus(HttpServletResponse.SC_OK);   // 200
-
-
             } catch (Exception se) {
                 debug.error(classMethod + "XACML Processing Exception", se);
                 // TODO Handle invalid.
@@ -156,17 +154,10 @@ public class XacmlPDPResource implements XACML3Constants {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
             }
 
-        } else {
-            // Bad or no content.
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
-        }
+
         // TODO Handle invalid.
         SAML2Utils.putHeaders(headers, response);
 
-        // TODO Temporary return...
-        if (xacmlRequestInformation.getXacmlStringResponse() == null) {
-            xacmlRequestInformation.setXacmlStringResponse(DEFAULT_RESPONSE);
-        }
     }
 
     /**
@@ -186,8 +177,28 @@ public class XacmlPDPResource implements XACML3Constants {
         MimeHeaders headers = SAML2Utils.getHeaders(request);
 
         // Ready our Response Object...
+        com.sun.identity.entitlement.xacml3.core.Result xacmlResult = new com.sun.identity.entitlement.xacml3.core.Result();
+        xacmlRequestInformation.getXacmlResponse().getResult().add(xacmlResult);
+        // Check Original Content
+        if (xacmlRequestInformation.getOriginalContent() == null) {
+            // Bad or no content.
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
+        }
+
+        debug.error("XACML Incoming Request:[" + xacmlRequestInformation.getOriginalContent() + "], " +
+                "Length:[" + xacmlRequestInformation.getOriginalContent().length() + "]");
+
+        // ********************************************
+        // Process the PDP Request from the PEP.
+        String pepEntityID = null;    // TODO Need to resolve this.
+
+
 
         // TODO ....
+
+
+
+
     }
 
     /**

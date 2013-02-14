@@ -86,6 +86,10 @@ import java.util.concurrent.TimeUnit;
  * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;home&#47;</li></ul></td><td><em>Provides Home Document</em></td></tr>
  * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;status&#47;</li></ul></td><td><em>Provides Status and Home
  * Document</em></td></tr>
+ * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;ping&#47;</li></ul></td><td><em>Provides
+ * Roundtrip from Ping Request to Ping Response.  Ping Response will always be in the form of a Decision Type of
+ * INDETERMINATE to conform to a standard XACML Decision Type.
+ * </em></td></tr>
  * <p/>
  * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
  * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;pdp&#47;</li></ul></td><td><em>Request from PEP</em></td></tr>
@@ -550,6 +554,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
                     return;
                 }
+            } else if (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/ping")) {
+
             } else {
                 // Is not the Correct Path, then indicated Unauthorized.
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
@@ -589,7 +595,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for Valid Digest Request.
         if (xacmlRequestInformation.isDigestValid()) {
-            // TODO -- Continue Validation of UserId and Password.
+            // TODO -- Continue Validation of Credentials...
+
+            // If Validated, indicated Authenticated Request.
+            xacmlRequestInformation.setAuthenticated(true);
         }
 
         // ************************************************************
@@ -681,7 +690,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         // *****************************************************************
         // Render our Response
-        renderResponse(requestContentType, xacmlRequestInformation.getXacmlStringResponse(), response);
+        renderResponse(requestContentType,
+                xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
     }
 
     /**
@@ -761,7 +771,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for Valid Digest Request.
         if (xacmlRequestInformation.isDigestValid()) {
-            // TODO -- Continue Validation of UserId and Password.
+            // TODO -- Continue Validation of Credentials...
 
             // If Validated, indicated Authenticated Request.
             xacmlRequestInformation.setAuthenticated(true);
@@ -789,6 +799,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
             }
         }
+
+        // TODO Check for a Ping Test Request...
+
         // **********************************************************************
         // Do Not Continue if we have not been authenticated.
         if (!xacmlRequestInformation.isAuthenticated()) {
@@ -954,7 +967,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         // *****************************************************************
         // Render our Response
-        renderResponse(requestContentType, xacmlRequestInformation.getXacmlStringResponse(), response);
+        renderResponse(requestContentType,
+                xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
     }
 
     @Override

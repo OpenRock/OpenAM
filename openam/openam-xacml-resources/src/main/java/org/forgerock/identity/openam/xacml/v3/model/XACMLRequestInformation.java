@@ -25,11 +25,13 @@
  */
 package org.forgerock.identity.openam.xacml.v3.model;
 
+import com.sun.identity.entitlement.xacml3.core.Response;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -41,7 +43,7 @@ import java.util.Scanner;
  *
  * @author jeff.schenk@forgerock.com
  */
-public class XACMLRequestInformation {
+public class XACMLRequestInformation implements Serializable {
     /**
      * Request Parsed correctly for either XML or JSON Data.
      */
@@ -233,12 +235,10 @@ public class XACMLRequestInformation {
      */
     private boolean digestValid = false;
     /**
-     * Response Field for Request,
-     * Digest Valid Indicator.
-     * Ca
+     * Response Field for Request.
+     * Contains XACML Response Object.
      */
-    private String xacmlStringResponse = null;
-
+    private Response xacmlResponse = new Response();
 
     /**
      * Default Constructor.
@@ -472,12 +472,25 @@ public class XACMLRequestInformation {
         this.digestValid = digestValid;
     }
 
-    public String getXacmlStringResponse() {
-        return xacmlStringResponse;
+    /**
+     * Produces String Content based upon Request Content Type.
+     * @param requestContentType
+     * @return
+     */
+    public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) {
+        StringBuilder sb = new StringBuilder();
+
+        // TODO.....
+
+        return sb.toString();
     }
 
-    public void setXacmlStringResponse(String xacmlStringResponse) {
-        this.xacmlStringResponse = xacmlStringResponse;
+    public Response getXacmlResponse() {
+        return xacmlResponse;
+    }
+
+    public void setXacmlResponse(Response xacmlResponse) {
+        this.xacmlResponse = xacmlResponse;
     }
 
     @Override
@@ -508,7 +521,7 @@ public class XACMLRequestInformation {
         sb.append(", requestLocalPort=").append(requestLocalPort);
         sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
         sb.append(", digestValid=").append(digestValid);
-        sb.append(", xacmlStringResponse='").append(xacmlStringResponse).append('\'');
+        sb.append(", xacmlResponse=").append(xacmlResponse);
         sb.append('}');
         return sb.toString();
     }
