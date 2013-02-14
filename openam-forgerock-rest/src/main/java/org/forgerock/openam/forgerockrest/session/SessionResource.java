@@ -83,7 +83,7 @@ public class SessionResource extends ReadOnlyResource {
         }
 
         SessionQueryManager sessionQueryManager = new SessionQueryManager(new SessionQueryFactory());
-        router.addRoute(RoutingMode.STARTS_WITH, orgName + "sessions", new SessionResource(sessionQueryManager));
+        router.addRoute(orgName + "sessions", new SessionResource(sessionQueryManager));
     }
 
     /**

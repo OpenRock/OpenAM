@@ -57,7 +57,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import com.sun.identity.idsvcs.*;
 
 import com.sun.identity.idsvcs.*;
 import java.util.Set;
@@ -72,6 +71,7 @@ public final class RealmResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
 
     private Set subRealms = null;
+    private String realmPath = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
 
@@ -80,11 +80,12 @@ public final class RealmResource implements CollectionResourceProvider {
      */
     public RealmResource() {
         // No implementation required.
-        this.subRealms = null;
+        this.realmPath = null;
     }
 
-    public RealmResource(Set subRealms) {
+    public RealmResource(String realmPath) {
         this.subRealms = subRealms;
+        this.realmPath = realmPath;
     }
 
     /**
@@ -135,12 +136,7 @@ public final class RealmResource implements CollectionResourceProvider {
                 realm = "/" + realm;
             }
             // build realm to comply with format
-            String holdRealm = request.getResourceName();
-            if (holdRealm != null && !holdRealm.isEmpty()) {
-                // take out last realms param, a realm can be called realms
-                String tmp = new String(holdRealm.substring(0, holdRealm.lastIndexOf("/realms/")));
-                realm = tmp + realm;
-            }
+            realm = realmPath + realm;
 
             parentRealm = RealmUtils.getParentRealm(realm);
             childRealm = RealmUtils.getChildRealm(realm);
@@ -152,7 +148,7 @@ public final class RealmResource implements CollectionResourceProvider {
 
             // handle response
             // create a resource for handler to return
-            OrganizationConfigManager realmCreated = new OrganizationConfigManager(getSSOToken(),childRealm);
+            OrganizationConfigManager realmCreated = new OrganizationConfigManager(getSSOToken(),realm);
             resource = new Resource(childRealm, "0", createJsonMessage("realmCreated",
                     realmCreated.getOrganizationName()));
             handler.handleResult(resource);
@@ -243,10 +239,13 @@ public final class RealmResource implements CollectionResourceProvider {
         }
         boolean recursive = false;
         Resource resource = null;
-
+        String holdResourceId = resourceId;
+        if (holdResourceId != null && !holdResourceId.startsWith("/")) {
+            holdResourceId = "/" + holdResourceId;
+        }
         try {
-            OrganizationConfigManager ocm = new OrganizationConfigManager(
-                    getSSOToken(), resourceId);
+            String fqRealmPath = realmPath + holdResourceId;
+            OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), fqRealmPath);
             ocm.deleteSubOrganization(null, recursive);
             // handle resource
             resource = new Resource(resourceId, "0", createJsonMessage("success", "true"));
@@ -326,9 +325,14 @@ public final class RealmResource implements CollectionResourceProvider {
 
         Resource resource = null;
         JsonValue jval = null;
+        String holdResourceId = resourceId;
+        if (holdResourceId != null && !holdResourceId.startsWith("/")) {
+            holdResourceId = "/" + holdResourceId;
+        }
+        holdResourceId = realmPath + holdResourceId;
         try {
-            OrganizationConfigManager ocm = new OrganizationConfigManager(
-                    getSSOToken(), resourceId);
+
+            OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), holdResourceId);
             // get associated services for this realm , include mandatory service names.
             Set serviceNames = ocm.getAssignedServices();
             jval = createJsonMessage(SERVICE_NAMES, serviceNames);
@@ -416,6 +420,9 @@ public final class RealmResource implements CollectionResourceProvider {
                                     JsonValue jVal, String realm) throws Exception {
         Map defaultValues = null;
         OrganizationConfigManager realmCreatedOcm;
+        if (realmPath != null && !realmPath.endsWith("/")) {
+            realmPath = realmPath + "/";
+        }
         try {
             JsonValue realmDetails = jVal;
             if (jVal != null) {
@@ -423,7 +430,7 @@ public final class RealmResource implements CollectionResourceProvider {
             }
             ocm.createSubOrganization(realm, defaultValues);
             // Get the Organization Configuration Manager for the new Realm
-            realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
+            realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realmPath + realm);
             List newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
             if (!newServiceNames.isEmpty() && newServiceNames != null) {
                 // assign services to realm
@@ -551,6 +558,9 @@ public final class RealmResource implements CollectionResourceProvider {
         if (realm != null && !realm.startsWith("/")) {
             realm = "/" + realm;
         }
+        if(!realmPath.equalsIgnoreCase("/")){
+            realm = realmPath +  realm;
+        }
 
         try {
             // The initial attempt to UPDATE a realm,
@@ -578,12 +588,6 @@ public final class RealmResource implements CollectionResourceProvider {
                         + resourceId + ":" + e + "\n" + "CREATING " + resourceId);
                 // Realm was NOT found, therefore create the realm
                 try {
-                    String holdRealm = request.getResourceName();
-                    if (holdRealm != null && !holdRealm.isEmpty()) {
-                        // take out last realm param
-                        String tmp = new String(holdRealm.substring(0, holdRealm.lastIndexOf("/realms/")));
-                        realm = tmp + realm;
-                    }
                     String parentRealm = RealmUtils.getParentRealm(realm);
                     String childRealm = RealmUtils.getChildRealm(realm);
                     ocm = new OrganizationConfigManager(getSSOToken(), parentRealm);
@@ -592,7 +596,7 @@ public final class RealmResource implements CollectionResourceProvider {
 
                     // handle response
                     // read the realm to make sure that it has been created...
-                    realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), childRealm);
+                    realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
                     resource = new Resource(childRealm, "0", createJsonMessage("realmCreated",
                             realmCreatedOcm.getOrganizationName()));
                     handler.handleResult(resource);

@@ -45,13 +45,13 @@ public final class RealmDispatcher {
             if (rName.length() > 1) rName = rName + "/";
 
 
-            router.addRoute(EQUALS, rName + "users", new IdentityResource("user", rName));
-            router.addRoute(EQUALS, rName + "agents", new IdentityResource("agent", rName));
-            router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));
+            router.addRoute(rName + "users", new IdentityResource("user", rName));
+            router.addRoute(rName + "agents", new IdentityResource("agent", rName));
+            router.addRoute(rName + "groups", new IdentityResource("group", rName));
 
             Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
-            router.addRoute(EQUALS, rName + "realms", new RealmResource(subOrgs));
-            //Recursively calls on each realm registring users agents groups for each subrealm
+            router.addRoute(rName + "realms", new RealmResource("null"));
+            //Recursively calls on each realm registering users agents groups for each subrealm
             for (Object theRealm : subOrgs) {
                 String realm = rName + (String) theRealm;
                 initRealmEndpoints(new OrganizationConfigManager(adminToken, realm), router);
@@ -74,10 +74,9 @@ public final class RealmDispatcher {
 
     static public void initDispatcher(Router router) {
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
+            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken, "/");
-            initRealmEndpoints(ocm, router);
+            //initRealmEndpoints(ocm, router);
             initGlobalEndpoints(ocm, router);
         } catch (Exception e) {
 

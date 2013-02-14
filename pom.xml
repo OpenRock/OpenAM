@@ -251,8 +251,8 @@
 
         <!-- Final Packaging Distribution Kit -->
         <module>openam-distribution</module>
-        <!-- Final Packaging Distribution Kit -->
-        <module>openam-dashboard</module>
+        <!-- Final Packaging Distribution Kit
+        <module>openam-dashboard</module>   -->
 
         <module>openam-xacml-resources</module>
 
