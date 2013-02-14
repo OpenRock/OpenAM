@@ -172,7 +172,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static ScheduledExecutorService nonceRefreshExecutor;
 
     /**
-     * Initialize our Servlet
+     * Initialize our Servlet/Restlet Request Handler for All
+     * XACML v3 Requests.
      *
      * @param config
      * @throws ServletException
@@ -243,6 +244,290 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Allow Parent to initialize as well.
         super.init(config);
     }
+
+    // ******************************************************************************************************
+    // Servlet/Restlet Processing Methods
+    // ******************************************************************************************************
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "This ForgeRock OpenAM XACML v3 Servlet/Restlet Implementation, Standards per OASIS, 2013.";
+    }
+
+    /**
+     * Handles the HTTP <code>GET</code> method XACML REST Request.
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws java.io.IOException
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        /**
+         * Process our GET Method.
+         */
+        processRequest(request, response);
+
+        /**
+         * Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status
+         ￼
+         Normative Source
+         ￼
+         GET on the home location MUST return status code 200
+         ￼
+         Target
+         ￼
+         Response to GET request on the home location
+         ￼
+         Predicate
+         ￼
+         The HTTP status code in the [response] is 200
+         ￼
+         Prescription Level
+         ￼
+         mandatory
+         */
+
+
+        /**
+         * Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body
+         ￼
+         Normative Source
+         ￼
+         GET on the home location MUST return a home document
+         ￼
+         Target
+         ￼
+         Response to GET request on the home location
+         ￼
+         Predicate
+         ￼
+         The HTTP body in the [response] follows the home document schema
+         [HomeDocument]
+         ￼
+         Prescription Level
+         ￼
+         mandatory
+         */
+
+
+        /**
+         * Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
+         ￼
+         Normative Source
+         ￼
+         The XACML entry point representation SHOULD contain a link to the PDP
+         ￼
+         Target
+         ￼
+         Response to GET request on the home location
+         ￼
+         Predicate
+         ￼
+         The home document in the [response] body contains a resource with link relation
+         http://docs.oasis-open.org/ns/xacml/relation/pdp and a valid URL
+         ￼
+         Prescription Level
+         ￼
+         mandatory
+         */
+
+
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request  the <code>HttpServletRequest</code> object.
+     * @param response the <code>HttpServletResponse</code> object.
+     * @throws ServletException    if the request could not be
+     *                             handled.
+     * @throws java.io.IOException if an input or output error occurs.
+     */
+    @Override
+    public void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+        /**
+         * Process our POST Method.
+         */
+        processRequest(request, response);
+
+        // POST operations to PDP.
+
+        /**
+         * ￼
+         Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:status
+         ￼
+         Normative Source
+         ￼
+         POST on the PDP with a valid XACML request MUST return status code 200
+         ￼
+         Target
+         ￼
+         Response to POST request on the PDP location with valid XACML request in the body
+         ￼
+         Predicate
+         ￼
+         The HTTP status code in the [response] is 200
+         ￼
+         Prescription Level
+         ￼
+         mandatory
+         */
+
+
+        /**
+         * Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:body
+         ￼
+         Normative Source
+         ￼
+         POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
+         ￼
+         Target
+         ￼
+         Response to POST request on the PDP location with valid XACML request in the body
+         ￼
+         Predicate
+         ￼
+         The HTTP body in the [response] is a valid XACML response
+         ￼
+         Prescription Level
+         ￼
+         mandatory
+         */
+
+
+        /**
+         * ￼
+         Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:invalid
+         ￼
+         Normative Source
+         ￼
+         POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
+         ￼
+         Target
+         ￼
+         Response to POST request on the PDP location with invalid XACML request in the body
+         ￼
+         Predicate
+         ￼
+         The HTTP status code in the [response] is 400
+         ￼
+         Prescription Level
+         ￼
+         mandatory
+         */
+
+
+        /**
+         * Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:status
+         ￼
+         Normative Source
+         ￼
+         POST on the PDP with a valid XACML request MUST return status code 200
+         ￼
+         Target
+         ￼
+         Response to POST request on the PDP location with valid XACML request wrapped in a
+         xacml-samlp:XACMLAuthzDecisionQuery in the body
+         ￼
+         Predicate
+         ￼
+         The HTTP status code in the [response] is 200
+         ￼
+         Prescription Level
+         ￼
+         optional
+         */
+
+
+        /**
+         * Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:body
+         ￼
+         Normative Source
+         ￼
+         POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
+         ￼
+         Target
+         ￼
+         Response to POST request on the PDP location with valid XACML request wrapped in a
+         xacml-samlp:XACMLAuthzDecisionQuery in the body
+         ￼
+         Predicate
+         ￼
+         The HTTP body in the [response] is a valid XACML response wrapped in a
+         samlp:Response
+         ￼
+         Prescription Level
+         ￼
+         optional
+         */
+
+
+        /**
+         * ￼
+         Id
+         ￼
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:invalid
+         ￼
+         Normative Source
+         ￼
+         POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
+         ￼
+         Target
+         ￼
+         Response to POST request on the PDP location with invalid XACML request
+         wrapped in a xacml-samlp:XACMLAuthzDecisionQuery in the body
+         ￼
+         Predicate
+         ￼
+         The HTTP status code in the [response] is 400
+         ￼
+         Prescription Level
+         ￼
+         optional
+         */
+
+
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPut(req, resp);    // TODO Future
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doDelete(req, resp);    // TODO Future
+    }
+
+    // ******************************************************************************************************
+    // Common Private Methods
+    // ******************************************************************************************************
 
     /**
      * Generate the Authentication Header with our Digest.
@@ -424,6 +709,191 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
+     * Common Process Request Method.
+     * Provides processing for both GET and POST methods.
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String classMethod = "XacmlContentHandlerService:processRequest";
+        // ******************************************************************
+        // Validate Request and Obtain Media Type
+        ContentType requestContentType = this.preProcessingRequest(request, response);
+        if ((requestContentType == null) || (requestContentType.equals(ContentType.NONE))) {
+            // We do not have a valid Application Content Type or other issue.
+            // Response Status set in preProcessingRequest method.
+            response.setCharacterEncoding("UTF-8");
+            response.setContentLength(0);
+            return;
+        }
+        // ******************************************************************
+        // Parse our Request...
+        XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
+        if (xacmlRequestInformation == null) {
+            // This Starts the Authorization via Digest Flow...
+            this.renderUnAuthorized("", requestContentType, response);
+            return;
+        }
+        // ******************************************************************
+        // Check for any HTTP Digest Authorization Request or content.
+        if ((request.getContentLength() <= 0) &&
+                ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
+                        (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
+            // ***********************************************************************************************
+            // Knowing we have no Authentication at this point check the Request Path Information, provide the
+            // Home Document to the Requester by Rendering our Response.
+            if ((xacmlRequestInformation.getRequestPathInfo() == null) ||
+                    (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
+                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp")) ||
+                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/home")) ||
+                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/status"))) {
+                // All other EndPoints Require Authentication to obtain access.
+                try {
+                    renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
+                            request), response);
+                    return;
+                } catch (JSONException jsonException) {
+                    // If any Exceptions, Force Unauthorized and show exception for debugging.
+                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
+                    // This Starts the Authorization via Digest Flow...
+                    this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                    return;
+                }
+            } else if (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/ping")) {
+                // TODO
+            } else {
+                // Is not the Correct Path, then indicated Unauthorized.
+                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                return;
+            }
+
+        } // End of outer if Check for content
+        // ******************************************************************
+        // Check for a existence of a XACML Request, for a POST, we must have
+        // Correct Request Content and if no Request Object in XML or JSON
+        // form.
+        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
+                (xacmlRequestInformation.isRequestNodePresent()) ) {
+            // No Request Node found within the document, not valid request.
+            this.renderBadRequest(requestContentType, response);
+            return;
+        }
+        // ******************************************************************
+        // Obtain our Request Content Data.
+        if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
+                (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
+            AuthenticationDigest authenticationDigestResponse =
+                    preAuthenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
+                            xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
+            if (authenticationDigestResponse == null) {
+                // Not Authenticated.
+                // This Starts the Authorization via Digest Flow...
+                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                return;
+            } else {
+                xacmlRequestInformation.setDigestValid(true);
+            }
+        } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
+            // **************************************************************
+            // if no XACML saml Wrapper, then reject request as UnAuthorized.
+            //
+            // We only support WWW Authenticate with Schemes:
+            // + Digest, Basic Authentication is not supported per OASIS  Specification.
+            // Or Content whose contents contains a wrapper in either XML or JSON.
+            // + XACMLAuthzDecisionQuery Wrapper Of Request.
+            //
+            // This will begin the Authorization Digest Flow...
+            this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+            return;
+        }
+        // ******************************************************************
+        // Check for Valid Digest Request.
+        if (xacmlRequestInformation.isDigestValid()) {
+            // TODO -- Continue Validation of Credentials...
+
+            // If Validated, indicated Authenticated Request.
+            xacmlRequestInformation.setAuthenticated(true);
+        }
+        // ******************************************************************
+        // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
+        if (xacmlRequestInformation.getAuthenticationContent() != null) {
+            // If the Content is XML Based, we have a DOM.
+            if (requestContentType.commonType() == CommonType.XML) {
+                // **************************************************************
+                // Content is XML and Nodes are Available to be consumed.
+                // So perform the PDP Request from the PEP, Authentication will
+                // be performed naturally since the request is wrapped in a
+                // PEP Authentication outer request.
+                // Response is located within the XacmlRequestInformation Object.
+                XacmlPDPResource.processPDP_XMLRequest(xacmlRequestInformation, request, response);
+                // TODO -- Analyze Response.
+
+            } else {
+                // **************************************************************
+                // Else, our Content is assumed to be JSON, but we can still have
+                // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
+                XacmlPDPResource.processPDP_JSONRequest(xacmlRequestInformation, request, response);
+                // TODO -- Analyze Response.
+
+            }
+            // **************************************************
+            // Determine if the Authentication Wrapper provided
+            // a Request which was already satisfied.
+            if (xacmlRequestInformation.isRequestProcessed()) {
+                // *****************************************************************
+                // Render our Response
+                renderResponse(requestContentType,
+                     xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
+            }
+        } // End of Check for XACMLAuthzDecisionQuery Object.
+
+        // TODO Check for a Ping Test Request...
+
+        // **********************************************************************
+        // Do Not Continue if we have not been authenticated.
+        if (!xacmlRequestInformation.isAuthenticated()) {
+            // ******************************************************************
+            // Not Authenticated nor Authorized, Forbidden.
+            response.setCharacterEncoding("UTF-8");
+            response.setContentLength(0);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403.
+            renderResponse(requestContentType, null, response);
+            return;
+        }
+        // ******************************************************************
+        // Now this session has been Authenticated, using Auth-Digest or
+        // other Authentication Algorithm, process the Authenticated Request...
+        //
+        // Check the Request Path Information.
+        //
+        if ((xacmlRequestInformation.getRequestPathInfo() == null) ||
+                (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
+                (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp"))) {
+
+            // TODO Process PDP Request, Hook into existing code base here......
+
+
+        } else {
+
+            // TODO Additional Request Processing.
+
+
+        }
+        // *****************************************************************
+        // Render our Response, response Setting should be set prior.
+        renderResponse(requestContentType,
+          xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
+    }
+
+    // ******************************************************************************************************
+    // Common Rendering Response Methods
+    // ******************************************************************************************************
+
+    /**
      * Private Helper Method to Render Response Content.
      *
      * @param contentType
@@ -485,500 +955,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         response.setStatus(HttpServletResponse.SC_OK);  // 200
         renderResponse(requestContentType, responseContent, response);
         return;
-    }
-
-
-    // ******************************************************************************************************
-    // Servlet/Restlet Processing Methods
-    // ******************************************************************************************************
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "This ForgeRock OpenAM XACML 3.0 Servlet/Restlet Implementation, Standards per OASIS, 2013.";
-    }
-
-    /**
-     * Handles the HTTP <code>GET</code> method XACML REST Request.
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws java.io.IOException
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final String classMethod = "XacmlContentHandlerService:doGet";
-        // ******************************************************************
-        // Validate Request and Obtain Media Type
-        ContentType requestContentType = this.preProcessingRequest(request, response);
-        if ((requestContentType == null) || (requestContentType.equals(ContentType.NONE))) {
-            // We do not have a valid Application Content Type or other issue.
-            // Response Status set in preProcessingRequest method.
-            return;
-        }
-        // ******************************************************************
-        // Parse our Request...
-        XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
-        if (xacmlRequestInformation == null) {
-            // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized("", requestContentType, response);
-            return;
-        }
-        // ******************************************************************
-        // Check for any HTTP Digest Authorization Request
-        if ((request.getContentLength() <= 0) &&
-                ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
-                        (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
-            // ***********************************************************************************************
-            // Knowing we have no Authentication at this point check the Request Path Information, provide the
-            // Home Document to the Requester by Rendering our Response.
-            if ((xacmlRequestInformation.getRequestPathInfo() == null) ||
-                    (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
-                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp")) ||
-                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/home")) ||
-                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/status"))) {
-                // All other EndPoints Require Authentication to obtain access.
-                try {
-                    renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
-                            request), response);
-                    return;
-                } catch (JSONException jsonException) {
-                    // If any Exceptions, Force Unauthorized and show exception for debugging.
-                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
-                    // This Starts the Authorization via Digest Flow...
-                    this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                    return;
-                }
-            } else if (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/ping")) {
-
-            } else {
-                // Is not the Correct Path, then indicated Unauthorized.
-                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                return;
-            }
-
-        } // End of outer if Check for content
-        // ******************************************************************
-        // Obtain our Request Content Data.
-        if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty()) &&
-                (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
-            AuthenticationDigest authenticationDigestResponse =
-                    preAuthenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
-                            xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
-            if (authenticationDigestResponse == null) {
-                // Not Authenticated.
-                // This Starts the Authorization via Digest Flow...
-                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                return;
-            } else {
-                xacmlRequestInformation.setDigestValid(true);
-            }
-        } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
-            // **************************************************************
-            // if no XACML saml Wrapper, then reject request as UnAuthorized.
-            //
-            // We only support WWW Authenticate with Schemes:
-            // + Digest, Basic Authentication is not supported per OASIS  Specification.
-            // Or Content whose contents contains a wrapper in either XML or JSON.
-            // + XACMLAuthzDecisionQuery Wrapper Of Request.
-            //
-            // This will begin the Authorization Digest Flow...
-            this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-            return;
-        }
-        // ******************************************************************
-        // Check for Valid Digest Request.
-        if (xacmlRequestInformation.isDigestValid()) {
-            // TODO -- Continue Validation of Credentials...
-
-            // If Validated, indicated Authenticated Request.
-            xacmlRequestInformation.setAuthenticated(true);
-        }
-
-        // ************************************************************
-        // Accept a pre-determined entry point for the Home Documents
-        try {
-            // *****************************************************************
-            // Render our Response
-            renderResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation, request), response);
-            return;
-
-        } catch (JSONException je) {
-            debug.error("JSON processing Exception: " + je.getMessage(), je);
-        }
-
-
-        /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status
-         ￼
-         Normative Source
-         ￼
-         GET on the home location MUST return status code 200
-         ￼
-         Target
-         ￼
-         Response to GET request on the home location
-         ￼
-         Predicate
-         ￼
-         The HTTP status code in the [response] is 200
-         ￼
-         Prescription Level
-         ￼
-         mandatory
-         */
-
-
-        /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body
-         ￼
-         Normative Source
-         ￼
-         GET on the home location MUST return a home document
-         ￼
-         Target
-         ￼
-         Response to GET request on the home location
-         ￼
-         Predicate
-         ￼
-         The HTTP body in the [response] follows the home document schema
-         [HomeDocument]
-         ￼
-         Prescription Level
-         ￼
-         mandatory
-         */
-
-
-        /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
-         ￼
-         Normative Source
-         ￼
-         The XACML entry point representation SHOULD contain a link to the PDP
-         ￼
-         Target
-         ￼
-         Response to GET request on the home location
-         ￼
-         Predicate
-         ￼
-         The home document in the [response] body contains a resource with link relation
-         http://docs.oasis-open.org/ns/xacml/relation/pdp and a valid URL
-         ￼
-         Prescription Level
-         ￼
-         mandatory
-         */
-
-        // TODO Determine if there are any other Get Request Types we need to deal with,
-        // TODO otherwise pass along.
-
-
-        // *****************************************************************
-        // Render our Response
-        renderResponse(requestContentType,
-                xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request  the <code>HttpServletRequest</code> object.
-     * @param response the <code>HttpServletResponse</code> object.
-     * @throws ServletException    if the request could not be
-     *                             handled.
-     * @throws java.io.IOException if an input or output error occurs.
-     */
-    @Override
-    public void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
-        String classMethod = "XacmlContentHandlerService:doPost";
-        // ******************************************************************
-        // Validate Request and Obtain Media Type
-        ContentType requestContentType = this.preProcessingRequest(request, response);
-        if ((requestContentType == null) || (requestContentType.equals(ContentType.NONE))) {
-            // We do not have a valid Application Content Type or other issue.
-            // Response Status set in preProcessingRequest method.
-            response.setCharacterEncoding("UTF-8");
-            response.setContentLength(0);
-            return;
-        }
-        // ******************************************************************
-        // Parse our Request...
-        XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
-        if (xacmlRequestInformation == null) {
-            // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized("", requestContentType, response);
-            return;
-        }
-        // ******************************************************************
-        // Check for any HTTP Digest Authorization Request
-        if ((request.getContentLength() == 0) && (xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (!xacmlRequestInformation.getAuthenticationHeader().isEmpty())) {
-            // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-            return;
-        }
-        // ******************************************************************
-        // Check for a existence of a XACML Request
-        if (xacmlRequestInformation.isRequestNodePresent()) {
-            // No Request Node found within the document, not valid request.
-            this.renderBadRequest(requestContentType, response);
-            return;
-        }
-        // ******************************************************************
-        // Obtain our Request Content Data.
-        if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
-            AuthenticationDigest authenticationDigestResponse =
-                    preAuthenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
-                            xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
-            if (authenticationDigestResponse == null) {
-                // Not Authenticated.
-                // This Starts the Authorization via Digest Flow...
-                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                return;
-            } else {
-                xacmlRequestInformation.setDigestValid(true);
-            }
-        } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
-            // if no XACML saml Wrapper,
-            // We only support WWW Authenticate with Schemes:
-            // + Digest, Basic Authentication is not supported per OASIS  Specification.
-            // Or Content whose contents contains a wrapper in either XML or JSON.
-            // + XACMLAuthzDecisionQuery Wrapper Of Request.
-            //
-            // This Starts the Authorization Digest Flow...
-            this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-            return;
-        }
-        // ******************************************************************
-        // Check for Valid Digest Request.
-        if (xacmlRequestInformation.isDigestValid()) {
-            // TODO -- Continue Validation of Credentials...
-
-            // If Validated, indicated Authenticated Request.
-            xacmlRequestInformation.setAuthenticated(true);
-        }
-        // ******************************************************************
-        // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
-        if (xacmlRequestInformation.getAuthenticationContent() != null) {
-            // If the Content is XML Based, we have a DOM.
-            if (requestContentType.commonType() == CommonType.XML) {
-                // **************************************************************
-                // Content is XML and Nodes are Available to be consumed.
-                // So perform the PDP Request from the PEP, Authentication will
-                // be performed naturally since the request is wrapped in a
-                // PEP Authentication outer request.
-                // Response is located within the XacmlRequestInformation Object.
-                XacmlPDPResource.processPDP_XMLRequest(xacmlRequestInformation, request, response);
-                // TODO -- Analyze Response.
-
-            } else {
-                // **************************************************************
-                // Else, our Content is assumed to be JSON, but we can still have
-                // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
-                XacmlPDPResource.processPDP_JSONRequest(xacmlRequestInformation, request, response);
-                // TODO -- Analyze Response.
-
-            }
-        }
-
-        // TODO Check for a Ping Test Request...
-
-        // **********************************************************************
-        // Do Not Continue if we have not been authenticated.
-        if (!xacmlRequestInformation.isAuthenticated()) {
-            // ******************************************************************
-            // Not Authenticated nor Authorized, Forbidden.
-            response.setCharacterEncoding("UTF-8");
-            response.setContentLength(0);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403.
-            renderResponse(requestContentType, null, response);
-            return;
-        }
-        // ******************************************************************
-        // Now this session has been Authenticated, using Auth-Digest,
-        // Process the Authenticated Request...
-        //
-
-
-        // POST operations to PDP.
-
-        /**
-         * ￼
-         Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:status
-         ￼
-         Normative Source
-         ￼
-         POST on the PDP with a valid XACML request MUST return status code 200
-         ￼
-         Target
-         ￼
-         Response to POST request on the PDP location with valid XACML request in the body
-         ￼
-         Predicate
-         ￼
-         The HTTP status code in the [response] is 200
-         ￼
-         Prescription Level
-         ￼
-         mandatory
-         */
-
-
-        /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:body
-         ￼
-         Normative Source
-         ￼
-         POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
-         ￼
-         Target
-         ￼
-         Response to POST request on the PDP location with valid XACML request in the body
-         ￼
-         Predicate
-         ￼
-         The HTTP body in the [response] is a valid XACML response
-         ￼
-         Prescription Level
-         ￼
-         mandatory
-         */
-
-
-        /**
-         * ￼
-         Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:invalid
-         ￼
-         Normative Source
-         ￼
-         POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
-         ￼
-         Target
-         ￼
-         Response to POST request on the PDP location with invalid XACML request in the body
-         ￼
-         Predicate
-         ￼
-         The HTTP status code in the [response] is 400
-         ￼
-         Prescription Level
-         ￼
-         mandatory
-         */
-
-
-        /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:status
-         ￼
-         Normative Source
-         ￼
-         POST on the PDP with a valid XACML request MUST return status code 200
-         ￼
-         Target
-         ￼
-         Response to POST request on the PDP location with valid XACML request wrapped in a
-         xacml-samlp:XACMLAuthzDecisionQuery in the body
-         ￼
-         Predicate
-         ￼
-         The HTTP status code in the [response] is 200
-         ￼
-         Prescription Level
-         ￼
-         optional
-         */
-
-
-        /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:body
-         ￼
-         Normative Source
-         ￼
-         POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
-         ￼
-         Target
-         ￼
-         Response to POST request on the PDP location with valid XACML request wrapped in a
-         xacml-samlp:XACMLAuthzDecisionQuery in the body
-         ￼
-         Predicate
-         ￼
-         The HTTP body in the [response] is a valid XACML response wrapped in a
-         samlp:Response
-         ￼
-         Prescription Level
-         ￼
-         optional
-         */
-
-
-        /**
-         * ￼
-         Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:invalid
-         ￼
-         Normative Source
-         ￼
-         POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
-         ￼
-         Target
-         ￼
-         Response to POST request on the PDP location with invalid XACML request
-         wrapped in a xacml-samlp:XACMLAuthzDecisionQuery in the body
-         ￼
-         Predicate
-         ￼
-         The HTTP status code in the [response] is 400
-         ￼
-         Prescription Level
-         ￼
-         optional
-         */
-
-        // *****************************************************************
-        // Render our Response
-        renderResponse(requestContentType,
-                xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
-    }
-
-    @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);    // TODO
-    }
-
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doDelete(req, resp);    // TODO
     }
 
     /**

@@ -135,11 +135,13 @@ public class XacmlPDPResource implements XACML3Constants {
                                 request,
                                 requestDocument.getDocumentElement());
                 if (samlResponse != null) {
+                    // TODO -- Determine response...
                     //xacmlRequestInformation.setXacmlStringResponse(samlResponse.toXMLString(true, true));
+
                     // *******************************************
                     // Set our Response Status per specification.
                     response.setStatus(HttpServletResponse.SC_OK);   // 200
-
+                    xacmlRequestInformation.setRequestProcessed(true);
                     return;
 
                 } else {
@@ -192,7 +194,7 @@ public class XacmlPDPResource implements XACML3Constants {
         // Process the PDP Request from the PEP.
         String pepEntityID = null;    // TODO Need to resolve this.
 
-
+        // TODO -- we  build up a Request Object from our JSON Map and send to normal XACML Processing.
 
         // TODO ....
 

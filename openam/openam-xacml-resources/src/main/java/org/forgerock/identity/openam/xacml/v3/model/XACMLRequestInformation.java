@@ -45,6 +45,13 @@ import java.util.Scanner;
  */
 public class XACMLRequestInformation implements Serializable {
     /**
+     * Indicates if Request has been Processed or not.
+     * Used when a XACMLAuthzDecisionQuery Wrapper of a Request
+     * is presented.  The Request may have been already processed
+     * within the wrapper processing.
+     */
+    private boolean requestProcessed;
+    /**
      * Request Parsed correctly for either XML or JSON Data.
      */
     private boolean parsedCorrectly;
@@ -92,6 +99,7 @@ public class XACMLRequestInformation implements Serializable {
     /**
      *  Information obtained from actual HTTPServletRequest Object.
      */
+    private String requestMethod;
     private String requestAuthenticationType;
     private Object requestUserPrincipal;
     private String requestContextPath;
@@ -257,6 +265,7 @@ public class XACMLRequestInformation implements Serializable {
         this.realm = realm;
         this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
         // Save our Request Information.
+        this.requestMethod = request.getMethod();
         this.requestAuthenticationType = request.getAuthType();
         this.requestUserPrincipal = request.getUserPrincipal();
         this.requestContextPath = request.getContextPath();
@@ -370,6 +379,14 @@ public class XACMLRequestInformation implements Serializable {
 
     public void setRequestNodePresent(boolean requestNodePresent) {
         this.requestNodePresent = requestNodePresent;
+    }
+
+    public String getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(String requestMethod) {
+        this.requestMethod = requestMethod;
     }
 
     public String getRequestAuthenticationType() {
@@ -493,11 +510,20 @@ public class XACMLRequestInformation implements Serializable {
         this.xacmlResponse = xacmlResponse;
     }
 
+    public boolean isRequestProcessed() {
+        return requestProcessed;
+    }
+
+    public void setRequestProcessed(boolean requestProcessed) {
+        this.requestProcessed = requestProcessed;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
         sb.append("XACMLRequestInformation");
-        sb.append("{parsedCorrectly=").append(parsedCorrectly);
+        sb.append("{requestProcessed=").append(requestProcessed);
+        sb.append(", parsedCorrectly=").append(parsedCorrectly);
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
         sb.append(", realm='").append(realm).append('\'');
@@ -508,6 +534,7 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
         sb.append(", authenticated=").append(authenticated);
         sb.append(", authenticationContent=").append(authenticationContent);
+        sb.append(", requestMethod='").append(requestMethod).append('\'');
         sb.append(", requestAuthenticationType='").append(requestAuthenticationType).append('\'');
         sb.append(", requestUserPrincipal=").append(requestUserPrincipal);
         sb.append(", requestContextPath='").append(requestContextPath).append('\'');
