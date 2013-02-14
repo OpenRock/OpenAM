@@ -535,9 +535,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // Home Document to the Requester by Rendering our Response.
             if ( (xacmlRequestInformation.getRequestPathInfo() == null) ||
                  (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
-                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("pdp")) ||
-                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("home")) ||
-                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("status")) ) {
+                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp")) ||
+                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/home")) ||
+                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/status")) ) {
                  // All other EndPoints Require Authentication to obtain access.
             try {
                 renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
