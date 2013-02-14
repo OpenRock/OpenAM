@@ -547,7 +547,7 @@ public class XACMLRequestInformation {
         sb.append(":");
         sb.append(this.getRequestLocalPort());
         sb.append(this.getRequestContextPath());
-        sb.append("/").append(this.getRequestServletPath());
+        sb.append(this.getRequestServletPath());
         return sb.toString();
     }
 

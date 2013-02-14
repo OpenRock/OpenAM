@@ -527,29 +527,29 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request
-        if ( (request.getContentLength() <= 0) &&
-                ( (xacmlRequestInformation.getAuthenticationHeader() == null) ||
-                  (xacmlRequestInformation.getAuthenticationHeader().isEmpty()) ) )  {
+        if ((request.getContentLength() <= 0) &&
+                ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
+                        (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
             // ***********************************************************************************************
             // Knowing we have no Authentication at this point check the Request Path Information, provide the
             // Home Document to the Requester by Rendering our Response.
-            if ( (xacmlRequestInformation.getRequestPathInfo() == null) ||
-                 (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
-                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp")) ||
-                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/home")) ||
-                 (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/status")) ) {
-                 // All other EndPoints Require Authentication to obtain access.
-            try {
-                renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
-                        request), response);
-                return;
-            } catch (JSONException jsonException) {
-                // If any Exceptions, Force Unauthorized and show exception for debugging.
-                debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
-                // This Starts the Authorization via Digest Flow...
-                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                return;
-            }
+            if ((xacmlRequestInformation.getRequestPathInfo() == null) ||
+                    (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
+                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp")) ||
+                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/home")) ||
+                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/status"))) {
+                // All other EndPoints Require Authentication to obtain access.
+                try {
+                    renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
+                            request), response);
+                    return;
+                } catch (JSONException jsonException) {
+                    // If any Exceptions, Force Unauthorized and show exception for debugging.
+                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
+                    // This Starts the Authorization via Digest Flow...
+                    this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                    return;
+                }
             } else {
                 // Is not the Correct Path, then indicated Unauthorized.
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
