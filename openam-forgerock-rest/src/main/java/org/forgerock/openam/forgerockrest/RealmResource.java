@@ -433,7 +433,7 @@ public final class RealmResource implements CollectionResourceProvider {
             // Get the Organization Configuration Manager for the new Realm
             realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realmPath + realm);
             List newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
-            if (!newServiceNames.isEmpty() && newServiceNames != null) {
+            if (newServiceNames != null && !newServiceNames.isEmpty()) {
                 // assign services to realm
                 assignServices(realmCreatedOcm, newServiceNames);
             }
