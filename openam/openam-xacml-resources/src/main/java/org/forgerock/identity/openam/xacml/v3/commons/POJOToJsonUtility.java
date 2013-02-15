@@ -56,7 +56,7 @@ public class POJOToJsonUtility {
         // (without this setting, an exception is thrown in those cases)
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         // Enable or Disable Additional Features Here...
-    };
+    }
 
     /**
      * JSON to Map from String Content.
@@ -65,7 +65,7 @@ public class POJOToJsonUtility {
      * @return
      * @throws java.io.IOException
      */
-    public static final String toString(Object object) throws IOException {
+    public static String toString(Object object) throws IOException {
         // Return rendered Marshaled Object.
         return mapper.writeValueAsString(object);
     }

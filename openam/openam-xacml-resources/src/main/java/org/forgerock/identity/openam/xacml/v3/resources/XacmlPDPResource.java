@@ -226,7 +226,7 @@ public class XacmlPDPResource implements XACML3Constants {
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "xsi type is : " + xsiType);
             }
-            if (xsiType != null && xsiType.indexOf(XACML_AUTHZ_QUERY) != -1) {
+            if (xsiType != null && xsiType.contains(XACML_AUTHZ_QUERY)) {
                 RequestAbstract samlRequest =
                         ContextFactory.getInstance()
                                 .createXACMLAuthzDecisionQuery(reqAbs);

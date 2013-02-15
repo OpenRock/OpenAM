@@ -223,7 +223,7 @@ public class XACMLRequestInformation implements Serializable {
 
         @Override
         public String toString() {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             sb.append("XACMLAuthzDecisionQuery");
             sb.append("{id='").append(id).append('\'');
             sb.append(", version='").append(version).append('\'');
@@ -523,7 +523,7 @@ public class XACMLRequestInformation implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("XACMLRequestInformation");
         sb.append("{requestProcessed=").append(requestProcessed);
         sb.append(", parsedCorrectly=").append(parsedCorrectly);
@@ -562,7 +562,7 @@ public class XACMLRequestInformation implements Serializable {
      * @param request
      * @return String - Request Content Body.
      */
-    private final String getRequestBody(final HttpServletRequest request) {
+    private String getRequestBody(final HttpServletRequest request) {
         // Get the body content of the HTTP request,
         // remember we have no normal WS* SOAP Body, just String
         // data either XML or JSON.

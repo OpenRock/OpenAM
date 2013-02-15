@@ -46,7 +46,7 @@ public class POJOToXmlUtility {
      * @return
      * @throws java.io.IOException
      */
-    public static final String toString(Object object) throws IOException {
+    public static String toString(Object object) throws IOException {
         XmlMapper mapper = new XmlMapper();
         return mapper.writeValueAsString(object);
     }

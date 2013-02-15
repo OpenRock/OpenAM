@@ -172,7 +172,10 @@ public class XACML3Utils implements XACML3Constants {
             return null;
         }
         NodeList nlBody = messageBody.getChildNodes();
-
+        if (nlBody == null) {
+            debug.error("XACML3Utils.getSamlpElement: empty body");
+            throw new SAML2Exception(bundle.getString("missingBody"));
+        }
         int blength = nlBody.getLength();
         if (blength <= 0) {
             debug.error("XACML3Utils.getSamlpElement: empty body");

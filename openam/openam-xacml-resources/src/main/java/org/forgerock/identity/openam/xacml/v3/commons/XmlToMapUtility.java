@@ -55,7 +55,7 @@ public class XmlToMapUtility {
      * @return
      * @throws java.io.IOException
      */
-    public static final Map<String, Object> fromString(String rawContent) throws JSONException, IOException {
+    public static Map<String, Object> fromString(String rawContent) throws JSONException, IOException {
         return toMAP(rawContent);
     }
 
@@ -67,7 +67,7 @@ public class XmlToMapUtility {
      * @return
      * @throws JSONException, java.io.IOException
      */
-    private static final Map<String, Object> toMAP(String xmlData)
+    private static Map<String, Object> toMAP(String xmlData)
             throws JSONException, IOException {
         if ((xmlData == null) || (xmlData.isEmpty())) {
             return null;
@@ -83,7 +83,7 @@ public class XmlToMapUtility {
      * @return
      * @throws JSONException
      */
-    public final static String toJSON(String xmlData)
+    public static String toJSON(String xmlData)
             throws JSONException {
         if ((xmlData == null) || (xmlData.isEmpty())) {
             return null;
@@ -103,8 +103,8 @@ public class XmlToMapUtility {
         if ((args == null) || (args.length < 1)) {
             return;
         }
-        for (int i = 0; i < args.length; i++) {
-            InputStream inputStream = new FileInputStream(new File(args[i]));
+        for (String argument : args) {
+            InputStream inputStream = new FileInputStream(new File(argument));
             String rawContent = new Scanner(inputStream).useDelimiter("\\A").next();
 
             Map<String, Object> mapObjects = fromString(rawContent);

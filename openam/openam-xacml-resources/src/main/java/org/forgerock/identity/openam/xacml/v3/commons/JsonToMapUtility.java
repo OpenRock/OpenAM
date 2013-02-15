@@ -59,7 +59,7 @@ public class JsonToMapUtility {
         // (without this setting, an exception is thrown in those cases)
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         // Enable or Disable Additional Features Here...
-    };
+    }
 
     /**
      * JSON to Map from an InputStream
@@ -68,7 +68,7 @@ public class JsonToMapUtility {
      * @return
      * @throws IOException
      */
-    public static final Map<String, Object> fromStream(InputStream streamContent) throws IOException {
+    public static Map<String, Object> fromStream(InputStream streamContent) throws IOException {
         JsonFactory f = new MappingJsonFactory();
         JsonParser jp = f.createJsonParser(streamContent);
         return performParsing(jp);
@@ -81,7 +81,7 @@ public class JsonToMapUtility {
      * @return
      * @throws IOException
      */
-    public static final Map<String, Object> fromFile(File fileContent) throws IOException {
+    public static Map<String, Object> fromFile(File fileContent) throws IOException {
         JsonFactory f = new MappingJsonFactory();
         JsonParser jp = f.createJsonParser(fileContent);
         return performParsing(jp);
@@ -94,7 +94,7 @@ public class JsonToMapUtility {
      * @return
      * @throws IOException
      */
-    public static final Map<String, Object> fromString(String rawContent) throws IOException {
+    public static Map<String, Object> fromString(String rawContent) throws IOException {
         JsonFactory f = new MappingJsonFactory();
         JsonParser jp = f.createJsonParser(rawContent);
         return performParsing(jp);
@@ -107,7 +107,7 @@ public class JsonToMapUtility {
      * @return
      * @throws IOException
      */
-    public static final Map<String, Object> fromByteArray(byte[] byteData) throws IOException {
+    public static Map<String, Object> fromByteArray(byte[] byteData) throws IOException {
         JsonFactory f = new MappingJsonFactory();
         JsonParser jp = f.createJsonParser(byteData);
         return performParsing(jp);
@@ -145,8 +145,8 @@ public class JsonToMapUtility {
             return;
         }
         try {
-            for (int i = 0; i < args.length; i++) {
-                Map<String, Object> mapObject = fromFile(new File(args[i]));
+            for (String argument : args) {
+                Map<String, Object> mapObject = fromFile(new File(argument));
                 System.out.println(mapObject);
             }
         } catch (Exception e) {

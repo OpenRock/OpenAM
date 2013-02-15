@@ -519,7 +519,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      *
      * @return
      */
-    private final String generateAuthenticateHeader(String realm) {
+    private String generateAuthenticateHeader(String realm) {
         StringBuilder header = new StringBuilder();
         header.append("Digest realm=\"").append(realm).append("\",");
         if (!StringUtils.isBlank(authenticationMethod)) {
@@ -537,7 +537,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      *
      * @return String of Calculated Nonce
      */
-    private final String calculateNonce() {
+    private String calculateNonce() {
         Date d = new Date();
         SimpleDateFormat f = new SimpleDateFormat("yyyy:MM:dd:hh:mm:ss");
         String fmtDate = f.format(d);
@@ -553,7 +553,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param nonce
      * @return String of Calculated Opaque
      */
-    private final String getOpaque(String domain, String nonce) {
+    private String getOpaque(String domain, String nonce) {
         return DigestUtils.md5Hex(domain + nonce);
     }
 
@@ -923,7 +923,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         response.addHeader(WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader(realm));
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401
         renderResponse(requestContentType, null, response);
-        return;
     }
 
     /**
@@ -935,7 +934,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 400
         renderResponse(requestContentType, null, response);
-        return;
     }
 
     /**
@@ -950,7 +948,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);  // 200
         renderResponse(requestContentType, responseContent, response);
-        return;
     }
 
     /**
