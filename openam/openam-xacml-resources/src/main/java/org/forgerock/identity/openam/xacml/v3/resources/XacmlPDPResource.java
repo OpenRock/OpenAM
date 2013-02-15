@@ -288,6 +288,9 @@ public class XacmlPDPResource implements XACML3Constants {
         String classMethod = "XacmlContentHandlerService:processSAML4XACMLRequest";
         Response samlResponse = null;
 
+        // TODO -------- Hook In!
+
+
         if ((reqAbs != null) && (reqAbs.hasAttributes())) {
             RequestAbstract samlRequest =
                     createXACML3AuthzDecisionQuery(reqAbs);
@@ -437,6 +440,7 @@ public class XacmlPDPResource implements XACML3Constants {
             }
         }
 
+        // TODO -- Was from SOAP Method originally....
         //getRequestHandlerClass
         RequestHandler handler =
                 (RequestHandler) XacmlContentHandlerService.getHandlers().get(key);  // TODO -- This was referencing

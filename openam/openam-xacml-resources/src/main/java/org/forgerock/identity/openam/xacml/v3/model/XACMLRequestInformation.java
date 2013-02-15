@@ -26,7 +26,10 @@
 package org.forgerock.identity.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.Response;
+import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.POJOToJsonUtility;
+import org.forgerock.identity.openam.xacml.v3.commons.POJOToXmlUtility;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -494,12 +497,12 @@ public class XACMLRequestInformation implements Serializable {
      * @param requestContentType
      * @return
      */
-    public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) {
-        StringBuilder sb = new StringBuilder();
-
-        // TODO.....
-
-        return sb.toString();
+    public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) throws IOException {
+        if (requestContentType.commonType().equals(CommonType.XML)) {
+          return POJOToXmlUtility.toString(this.getXacmlResponse());
+        } else {
+          return POJOToJsonUtility.toString(this.getXacmlResponse());
+        }
     }
 
     public Response getXacmlResponse() {
