@@ -41,6 +41,7 @@ import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlHomeResource;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPDPResource;
 
+import org.forgerock.identity.openam.xacml.v3.resources.XacmlPingResource;
 import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -88,7 +89,7 @@ import java.util.concurrent.TimeUnit;
  * Document</em></td></tr>
  * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;ping&#47;</li></ul></td><td><em>Provides
  * Roundtrip from Ping Request to Ping Response.  Ping Response will always be in the form of a Decision Type of
- * INDETERMINATE to conform to a standard XACML Decision Type.
+ * INDETERMINATE to conform to a standard XACML Decision Type. [ForgeRockOnly]
  * </em></td></tr>
  * <p/>
  * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
@@ -275,72 +276,56 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         processRequest(request, response);
 
         /**
-         * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status
+         * Id: urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status
          ￼
          Normative Source
-         ￼
-         GET on the home location MUST return status code 200
+         ￼GET on the home location MUST return status code 200
          ￼
          Target
-         ￼
-         Response to GET request on the home location
+          Response to GET request on the home location
          ￼
          Predicate
-         ￼
-         The HTTP status code in the [response] is 200
+         ￼ The HTTP status code in the [response] is 200
          ￼
          Prescription Level
-         ￼
-         mandatory
+         ￼mandatory
          */
 
 
         /**
-         * Id
-         ￼
+         * Id ￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body
-         ￼
-         Normative Source
-         ￼
+
+         Normative Source￼
          GET on the home location MUST return a home document
          ￼
-         Target
-         ￼
+         Target￼
          Response to GET request on the home location
          ￼
          Predicate
-         ￼
          The HTTP body in the [response] follows the home document schema
          [HomeDocument]
          ￼
          Prescription Level
-         ￼
          mandatory
          */
 
 
         /**
          * Id
-         ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
+           urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
          ￼
          Normative Source
-         ￼
          The XACML entry point representation SHOULD contain a link to the PDP
          ￼
          Target
-         ￼
          Response to GET request on the home location
          ￼
          Predicate
-         ￼
          The home document in the [response] body contains a resource with link relation
          http://docs.oasis-open.org/ns/xacml/relation/pdp and a valid URL
          ￼
          Prescription Level
-         ￼
          mandatory
          */
 
@@ -742,35 +727,42 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Check for any HTTP Digest Authorization Request or content.
         if ((request.getContentLength() <= 0) &&
                 ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
-                        (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
+                 (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
             // ***********************************************************************************************
             // Knowing we have no Authentication at this point check the Request Path Information, provide the
             // Home Document to the Requester by Rendering our Response.
-            if ((xacmlRequestInformation.getRequestPathInfo() == null) ||
-                    (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
-                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp")) ||
-                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/home")) ||
-                    (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/status"))) {
+            if ((xacmlRequestInformation.getRequestURI() == null) ||
+                    (xacmlRequestInformation.getRequestURI().isEmpty()) ||
+                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml")) ||
+                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/pdp")) ||
+                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/home")) ||
+                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/status"))) {
                 // All other EndPoints Require Authentication to obtain access.
                 try {
                     renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
                             request), response);
-                    return;
                 } catch (JSONException jsonException) {
                     // If any Exceptions, Force Unauthorized and show exception for debugging.
                     debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
                     // This Starts the Authorization via Digest Flow...
                     this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                    return;
                 }
-            } else if (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/ping")) {
-                // TODO
+            } else if (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/ping")) {
+                try{
+                    renderServerOKResponse(requestContentType, XacmlPingResource.getPing(xacmlRequestInformation,
+                            request), response);
+                } catch (JSONException jsonException) {
+                    // If any Exceptions, Force Unauthorized and show exception for debugging.
+                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
+                    // This Starts the Authorization via Digest Flow...
+                    this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                }
             } else {
-                // Is not the Correct Path, then indicated Unauthorized.
+                // Not the Correct Path, then indicated Unauthorized.
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                return;
             }
-
+            // Return.
+            return;
         } // End of outer if Check for content
         // ******************************************************************
         // Check for a existence of a XACML Request, for a POST, we must have
@@ -801,7 +793,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // **************************************************************
             // if no XACML saml Wrapper, then reject request as UnAuthorized.
             //
-            // We only support WWW Authenticate with Schemes:
+            // We only support currently WWW Authenticate capabilities
             // + Digest, Basic Authentication is not supported per OASIS  Specification.
             // Or Content whose contents contains a wrapper in either XML or JSON.
             // + XACMLAuthzDecisionQuery Wrapper Of Request.
@@ -815,12 +807,18 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if (xacmlRequestInformation.isDigestValid()) {
             // TODO -- Continue Validation of Credentials...
 
+
             // If Validated, indicated Authenticated Request.
-            xacmlRequestInformation.setAuthenticated(true);
+            xacmlRequestInformation.setAuthenticated(false);
+
+            // TODO FIX.....Set to true only for testing and if not derived from true Auth, to allow unauthenticated
+            // TODO FIX..... requests to enter.
+
         }
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
-        if (xacmlRequestInformation.getAuthenticationContent() != null) {
+        if ( (!xacmlRequestInformation.isAuthenticated()) &&
+             (xacmlRequestInformation.getAuthenticationContent() != null) ) {
             // If the Content is XML Based, we have a DOM.
             if (requestContentType.commonType() == CommonType.XML) {
                 // **************************************************************
@@ -843,15 +841,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // **************************************************
             // Determine if the Authentication Wrapper provided
             // a Request which was already satisfied.
-            if (xacmlRequestInformation.isRequestProcessed()) {
+            if ( (!xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
                 // *****************************************************************
                 // Render our Response
                 renderResponse(requestContentType,
                      xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
             }
-        } // End of Check for XACMLAuthzDecisionQuery Object.
-
-        // TODO Check for a Ping Test Request...
+        } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
         // **********************************************************************
         // Do Not Continue if we have not been authenticated.
@@ -870,9 +866,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         //
         // Check the Request Path Information.
         //
-        if ((xacmlRequestInformation.getRequestPathInfo() == null) ||
-                (xacmlRequestInformation.getRequestPathInfo().isEmpty()) ||
-                (xacmlRequestInformation.getRequestPathInfo().equalsIgnoreCase("/pdp"))) {
+        if ((xacmlRequestInformation.getRequestURI() == null) ||
+                (xacmlRequestInformation.getRequestURI().isEmpty()) ||
+                (xacmlRequestInformation.getRequestURI().contains("/xacml/pdp"))) {
 
             // TODO Process PDP Request, Hook into existing code base here......
 

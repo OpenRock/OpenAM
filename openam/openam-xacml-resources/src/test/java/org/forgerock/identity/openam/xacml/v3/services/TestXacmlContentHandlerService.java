@@ -59,6 +59,9 @@ public class TestXacmlContentHandlerService {
 
         servletTester = new ServletTester();
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/home");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/status");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/ping");
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp/authorization");
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp");
         servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pip");
@@ -77,7 +80,7 @@ public class TestXacmlContentHandlerService {
     // *********************************************************
 
     @Test
-    public void testUseCase_GET_HOME() {
+    public void testUseCase_GET() {
 
         HttpTester request = new HttpTester();
         request.setMethod("GET");
@@ -100,7 +103,53 @@ public class TestXacmlContentHandlerService {
     }
 
     @Test
-    public void testUseCase_GET_HOME_PDP() {
+    public void testUseCase_GET_HOME() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml/home");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.XML.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_STATUS() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml/status");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.XML.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_PDP() {
 
         HttpTester request = new HttpTester();
         request.setMethod("GET");
@@ -123,7 +172,7 @@ public class TestXacmlContentHandlerService {
     }
 
     @Test
-    public void testUseCase_GET_HOME_PIP() {
+    public void testUseCase_GET_PIP() {
 
         HttpTester request = new HttpTester();
         request.setMethod("GET");
@@ -133,10 +182,10 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
 
         try {
-            // Check for a 200 on our Get.
+            // Check for a 401 on our Get.
             HttpTester response = new HttpTester();
             response.parse(servletTester.getResponses(request.generate()));
-            assertEquals(response.getStatus(),200);
+            assertEquals(response.getStatus(),401);
         } catch (IOException ioe) {
 
         } catch (Exception e) {
@@ -146,7 +195,7 @@ public class TestXacmlContentHandlerService {
     }
 
     @Test
-    public void testUseCase_GET_HOME_PAP() {
+    public void testUseCase_GET_PAP() {
 
         HttpTester request = new HttpTester();
         request.setMethod("GET");
@@ -156,10 +205,10 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Content-Type", ContentType.XACML_PLUS_JSON.applicationType());
 
         try {
-            // Check for a 200 on our Get.
+            // Check for a 401 on our Get.
             HttpTester response = new HttpTester();
             response.parse(servletTester.getResponses(request.generate()));
-            assertEquals(response.getStatus(),200);
+            assertEquals(response.getStatus(),401);
         } catch (IOException ioe) {
 
         } catch (Exception e) {
@@ -183,6 +232,29 @@ public class TestXacmlContentHandlerService {
             HttpTester response = new HttpTester();
             response.parse(servletTester.getResponses(request.generate()));
             assertEquals(response.getStatus(),415);
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    @Test
+    public void testUseCase_GET_PING() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("GET");
+        request.addHeader("Host", "example.org");
+        request.setURI("/xacml/ping");
+        request.setVersion("HTTP/1.1");
+        request.addHeader("Content-Type", ContentType.JSON.applicationType());
+
+        try {
+            // Check for a 200 on our Get.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),200);
         } catch (IOException ioe) {
 
         } catch (Exception e) {

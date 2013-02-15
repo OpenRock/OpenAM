@@ -69,7 +69,7 @@ public class XacmlHomeResource implements XACML3Constants {
      */
     public static String getHome(XACMLRequestInformation xacmlRequestInformation, HttpServletRequest request) throws ServletException,
             JSONException, IOException {
-        String classMethod = "XacmlHomeResource:resourceHomeRequested";
+        String classMethod = "XacmlHomeResource:getHome";
         debug.error(classMethod + " processing URI:[" + request.getRequestURI() + "], Content Type:[" + request.getContentType() + "]");
         StringBuilder sb = new StringBuilder();
         // ************************************************************
@@ -94,7 +94,7 @@ public class XacmlHomeResource implements XACML3Constants {
         sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
         sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
         sb.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
-        sb.append("<atom:link href=\042/xacml/pdp/authorization\042/>");
+        sb.append("<atom:link href=\042"+PDP_AUTHORIZATION_ENDPOINT+"\042/>");
         sb.append("</resource>");
         sb.append("</resources>");
         return sb.toString();
@@ -112,7 +112,7 @@ public class XacmlHomeResource implements XACML3Constants {
         JSONArray resourceArray = new JSONArray();
 
         JSONObject resource_1 = new JSONObject();
-        resource_1.append("href", "/xacml/");
+        resource_1.append("href", PDP_AUTHORIZATION_ENDPOINT);
         JSONObject resource_1A = new JSONObject();
         resource_1A.append(xacmlRequestInformation.getXacmlHome(), resource_1);
 

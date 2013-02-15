@@ -26,7 +26,17 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * XACML Ping Resource
@@ -43,8 +53,66 @@ public class XacmlPingResource implements XACML3Constants {
      */
     private static Debug debug = Debug.getInstance("amXACML");
 
+    /**
+     * Creates Ping Document Content.
+     *
+     * @param xacmlRequestInformation
+     * @param request
+     * @return String -- Containing Response in requested ContentType.
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
+     */
+    public static String getPing(XACMLRequestInformation xacmlRequestInformation, HttpServletRequest request) throws
+            ServletException,
+            JSONException, IOException {
+        String classMethod = "XacmlPingResource:getPing";
+        debug.error(classMethod + " processing URI:[" + request.getRequestURI() + "], Content Type:[" + request.getContentType() + "]");
+        StringBuilder sb = new StringBuilder();
+        // ************************************************************
+        // Determine how to respond based upon Content Type.
+        if ( (xacmlRequestInformation.getContentType().equals(ContentType.NONE.applicationType())) ||
+                (xacmlRequestInformation.getContentType().commonType() == CommonType.JSON) ) {
+            sb.append(getJSONPingDocument(xacmlRequestInformation));
+        } else {
+            // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
+            sb.append(getXMLPingDocument(xacmlRequestInformation));
+        } // End of Check for Content Type.
+
+        // *******************************************************
+        // Render with XML or JSON content.
+        return sb.toString();
+    }
+
+    /**
+     * Provide an XML Rendered PING Document.
+     *
+     * @param xacmlRequestInformation
+     * @return
+     */
+    public static String getXMLPingDocument(XACMLRequestInformation xacmlRequestInformation) {
+        StringBuilder sb = new StringBuilder();
+        // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
+        sb.append(XML_HEADER);
+        // TODO...
+        return sb.toString();
+    }
 
 
+    /**
+     * Provide an JSON Rendered PING Document.
+     *
+     * @return JSONObject
+     * @throws org.json.JSONException
+     */
+    public static JSONObject getJSONPingDocument(XACMLRequestInformation xacmlRequestInformation) throws
+            JSONException {
+        JSONObject ping = new JSONObject();
+        JSONArray pingArray = new JSONArray();
 
+        // TODO
+
+        ping.append("ping", pingArray);
+        return ping;
+    }
 
 }

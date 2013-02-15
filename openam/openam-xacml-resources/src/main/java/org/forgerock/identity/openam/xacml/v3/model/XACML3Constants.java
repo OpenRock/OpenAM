@@ -53,16 +53,16 @@ public interface XACML3Constants extends XACMLConstants {
      * Common Globals Definitions
      */
     public static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
-    public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION = "authorization";
     public static final String DIGEST = "Digest";
     public static final String REQUEST = "Request";
-    public static final String REQUEST_ABSTRACT = "RequestAbstract";
     public static final String XSI_TYPE_ATTR = "xsi:type";
     public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
     public static final String METAALIAS_KEY = "/metaAlias";
 
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
 
+    public static final String PDP_AUTHORIZATION_ENDPOINT = "/xacml/pdp/"+AUTHORIZATION;
 
     /**
      * Default Response
