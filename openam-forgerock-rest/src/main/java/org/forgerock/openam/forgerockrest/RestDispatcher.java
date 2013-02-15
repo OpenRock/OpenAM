@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 import org.jvnet.wom.impl.util.Iterators;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -41,11 +42,10 @@ public final class RestDispatcher {
     public static Debug debug = Debug.getInstance("frRest");
 
     /* Endpoints for forgerock-rest */
-    final static private String RESOURCE = "resource";
-    final static private String REALMS = "realms";
-    final static private String USERS = "users";
-    final static private String GROUPS = "groups";
-    final static private String AGENTS = "agents";
+    final static private String REALMS = "/realms";
+    final static private String USERS = "/users";
+    final static private String GROUPS = "/groups";
+    final static private String AGENTS = "/agents";
 
     private static RestDispatcher instance = null;
     private RequestHandler handler = null;
@@ -102,16 +102,16 @@ public final class RestDispatcher {
         String endpoint =  (String)parsedDetails.get("resourceName");
         String realmPath = (String)parsedDetails.get("realmPath");
 
-        if (endpoint.equalsIgnoreCase("/users")) {
+        if (endpoint.equalsIgnoreCase(USERS)) {
             router.addRoute(endpoint,new IdentityResource("user", realmPath));
             router.addRoute(RoutingMode.STARTS_WITH, "/{user}", subrealms(parsedDetails,path));
-        } else if (endpoint.equalsIgnoreCase("/agents")) {
+        } else if (endpoint.equalsIgnoreCase(AGENTS)) {
             router.addRoute(endpoint,new IdentityResource("agent", realmPath));
             router.addRoute(RoutingMode.STARTS_WITH, "/{agent}", subrealms(parsedDetails,path));
-        } else if (endpoint.equalsIgnoreCase("/groups")) {
+        } else if (endpoint.equalsIgnoreCase(GROUPS)) {
             router.addRoute(endpoint,new IdentityResource("group", realmPath));
             router.addRoute(RoutingMode.STARTS_WITH, "/{group}", subrealms(parsedDetails,path));
-        } else if (endpoint.equalsIgnoreCase("/realms")) {
+        } else if (endpoint.equalsIgnoreCase(REALMS)) {
             router.addRoute(endpoint,new RealmResource(realmPath));
             router.addRoute(RoutingMode.STARTS_WITH, "/{realm}", subrealms(parsedDetails,path));
         }
@@ -344,6 +344,10 @@ public final class RestDispatcher {
                         debug.warning(next + "is the endpoint because it is not a realm");
                         endpoint = new StringBuilder("/");
                         endpoint.append(lastNonBlank);
+                        if(!checkValidEndpoint(endpoint.toString())){
+                            debug.warning(endpoint.toString() + "is the endpoint because it is not a realm");
+                            throw new NotFoundException("Endpoint " + endpoint.toString() + " is not a defined endpoint.");
+                        }
                         // add the rest of tokens as resource name
                         lastNonBlankID = next;
                         while (tokenizer.hasMoreElements()) {

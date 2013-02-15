@@ -59,6 +59,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 
 import com.sun.identity.idsvcs.*;
+
 import java.util.Set;
 
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
@@ -130,9 +131,9 @@ public final class RealmResource implements CollectionResourceProvider {
         String realm = jVal.get("realm").asString();
 
         try {
-            if(realm.isEmpty()){
+            if (realm.isEmpty()) {
                 handler.handleError(new BadRequestException("No realm name provided."));
-            }else if (realm != null && !realm.startsWith("/")) {
+            } else if (realm != null && !realm.startsWith("/")) {
                 realm = "/" + realm;
             }
             // build realm to comply with format
@@ -148,7 +149,7 @@ public final class RealmResource implements CollectionResourceProvider {
 
             // handle response
             // create a resource for handler to return
-            OrganizationConfigManager realmCreated = new OrganizationConfigManager(getSSOToken(),realm);
+            OrganizationConfigManager realmCreated = new OrganizationConfigManager(getSSOToken(), realm);
             resource = new Resource(childRealm, "0", createJsonMessage("realmCreated",
                     realmCreated.getOrganizationName()));
             handler.handleResult(resource);
@@ -485,7 +486,7 @@ public final class RealmResource implements CollectionResourceProvider {
     private void updateConfiguredServices(OrganizationConfigManager ocm,
                                           Map serviceNames) throws SMSException {
         try {
-            ocm.setAttributes(IdConstants.REPO_SERVICE,(Map) serviceNames.get(IdConstants.REPO_SERVICE));
+            ocm.setAttributes(IdConstants.REPO_SERVICE, (Map) serviceNames.get(IdConstants.REPO_SERVICE));
         } catch (SMSException smse) {
             throw smse;
         }
@@ -558,8 +559,8 @@ public final class RealmResource implements CollectionResourceProvider {
         if (realm != null && !realm.startsWith("/")) {
             realm = "/" + realm;
         }
-        if(!realmPath.equalsIgnoreCase("/")){
-            realm = realmPath +  realm;
+        if (!realmPath.equalsIgnoreCase("/")) {
+            realm = realmPath + realm;
         }
 
         try {
@@ -571,11 +572,11 @@ public final class RealmResource implements CollectionResourceProvider {
             // update ID_REPO attributes
             updateConfiguredServices(ocm, createServicesMap(realmDetails));
             newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
-            if (!newServiceNames.isEmpty() && newServiceNames != null) {
+            if (newServiceNames != null && !newServiceNames.isEmpty()) {
                 assignServices(ocm, newServiceNames); //assign services to realm
             }
             // READ THE REALM
-            realmCreatedOcm = new OrganizationConfigManager(getSSOToken(),realm);
+            realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
             // create a resource for handler to return
             resource = new Resource(realm, "0", createJsonMessage("realmUpdated",
                     realmCreatedOcm.getOrganizationName()));
