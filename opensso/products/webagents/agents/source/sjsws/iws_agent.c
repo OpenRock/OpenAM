@@ -55,7 +55,12 @@
 #include "am_web.h"
 
 #include <stdio.h>
-#if defined(WINNT)
+#ifdef _MSC_VER
+#include <io.h>
+#define R_OK            4
+#ifndef access
+#define access          _access
+#endif
 #define snprintf        _snprintf
 #else
 #include <unistd.h>
