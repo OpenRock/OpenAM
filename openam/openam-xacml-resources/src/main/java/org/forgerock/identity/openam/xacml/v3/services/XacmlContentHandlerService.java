@@ -733,10 +733,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // Home Document to the Requester by Rendering our Response.
             if ((xacmlRequestInformation.getRequestURI() == null) ||
                     (xacmlRequestInformation.getRequestURI().isEmpty()) ||
-                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml")) ||
-                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/pdp")) ||
-                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/home")) ||
-                    (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/status"))) {
+                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
+                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
+                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/home")) ||
+                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status"))) {
                 // All other EndPoints Require Authentication to obtain access.
                 try {
                     renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
@@ -747,7 +747,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     // This Starts the Authorization via Digest Flow...
                     this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
                 }
-            } else if (xacmlRequestInformation.getRequestURI().equalsIgnoreCase("/xacml/ping")) {
+            } else if (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/ping")) {
                 try{
                     renderServerOKResponse(requestContentType, XacmlPingResource.getPing(xacmlRequestInformation,
                             request), response);
@@ -868,7 +868,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         //
         if ((xacmlRequestInformation.getRequestURI() == null) ||
                 (xacmlRequestInformation.getRequestURI().isEmpty()) ||
-                (xacmlRequestInformation.getRequestURI().contains("/xacml/pdp"))) {
+                (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp"))) {
 
             // TODO Process PDP Request, Hook into existing code base here......
 

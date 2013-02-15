@@ -58,14 +58,14 @@ public class TestXacmlContentHandlerService {
     public void before() throws Exception {
 
         servletTester = new ServletTester();
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/home");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/status");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/ping");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp/authorization");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pip");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pap");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/home");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/status");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/ping");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pdp/authorization");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pdp");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pip");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pap");
 
         servletTester.start();
     }
@@ -85,7 +85,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml");
+        request.setURI("/openam/xacml");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
 
@@ -108,7 +108,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml/home");
+        request.setURI("/openam/xacml/home");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
 
@@ -131,7 +131,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml/status");
+        request.setURI("/openam/xacml/status");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
 
@@ -154,7 +154,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml/pdp");
+        request.setURI("/openam/xacml/pdp");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.XACML_PLUS_XML.applicationType());
 
@@ -177,7 +177,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml/pip");
+        request.setURI("/openam/xacml/pip");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
 
@@ -200,7 +200,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml/pap");
+        request.setURI("/openam/xacml/pap");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.XACML_PLUS_JSON.applicationType());
 
@@ -223,7 +223,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml");
+        request.setURI("/openam/xacml");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
 
@@ -246,7 +246,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("GET");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml/ping");
+        request.setURI("/openam/xacml/ping");
         request.setVersion("HTTP/1.1");
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
 
@@ -274,7 +274,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml");
+        request.setURI("/openam/xacml");
         request.setVersion("HTTP/1.1");
 
         try {
@@ -296,7 +296,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.setURI("/xacml");
+        request.setURI("/openam/xacml");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
 
@@ -320,7 +320,7 @@ public class TestXacmlContentHandlerService {
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
-        request.setURI("/xacml/pdp/authorization");
+        request.setURI("/openam/xacml/pdp/authorization");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
 
@@ -344,7 +344,7 @@ public class TestXacmlContentHandlerService {
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
-        request.setURI("/xacml/pdp/authorization");
+        request.setURI("/openam/xacml/pdp/authorization");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
 
@@ -388,7 +388,7 @@ public class TestXacmlContentHandlerService {
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
         request.addHeader("Content-Type", ContentType.XML.applicationType());
-        request.setURI("/xacml/pdp");
+        request.setURI("/openam/xacml/pdp");
         request.setVersion("HTTP/1.1");
 
         String testData = XACML3Utils.getResourceContents(testAuthzDecisionQuery_ResourceName);
