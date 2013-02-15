@@ -64,6 +64,7 @@
 #include "auth_context.h"
 #include "am_sso.h"
 #include "am_utils.h"
+#include <pcre.h>
 
 #include <locale.h>
 
@@ -1047,6 +1048,26 @@ am_web_cleanup() {
     return status;
 }
 
+static int match(const char *subject, const char *pattern) {
+    pcre *x = NULL;
+    const char *error;
+    int erroroffset, rc = -1;
+    int offsets[3];
+    if (subject == NULL || pattern == NULL) return 0;
+    x = pcre_compile(pattern, 0, &error, &erroroffset, NULL);
+    if (x != NULL) {
+        rc = pcre_exec(x, NULL, subject, strlen(subject),
+                0, 0, offsets, 3);
+        if (rc < 0) {
+            am_web_log_debug("match(): result code: %d %s", rc, (rc == -1 ? "(no match)" : ""));
+        }
+        free(x);
+    } else {
+        if (error != NULL) am_web_log_debug("match(): error: %s", error);
+    }
+    return rc < 0 ? 0 : 1;
+}
+
 // -- supporting methods for am_web_is_access_allowed
 
 /* Throws std::exceptions's from URL methods */
@@ -1151,39 +1172,52 @@ am_bool_t in_not_enforced_list(URL &urlObj,
 		  thisfunc, url, baseURL);
         found = AM_TRUE;
     } else {
-        for (i = 0;
-	    (i < (*agentConfigPtr)->not_enforced_list.size) 
-	     && (AM_FALSE == found);
-	     i++) {
-	    am_resource_match_t match_status;
-
-	    if ((*agentConfigPtr)->not_enforced_list.list[i].has_patterns
-		 == AM_TRUE) {
-            if (AM_TRUE ==
-                 (*agentConfigPtr)->ignore_path_info_for_not_enforced_list)
-            {
-	        match_status = am_policy_compare_urls(
-                    &rsrcTraits, 
-                    (*agentConfigPtr)->not_enforced_list.list[i].url,
-	            baseURL, B_TRUE);
-	    } else {
-	        match_status = am_policy_compare_urls(
-                &rsrcTraits, (*agentConfigPtr)->not_enforced_list.list[i].url,
-                            url, B_TRUE);
+        if ((*agentConfigPtr)->nfurl_regex_enabled) {
+            am_web_log_debug("%s(): regular expressions are enabled", thisfunc);
+            for (i = 0; (i < (*agentConfigPtr)->not_enforced_list.size) && (AM_FALSE == found); i++) {
+                if (match(url, (*agentConfigPtr)->not_enforced_list.list[i].url)) {
+                    am_web_log_debug("%s(%s): matched '%s' entry in not-enforced list", thisfunc,
+                            url, (*agentConfigPtr)->not_enforced_list.list[i].url);
+                    found = AM_TRUE;
+                } else {
+                    am_web_log_debug("%s(%s): does not match '%s' entry in not-enforced list", thisfunc,
+                            url, (*agentConfigPtr)->not_enforced_list.list[i].url);
                 }
-            } else {
-                match_status = am_policy_compare_urls(
-                    &rsrcTraits, (*agentConfigPtr)->not_enforced_list.list[i].url,
-                url, B_FALSE);
-	    }
+            }
+        } else {
+            for (i = 0;
+                    (i < (*agentConfigPtr)->not_enforced_list.size)
+                    && (AM_FALSE == found);
+                    i++) {
+                am_resource_match_t match_status;
 
-	    if (AM_EXACT_MATCH == match_status ||
-	        AM_EXACT_PATTERN_MATCH == match_status) {
-            am_web_log_debug("%s(%s): "
-			 "matched '%s' entry in not-enforced list", thisfunc,
-			 url, (*agentConfigPtr)->not_enforced_list.list[i].url);
-	        found = AM_TRUE;
-	    }
+                if ((*agentConfigPtr)->not_enforced_list.list[i].has_patterns
+                        == AM_TRUE) {
+                    if (AM_TRUE ==
+                            (*agentConfigPtr)->ignore_path_info_for_not_enforced_list) {
+                        match_status = am_policy_compare_urls(
+                                &rsrcTraits,
+                                (*agentConfigPtr)->not_enforced_list.list[i].url,
+                                baseURL, B_TRUE);
+                    } else {
+                        match_status = am_policy_compare_urls(
+                                &rsrcTraits, (*agentConfigPtr)->not_enforced_list.list[i].url,
+                                url, B_TRUE);
+                    }
+                } else {
+                    match_status = am_policy_compare_urls(
+                            &rsrcTraits, (*agentConfigPtr)->not_enforced_list.list[i].url,
+                            url, B_FALSE);
+                }
+
+                if (AM_EXACT_MATCH == match_status ||
+                        AM_EXACT_PATTERN_MATCH == match_status) {
+                    am_web_log_debug("%s(%s): "
+                            "matched '%s' entry in not-enforced list", thisfunc,
+                            url, (*agentConfigPtr)->not_enforced_list.list[i].url);
+                    found = AM_TRUE;
+                }
+            }
         }
 
         if ((*agentConfigPtr)->reverse_the_meaning_of_not_enforced_list 
@@ -1953,6 +1987,11 @@ am_web_is_access_allowed(const char *sso_token,
             isAgentLogoutURL = AM_TRUE;
             am_web_log_max_debug("%s: url %s IS logout url.", thisfunc,url);
         }
+        if ((*agentConfigPtr)->alogout_regex != NULL &&
+            am_web_is_agent_logout_url(url, agent_config) == B_TRUE) {
+            isAgentLogoutURL = AM_TRUE;
+            am_web_log_max_debug("%s: url %s IS logout url.", thisfunc,url);
+        }
     }
 
     //Check whether agent is operating in cookieless mode.
@@ -2192,7 +2231,12 @@ am_web_is_access_allowed(const char *sso_token,
                     } else {
                         am_web_log_debug("%s: Logged out session id %s.",
                                         thisfunc, sso_token);
-                        redirLogoutStatus = AM_REDIRECT_LOGOUT;
+                        if ((*agentConfigPtr)->user_logout_redirect_disable == 1 
+                                && (*agentConfigPtr)->logout_redirect_url == NULL) {
+                            redirLogoutStatus = AM_SUCCESS;
+                        } else {
+                            redirLogoutStatus = AM_REDIRECT_LOGOUT;
+                        }
                     }
                     return redirLogoutStatus;
 
@@ -4607,25 +4651,37 @@ am_web_is_agent_logout_url(const char *url,
 	    Log::log(boot_info.log_module, Log::LOG_DEBUG,
 		     "%s(%s): normalized URL %s.\n", thisfunc, url, norm_url);
 	    unsigned int i;
-	    for (i = 0;
-		(i < (*agentConfigPtr)->agent_logout_url_list.size) && (B_FALSE == found);
-		 i++) {
-		am_resource_traits_t rsrcTraits;
-		populate_am_resource_traits(rsrcTraits, agent_config);
-		am_resource_match_t match_status;
-		boolean_t usePatterns =
-		    (*agentConfigPtr)->agent_logout_url_list.list[i].has_patterns==AM_TRUE? B_TRUE:B_FALSE;
-		match_status = am_policy_compare_urls(
-		    &rsrcTraits, (*agentConfigPtr)->agent_logout_url_list.list[i].url, norm_url, usePatterns);
-		if (match_status == AM_EXACT_MATCH ||
-		    match_status == AM_EXACT_PATTERN_MATCH) {
-		    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-			"%s(%s): matched '%s' entry in logout url list",
-			thisfunc, url, (*agentConfigPtr)->agent_logout_url_list.list[i].url);
-		    found = B_TRUE;
-		    break;
-		}
-	    }
+	    if ((*agentConfigPtr)->alogout_regex != NULL) {
+                am_web_log_debug("%s(): trying logout regular expression %s", thisfunc, (*agentConfigPtr)->alogout_regex);
+                if (match(norm_url, (*agentConfigPtr)->alogout_regex)) {
+                    am_web_log_debug("%s(%s): matched '%s' entry in agent logout regular expression", thisfunc,
+                            norm_url, (*agentConfigPtr)->alogout_regex);
+                    found = B_TRUE;
+                } else {
+                    am_web_log_debug("%s(%s): does not match '%s' entry in agent logout regular expression", thisfunc,
+                            norm_url, (*agentConfigPtr)->alogout_regex);
+                }
+            } else {
+                for (i = 0;
+                        (i < (*agentConfigPtr)->agent_logout_url_list.size) && (B_FALSE == found);
+                        i++) {
+                    am_resource_traits_t rsrcTraits;
+                    populate_am_resource_traits(rsrcTraits, agent_config);
+                    am_resource_match_t match_status;
+                    boolean_t usePatterns =
+                            (*agentConfigPtr)->agent_logout_url_list.list[i].has_patterns == AM_TRUE ? B_TRUE : B_FALSE;
+                    match_status = am_policy_compare_urls(
+                            &rsrcTraits, (*agentConfigPtr)->agent_logout_url_list.list[i].url, norm_url, usePatterns);
+                    if (match_status == AM_EXACT_MATCH ||
+                            match_status == AM_EXACT_PATTERN_MATCH) {
+                        Log::log(boot_info.log_module, Log::LOG_DEBUG,
+                                "%s(%s): matched '%s' entry in logout url list",
+                                thisfunc, url, (*agentConfigPtr)->agent_logout_url_list.list[i].url);
+                        found = B_TRUE;
+                        break;
+                    }
+                }
+            }
 	}
 	catch (InternalException& exi) {
 	    am_web_log_error("%s: Internal exception encountered: %s.",
@@ -6753,6 +6809,15 @@ extern "C" AM_WEB_EXPORT const char *am_web_get_password_encryption_key(void* ag
     return (*agentConfigPtr)->password_encr_key;
 }
 
+extern "C" AM_WEB_EXPORT int am_web_validate_url(void* agent_config, const char *url) {
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    if ((*agentConfigPtr)->invalid_url_regex != NULL) {
+        return match(url, (*agentConfigPtr)->invalid_url_regex);
+    }
+    return -1;
+}
+
 extern "C" AM_WEB_EXPORT boolean_t
 am_web_is_remoteuser_header_disabled(void* agent_config) {
     boolean_t status = B_FALSE;
@@ -6801,7 +6866,12 @@ am_web_get_logout_url(char** logout_url, void* agent_config)
         ret = AM_SUCCESS;
     }
 
-    *logout_url=strdup(retVal.c_str());
+    if ((*agentConfigPtr)->user_logout_redirect_disable == 1 
+            && (*agentConfigPtr)->logout_redirect_url != NULL) {
+        *logout_url = strdup((*agentConfigPtr)->logout_redirect_url);
+    } else {
+        *logout_url = strdup(retVal.c_str());
+    }
 
     return ret;
 }

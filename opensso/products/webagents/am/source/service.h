@@ -30,6 +30,10 @@
  * particular service.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __SERVICE_H__
 #define __SERVICE_H__
 
@@ -224,6 +228,8 @@ class Service {
 
     am_status_t user_logout(const char *ssoTokenId,
                                    Properties& properties);
+    
+    am_status_t invalidate_user_session(const char *ssoTokenId, Properties& properties);
 
     void flushPolicyEntry(const SSOToken&);
 

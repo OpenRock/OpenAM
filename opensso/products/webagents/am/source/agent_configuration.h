@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010 - 2012 ForgeRock AS
+ * Portions Copyrighted 2010 - 2013 ForgeRock Inc
  */
 
 
@@ -203,6 +203,10 @@ public:
     int iis_logonuser_enabled;
     const char *password_encr_key;
     PRBool remote_user_header_disable;
+    int nfurl_regex_enabled;
+    const char *alogout_regex;
+    int user_logout_redirect_disable;
+    const char *invalid_url_regex;
     
     smap_t cond_login_url;
     
@@ -308,6 +312,10 @@ public:
         this->iis_logonuser_enabled = 0;
         this->password_encr_key = NULL;
         this->remote_user_header_disable = AM_FALSE;
+        this->nfurl_regex_enabled = 0;
+        this->alogout_regex = NULL;
+        this->user_logout_redirect_disable = 0;
+        this->invalid_url_regex = NULL;
 
     }
     

@@ -26,8 +26,9 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
+
 #include <climits>
 #include <ctime>
 #include <string>
@@ -1795,6 +1796,37 @@ Service::invalidate_session(const char *ssoTokenId) {
     return status;
 }
 
+am_status_t
+Service::invalidate_user_session(const char *ssoTokenId, Properties& properties) {
+    am_status_t status = AM_FAILURE;
+    ServiceInfo svcInfo;
+    bool cookieEncoded = strchr(ssoTokenId, '%') != NULL;
+    const SSOToken ssoToken(cookieEncoded ? Http::decode(ssoTokenId) : ssoTokenId,
+            cookieEncoded ? ssoTokenId : Http::encode(ssoTokenId));
+
+    if (properties.getBool("com.forgerock.agents.config.logout.redirect.disable", false)) {
+        am_status_t dstatus = mSSOTokenSvc.destroySession(svcInfo, ssoToken.getString());
+        Log::log(logID, Log::LOG_WARNING, 
+            "invalidate_user_session(): status %s invalidating session %s",
+                am_status_to_name(dstatus), ssoTokenId);
+    }
+    
+    status = AM_SUCCESS;
+
+    mSSOTokenSvc.removeSSOTokenTableEntry(ssoToken.getString());
+
+    PolicyEntryRefCntPtr uPolicyEntry = policyTable.find(ssoToken.getString());
+    if (uPolicyEntry) {
+        // remove sso token entry from table whether or not destroySession
+        // was successful.
+        policyTable.remove(ssoToken.getString());
+        Log::log(logID, Log::LOG_DEBUG, "Service::invalidate_user_session(): "
+                "sso token %s removed from policy table.",
+                ssoTokenId);
+    }
+    return status;
+}
+
 /*
  * This function gets used by agent to invalidate user
  * ssotoken when logout feature used.
@@ -1806,7 +1838,7 @@ Service::user_logout(const char *ssoTokenId,
     am_status_t status = AM_FAILURE;
     string func("Service::user_logout");
 
-    status = invalidate_session(ssoTokenId);
+    status = invalidate_user_session(ssoTokenId, properties);
 
     // If app ssotoken got invalidated,
     // then agent need to reinitialize. 
@@ -1820,7 +1852,7 @@ Service::user_logout(const char *ssoTokenId,
             // agent reinitialized, so try invalidate_session again.
             // this will be required in case app ssotoken invalidated
             // not because of server restart, but for some other reason.
-            status = invalidate_session(ssoTokenId);
+            status = invalidate_user_session(ssoTokenId, properties);
         } 
     }
     return status;

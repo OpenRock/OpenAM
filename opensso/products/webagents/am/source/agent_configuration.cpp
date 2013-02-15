@@ -30,7 +30,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #include <prlock.h>
@@ -566,6 +566,32 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 parameter, B_FALSE,
                 reinterpret_cast<int *> (&this->remote_user_header_disable));
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->remote_user_header_disable ? "TRUE" : "FALSE"));
+    }
+    
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.notenforced.url.regex.enable";
+        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->nfurl_regex_enabled));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->nfurl_regex_enabled ? "TRUE" : "FALSE"));
+    }
+    
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.agent.logout.url.regex";
+        am_properties_get_with_default(this->properties, parameter, NULL, &(this->alogout_regex));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->alogout_regex);
+    }
+    
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.config.logout.redirect.disable";
+        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->user_logout_redirect_disable));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->user_logout_redirect_disable ? "TRUE" : "FALSE"));
+    }
+    
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.agent.invalid.url.regex";
+        am_properties_get_with_default(this->properties, parameter, NULL, &(this->invalid_url_regex));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->invalid_url_regex);
     }
     
     /* Get url string comparision case sensitivity values. */
@@ -1499,6 +1525,9 @@ void AgentConfiguration::cleanup_properties()
 
     this->notenforcedIPmode = NULL;
     this->dummyPostPrefixUri = NULL;
+    this->password_encr_key = NULL;
+    this->alogout_regex = NULL;
+    this->invalid_url_regex = NULL;
     
     this->cond_login_url.clear();
 

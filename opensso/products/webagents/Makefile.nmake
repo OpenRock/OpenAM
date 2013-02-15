@@ -45,21 +45,21 @@ AM_DOMINO_SRC = agents\source\domino\domino_agent.c
 DEP_INCPATH = \
 !IFDEF X64
    /I"extlib\WINNT\libxml2_64\include" /I"extlib\WINNT\nspr_64\include" /I"extlib\WINNT\domino_64\include" \
-   /I"extlib\WINNT\nss_64\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include"
+   /I"extlib\WINNT\nss_64\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include" /I"extlib\WINNT\pcre_64\include"
 !ELSE
    /I"extlib\WINNT\libxml2\include" /I"extlib\WINNT\nspr\include" /I"extlib\WINNT\domino\include" \
-   /I"extlib\WINNT\nss\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include"
+   /I"extlib\WINNT\nss\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include" /I"extlib\WINNT\pcre\include"
 !ENDIF
 
-DEP_LIBS = libxml2.lib nspr4.lib nss3.lib ssl3.lib plc4.lib kernel32.lib user32.lib 
+DEP_LIBS = libxml2.lib nspr4.lib nss3.lib ssl3.lib plc4.lib kernel32.lib user32.lib pcre.lib
 
 DEP_LIBPATH = \
 !IFDEF X64
   /LIBPATH:"extlib\WINNT\libxml2_64\lib" /LIBPATH:"extlib\WINNT\nspr_64\lib" /LIBPATH:"extlib\WINNT\domino_64\lib" \
-  /LIBPATH:"extlib\WINNT\nss_64\lib" /LIBPATH:"extlib\WINNT\proxy40_64\lib" /LIBPATH:"extlib\WINNT\sjsws_64\lib"
+  /LIBPATH:"extlib\WINNT\nss_64\lib" /LIBPATH:"extlib\WINNT\proxy40_64\lib" /LIBPATH:"extlib\WINNT\sjsws_64\lib" /LIBPATH:"extlib\WINNT\pcre_64\lib"
 !ELSE
   /LIBPATH:"extlib\WINNT\libxml2\lib" /LIBPATH:"extlib\WINNT\nspr\lib" /LIBPATH:"extlib\WINNT\domino\lib" \
-  /LIBPATH:"extlib\WINNT\nss\lib" /LIBPATH:"extlib\WINNT\proxy40\lib" /LIBPATH:"extlib\WINNT\sjsws\lib"
+  /LIBPATH:"extlib\WINNT\nss\lib" /LIBPATH:"extlib\WINNT\proxy40\lib" /LIBPATH:"extlib\WINNT\sjsws\lib" /LIBPATH:"extlib\WINNT\pcre\lib"
 !ENDIF
 
 
@@ -75,7 +75,7 @@ LDFLAGS = /NOLOGO /INCREMENTAL:NO /errorReport:none \
 
 CFLAGS = /O2 /Oi /GL /Gy /D _WINDLL /FD /D_CRT_SECURE_NO_WARNINGS \
    /D AM_BUILDING_LIB /wd4996 /wd4101 /wd4244 /D WINNT \
-   /EHsc /nologo /Zi /errorReport:none /Iam\source /MD /W3 \
+   /EHsc /nologo /Zi /errorReport:none /Iam\source /MD /W3 /D PCRE_STATIC \
 !IFDEF X64 
    /D _AMD64_ /c
 !ELSE

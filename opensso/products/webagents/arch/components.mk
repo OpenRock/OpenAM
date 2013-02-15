@@ -139,6 +139,19 @@ LIBXML_LIBS := -lxml2
 endif
 endif
 
+##########################################
+# PCRE defines
+##########################################
+
+PCRE_DIR := $(EXTERNAL_DIR)/pcre
+ifeq ($(BUILD_TYPE), 64)
+PCRE_DIR := $(EXTERNAL_DIR)/pcre_64
+endif
+PCRE_INC_DIR := $(PCRE_DIR)/include
+PCRE_LIB_DIR := $(PCRE_DIR)/lib
+ifndef	PCRE_LIBS
+PCRE_LIBS := $(PCRE_LIB_DIR)/libpcre.a
+endif
 
 ##########################################
 # NSPR defines
