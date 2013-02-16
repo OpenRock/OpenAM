@@ -136,8 +136,10 @@ public final class RealmResource implements CollectionResourceProvider {
             } else if (realm != null && !realm.startsWith("/")) {
                 realm = "/" + realm;
             }
-            // build realm to comply with format
-            realm = realmPath + realm;
+            if (!realmPath.equalsIgnoreCase("/")) {
+                // build realm to comply with format if not top level
+                realm = realmPath + realm;
+            }
 
             parentRealm = RealmUtils.getParentRealm(realm);
             childRealm = RealmUtils.getChildRealm(realm);
