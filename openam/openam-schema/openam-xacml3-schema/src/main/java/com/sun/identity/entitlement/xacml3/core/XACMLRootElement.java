@@ -32,8 +32,6 @@ public interface XACMLRootElement {
      */
     public static final String XACML3_NAMESPACE = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
 
-
-
     /**
      * Required Method within all Implementing Classes.
      *
