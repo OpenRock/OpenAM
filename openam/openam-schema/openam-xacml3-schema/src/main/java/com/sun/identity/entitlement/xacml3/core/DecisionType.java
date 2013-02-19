@@ -58,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "DecisionType")
 @XmlEnum
-public enum DecisionType implements XACMLRootElement {
+public enum DecisionType {
 
     @XmlEnumValue("Permit")
     PERMIT("Permit"),
@@ -85,19 +85,6 @@ public enum DecisionType implements XACMLRootElement {
             }
         }
         throw new IllegalArgumentException(v);
-    }
-
-    /**
-     * Default toXML Method to Marshal Object into XML.
-     * @return String - Marshaled Results into XML String.
-     */
-    public String toXML() {
-            StringBuilder stringBuilder = new StringBuilder();
-
-
-
-            // Return Marshaled Data.
-            return stringBuilder.toString();
     }
 
 }

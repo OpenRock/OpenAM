@@ -27,6 +27,7 @@ package org.forgerock.identity.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.XACMLConstants;
 
+
 /**
  * Model XACML3 Constants
  *
@@ -118,8 +119,6 @@ public interface XACML3Constants extends XACMLConstants {
      * Prescription Level: mandatory
      */
     public static final String URN_HOME_STATUS = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status";
-
-
     public static final String URN_HOME_BODY = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body";
 
 }

@@ -28,7 +28,15 @@ package com.sun.identity.entitlement.xacml3.core;
 public interface XACMLRootElement {
 
     /**
+     * XACML 3 Default Namespace.
+     */
+    public static final String XACML3_NAMESPACE = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
+
+
+
+    /**
      * Required Method within all Implementing Classes.
+     *
      * @return String of Marshaled XACML POJO to XML.
      */
     public String toXML();

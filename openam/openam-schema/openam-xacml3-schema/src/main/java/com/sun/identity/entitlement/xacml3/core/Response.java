@@ -102,9 +102,20 @@ public class Response implements XACMLRootElement {
      */
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<").append(this.getClass().getSimpleName()).
+                append("").
+                append(">").append("/n");
+        // ************************************************
+        // Iterate over the Response Object to Marshal
+        // into XML.
+        for (Result result : this.getResult()) {
+            if (result != null) {
+                result.toXML();
+            }
 
-
-
+        } // End of Loop for Embedded Results.
+        // Finalize Response Node.
+        stringBuilder.append("</").append(this.getClass().getSimpleName()).append(">").append("/n");
         // Return Marshaled Data.
         return stringBuilder.toString();
     }

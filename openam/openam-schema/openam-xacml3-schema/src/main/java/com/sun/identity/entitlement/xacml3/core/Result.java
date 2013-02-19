@@ -245,9 +245,41 @@ public class Result implements XACMLRootElement {
      */
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
+        // Begin Result Node.
+        stringBuilder.append("<").append(this.getClass().getSimpleName()).append(">/n");
+        if (this.getDecision() != null) {
+            stringBuilder.append("<Decision>").append(this.getDecision().value()).append("</Decision>").append("\n");
+        } else {
+            stringBuilder.append("<Decision>").append(DecisionType.INDETERMINATE.value()).append("</Decision>").append("\n");
+        }
 
+        // Begin Status Marshaling, if Applicable
+        if (this.getStatus() != null) {
+            stringBuilder.append(this.getStatus().toXML());
+        }
 
+        // Begin Attributes Marshaling, if Applicable
+        if (this.getAttributes() != null) {
+            stringBuilder.append(this.getAttributes() );
+        }
 
+        // Begin Associated Advice Marshaling, if Applicable
+        if (this.getAssociatedAdvice() != null) {
+            stringBuilder.append(this.getAssociatedAdvice().toXML());
+        }
+
+        // Begin Obligations Marshaling, if Applicable
+        if (this.getObligations() != null) {
+            stringBuilder.append(this.getObligations().toXML());
+        }
+
+        // Begin Policy Identifier List Marshaling, if Applicable
+        if (this.getPolicyIdentifierList() != null) {
+            stringBuilder.append(this.getPolicyIdentifierList().toXML());
+        }
+
+        // Finalize Result Node.
+        stringBuilder.append("</"+this.getClass().getName()).append("/n");
         // Return Marshaled Data.
         return stringBuilder.toString();
     }
