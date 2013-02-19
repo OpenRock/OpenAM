@@ -165,8 +165,7 @@
             <artifactId>bctsp-jdk16</artifactId>
             <version>1.46</version>
         </dependency>
-        <!-- XML APIs -->
-        <!-- Xerces-J Required for fedlet and XACML -->
+        <!-- Xerces-J Required for XACML -->
         <dependency>
             <groupId>xerces-J</groupId>
             <artifactId>xercesImpl</artifactId>

@@ -66,6 +66,9 @@ public class POJOToJsonUtility {
      * @throws java.io.IOException
      */
     public static String toString(Object object) throws IOException {
+        if (object == null) {
+            return null;
+        }
         // Return rendered Marshaled Object.
         return mapper.writeValueAsString(object);
     }

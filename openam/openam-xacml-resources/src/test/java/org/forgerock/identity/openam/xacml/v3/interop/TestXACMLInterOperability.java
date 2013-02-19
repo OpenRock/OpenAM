@@ -57,11 +57,11 @@ public class TestXACMLInterOperability {
     public void before() throws Exception {
 
         servletTester = new ServletTester();
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp/authorization");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pdp");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pip");
-        servletTester.addServlet(XacmlContentHandlerService.class, "/xacml/pap");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pdp/authorization");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pdp");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pip");
+        servletTester.addServlet(XacmlContentHandlerService.class, "/openam/xacml/pap");
 
         servletTester.start();
     }
@@ -71,7 +71,25 @@ public class TestXACMLInterOperability {
         servletTester.stop();
     }
 
+    // *********************************************************
+    // Applicable InterOp Use Cases
+    // *********************************************************
 
+    @Test
+    public void testUseCase_IMPORT_POLICY() {
 
+    }
+
+    @Test
+    public void testUseCase_EC_POLICY() {
+
+    }
+
+    @Test
+    public void testUseCase_IPC_POLICY() {
+
+    }
+
+    // Additional Tests TBD...
 
 }

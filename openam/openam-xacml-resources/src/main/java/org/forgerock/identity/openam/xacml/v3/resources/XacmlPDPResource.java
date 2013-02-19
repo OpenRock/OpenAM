@@ -110,9 +110,6 @@ public class XacmlPDPResource implements XACML3Constants {
         // Get all the headers from the HTTP request
         MimeHeaders headers = SAML2Utils.getHeaders(request);
 
-        // Ready our Response Object...
-        com.sun.identity.entitlement.xacml3.core.Result xacmlResult = new com.sun.identity.entitlement.xacml3.core.Result();
-        xacmlRequestInformation.getXacmlResponse().getResult().add(xacmlResult);
         // Check Original Content
         if (xacmlRequestInformation.getOriginalContent() == null) {
                 // Bad or no content.

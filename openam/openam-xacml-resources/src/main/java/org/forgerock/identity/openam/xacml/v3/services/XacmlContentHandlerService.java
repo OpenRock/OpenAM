@@ -110,6 +110,9 @@ import java.util.concurrent.TimeUnit;
  * </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;export&#47</li></ul></td><td><em>PAP Export Policy</em></td></tr>
  * </table>
  *
+ * WWW-Authentication via Digest definition can be found here:
+ * http://en.wikipedia.org/wiki/Digest_Access_Authentication#Alternative_authentication_protocols
+ *
  * @author Jeff.Schenk@forgerock.com
  */
 public class XacmlContentHandlerService extends HttpServlet implements XACML3Constants {
@@ -522,8 +525,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private String generateAuthenticateHeader(String realm) {
         StringBuilder header = new StringBuilder();
         header.append("Digest realm=\"").append(realm).append("\",");
-        if (!StringUtils.isBlank(authenticationMethod)) {
-            header.append("qop=").append(authenticationMethod).append(",");
+        if (!StringUtils.isBlank(authenticationMethods)) {
+            header.append("qop=\"").append(authenticationMethods).append("\",");
         }
         header.append("algorithm=\"").append("md5").append("\",");
         header.append("nonce=\"").append(nonce).append("\",");
@@ -571,13 +574,14 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @throws ServletException
      * @throws IOException
      */
-    private AuthenticationDigest preAuthenticateUsingDigest(final String authenticationHeader,
-                                                            final String requestBody,
-                                                            final HttpServletRequest request, String realm)
+    private AuthenticationDigest authenticateUsingDigest(final String authenticationHeader,
+                                                         final String requestBody,
+                                                         final HttpServletRequest request, String realm)
             throws ServletException, IOException {
+        final String classMethod = "XacmlContentHandlerService:authenticateUsingDigest";
         // *********************************************
         // Parse the Authentication Header Information.
-        System.out.println("authenticationHeader:[" + authenticationHeader + "]"); // TODO Change Me...
+        debug.error(classMethod+" authenticationHeader:[" + authenticationHeader + "]"); // TODO Change Me...
 
         String headerStringWithoutAuthScheme = authenticationHeader.substring(authenticationHeader.indexOf(" ") + 1)
                 .trim();
@@ -602,7 +606,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         String requestURI = headerValues.get("uri");
 
-        if (!StringUtils.isBlank(qop) && qop.equals("auth-int")) {
+        if ( (StringUtils.isNotBlank(qop)) && (qop.equalsIgnoreCase("auth-int")) &&
+             (StringUtils.isNotBlank(requestBody)) ) {
             String entityBodyMd5 = DigestUtils.md5Hex(requestBody);
             ha2 = DigestUtils.md5Hex(method + ":" + requestURI + ":" + entityBodyMd5);
         } else {
@@ -622,12 +627,24 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
             serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":"
                     + nonceCount + ":" + clientNonce + ":" + qop + ":" + ha2);
-
         }
         // ******************************************************
         // Now Compare our Server Response with Client Response.
         String clientResponse = headerValues.get("response");
-        if (!serverResponse.equals(clientResponse)) {
+        if ( (clientResponse == null) || (clientResponse.isEmpty()) ) {
+            clientResponse = headerValues.get("solution");
+        }
+
+        // ******************************************************
+        // Show both calculated and received value from client.
+        debug.error("*** Server Response: "+serverResponse);
+        debug.error("*** Client Response: "+clientResponse);
+
+        // ******************************************************
+        // Check for any Nulls on either side.
+        if ( (clientResponse == null) || (clientResponse.isEmpty()) ||
+             (serverResponse == null) || (serverResponse.isEmpty()) ||
+             (!serverResponse.equals(clientResponse)) ) {
             return null;
         } else {
             // Authenticate Digest is Valid.
@@ -720,12 +737,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
         if (xacmlRequestInformation == null) {
             // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized("", requestContentType, response);
+            this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
             return;
         }
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request or content.
         if ((request.getContentLength() <= 0) &&
+            (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
                 ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
                  (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
             // ***********************************************************************************************
@@ -765,29 +783,22 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return;
         } // End of outer if Check for content
         // ******************************************************************
-        // Check for a existence of a XACML Request, for a POST, we must have
-        // Correct Request Content and if no Request Object in XML or JSON
-        // form.
-        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
-                (xacmlRequestInformation.isRequestNodePresent()) ) {
-            // No Request Node found within the document, not valid request.
-            this.renderBadRequest(requestContentType, response);
-            return;
-        }
-        // ******************************************************************
         // Obtain our Request Content Data.
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
                 (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
             AuthenticationDigest authenticationDigestResponse =
-                    preAuthenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
+                    authenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
                             xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
+            // If we receive a valid authenticationDigestResponse Object, we have successfully Authenticated the
+            // Client.
             if (authenticationDigestResponse == null) {
                 // Not Authenticated.
                 // This Starts the Authorization via Digest Flow...
                 this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
                 return;
             } else {
-                xacmlRequestInformation.setDigestValid(true);
+                // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
+                xacmlRequestInformation.setAuthenticated(true);
             }
         } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
             // **************************************************************
@@ -801,19 +812,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // This will begin the Authorization Digest Flow...
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
             return;
-        }
-        // ******************************************************************
-        // Check for Valid Digest Request.
-        if (xacmlRequestInformation.isDigestValid()) {
-            // TODO -- Continue Validation of Credentials...
-
-
-            // If Validated, indicated Authenticated Request.
-            xacmlRequestInformation.setAuthenticated(false);
-
-            // TODO FIX.....Set to true only for testing and if not derived from true Auth, to allow unauthenticated
-            // TODO FIX..... requests to enter.
-
         }
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
@@ -841,7 +839,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // **************************************************
             // Determine if the Authentication Wrapper provided
             // a Request which was already satisfied.
-            if ( (!xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
+            if ( (xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
                 // *****************************************************************
                 // Render our Response
                 renderResponse(requestContentType,
@@ -850,7 +848,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
         // **********************************************************************
-        // Do Not Continue if we have not been authenticated.
+        // Do Not Continue if we have authenticated or Trust Requester.
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized, Forbidden.
@@ -861,17 +859,29 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return;
         }
         // ******************************************************************
+        // Check for a existence of a XACML Request, for a POST, we must have
+        // Correct Request Content and if no Request Object in XML or JSON
+        // form.
+        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
+                (xacmlRequestInformation.isRequestNodePresent()) ) {
+            // No Request Node found within the document, not valid request.
+            this.renderBadRequest(requestContentType, response);
+            return;
+        }
+        // ******************************************************************
         // Now this session has been Authenticated, using Auth-Digest or
         // other Authentication Algorithm, process the Authenticated Request...
         //
         // Check the Request Path Information.
         //
         if ((xacmlRequestInformation.getRequestURI() == null) ||
-                (xacmlRequestInformation.getRequestURI().isEmpty()) ||
-                (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp"))) {
+            (xacmlRequestInformation.getRequestURI().trim().isEmpty()) ||
+            (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
+            (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
+            (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp/"))) {
 
             // TODO Process PDP Request, Hook into existing code base here......
-
+            //xacmlRequestProcessor.processRequest()
 
         } else {
 
@@ -880,9 +890,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         }
         // *****************************************************************
-        // Render our Response, response Setting should be set prior.
-        renderResponse(requestContentType,
-          xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
+        // Render our Response, response Setting should be set prior, if not
+        // it will set a default Indeterminate Result Response.
+        String responseContent = xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType);
+        response.setStatus(HttpServletResponse.SC_OK);      // 200.
+        renderResponse(requestContentType, responseContent, response);
     }
 
     // ******************************************************************************************************
@@ -967,6 +979,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         String queryMetaAlias =
                 XACML3Utils.getMetaAliasByUri(requestURI);
         String realm = XACML3Utils.getRealmByMetaAlias(queryMetaAlias);
+        if ( (realm == null) || (realm.isEmpty()) ) {
+            realm = XACML3_PDP_DEFAULT_REALM;
+        }
 
         // Attempt to get the PDP Entity ID...
         String pdpEntityID = null;

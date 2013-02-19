@@ -29,6 +29,7 @@ import static org.testng.Assert.*;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.junit.runner.RunWith;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
@@ -361,8 +362,8 @@ public class TestXacmlContentHandlerService {
 
             // Example of Data for WWW-Authenticate.
             // Digest realm="example.org",qop=auth,nonce="9fc422776b40c52a8a107742f9a08d5c",opaque="aba7d38a079f1a7d2e0ba2d4b84f3aa2"
-            assertNotNull(response.getHeader("WWW-Authenticate"));
-            assertTrue(response.getHeader("WWW-Authenticate").startsWith("Digest "));
+            assertNotNull(response.getHeader(XACML3Constants.WWW_AUTHENTICATE_HEADER));
+            assertTrue(response.getHeader(XACML3Constants.WWW_AUTHENTICATE_HEADER).startsWith("Digest "));
 
 
             // Dump all Headers

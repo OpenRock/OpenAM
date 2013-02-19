@@ -35,9 +35,19 @@ import com.sun.identity.entitlement.xacml3.XACMLConstants;
 public interface XACML3Constants extends XACMLConstants {
 
     /**
-     *
+     * XACML 3 Core Package Information.
+     */
+    public static final String XACML3_CORE_PKG
+            = "com.sun.identity.entitlement.xacml3.core";
+
+    /**
+     *  XACML 3 Default Namespace.
      */
     public static final String XACML3_NAMESPACE = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
+    /**
+     *  XACML 3 Default PDP Realm.
+     */
+    public static final String XACML3_PDP_DEFAULT_REALM = "OpenAM_XACML_PDP_Realm";
     /**
      * Constant used to identify meta alias.
      */
@@ -46,7 +56,7 @@ public interface XACML3Constants extends XACMLConstants {
     /**
      * Digest Authentication Global Constants.
      */
-    public static final String authenticationMethod = "auth";
+    public static final String authenticationMethods = "auth,auth-int";   // See http://tools.ietf.org/html/rfc2617
     public static final String USERNAME = "username";
 
     /**
@@ -63,13 +73,6 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
 
     public static final String PDP_AUTHORIZATION_ENDPOINT = "/xacml/pdp/"+AUTHORIZATION;
-
-    /**
-     * Default Response
-     */
-    public static final String DEFAULT_RESPONSE = XML_HEADER + "<xacml-ctx:response " +
-            "xmlns:xacml-ctx=\"" + XACML3_NAMESPACE + "\">" +
-            "</xacml-ctx:response>";
 
     /**
      * Current Standards Schema Resource Name.

@@ -25,13 +25,15 @@
  */
 package org.forgerock.identity.openam.xacml.v3.model;
 
-import com.sun.identity.entitlement.xacml3.core.Response;
+import com.sun.identity.entitlement.xacml3.core.*;
 import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.POJOToJsonUtility;
 import org.forgerock.identity.openam.xacml.v3.commons.POJOToXmlUtility;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBException;
+import javax.xml.validation.Schema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -90,10 +92,6 @@ public class XACMLRequestInformation implements Serializable {
      * Optional HTTP Digest Authorization Request
      */
     private String authenticationHeader;
-    /**
-     * Indicates if this Request has been authenticated or not.
-     */
-    private boolean authenticated;
     /**
      * Content, can be either XML or JSON depending upon the specified ContentType.
      * If this object is Null, we have an Anonymous/Guest Request.
@@ -240,11 +238,9 @@ public class XACMLRequestInformation implements Serializable {
      */
     XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery;
     /**
-     * Response Field for Request,
-     * Digest Valid Indicator.
-     * Can be False, if a XACMLAuthzDecisionQuery is performed.
+     * Indicates if this Request has been authenticated or not.
      */
-    private boolean digestValid = false;
+    private boolean authenticated;
     /**
      * Response Field for Request.
      * Contains XACML Response Object.
@@ -285,6 +281,8 @@ public class XACMLRequestInformation implements Serializable {
         if (request.getContentLength() > 0) {
             this.originalContent = this.getRequestBody(request);
         }
+        // Pull our Authentication Header if One Exists as a response from an initial Digest.
+        this.setAuthenticationHeader(request.getHeader(XACML3Constants.AUTHORIZATION));
     }
 
 
@@ -484,33 +482,42 @@ public class XACMLRequestInformation implements Serializable {
         this.parsedCorrectly = parsedCorrectly;
     }
 
-    public boolean isDigestValid() {
-        return digestValid;
-    }
-
-    public void setDigestValid(boolean digestValid) {
-        this.digestValid = digestValid;
-    }
-
     /**
      * Produces String Content based upon Request Content Type.
      * @param requestContentType
      * @return
      */
-    public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) throws IOException {
+    public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) {
         if (requestContentType.commonType().equals(CommonType.XML)) {
-          return POJOToXmlUtility.toString(this.getXacmlResponse());
+            try {
+                return POJOToXmlUtility.toString(this.getXacmlResponse());
+            } catch(Exception exception) {
+                return null;
+            }
         } else {
-          return POJOToJsonUtility.toString(this.getXacmlResponse());
+            try {
+                return POJOToJsonUtility.toString(this.getXacmlResponse());
+            } catch(Exception exception) {
+                return null;
+            }
         }
     }
 
     public Response getXacmlResponse() {
-        return xacmlResponse;
+        if ( (this.xacmlResponse == null) || (this.xacmlResponse.getResult() == null) ||
+             (this.xacmlResponse.getResult().isEmpty()) ) {
+            return new XACMLDefaultResponse();
+        } else {
+            return this.xacmlResponse;
+        }
     }
 
     public void setXacmlResponse(Response xacmlResponse) {
-        this.xacmlResponse = xacmlResponse;
+        if (this.xacmlResponse == null) {
+            this.xacmlResponse =  new XACMLDefaultResponse();
+        } else {
+            this.xacmlResponse = xacmlResponse;
+        }
     }
 
     public boolean isRequestProcessed() {
@@ -550,7 +557,6 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", requestServerName='").append(requestServerName).append('\'');
         sb.append(", requestLocalPort=").append(requestLocalPort);
         sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
-        sb.append(", digestValid=").append(digestValid);
         sb.append(", xacmlResponse=").append(xacmlResponse);
         sb.append('}');
         return sb.toString();
@@ -593,6 +599,5 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(this.getRequestServletPath());
         return sb.toString();
     }
-
 
 }
