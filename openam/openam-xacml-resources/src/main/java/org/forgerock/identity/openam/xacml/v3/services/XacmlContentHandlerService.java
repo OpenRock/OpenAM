@@ -880,6 +880,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
             (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp/"))) {
 
+            // TODO
+
             // TODO Process PDP Request, Hook into existing code base here......
             //xacmlRequestProcessor.processRequest()
 
@@ -893,8 +895,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Render our Response, response Setting should be set prior, if not
         // it will set a default Indeterminate Result Response.
         String responseContent = xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType);
-        response.setStatus(HttpServletResponse.SC_OK);      // 200.
-        renderResponse(requestContentType, responseContent, response);
+        renderServerOKResponse(requestContentType, responseContent, response);
     }
 
     // ******************************************************************************************************
@@ -1144,7 +1145,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             return;
         }
         try {
-            // The Original Content will be UnMarshalled into a Map Object stored in Content.
+            // The Original Content will be UnMarshaled into a Map Object stored in Content.
             xacmlRequestInformation.setContent(JsonToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
             xacmlRequestInformation.setParsedCorrectly(true);
         } catch (IOException ioe) {

@@ -59,7 +59,7 @@ public class TestPOJOToXmlUtility {
         XACMLDefaultResponse xacmlDefaultResponse = new XACMLDefaultResponse();
         assertNotNull(xacmlDefaultResponse);
 
-        String xml = POJOToXmlUtility.toString(xacmlDefaultResponse);
+        String xml = POJOToXmlUtility.toXML(xacmlDefaultResponse);
         assertNotNull(xml);
 
         System.out.println("XML: "+xml);

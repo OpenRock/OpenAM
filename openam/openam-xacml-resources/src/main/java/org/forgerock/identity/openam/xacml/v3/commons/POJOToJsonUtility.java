@@ -65,7 +65,7 @@ public class POJOToJsonUtility {
      * @return
      * @throws java.io.IOException
      */
-    public static String toString(Object object) throws IOException {
+    public static String toJSON(Object object) throws IOException {
         if (object == null) {
             return null;
         }

@@ -25,25 +25,31 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
-
 /**
- * XACML PIP Resource Interface.
+ * XACML PIP Resource In-Memory Resource Bucket Service.
  * <p/>
  * Policy Information Point (PIP)
  *
  * The system entity that acts as a source of various Attribute Values.
  *
- * Depending upon the Implementation will provide where Policy Information is obtained.
+ * This Implementation will provide and In-Memory Concrete PIP Object.
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPIPResource extends XACML3Constants {
+public class XacmlPIPResourceInMemoryImpl implements XacmlPIPResource {
 
-    Object get(String bucketName, String resourceName);
+    public Object get(String bucketName, String resourceName) {
+        // TODO
+        return null;
+    }
 
-    boolean set(String bucketName, String resourceName, Object value);
+    public boolean set(String bucketName, String resourceName, Object value) {
+        // TODO
+        return false;
+    }
 
-    boolean remove(String bucketName, String resourceName);
-
+    public boolean remove(String bucketName, String resourceName) {
+        // TODO
+        return false;
+    }
 }

@@ -25,10 +25,8 @@
 package org.forgerock.identity.openam.xacml.v3.commons;
 
 
-import com.sun.identity.entitlement.xacml3.core.DecisionType;
 import com.sun.identity.entitlement.xacml3.core.Response;
-import com.sun.identity.entitlement.xacml3.core.Result;
-import com.sun.identity.entitlement.xacml3.core.Status;
+
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
 /**
@@ -57,7 +55,7 @@ public class POJOToXmlUtility implements XACML3Constants {
      * @return
      * @throws java.io.IOException
      */
-    public static String toString(final Response response) {
+    public static String toXML(final Response response) {
         if (response == null) {
             return null;
         }
@@ -65,7 +63,7 @@ public class POJOToXmlUtility implements XACML3Constants {
         // **********************************************
         // Transform/Marshal/Serialize Request Object to
         // XML Object.
-        stringBuilder.append(XML_HEADER + "/n");
+        stringBuilder.append(XML_HEADER);
         stringBuilder.append(response.toXML());
         // Return -- Marshaled Response Object to send over the wire.
         return stringBuilder.toString();

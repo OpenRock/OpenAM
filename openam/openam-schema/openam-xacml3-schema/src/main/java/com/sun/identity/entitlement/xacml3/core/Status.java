@@ -154,9 +154,21 @@ public class Status implements XACMLRootElement {
      */
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
-
-
-
+        // Begin Status Node.
+        stringBuilder.append("<Status>");
+        if (this.getStatusCode() != null) {
+            stringBuilder.append(this.getStatusCode().toXML());
+        }
+        if (this.getStatusMessage() != null) {
+            stringBuilder.append("<StatusMessage>");
+            stringBuilder.append(this.getStatusMessage());
+            stringBuilder.append("</StatusMessage>");
+        }
+        if (this.getStatusDetail() != null) {
+            stringBuilder.append(this.getStatusDetail().toXML());
+        }
+        // End Status Node.
+        stringBuilder.append("</Status>");
         // Return Marshaled Data.
         return stringBuilder.toString();
     }

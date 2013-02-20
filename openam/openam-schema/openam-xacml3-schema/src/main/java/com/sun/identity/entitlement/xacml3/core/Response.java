@@ -35,6 +35,7 @@
 package com.sun.identity.entitlement.xacml3.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.*;
 
@@ -102,20 +103,21 @@ public class Response implements XACMLRootElement {
      */
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<").append("Response").
+        stringBuilder.append("<").append("Response ").
                 append("xmlns=\"" + XACML3_NAMESPACE + "\"").
                 append(">");
         // ************************************************
         // Iterate over the Response Object to Marshal
         // into XML.
-        for (Result result : this.getResult()) {
+        Iterator<Result> resultIterator = this.getResult().iterator();
+        while(resultIterator.hasNext()) {
+            Result result = resultIterator.next();
             if (result != null) {
-                result.toXML();
+                stringBuilder.append(result.toXML());
             }
-
         } // End of Loop for Embedded Results.
         // Finalize Response Node.
-        stringBuilder.append("</").append(this.getClass().getSimpleName()).append(">");
+        stringBuilder.append("</Response>");
         // Return Marshaled Data.
         return stringBuilder.toString();
     }

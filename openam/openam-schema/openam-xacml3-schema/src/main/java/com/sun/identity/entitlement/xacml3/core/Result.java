@@ -35,6 +35,7 @@
 package com.sun.identity.entitlement.xacml3.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -246,21 +247,25 @@ public class Result implements XACMLRootElement {
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
         // Begin Result Node.
-        stringBuilder.append("<").append(this.getClass().getSimpleName()).append(">/n");
+        stringBuilder.append("<Result>");
+        // Begin Decision
+        stringBuilder.append("<Decision>"); // Required.
         if (this.getDecision() != null) {
-            stringBuilder.append("<Decision>").append(this.getDecision().value()).append("</Decision>").append("\n");
+            stringBuilder.append(this.getDecision().value());
         } else {
-            stringBuilder.append("<Decision>").append(DecisionType.INDETERMINATE.value()).append("</Decision>").append("\n");
+            stringBuilder.append(DecisionType.INDETERMINATE.value());
         }
+        // End Decision
+        stringBuilder.append("</Decision>");
 
         // Begin Status Marshaling, if Applicable
         if (this.getStatus() != null) {
             stringBuilder.append(this.getStatus().toXML());
         }
 
-        // Begin Attributes Marshaling, if Applicable
-        if (this.getAttributes() != null) {
-            stringBuilder.append(this.getAttributes() );
+        // Begin Obligations Marshaling, if Applicable
+        if (this.getObligations() != null) {
+            stringBuilder.append(this.getObligations().toXML());
         }
 
         // Begin Associated Advice Marshaling, if Applicable
@@ -268,9 +273,20 @@ public class Result implements XACMLRootElement {
             stringBuilder.append(this.getAssociatedAdvice().toXML());
         }
 
-        // Begin Obligations Marshaling, if Applicable
-        if (this.getObligations() != null) {
-            stringBuilder.append(this.getObligations().toXML());
+        // Begin Attributes Marshaling, if Applicable
+        if ( (this.getAttributes() != null) && (this.getAttributes().size() > 0) ) {
+            stringBuilder.append("<Attributes>");
+            // ************************************************
+            // Iterate over the Response Object to Marshal
+            // into XML.
+            Iterator<Attributes> attributesIterator =  this.getAttributes().iterator();
+            while(attributesIterator.hasNext()) {
+                Attributes innerAttributes = attributesIterator.next();
+                if (innerAttributes != null) {
+                    stringBuilder.append(innerAttributes.toXML());
+                }
+            } // End of Loop for Embedded Results.
+            stringBuilder.append("</Attributes>");
         }
 
         // Begin Policy Identifier List Marshaling, if Applicable
@@ -279,7 +295,7 @@ public class Result implements XACMLRootElement {
         }
 
         // Finalize Result Node.
-        stringBuilder.append("</"+this.getClass().getName()).append("/n");
+        stringBuilder.append("</Result>");
         // Return Marshaled Data.
         return stringBuilder.toString();
     }

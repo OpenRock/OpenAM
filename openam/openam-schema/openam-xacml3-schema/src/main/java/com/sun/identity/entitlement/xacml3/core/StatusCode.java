@@ -128,9 +128,11 @@ public class StatusCode implements XACMLRootElement {
      */
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
-
-
-
+        // Begin Status Node.
+        stringBuilder.append("<StatusCode>");
+            stringBuilder.append(this.getValue());
+        // End Status Node.
+        stringBuilder.append("</StatusCode>");
         // Return Marshaled Data.
         return stringBuilder.toString();
     }

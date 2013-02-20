@@ -26,14 +26,13 @@
 package org.forgerock.identity.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.*;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.POJOToJsonUtility;
 import org.forgerock.identity.openam.xacml.v3.commons.POJOToXmlUtility;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
-import javax.xml.validation.Schema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -49,6 +48,11 @@ import java.util.Scanner;
  * @author jeff.schenk@forgerock.com
  */
 public class XACMLRequestInformation implements Serializable {
+    /**
+     * Define our Static resource Bundle for our debugger.
+     */
+    private static Debug debug = Debug.getInstance("amXACML");
+
     /**
      * Indicates if Request has been Processed or not.
      * Used when a XACMLAuthzDecisionQuery Wrapper of a Request
@@ -490,14 +494,18 @@ public class XACMLRequestInformation implements Serializable {
     public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) {
         if (requestContentType.commonType().equals(CommonType.XML)) {
             try {
-                return POJOToXmlUtility.toString(this.getXacmlResponse());
+                return POJOToXmlUtility.toXML(this.getXacmlResponse());
             } catch(Exception exception) {
+                debug.error(this.getClass().getSimpleName()+" Exception performing POJOToXmlUtility.toXML: " +
+                        ""+exception.getMessage(),exception);
                 return null;
             }
         } else {
             try {
-                return POJOToJsonUtility.toString(this.getXacmlResponse());
+                return POJOToJsonUtility.toJSON(this.getXacmlResponse());
             } catch(Exception exception) {
+                debug.error(this.getClass().getSimpleName()+" Exception performing POJOToJsonUtility.toXML: " +
+                        ""+exception.getMessage(),exception);
                 return null;
             }
         }

@@ -35,6 +35,7 @@
 package com.sun.identity.entitlement.xacml3.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -107,9 +108,21 @@ public class StatusDetail implements XACMLRootElement {
      */
     public String toXML() {
         StringBuilder stringBuilder = new StringBuilder();
-
-
-
+        // Begin Attributes Marshaling, if Applicable
+        if ( (this.getAny() != null) && (this.getAny().size() > 0) ) {
+            stringBuilder.append("<StatusDetail>");
+            // ************************************************
+            // Iterate over the Response Object to Marshal
+            // into XML.
+            Iterator iterator =  this.getAny().iterator();
+            while(iterator.hasNext()) {
+                Object object = iterator.next();
+                if (object != null) {
+                    object.toString();
+                }
+            } // End of Loop for Embedded Results.
+            stringBuilder.append("</StatusDetail>");
+        }
         // Return Marshaled Data.
         return stringBuilder.toString();
     }
