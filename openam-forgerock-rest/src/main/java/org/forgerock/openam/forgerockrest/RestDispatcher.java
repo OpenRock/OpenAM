@@ -23,8 +23,6 @@ import com.sun.identity.sm.SMSException;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
-import org.jvnet.wom.impl.util.Iterators;
-import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.forgerock.openam.dashboard.DashboardResource;
 
 import javax.servlet.ServletConfig;
@@ -95,29 +93,28 @@ public final class RestDispatcher {
      * Returns a request handler which will handle all requests to a realm,
      * including sub-realms, users, and groups.
      *
-     * @param path
-     *            The realm.
+     * @param path The realm.
      * @return A request handler which will handle all requests to a realm,
      *         including sub-realms, users, and groups.
      */
     private static RequestHandler realm(Map parsedDetails, final String path) {
         final Router router = new Router();
-        String endpoint =  (String)parsedDetails.get("resourceName");
-        String realmPath = (String)parsedDetails.get("realmPath");
+        String endpoint = (String) parsedDetails.get("resourceName");
+        String realmPath = (String) parsedDetails.get("realmPath");
 
         if (endpoint.equalsIgnoreCase(USERS)) {
-            router.addRoute(endpoint,new IdentityResource("user", realmPath));
-            router.addRoute(RoutingMode.STARTS_WITH, "/{user}", subrealms(parsedDetails,path));
+            router.addRoute(endpoint, new IdentityResource("user", realmPath));
+            router.addRoute(RoutingMode.STARTS_WITH, "/{user}", subrealms(parsedDetails, path));
         } else if (endpoint.equalsIgnoreCase(AGENTS)) {
-            router.addRoute(endpoint,new IdentityResource("agent", realmPath));
-            router.addRoute(RoutingMode.STARTS_WITH, "/{agent}", subrealms(parsedDetails,path));
+            router.addRoute(endpoint, new IdentityResource("agent", realmPath));
+            router.addRoute(RoutingMode.STARTS_WITH, "/{agent}", subrealms(parsedDetails, path));
         } else if (endpoint.equalsIgnoreCase(GROUPS)) {
-            router.addRoute(endpoint,new IdentityResource("group", realmPath));
-            router.addRoute(RoutingMode.STARTS_WITH, "/{group}", subrealms(parsedDetails,path));
+            router.addRoute(endpoint, new IdentityResource("group", realmPath));
+            router.addRoute(RoutingMode.STARTS_WITH, "/{group}", subrealms(parsedDetails, path));
         } else if (endpoint.equalsIgnoreCase(REALMS)) {
-            router.addRoute(endpoint,new RealmResource(realmPath));
-            router.addRoute(RoutingMode.STARTS_WITH, "/{realm}", subrealms(parsedDetails,path));
-        } else if(endpoint.equalsIgnoreCase(DASHBOARD)){
+            router.addRoute(endpoint, new RealmResource(realmPath));
+            router.addRoute(RoutingMode.STARTS_WITH, "/{realm}", subrealms(parsedDetails, path));
+        }  else if(endpoint.equalsIgnoreCase(DASHBOARD)){
             router.addRoute(endpoint,new DashboardResource());
         }
         return router;
@@ -143,81 +140,70 @@ public final class RestDispatcher {
         }
         factory = Resources.newInternalConnectionFactory(new RequestHandler() {
             public void handleAction(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> jsonValueResultHandler) {
-                //To change body of implemented methods use File | Settings | File Templates.
                 jsonValueResultHandler.handleResult(new JsonValue(new HashMap<String, Object>()));
             }
 
             public void handleCreate(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> resourceResultHandler) {
-                try{
+                try {
                     Map parsedDetails = getRequestDetails(createRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, createRequest.getResourceName());
                     rootRealm.handleCreate(serverContext, createRequest, resourceResultHandler);
-                } catch( NotFoundException nfe) {
+                } catch (NotFoundException nfe) {
                     // URL not valid request
                     resourceResultHandler.handleError(nfe);
                 }
             }
 
             public void handleDelete(ServerContext serverContext, DeleteRequest deleteRequest, ResultHandler<Resource> resourceResultHandler) {
-                try{
+                try {
                     Map parsedDetails = getRequestDetails(deleteRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, deleteRequest.getResourceName());
                     rootRealm.handleDelete(serverContext, deleteRequest, resourceResultHandler);
-                } catch( NotFoundException nfe) {
+                } catch (NotFoundException nfe) {
                     // URL not valid request
                     resourceResultHandler.handleError(nfe);
                 }
             }
 
             public void handlePatch(ServerContext serverContext, PatchRequest patchRequest, ResultHandler<Resource> resourceResultHandler) {
-                try{
+                try {
                     Map parsedDetails = getRequestDetails(patchRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, patchRequest.getResourceName());
                     rootRealm.handlePatch(serverContext, patchRequest, resourceResultHandler);
-                } catch( NotFoundException nfe) {
+                } catch (NotFoundException nfe) {
                     // URL not valid request
                     resourceResultHandler.handleError(nfe);
                 }
             }
 
             public void handleQuery(ServerContext serverContext, QueryRequest queryRequest, QueryResultHandler queryResultHandler) {
-                try{
+                try {
                     Map parsedDetails = getRequestDetails(queryRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, queryRequest.getResourceName());
                     rootRealm.handleQuery(serverContext, queryRequest, queryResultHandler);
-                } catch( NotFoundException nfe) {
+                } catch (NotFoundException nfe) {
                     // URL not valid request
                     queryResultHandler.handleError(nfe);
                 }
             }
 
             public void handleRead(ServerContext serverContext, ReadRequest readRequest, ResultHandler<Resource> resourceResultHandler) {
-
-                String realmPath = null;
-                String endpoint = null;
-                String resourceId = null;
-                try{
+                try {
                     Map parsedDetails = getRequestDetails(readRequest.getResourceName());
-                    realmPath = (String)parsedDetails.get("realmPath");
-                    endpoint = (String)parsedDetails.get("resourceName");
-                    resourceId = (String)parsedDetails.get("resourceId");
-                    if(null == realmPath || null == endpoint ){
-                        resourceResultHandler.handleError(new PermanentException(404, "Cannot create collection.", null));
-                    }
                     final RequestHandler rootRealm = realm(parsedDetails, readRequest.getResourceName());
                     rootRealm.handleRead(serverContext, readRequest, resourceResultHandler);
-                } catch( NotFoundException nfe) {
+                } catch (NotFoundException nfe) {
                     // URL not valid request
                     resourceResultHandler.handleError(nfe);
                 }
             }
 
             public void handleUpdate(ServerContext serverContext, UpdateRequest updateRequest, ResultHandler<Resource> resourceResultHandler) {
-                try{
+                try {
                     Map parsedDetails = getRequestDetails(updateRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, updateRequest.getResourceName());
                     rootRealm.handleUpdate(serverContext, updateRequest, resourceResultHandler);
-                } catch( NotFoundException nfe) {
+                } catch (NotFoundException nfe) {
                     // URL not valid request
                     resourceResultHandler.handleError(nfe);
                 }
@@ -237,11 +223,10 @@ public final class RestDispatcher {
     /**
      * Returns a request handler which will handle requests to a sub-realm.
      *
-     * @param parentPath
-     *            The parent realm.
+     * @param parentPath The parent realm.
      * @return A request handler which will handle requests to a sub-realm.
      */
-    private static RequestHandler subrealms(final Map parsedDetails,final String parentPath) {
+    private static RequestHandler subrealms(final Map parsedDetails, final String parentPath) {
         return new RequestHandler() {
 
             public void handleAction(final ServerContext context, final ActionRequest request,
@@ -279,9 +264,8 @@ public final class RestDispatcher {
                 subrealm(parentPath, context).handleUpdate(context, request, handler);
             }
 
-            private RequestHandler subrealm(final String parentPath,
-                                            final ServerContext context) {
-                return realm(parsedDetails,parentPath);
+            private RequestHandler subrealm(final String parentPath, final ServerContext context) {
+                return realm(parsedDetails, parentPath);
             }
         };
     }
@@ -294,7 +278,11 @@ public final class RestDispatcher {
     private SSOToken getSSOToken() {
         return (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
-
+    /*
+     * Checks endpoint to make sure it has been reserved.
+     * @param token endpoint that needs verification
+     * @boolean true is the endpoint is valid, false if the endpoint has not been defined
+     */
     private boolean checkValidEndpoint(String token) {
         Set<String> endPoints = getEndpointList();
         if (endPoints.contains(token)) {
@@ -309,8 +297,8 @@ public final class RestDispatcher {
      * @return Map containing realmPath, resourceName, and resourceID
      * @throws NotFoundException when configuration manager cannot retrieve a realm
      */
-    private Map<String,String> getRequestDetails(String resourceName) throws NotFoundException {
-        Map<String,String> details = new HashMap<String,String>(3);
+    private Map<String, String> getRequestDetails(String resourceName) throws NotFoundException {
+        Map<String, String> details = new HashMap<String, String>(3);
         if (StringUtils.isBlank(resourceName)) {
             return null;
         }
@@ -326,8 +314,8 @@ public final class RestDispatcher {
         OrganizationConfigManager ocm = null;
 
         try {
-            ocm = new OrganizationConfigManager(getSSOToken(),realmPath.toString());
-        } catch (SMSException smse){
+            ocm = new OrganizationConfigManager(getSSOToken(), realmPath.toString());
+        } catch (SMSException smse) {
             throw new NotFoundException(smse.getMessage(), smse);
         }
         while (tokenizer.hasMoreElements()) {
@@ -344,12 +332,12 @@ public final class RestDispatcher {
                             realmPath.append("/").append(lastNonBlank);
                         }
                         ocm = new OrganizationConfigManager(getSSOToken(), realmPath.toString());
-                    } catch (SMSException smse){
+                    } catch (SMSException smse) {
                         // cannot retrieve realm, must be endpoint
                         debug.warning(next + "is the endpoint because it is not a realm");
                         endpoint = new StringBuilder("/");
                         endpoint.append(lastNonBlank);
-                        if(!checkValidEndpoint(endpoint.toString())){
+                        if (!checkValidEndpoint(endpoint.toString())) {
                             debug.warning(endpoint.toString() + "is the endpoint because it is not a realm");
                             throw new NotFoundException("Endpoint " + endpoint.toString() + " is not a defined endpoint.");
                         }
@@ -375,18 +363,20 @@ public final class RestDispatcher {
             }
         }
 
-        details.put("realmPath",realmPath.toString());
+        details.put("realmPath", realmPath.toString());
 
-        if(null != endpoint && !endpoint.toString().isEmpty()){
+        if (null != endpoint && !endpoint.toString().isEmpty()) {
             details.put("resourceName", endpoint.toString());
         } else {
             endpoint = new StringBuilder("/");
-            details.put("resourceName",endpoint.append(lastNonBlank).toString());
+            details.put("resourceName", endpoint.append(lastNonBlank).toString());
         }
         if (null != resourceID) {
             details.put("resourceId", resourceID.append("/").append(lastNonBlankID).toString());
-        } else {
+        } else if (null != lastNonBlank) {
             details.put("resourceId", lastNonBlankID);
+        } else {
+            throw new NotFoundException("Resource ID has not been provided.");
         }
 
         return details;
