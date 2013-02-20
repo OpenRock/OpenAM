@@ -26,23 +26,28 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+urn:oasis:names:tc:xacml:1.0:function:double-equal
+This function SHALL take two arguments of data-type
+“http://www.w3.org/2001/XMLSchema#double” and SHALL return
+an “http://www.w3.org/2001/XMLSchema#boolean”.
+It SHALL perform its evaluation on doubles according to IEEE 754 [IEEE754].
 */
+
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 public class DoubleEqual extends XACMLFunction {
 
-    public DoubleEqual(String attrID, Object attrValue)  {
-        setAttributeID(attrID);
-        setValue(attrValue);
+    public DoubleEqual()  {
     }
     public boolean evaluate( XACMLPIPObject pip){
-        return false;
+        if ( getArgCount() != 2) {
+            return false;
+        }
+        String s = (String)getArg(0).getValue(pip);
+        Double arg0 = Double.parseDouble(s);
+        String s1 = (String)getArg(1).getValue(pip);
+        Double arg1 = Double.parseDouble(s1);
+
+        return arg0.equals(arg1);
     }
 }

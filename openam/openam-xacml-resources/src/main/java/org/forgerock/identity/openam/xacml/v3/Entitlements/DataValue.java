@@ -23,30 +23,26 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.v3.Functions;
+
+package org.forgerock.identity.openam.xacml.v3.Entitlements;
+
+
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:integer-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#integer”
- and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
- The function SHALL return “True” if and only if the two arguments represent the same number.
+    This class Encapsulates a DataValue from the XACML policy.
+    In this case, we have the actual Data in the object
+
  */
 
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+public class DataValue extends FunctionArgument {
+    private Object data;
 
-public class IntegerEqual extends XACMLFunction {
+    public DataValue(String type, Object value) {
+        setType(type);
+        data = value;
+    };
 
-    public IntegerEqual()  {
-    }
-    public boolean evaluate( XACMLPIPObject pip){
-        if ( getArgCount() != 2) {
-            return false;
-        }
-        String s = (String)getArg(0).getValue(pip);
-        Integer arg0 = Integer.parseInt(s);
-        String s1 = (String)getArg(1).getValue(pip);
-        Integer arg1 = Integer.parseInt(s1);
-
-        return arg0.equals(arg1);
+    public Object getValue(XACMLPIPObject pip) {
+        return data;
     }
 }

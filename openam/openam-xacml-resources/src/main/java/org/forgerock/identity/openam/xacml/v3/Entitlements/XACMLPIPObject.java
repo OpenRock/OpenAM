@@ -27,4 +27,7 @@
 package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
 public class XACMLPIPObject {
+    public Object resolve(String category, String AttributeID) {
+        return null;
+    }
 }

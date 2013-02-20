@@ -24,7 +24,11 @@
  *
  */
 package org.forgerock.identity.openam.xacml.v3.Functions;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /*
@@ -33,16 +37,31 @@ import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
     ResourceID, and a Value, which will be checked
     when the function is evaluated.
  */
-public abstract class XACMLFunction {
-    private String attributeID;
-    private Object value;
+public abstract class XACMLFunction extends FunctionArgument {
+    private List<FunctionArgument> arguments;
 
-    public void setAttributeID(String s) {
-        attributeID = s;
-        };
-    public void setValue(Object obj) {
-        value = obj;
-        };
+    public XACMLFunction() {
+        arguments = new ArrayList<FunctionArgument>();
+    }
 
+    public void addArgument(FunctionArgument arg) {
+        arguments.add(arg);
+    };
+    public void addArgument(List<FunctionArgument> args) {
+        arguments.addAll(args);
+    };
+    public Object getValue(XACMLPIPObject pip) {
+        return evaluate(pip);
+    };
     abstract public boolean evaluate( XACMLPIPObject pip);
+
+
+    /* Protected methods only for subclasses */
+
+    protected FunctionArgument getArg(int index) {
+        return arguments.get(index);
+    }
+    protected int getArgCount() {
+        return arguments.size();
+    }
 }
