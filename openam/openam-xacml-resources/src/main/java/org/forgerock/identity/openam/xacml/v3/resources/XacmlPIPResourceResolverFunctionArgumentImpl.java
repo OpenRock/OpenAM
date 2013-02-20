@@ -26,20 +26,31 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * XACML PIP Resource Interface.
+ * XACML PIP Resource In-Memory Resource Bucket Service.
  * <p/>
  * Policy Information Point (PIP)
  *
  * The system entity that acts as a source of various Attribute Values.
  *
- * Depending upon the Implementation will provide where Policy Information is obtained.
+ * This Implementation will provide and In-Memory Concrete PIP Object.
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPIPResource extends XACML3Constants {
+public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResource {
+
+    private Map<XacmlPIPResourceIdentifier, FunctionArgument> resourceResolutionMap;
+
+    /**
+     * Default Constructor.
+     */
+    public XacmlPIPResourceResolverFunctionArgumentImpl() {
+        this.clear();
+    }
 
     /**
      * Put a new instance of a FunctionArgument based upon Category and Attribute ID, which
@@ -51,28 +62,44 @@ public interface XacmlPIPResource extends XACML3Constants {
      * @return
      */
     public boolean put(String category, String attributeId, String dataType, String value,
-                       boolean includeInResult, FunctionArgument functionArgument);
+                       boolean includeInResult, FunctionArgument functionArgument) {
+        XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
+                new XacmlPIPResourceIdentifier(category, attributeId, dataType, value, includeInResult);
+        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier, functionArgument);
+        return true;
+    }
 
     /**
      * Remove an instance of a FunctionArgument based upon Category and Attribute ID.
      *
      * @param category
-     * @param AttributeID
+     * @param attributeId
      * @return
      */
-    public boolean remove(String category, String AttributeID);
+    public boolean remove(String category, String attributeId) {
+        XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
+                new XacmlPIPResourceIdentifier(category, attributeId);
+        this.resourceResolutionMap.remove(xacmlPIPResourceIdentifier);
+        return true;
+    }
 
     /**
      * Resolve a Policy Resource Request Function Argument by using the Category and Attribute ID.
+     *
      * @param category
-     * @param AttributeID
+     * @param attributeId
      * @return
      */
-    public FunctionArgument resolve(String category, String AttributeID);
+    public FunctionArgument resolve(String category, String attributeId) {
+        XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
+                new XacmlPIPResourceIdentifier(category, attributeId);
+        return this.resourceResolutionMap.get(xacmlPIPResourceIdentifier);
+    }
 
     /**
      * Clear out the Entire Map.
      */
-    public void clear();
-
+    public void clear() {
+        this.resourceResolutionMap = new HashMap<XacmlPIPResourceIdentifier, FunctionArgument>();
+    }
 }
