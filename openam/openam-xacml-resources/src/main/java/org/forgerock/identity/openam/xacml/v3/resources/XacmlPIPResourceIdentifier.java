@@ -38,7 +38,10 @@ import java.io.Serializable;
  * @author Jeff.Schenk@forgerock.com
  */
 public class XacmlPIPResourceIdentifier implements Serializable {
-
+    /**
+     * Request Identifier to keep things consistent among Requests.
+     */
+    private String requestId;
     /**
      * XACML Category URN
      * Example:
@@ -52,14 +55,6 @@ public class XacmlPIPResourceIdentifier implements Serializable {
      */
     private String attributeId;
     /**
-     * XACML Value DataType
-     */
-    private String dataType;
-    /**
-     * XACML Data Value, Respective or Category and Attribute Id.
-     */
-    private String value;
-    /**
      * XACML Value, to indicate if this value should be contained in the XACML Result.
      */
     private boolean includeInResult;
@@ -71,31 +66,29 @@ public class XacmlPIPResourceIdentifier implements Serializable {
     }
 
     /**
-     * Constructor with minimal required fields to instantiate this Object Type.
+     * Constructor with all required fields to instantiate this Element Entry.
+     * @param requestId
      * @param category
      * @param attributeId
+     * @param includeInResult
      */
-    public XacmlPIPResourceIdentifier(String category, String attributeId) {
+    public XacmlPIPResourceIdentifier(String requestId, String category, String attributeId, boolean includeInResult) {
+        this.requestId = requestId;
         this.category = category;
         this.attributeId = attributeId;
+        this.includeInResult = includeInResult;
     }
 
     /**
-     * Constructor with all Fields.
-     *
+     * Constructor with minimal required fields to instantiate this Object Type.
+     * @param requestId
      * @param category
      * @param attributeId
-     * @param dataType
-     * @param value
-     * @param includeInResult
      */
-    public XacmlPIPResourceIdentifier(String category, String attributeId, String dataType, String value,
-                                      boolean includeInResult) {
+    public XacmlPIPResourceIdentifier(String requestId, String category, String attributeId) {
+        this.requestId = requestId;
         this.category = category;
         this.attributeId = attributeId;
-        this.dataType = dataType;
-        this.value = value;
-        this.includeInResult = includeInResult;
     }
 
     public String getCategory() {
@@ -114,22 +107,6 @@ public class XacmlPIPResourceIdentifier implements Serializable {
         this.attributeId = attributeId;
     }
 
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public boolean isIncludeInResult() {
         return includeInResult;
     }
@@ -142,22 +119,15 @@ public class XacmlPIPResourceIdentifier implements Serializable {
     public String toString() {
         final StringBuffer sb = new StringBuffer();
         sb.append("XacmlPIPResourceIdentifier");
-        sb.append("{category='").append(category).append('\'');
+        sb.append("{requestId='").append(requestId).append('\'');
+        sb.append(", category='").append(category).append('\'');
         sb.append(", attributeId='").append(attributeId).append('\'');
-        sb.append(", dataType='").append(dataType).append('\'');
-        sb.append(", value='").append(value).append('\'');
         sb.append(", includeInResult=").append(includeInResult);
         sb.append('}');
         return sb.toString();
     }
 
-    /**
-     * Override of Equals to ensure we take into consideration
-     * the Category and AttributeId fields as our complex Identifier.
-     *
-     * @param o
-     * @return boolean - Indicates if Object is Equal or Not.
-     */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -167,19 +137,15 @@ public class XacmlPIPResourceIdentifier implements Serializable {
 
         if (attributeId != null ? !attributeId.equals(that.attributeId) : that.attributeId != null) return false;
         if (category != null ? !category.equals(that.category) : that.category != null) return false;
+        if (requestId != null ? !requestId.equals(that.requestId) : that.requestId != null) return false;
 
         return true;
     }
 
-    /**
-     * Override of Hash Code to ensure we take into consideration
-     * the Category and AttributeId fields as our complex Identifier.
-     *
-     * @return int - calculated Hash Code.
-     */
     @Override
     public int hashCode() {
-        int result = category != null ? category.hashCode() : 0;
+        int result = requestId != null ? requestId.hashCode() : 0;
+        result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (attributeId != null ? attributeId.hashCode() : 0);
         return result;
     }

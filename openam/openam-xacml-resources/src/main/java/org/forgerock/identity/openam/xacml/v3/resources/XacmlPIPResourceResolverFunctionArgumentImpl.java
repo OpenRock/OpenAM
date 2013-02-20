@@ -25,6 +25,7 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
+import org.forgerock.identity.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 
 import java.util.HashMap;
@@ -56,29 +57,31 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      * Put a new instance of a FunctionArgument based upon Category and Attribute ID, which
      * have been parsed upstream.
      *
+     * @param requestId
      * @param category
      * @param attributeId
-     * @param functionArgument
      * @return
      */
-    public boolean put(String category, String attributeId, String dataType, String value,
-                       boolean includeInResult, FunctionArgument functionArgument) {
+    public boolean put(String requestId, String category, String attributeId, String dataType, String value,
+                       boolean includeInResult) {
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
-                new XacmlPIPResourceIdentifier(category, attributeId, dataType, value, includeInResult);
-        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier, functionArgument);
+                new XacmlPIPResourceIdentifier(requestId, category, attributeId, includeInResult);
+
+        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value));
         return true;
     }
 
     /**
      * Remove an instance of a FunctionArgument based upon Category and Attribute ID.
      *
+     * @param requestId
      * @param category
      * @param attributeId
      * @return
      */
-    public boolean remove(String category, String attributeId) {
+    public boolean remove(String requestId, String category, String attributeId) {
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
-                new XacmlPIPResourceIdentifier(category, attributeId);
+                new XacmlPIPResourceIdentifier(requestId, category, attributeId);
         this.resourceResolutionMap.remove(xacmlPIPResourceIdentifier);
         return true;
     }
@@ -86,13 +89,14 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
     /**
      * Resolve a Policy Resource Request Function Argument by using the Category and Attribute ID.
      *
+     * @param requestId
      * @param category
      * @param attributeId
      * @return
      */
-    public FunctionArgument resolve(String category, String attributeId) {
+    public FunctionArgument resolve(String requestId, String category, String attributeId) {
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
-                new XacmlPIPResourceIdentifier(category, attributeId);
+                new XacmlPIPResourceIdentifier(requestId, category, attributeId);
         return this.resourceResolutionMap.get(xacmlPIPResourceIdentifier);
     }
 

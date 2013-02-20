@@ -45,30 +45,37 @@ public interface XacmlPIPResource extends XACML3Constants {
      * Put a new instance of a FunctionArgument based upon Category and Attribute ID, which
      * have been parsed upstream.
      *
+     * @param requestId
      * @param category
      * @param attributeId
-     * @param functionArgument
+     * @param dataType
+     * @param value
+     * @param includeInResult
+     *
      * @return
      */
-    public boolean put(String category, String attributeId, String dataType, String value,
-                       boolean includeInResult, FunctionArgument functionArgument);
+    public boolean put(String requestId, String category, String attributeId, String dataType, String value,
+                       boolean includeInResult);
 
     /**
      * Remove an instance of a FunctionArgument based upon Category and Attribute ID.
      *
+     * @param requestId
      * @param category
      * @param AttributeID
      * @return
      */
-    public boolean remove(String category, String AttributeID);
+    public boolean remove(String requestId, String category, String AttributeID);
 
     /**
      * Resolve a Policy Resource Request Function Argument by using the Category and Attribute ID.
+     *
+     * @param requestId
      * @param category
      * @param AttributeID
      * @return
      */
-    public FunctionArgument resolve(String category, String AttributeID);
+    public FunctionArgument resolve(String requestId, String category, String AttributeID);
 
     /**
      * Clear out the Entire Map.
