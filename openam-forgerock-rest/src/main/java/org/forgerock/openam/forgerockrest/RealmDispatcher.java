@@ -22,6 +22,7 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 
+
 import java.security.AccessController;
 import java.util.Set;
 
@@ -70,6 +71,7 @@ public final class RealmDispatcher {
     private static void initGlobalEndpoints(OrganizationConfigManager ocm, Router router) {
         // Add Session routing.
         SessionResource.applyRouting(ocm, router);
+
     }
 
     static public void initDispatcher(Router router) {

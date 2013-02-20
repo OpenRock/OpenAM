@@ -17,6 +17,7 @@ package org.forgerock.openam.dashboard;
 
 import static org.forgerock.json.resource.RoutingMode.EQUALS;
 
+import com.sun.identity.sm.OrganizationConfigManager;
 import org.forgerock.json.resource.Router;
 
 
@@ -31,7 +32,7 @@ public final class DashboardDispatcher {
     }
 
     static public void initDispatcher(Router router) {
-        router.addRoute(EQUALS, "/dashboard", new DashboardResource());
+        router.addRoute("/dashboard", new DashboardResource());
     }
 }
 

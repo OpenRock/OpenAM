@@ -25,6 +25,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 import org.jvnet.wom.impl.util.Iterators;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.forgerock.openam.dashboard.DashboardResource;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -46,6 +47,7 @@ public final class RestDispatcher {
     final static private String USERS = "/users";
     final static private String GROUPS = "/groups";
     final static private String AGENTS = "/agents";
+    final static private String DASHBOARD = "/dashboard";
 
     private static RestDispatcher instance = null;
     private RequestHandler handler = null;
@@ -68,6 +70,7 @@ public final class RestDispatcher {
         endpoints.add(GROUPS);
         endpoints.add(AGENTS);
         endpoints.add(REALMS);
+        endpoints.add(DASHBOARD);
         return endpoints;
     }
 
@@ -114,6 +117,8 @@ public final class RestDispatcher {
         } else if (endpoint.equalsIgnoreCase(REALMS)) {
             router.addRoute(endpoint,new RealmResource(realmPath));
             router.addRoute(RoutingMode.STARTS_WITH, "/{realm}", subrealms(parsedDetails,path));
+        } else if(endpoint.equalsIgnoreCase(DASHBOARD)){
+            router.addRoute(endpoint,new DashboardResource());
         }
         return router;
     }
