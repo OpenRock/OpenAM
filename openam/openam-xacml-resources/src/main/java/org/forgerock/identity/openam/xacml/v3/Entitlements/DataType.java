@@ -27,21 +27,21 @@
 package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
 public class DataType {
-    public static String STRING = "http://www.w3.org/2001/XMLSchema#string";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#integer";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#double";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#time";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#date";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#dateTime";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#anyURI";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#hexBinary";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#base64Binary";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#dayTimeDuration";
-    public static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#yearMonthDuration";
-    public static String BOOLEAN = "urn:oasis:names:tc:xacml:1.0:data-type:x500Name";
-    public static String BOOLEAN = "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name";
-    public static String BOOLEAN = "urn:oasis:names:tc:xacml:2.0:data-type:ipAddress";
-    public static String BOOLEAN = "urn:oasis:names:tc:xacml:2.0:data-type:dnsName";
-    public static String BOOLEAN = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression";
+    public static String XACMLSTRING = "http://www.w3.org/2001/XMLSchema#string";
+    public static String XACMLBOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
+    public static String XACMLINTEGER = "http://www.w3.org/2001/XMLSchema#integer";
+    public static String XACMLDOUBLE = "http://www.w3.org/2001/XMLSchema#double";
+    public static String XACMLTIME = "http://www.w3.org/2001/XMLSchema#time";
+    public static String XACMLDATE = "http://www.w3.org/2001/XMLSchema#date";
+    public static String XACMLDATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    public static String XACMLANYURI = "http://www.w3.org/2001/XMLSchema#anyURI";
+    public static String XACMLHEXBINARY = "http://www.w3.org/2001/XMLSchema#hexBinary";
+    public static String XACMLBASE64BINARY = "http://www.w3.org/2001/XMLSchema#base64Binary";
+    public static String XACMLDAYTIMEDURATION = "http://www.w3.org/2001/XMLSchema#dayTimeDuration";
+    public static String XACMLYEARMONTHDURATION = "http://www.w3.org/2001/XMLSchema#yearMonthDuration";
+    public static String XACMLX500NAME = "urn:oasis:names:tc:xacml:1.0:data-type:x500Name";
+    public static String XACMLRFC822NAME = "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name";
+    public static String XACMLIPADDRESS = "urn:oasis:names:tc:xacml:2.0:data-type:ipAddress";
+    public static String XACMLDNSNAME = "urn:oasis:names:tc:xacml:2.0:data-type:dnsName";
+    public static String XACMLXPATHEXPRESSION = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression";
 }

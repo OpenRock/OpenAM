@@ -55,7 +55,7 @@ public class Or extends XACMLFunction {
         for (int i=0;i<args;i++) {
             Boolean v = (Boolean)getArg(i).getValue(pip);
             if (v.booleanValue() == true) {
-                return    FunctionArgument.trueObject
+                return    FunctionArgument.trueObject;
             }
         }
         return retVal;

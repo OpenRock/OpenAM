@@ -26,14 +26,14 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
 This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+    and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+    The function SHALL return "True" if and only if the value of both of its
+    arguments are of equal length and each string is determined to be equal.
+    Otherwise, it SHALL return “False”. The comparison SHALL use Unicode
+    codepoint collation, as defined for the identifier
+    http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.DataValue;
@@ -54,9 +54,7 @@ public class StringEqual extends XACMLFunction {
         String s = (String)getArg(0).getValue(pip);
         if ( s.equals((String)getArg(1).getValue(pip))) {
             retVal =   FunctionArgument.trueObject;
-        } else {
-            retVal =   FunctionArgument.falseObject;
-        };
+        }
         return retVal;
     }
 }

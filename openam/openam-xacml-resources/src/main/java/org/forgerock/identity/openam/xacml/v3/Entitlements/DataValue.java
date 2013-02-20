@@ -42,7 +42,7 @@ public class DataValue extends FunctionArgument {
         data = value;
     }
 
-    public Object getValue() {
+    public Object getValue(XACMLPIPObject pip) {
         return data;
     }
 }
