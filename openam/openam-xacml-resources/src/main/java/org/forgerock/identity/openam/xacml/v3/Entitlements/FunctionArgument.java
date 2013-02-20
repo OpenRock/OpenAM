@@ -37,8 +37,10 @@ package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
  */
 public abstract class FunctionArgument {
+    public static FunctionArgument trueObject = new DataValue(DataType.BOOLEAN,"true");
+    public static FunctionArgument falseObject = new DataValue(DataType.BOOLEAN,"false");
+    public static FunctionArgument indeterminateObject = new DataValue(DataType.BOOLEAN,"indeterminate");
     private String dataType;
-
 
     public void setType(String type) {
         this.dataType = type;

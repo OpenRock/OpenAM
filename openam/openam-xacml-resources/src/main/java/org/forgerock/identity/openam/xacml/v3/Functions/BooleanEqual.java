@@ -32,6 +32,7 @@ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
 The function SHALL return "True" if and only if the arguments are equal.
 Otherwise, it SHALL return “False”.*/
 
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 public class BooleanEqual extends XACMLFunction {
@@ -39,11 +40,18 @@ public class BooleanEqual extends XACMLFunction {
     public BooleanEqual()  {
     }
 
-    public boolean evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
         if ( getArgCount() != 2) {
-            return false;
+            return retVal;
         }
         String s = (String)getArg(0).getValue(pip);
-        return s.equalsIgnoreCase((String)getArg(1).getValue(pip));
+        if ( s.equalsIgnoreCase((String) getArg(1).getValue(pip))) {
+            retVal = FunctionArgument.trueObject;
+        } else {
+            retVal = FunctionArgument.falseObject;
+        }
+        return retVal;
     }
 }

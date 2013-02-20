@@ -40,9 +40,9 @@ public class DataValue extends FunctionArgument {
     public DataValue(String type, Object value) {
         setType(type);
         data = value;
-    };
+    }
 
-    public Object getValue(XACMLPIPObject pip) {
+    public Object getValue() {
         return data;
     }
 }

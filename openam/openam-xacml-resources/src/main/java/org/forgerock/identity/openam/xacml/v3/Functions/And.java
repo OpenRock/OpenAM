@@ -36,16 +36,29 @@ The comparison SHALL use Unicode codepoint collation,
 as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
 */
 
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 
 public class And extends XACMLFunction {
 
-    public And(String attrID, Object attrValue)  {
-        setAttributeID(attrID);
-        setValue(attrValue);
+    public And()  {
     }
-    public boolean evaluate( XACMLPIPObject pip){
-        return false;
+
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        FunctionArgument retVal =  FunctionArgument.trueObject;
+
+        if ( getArgCount() == 0) {
+            return retVal;
+        }
+        int args = getArgCount();
+
+        for (int i=0;i<args;i++) {
+            Boolean v = (Boolean)getArg(i).getValue(pip);
+            if (v.booleanValue() == false) {
+                return    FunctionArgument.falseObject
+            }
+        }
+        return retVal;
     }
 }

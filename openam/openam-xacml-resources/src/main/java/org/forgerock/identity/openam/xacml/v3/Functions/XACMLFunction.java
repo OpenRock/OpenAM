@@ -51,10 +51,9 @@ public abstract class XACMLFunction extends FunctionArgument {
         arguments.addAll(args);
     };
     public Object getValue(XACMLPIPObject pip) {
-        return evaluate(pip);
+        return evaluate(pip).getValue(pip);
     };
-    abstract public boolean evaluate( XACMLPIPObject pip);
-
+    abstract public FunctionArgument evaluate( XACMLPIPObject pip);
 
     /* Protected methods only for subclasses */
 

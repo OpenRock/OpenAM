@@ -26,23 +26,36 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+urn:oasis:names:tc:xacml:1.0:function:hexBinary-equal
+
+This function SHALL take two arguments of data-type
+	“http://www.w3.org/2001/XMLSchema#hexBinary” and SHALL return an
+	“http://www.w3.org/2001/XMLSchema#boolean”. It SHALL return "True" if the octet sequences
+	represented by the value of both arguments have equal length and are equal in a conjunctive,
+	point-wise, comparison using the “urn:oasis:names:tc:xacml:1.0:function:integer-equal” function.
+	Otherwise, it SHALL return “False”. The conversion from the string representation to an octet
+	sequence SHALL be as specified in [XS] Section 3.2.15.
 */
+
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 public class HexbinaryEqual extends XACMLFunction {
 
-    public HexbinaryEqual(String attrID, Object attrValue)  {
-        setAttributeID(attrID);
-        setValue(attrValue);
+    public HexbinaryEqual()  {
     }
-    public boolean evaluate( XACMLPIPObject pip){
-        return false;
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+        String s = (String)getArg(0).getValue(pip);
+        if ( s.equalsIgnoreCase((String) getArg(1).getValue(pip))) {
+            retVal = FunctionArgument.trueObject;
+        } else {
+            retVal = FunctionArgument.falseObject;
+        }
+        return retVal;
     }
 }

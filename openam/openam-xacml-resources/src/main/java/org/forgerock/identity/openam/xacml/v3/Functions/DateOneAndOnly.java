@@ -36,13 +36,20 @@ The comparison SHALL use Unicode codepoint collation,
 as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
 */
 
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+
 public class DateOneAndOnly extends XACMLFunction {
 
-    public DateOneAndOnly(String attrID, Object attrValue)  {
-        setAttributeID(attrID);
-        setValue(attrValue);
+    public DateOneAndOnly()  {
     }
-    public boolean evaluate( XACMLPIPObject pip){
-        return false;
+
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
+        if ( getArgCount() != 1) {
+            return FunctionArgument.indeterminateObject;
+        }
+        return getArg(0);
     }
 }

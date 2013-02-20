@@ -32,21 +32,29 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
  The function SHALL return “True” if and only if the two arguments represent the same number.
  */
 
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 public class IntegerEqual extends XACMLFunction {
 
     public IntegerEqual()  {
     }
-    public boolean evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
         if ( getArgCount() != 2) {
-            return false;
+            return retVal;
         }
         String s = (String)getArg(0).getValue(pip);
         Integer arg0 = Integer.parseInt(s);
         String s1 = (String)getArg(1).getValue(pip);
         Integer arg1 = Integer.parseInt(s1);
 
-        return arg0.equals(arg1);
+        if (arg0.equals(arg1)) {
+            retVal = FunctionArgument.trueObject;
+        } else {
+            retVal = FunctionArgument.falseObject;
+        }
+        return retVal;
     }
 }

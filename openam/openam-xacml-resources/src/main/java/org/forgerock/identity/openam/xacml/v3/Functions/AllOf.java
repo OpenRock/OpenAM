@@ -25,6 +25,7 @@
  */
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 /*
@@ -38,7 +39,7 @@ public class AllOf extends XACMLFunction {
 
     public AllOf()  {
     }
-    public boolean evaluate( XACMLPIPObject pip){
-        return false;
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        return FunctionArgument.falseObject;
     }
 }

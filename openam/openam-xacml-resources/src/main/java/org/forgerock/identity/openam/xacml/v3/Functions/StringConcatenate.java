@@ -26,23 +26,38 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
+urn:oasis:names:tc:xacml:2.0:function:string-concatenate
+
 This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+This function SHALL take two or more arguments of data-type
+     "http://www.w3.org/2001/XMLSchema#string" and SHALL return a
+     "http://www.w3.org/2001/XMLSchema#string".
+     The result SHALL be the concatenation, in order, of the arguments.
 */
+
+import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
 
 public class StringConcatenate extends XACMLFunction {
 
-    public StringConcatenate(String attrID, Object attrValue)  {
-        setAttributeID(attrID);
-        setValue(attrValue);
+    public StringConcatenate()  {
     }
-    public boolean evaluate( XACMLPIPObject pip){
-        return false;
+
+    public FunctionArgument evaluate( XACMLPIPObject pip){
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
+        if ( getArgCount() < 2) {
+            return retVal;
+        }
+        int args = getArgCount();
+
+        String s = (String)getArg(0).getValue(pip);
+
+        for (int i=1; i<args; i++) {
+            s.concat((String)getArg(i).getValue(pip));
+        }
+
+        return retVal;
     }
+
 }

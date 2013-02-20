@@ -47,6 +47,6 @@ public class DataDesignator extends FunctionArgument {
     };
 
     public Object getValue(XACMLPIPObject pip) {
-        return pip.resolve(category,attributeID);
+        return pip.resolve(category,attributeID).getValue(pip);
     }
 }
