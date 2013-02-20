@@ -520,7 +520,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     /**
      * Generate the Authentication Header with our Digest.
      *
-     * @return
+     * @return String of Generated Authentication Header.
      */
     private String generateAuthenticateHeader(String realm) {
         StringBuilder header = new StringBuilder();
@@ -581,10 +581,12 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         final String classMethod = "XacmlContentHandlerService:authenticateUsingDigest";
         // *********************************************
         // Parse the Authentication Header Information.
-        debug.error(classMethod+" authenticationHeader:[" + authenticationHeader + "]"); // TODO Change Me...
-
+        if (debug.messageEnabled()) {
+            debug.message(classMethod+" authenticationHeader:[" + authenticationHeader + "]");
+        }
         String headerStringWithoutAuthScheme = authenticationHeader.substring(authenticationHeader.indexOf(" ") + 1)
                 .trim();
+        // Obtain a Map of our Authentication Header.
         HashMap<String, String> headerValues = new HashMap<String, String>();
         String keyValueArray[] = headerStringWithoutAuthScheme.split(",");
         for (String keyval : keyValueArray) {
@@ -599,13 +601,15 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Obtain Each Value for Authentication
         // of the Digest.
         String method = request.getMethod();
-        String ha1 = DigestUtils.md5Hex(USERNAME + ":" + realm + ":" + "password");    // TODO This needs to be fixed.
+        // TODO This needs to be fixed.
+        String ha1 = DigestUtils.md5Hex(USERNAME + ":" + realm + ":" + "password");
+        // TODO, Get from a PIP Implementation.
 
+        // Obtain values to compute.
         String qop = headerValues.get("qop");
         String ha2;
-
         String requestURI = headerValues.get("uri");
-
+        // determine AUTH Digest Method Details...
         if ( (StringUtils.isNotBlank(qop)) && (qop.equalsIgnoreCase("auth-int")) &&
              (StringUtils.isNotBlank(requestBody)) ) {
             String entityBodyMd5 = DigestUtils.md5Hex(requestBody);
@@ -620,8 +624,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if (StringUtils.isBlank(qop)) {
             serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":" + ha2);
         } else {
-            String domain = headerValues.get("realm");   // TODO Fix me.....
-
             String nonceCount = headerValues.get("nc");
             String clientNonce = headerValues.get("cnonce");
 
@@ -634,12 +636,12 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if ( (clientResponse == null) || (clientResponse.isEmpty()) ) {
             clientResponse = headerValues.get("solution");
         }
-
         // ******************************************************
         // Show both calculated and received value from client.
-        debug.error("*** Server Response: "+serverResponse);
-        debug.error("*** Client Response: "+clientResponse);
-
+        if (debug.messageEnabled()) {
+            debug.message("*** Server Response: "+serverResponse);
+            debug.message("*** Client Response: "+clientResponse);
+        }
         // ******************************************************
         // Check for any Nulls on either side.
         if ( (clientResponse == null) || (clientResponse.isEmpty()) ||
@@ -647,7 +649,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
              (!serverResponse.equals(clientResponse)) ) {
             return null;
         } else {
-            // Authenticate Digest is Valid.
+            // Authenticated Digest is Valid, Allow Access.
             return authenticationDigest;
         }
     }
@@ -699,11 +701,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             response.setContentLength(0);
             return ContentType.NONE;
         }
-        // ******************************************************************
-        // Set up Method Logging Incoming Request.
-        // TODO Make message level of info.
-        debug.error(classMethod + " processing Incoming Request MediaType:[" + request.getContentType() +
-                "], Content Length:[" + request.getContentLength() + "]");
         // ******************************************************************
         // Indicate preProcessing was completed with no Issues and Content
         // Type is valid with our derived ContentType.
