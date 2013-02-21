@@ -439,17 +439,13 @@ public class XacmlPDPResource implements XACML3Constants {
 
         // TODO -- Was from SOAP Method originally....
         //getRequestHandlerClass
-        RequestHandler handler =
-                (RequestHandler) XacmlContentHandlerService.getHandlers().get(key);  // TODO -- This was referencing
-        // handlers in the SOAPBindingService class.
-        if (handler != null) {
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + "Found handler");
-            }
+
 
             // TODO Figure out how to implement this.
             //samlResponse = handler.handleQuery(pdpEntityID, pepEntityID,
             //        samlRequest, requestBodyElement);
+
+
 
             // set response attributes
             samlResponse.setID(SAML2Utils.generateID());
@@ -526,11 +522,7 @@ public class XacmlPDPResource implements XACML3Constants {
             }
             signResponse(samlResponse, realm, pepEntityID, pdpEntityID);
 
-        } else {
-            // error -  missing request handler.
-            debug.error(classMethod + "RequestHandler not found");
-            throw new SAML2Exception("missingRequestHandler");
-        }
+
         return samlResponse;
     }
 

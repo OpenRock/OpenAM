@@ -55,6 +55,8 @@ public class TestXacmlContentHandlerService {
 
     private final static String testAuthzDecisionQuery_ResourceName = "test_data/xacml3_authzDecisionQuery.xml";
 
+    private final static String testSOAPEnvelope_ResourceName = "test_data/request-curtiss.xml";
+
     @BeforeClass
     public void before() throws Exception {
 
@@ -415,5 +417,37 @@ public class TestXacmlContentHandlerService {
 
     }
 
+    @Test
+    public void testUseCase_XML_SOAP_ENVELOPE() {
+
+        HttpTester request = new HttpTester();
+        request.setMethod("POST");
+        request.addHeader("Host", "example.org");
+        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.setURI("/openam/xacml/pdp");
+        request.setVersion("HTTP/1.1");
+
+        String testData = XACML3Utils.getResourceContents(testSOAPEnvelope_ResourceName);
+        assertNotNull(testData);
+        request.setContent(testData);
+
+        try {
+            // Check for a 403 Forbidden.
+            HttpTester response = new HttpTester();
+            response.parse(servletTester.getResponses(request.generate()));
+            assertEquals(response.getStatus(),403);
+            assertNotNull(response.getHeader("Content-Type"));
+            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
+
+            assertNotNull(response.getHeader("Content-Length"));
+            assertTrue(response.getHeader("Content-Length").equals("0"));
+
+        } catch (IOException ioe) {
+
+        } catch (Exception e) {
+
+        }
+
+    }
 
 }

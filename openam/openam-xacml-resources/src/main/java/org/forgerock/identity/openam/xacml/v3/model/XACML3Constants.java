@@ -59,7 +59,6 @@ public interface XACML3Constants extends XACMLConstants {
      */
     public static final String authenticationMethods = "auth,auth-int";   // See http://tools.ietf.org/html/rfc2617
     public static final String USERNAME = "username";
-
     /**
      * Common Globals Definitions
      */
@@ -67,6 +66,7 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String AUTHORIZATION = "authorization";
     public static final String DIGEST = "Digest";
     public static final String REQUEST = "Request";
+    public static final String ENVELOPE = "Envelope";
     public static final String XSI_TYPE_ATTR = "xsi:type";
     public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
     public static final String METAALIAS_KEY = "/metaAlias";

@@ -39,7 +39,7 @@ import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPIPResource extends XACML3Constants {
+public interface XacmlPIPResourceResolver extends XACML3Constants {
 
     /**
      * Put a new instance of a FunctionArgument based upon Category and Attribute ID, which
@@ -81,5 +81,11 @@ public interface XacmlPIPResource extends XACML3Constants {
      * Clear out the Entire Map.
      */
     public void clear();
+
+    /**
+     * Provide the Size of our
+     * @return
+     */
+    public int size();
 
 }

@@ -42,7 +42,7 @@ import java.util.Map;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResource {
+public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResourceResolver {
 
     private Map<XacmlPIPResourceIdentifier, FunctionArgument> resourceResolutionMap;
 
@@ -64,6 +64,9 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      */
     public boolean put(String requestId, String category, String attributeId, String dataType, String value,
                        boolean includeInResult) {
+        if (this.resourceResolutionMap == null) {
+            this.clear();
+        }
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(requestId, category, attributeId, includeInResult);
 
@@ -80,6 +83,9 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      * @return
      */
     public boolean remove(String requestId, String category, String attributeId) {
+        if (this.resourceResolutionMap == null) {
+            return true;
+        }
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(requestId, category, attributeId);
         this.resourceResolutionMap.remove(xacmlPIPResourceIdentifier);
@@ -95,6 +101,9 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      * @return
      */
     public FunctionArgument resolve(String requestId, String category, String attributeId) {
+        if (this.resourceResolutionMap == null) {
+            return null;
+        }
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(requestId, category, attributeId);
         return this.resourceResolutionMap.get(xacmlPIPResourceIdentifier);
@@ -105,5 +114,17 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      */
     public void clear() {
         this.resourceResolutionMap = new HashMap<XacmlPIPResourceIdentifier, FunctionArgument>();
+    }
+
+    /**
+     * Provide the Size of our
+     * @return
+     */
+    public int size() {
+        if (this.resourceResolutionMap == null) {
+            return 0;
+        } else {
+            return this.resourceResolutionMap.size();
+        }
     }
 }

@@ -31,6 +31,8 @@ import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.POJOToJsonUtility;
 import org.forgerock.identity.openam.xacml.v3.commons.POJOToXmlUtility;
+import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolver;
+import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolverFunctionArgumentImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -77,7 +79,11 @@ public class XACMLRequestInformation implements Serializable {
      */
     private String realm;
     /**
-     *
+     * Request Node Present in Request Content.
+     */
+    private boolean soapEnvelopeNodePresent;
+    /**
+     * Request Node Present in Request Content.
      */
     private boolean requestNodePresent;
     /**
@@ -246,6 +252,10 @@ public class XACMLRequestInformation implements Serializable {
      */
     private boolean authenticated;
     /**
+     * Our PIP Resource Resolver for
+     */
+    private XacmlPIPResourceResolver pipResourceResolver;
+    /**
      * Response Field for Request.
      * Contains XACML Response Object.
      */
@@ -287,6 +297,9 @@ public class XACMLRequestInformation implements Serializable {
         }
         // Pull our Authentication Header if One Exists as a response from an initial Digest.
         this.setAuthenticationHeader(request.getHeader(XACML3Constants.AUTHORIZATION));
+        // Instantiate a new PIP Resource for our Request for eventual Evaluation of Request against
+        // our current Policy Base.
+
     }
 
 
@@ -474,6 +487,22 @@ public class XACMLRequestInformation implements Serializable {
         this.requestLocalPort = requestLocalPort;
     }
 
+    public boolean isSoapEnvelopeNodePresent() {
+        return soapEnvelopeNodePresent;
+    }
+
+    public void setSoapEnvelopeNodePresent(boolean soapEnvelopeNodePresent) {
+        this.soapEnvelopeNodePresent = soapEnvelopeNodePresent;
+    }
+
+    public XacmlPIPResourceResolver getPipResourceResolver() {
+        return pipResourceResolver;
+    }
+
+    public void setPipResourceResolver(XacmlPIPResourceResolver pipResourceResolver) {
+        this.pipResourceResolver = pipResourceResolver;
+    }
+
     // **********************************************
     // Response Fields for Request
     // **********************************************
@@ -536,21 +565,22 @@ public class XACMLRequestInformation implements Serializable {
         this.requestProcessed = requestProcessed;
     }
 
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuffer sb = new StringBuffer();
         sb.append("XACMLRequestInformation");
         sb.append("{requestProcessed=").append(requestProcessed);
         sb.append(", parsedCorrectly=").append(parsedCorrectly);
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
         sb.append(", realm='").append(realm).append('\'');
+        sb.append(", soapEnvelopeNodePresent=").append(soapEnvelopeNodePresent);
         sb.append(", requestNodePresent=").append(requestNodePresent);
         sb.append(", contentType=").append(contentType);
         sb.append(", originalContent='").append(originalContent).append('\'');
         sb.append(", content=").append(content);
         sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
-        sb.append(", authenticated=").append(authenticated);
         sb.append(", authenticationContent=").append(authenticationContent);
         sb.append(", requestMethod='").append(requestMethod).append('\'');
         sb.append(", requestAuthenticationType='").append(requestAuthenticationType).append('\'');
@@ -565,6 +595,8 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", requestServerName='").append(requestServerName).append('\'');
         sb.append(", requestLocalPort=").append(requestLocalPort);
         sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
+        sb.append(", authenticated=").append(authenticated);
+        sb.append(", pipResourceResolver=").append(pipResourceResolver);
         sb.append(", xacmlResponse=").append(xacmlResponse);
         sb.append('}');
         return sb.toString();

@@ -883,10 +883,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             //xacmlRequestProcessor.processRequest()
 
         } else {
-
-            // TODO Additional Request Processing.
-
-
+            // No Valid Request URI Found, render Bad Request.
+            this.renderBadRequest(requestContentType, response);
+            return;
         }
         // *****************************************************************
         // Render our Response, response Setting should be set prior, if not
@@ -1058,11 +1057,37 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // We need to obtain the Request Node and the
         // XACMLAuthzDecisionQuery wrapper if applicable.
         //
+        Node soapEnvelopeNode;
         Node requestNode;
         Node xacmlAuthzDecisionQueryNode;
 
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
+
+        // Check for a SOAP Envelope.
+        try {
+            // Verify we have a Request.
+            XPathExpression expr = xpath.compile("/" + ENVELOPE);
+            soapEnvelopeNode = (Node) expr.evaluate(document, XPathConstants.NODE);
+            if (soapEnvelopeNode != null) {
+                // Indicate our Request Node is in fact present, either wrapped or not.
+                xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
+                for (int i = 0; i < soapEnvelopeNode.getAttributes().getLength(); i++) {
+                    debug.error("Node: " + soapEnvelopeNode.getAttributes().item(i).getNodeName() + " attribute: " + soapEnvelopeNode
+                            .getAttributes().item(i));
+
+                    // TODO Verify....
+                    // TODO
+
+                }
+            }
+        } catch (XPathExpressionException xee) {
+            // Our initial Expression for a Node was invalid, we have no Request Object.
+            // This could be a maintenance which has no request, but not part of specification yet...
+            // Document could be bad or suspect.
+            debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
+            return;
+        }
 
         // Now check to see if we have an optional XACMLAuthzDecisionQueryNode wrapper for the request...
         try {
@@ -1158,17 +1183,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      */
     private static boolean isRequiredFieldPresent(String value) {
         return ((value != null) && (!value.isEmpty()));
-    }
-
-    /**
-     * Public Helper Method for accessing handlers.
-     * <p/>
-     * TODO Remove!!!!
-     *
-     * @return
-     */
-    public static HashMap getHandlers() {
-        return handlers;
     }
 
 }
