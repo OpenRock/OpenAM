@@ -20,18 +20,34 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.RoutingMode;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.DashboardResource;
+import org.forgerock.openam.forgerockrest.session.SessionResource;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import java.lang.reflect.Method;
 import java.security.AccessController;
+import javax.servlet.ServletException;
 import java.util.*;
 
-import static org.forgerock.json.resource.RoutingMode.EQUALS;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -46,12 +62,10 @@ public final class RestDispatcher {
     final static private String GROUPS = "/groups";
     final static private String AGENTS = "/agents";
     final static private String DASHBOARD = "/dashboard";
+    final static private String SESSIONS = "/sessions";
 
     private static RestDispatcher instance = null;
-    private RequestHandler handler = null;
     private ConnectionFactory factory = null;
-
-    final Router router = new Router();
 
     private RestDispatcher() {
 
@@ -62,6 +76,11 @@ public final class RestDispatcher {
         return instance;
     }
 
+    /**
+     * Adds all valid reserved endpoints to a Set
+     *
+     * @return a Set containing al the valid reserved endpoints
+     */
     private static Set<String> getEndpointList() {
         Set<String> endpoints = new HashSet<String>(2);
         endpoints.add(USERS);
@@ -69,31 +88,15 @@ public final class RestDispatcher {
         endpoints.add(AGENTS);
         endpoints.add(REALMS);
         endpoints.add(DASHBOARD);
+        endpoints.add(SESSIONS);
         return endpoints;
     }
 
-    private void callConfigClass(String className, Router router) {
-        // Check for configured connection factory class first.
-        if (className != null) {
-            final ClassLoader cl = this.getClass().getClassLoader();
-            try {
-                final Class<?> cls = Class.forName(className, true, cl);
-                // Try method which accepts ServletConfig.
-                final Method factoryMethod = cls.getMethod("initDispatcher", Router.class);
-
-                factoryMethod.invoke(null, router);
-                return;
-            } catch (final Exception e) {
-            }
-        }
-
-    }
-
     /**
-     * Returns a request handler which will handle all requests to a realm,
-     * including sub-realms, users, and groups.
+     * Returns a request handler which will handle all requests for a valid endpoint
      *
-     * @param path The realm.
+     * @param path          The full resource name
+     * @param parsedDetails Map of realmPath, resourceName, and resourceID
      * @return A request handler which will handle all requests to a realm,
      *         including sub-realms, users, and groups.
      */
@@ -114,36 +117,27 @@ public final class RestDispatcher {
         } else if (endpoint.equalsIgnoreCase(REALMS)) {
             router.addRoute(endpoint, new RealmResource(realmPath));
             router.addRoute(RoutingMode.STARTS_WITH, "/{realm}", subrealms(parsedDetails, path));
-        }  else if(endpoint.equalsIgnoreCase(DASHBOARD)){
-            router.addRoute(endpoint,new DashboardResource());
+        } else if (endpoint.equalsIgnoreCase(DASHBOARD)) {
+            router.addRoute(endpoint, new DashboardResource());
+        } else if (endpoint.equalsIgnoreCase(SESSIONS)) {
+            router.addRoute(endpoint, new SessionResource());
         }
         return router;
     }
 
     /**
-     * Build the initial dispatcher.
-     * This is a separate method so that we can modify the dispatching
-     * dynamically
+     * @return connection factory
+     * @throws ResourceException if resource name is not valid
      */
-    public ConnectionFactory buildConnectionFactory(ServletConfig config) throws ResourceException {
-        String roots = config.getInitParameter("rootContexts");
-
-        if (roots == null) {
-            throw new ServiceUnavailableException();
-        }
-        if (roots != null) {
-            String[] initClasses = config.getInitParameter("rootContexts").split(","); // not really much to do
-
-            for (String ctx : initClasses) {
-                callConfigClass(ctx.trim(), router);
-            }
-        }
+    public ConnectionFactory buildConnectionFactory() throws ResourceException {
         factory = Resources.newInternalConnectionFactory(new RequestHandler() {
-            public void handleAction(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> jsonValueResultHandler) {
+            public void handleAction(ServerContext serverContext, ActionRequest actionRequest,
+                                     ResultHandler<JsonValue> jsonValueResultHandler) {
                 jsonValueResultHandler.handleResult(new JsonValue(new HashMap<String, Object>()));
             }
 
-            public void handleCreate(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> resourceResultHandler) {
+            public void handleCreate(ServerContext serverContext, CreateRequest createRequest,
+                                     ResultHandler<Resource> resourceResultHandler) {
                 try {
                     Map parsedDetails = getRequestDetails(createRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, createRequest.getResourceName());
@@ -154,7 +148,8 @@ public final class RestDispatcher {
                 }
             }
 
-            public void handleDelete(ServerContext serverContext, DeleteRequest deleteRequest, ResultHandler<Resource> resourceResultHandler) {
+            public void handleDelete(ServerContext serverContext, DeleteRequest deleteRequest,
+                                     ResultHandler<Resource> resourceResultHandler) {
                 try {
                     Map parsedDetails = getRequestDetails(deleteRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, deleteRequest.getResourceName());
@@ -165,7 +160,8 @@ public final class RestDispatcher {
                 }
             }
 
-            public void handlePatch(ServerContext serverContext, PatchRequest patchRequest, ResultHandler<Resource> resourceResultHandler) {
+            public void handlePatch(ServerContext serverContext, PatchRequest patchRequest,
+                                    ResultHandler<Resource> resourceResultHandler) {
                 try {
                     Map parsedDetails = getRequestDetails(patchRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, patchRequest.getResourceName());
@@ -176,7 +172,8 @@ public final class RestDispatcher {
                 }
             }
 
-            public void handleQuery(ServerContext serverContext, QueryRequest queryRequest, QueryResultHandler queryResultHandler) {
+            public void handleQuery(ServerContext serverContext, QueryRequest queryRequest,
+                                    QueryResultHandler queryResultHandler) {
                 try {
                     Map parsedDetails = getRequestDetails(queryRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, queryRequest.getResourceName());
@@ -187,7 +184,8 @@ public final class RestDispatcher {
                 }
             }
 
-            public void handleRead(ServerContext serverContext, ReadRequest readRequest, ResultHandler<Resource> resourceResultHandler) {
+            public void handleRead(ServerContext serverContext, ReadRequest readRequest,
+                                   ResultHandler<Resource> resourceResultHandler) {
                 try {
                     Map parsedDetails = getRequestDetails(readRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, readRequest.getResourceName());
@@ -198,7 +196,8 @@ public final class RestDispatcher {
                 }
             }
 
-            public void handleUpdate(ServerContext serverContext, UpdateRequest updateRequest, ResultHandler<Resource> resourceResultHandler) {
+            public void handleUpdate(ServerContext serverContext, UpdateRequest updateRequest,
+                                     ResultHandler<Resource> resourceResultHandler) {
                 try {
                     Map parsedDetails = getRequestDetails(updateRequest.getResourceName());
                     final RequestHandler rootRealm = realm(parsedDetails, updateRequest.getResourceName());
@@ -212,9 +211,13 @@ public final class RestDispatcher {
         return factory;
     }
 
-    public static ConnectionFactory getConnectionFactory(ServletConfig config) throws ServletException {
+    /**
+     * @return Instance of a connection
+     * @throws ServletException if a connection instance cannot be retrieved
+     */
+    public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
-            return getInstance().buildConnectionFactory(config);
+            return getInstance().buildConnectionFactory();
         } catch (final Exception e) {
             throw new ServletException(e);
         }
@@ -223,7 +226,8 @@ public final class RestDispatcher {
     /**
      * Returns a request handler which will handle requests to a sub-realm.
      *
-     * @param parentPath The parent realm.
+     * @param parentPath    The parent realm.
+     * @param parsedDetails Map of realmPath, resourceName, and resourceID
      * @return A request handler which will handle requests to a sub-realm.
      */
     private static RequestHandler subrealms(final Map parsedDetails, final String parentPath) {
@@ -278,6 +282,7 @@ public final class RestDispatcher {
     private SSOToken getSSOToken() {
         return (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
+
     /*
      * Checks endpoint to make sure it has been reserved.
      * @param token endpoint that needs verification
@@ -328,7 +333,8 @@ public final class RestDispatcher {
                             realmPath.append(lastNonBlank);
                             topLevel = false;
                         } else {
-                            ocm = new OrganizationConfigManager(getSSOToken(), realmPath.toString() + "/" + lastNonBlank);
+                            ocm = new OrganizationConfigManager(getSSOToken(),
+                                    realmPath.toString() + "/" + lastNonBlank);
                             realmPath.append("/").append(lastNonBlank);
                         }
                         ocm = new OrganizationConfigManager(getSSOToken(), realmPath.toString());
@@ -339,7 +345,8 @@ public final class RestDispatcher {
                         endpoint.append(lastNonBlank);
                         if (!checkValidEndpoint(endpoint.toString())) {
                             debug.warning(endpoint.toString() + "is the endpoint because it is not a realm");
-                            throw new NotFoundException("Endpoint " + endpoint.toString() + " is not a defined endpoint.");
+                            throw new NotFoundException("Endpoint " + endpoint.toString()
+                                    + " is not a defined endpoint.");
                         }
                         // add the rest of tokens as resource name
                         lastNonBlankID = next;

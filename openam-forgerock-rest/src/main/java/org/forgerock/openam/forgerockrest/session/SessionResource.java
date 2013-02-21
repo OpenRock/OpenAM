@@ -66,24 +66,8 @@ public class SessionResource extends ReadOnlyResource {
 
     private SessionQueryManager queryManager;
 
-    public SessionResource(SessionQueryManager queryManager) {
-        this.queryManager = queryManager;
-    }
-
-    /**
-     * Applies the routing to the Router that this class supports.
-     *
-     * @param ocm Configuration required for organisation name.
-     * @param router Router to apply changes to.
-     */
-    public static void applyRouting(OrganizationConfigManager ocm, Router router) {
-        String orgName = ocm.getOrganizationName();
-        if (!orgName.endsWith("/")) {
-            orgName += "/";
-        }
-
-        SessionQueryManager sessionQueryManager = new SessionQueryManager(new SessionQueryFactory());
-        router.addRoute(orgName + "sessions", new SessionResource(sessionQueryManager));
+    public SessionResource() {
+        this.queryManager = new SessionQueryManager(new SessionQueryFactory());
     }
 
     /**
@@ -124,7 +108,7 @@ public class SessionResource extends ReadOnlyResource {
 
     /**
      * Queries the session resources using one of the predefined query filters.
-     *
+     * <p/>
      * all - (default) will query all Sessions across all servers.
      * list - will list the available servers which is useful for the next query
      * [server-id] - will list the available Sessions on the named server.
