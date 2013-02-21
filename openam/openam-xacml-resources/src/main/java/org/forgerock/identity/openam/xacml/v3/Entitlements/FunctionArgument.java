@@ -40,6 +40,7 @@ public abstract class FunctionArgument {
     public static FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN,"true");
     public static FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN,"false");
     public static FunctionArgument indeterminateObject = new DataValue(DataType.XACMLBOOLEAN,"indeterminate");
+
     private String dataType;
 
     public void setType(String type) {

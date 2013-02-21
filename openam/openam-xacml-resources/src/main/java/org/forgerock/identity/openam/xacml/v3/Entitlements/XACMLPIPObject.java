@@ -27,6 +27,15 @@
 package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
 public class XACMLPIPObject {
+    private XACML3Policy policyRef;
+
+    public   XACMLPIPObject(XACML3Policy pRef) {
+         policyRef = pRef;
+    }
+
+    public FunctionArgument getDefinedVariable(String variableID){
+         return policyRef.getDefinedVariable(variableID);
+    }
     public FunctionArgument resolve(String category, String AttributeID) {
         return null;
     }

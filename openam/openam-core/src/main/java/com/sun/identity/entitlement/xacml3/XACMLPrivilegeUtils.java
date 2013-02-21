@@ -1023,6 +1023,9 @@ public class XACMLPrivilegeUtils {
                 }
             }
         }
+        if (resourceNames.isEmpty()) {
+            resourceNames.add("");
+        }
         return resourceNames;
     }
 

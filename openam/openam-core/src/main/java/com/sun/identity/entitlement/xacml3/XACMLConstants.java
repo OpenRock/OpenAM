@@ -31,6 +31,11 @@ package com.sun.identity.entitlement.xacml3;
  */
 public interface XACMLConstants {
 
+    /*  this is to use the new XACML3 parser */
+
+    public static final boolean USE_NEW_XACML3 = true;
+
+
 public static final String XACML3_CORE_PKG 
         = "com.sun.identity.entitlement.xacml3.core";
 

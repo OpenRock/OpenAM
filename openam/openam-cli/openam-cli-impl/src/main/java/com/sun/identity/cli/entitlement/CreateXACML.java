@@ -50,6 +50,7 @@ import com.sun.identity.entitlement.ReferralPrivilegeManager;
 
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 
+import com.sun.identity.entitlement.xacml3.XACMLConstants;
 import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
@@ -135,8 +136,12 @@ public class CreateXACML extends AuthenticatedCommand {
                     if (XACMLPrivilegeUtils.isReferralPolicy(policy)) {
                         rpm.add(XACMLPrivilegeUtils.policyToReferral(policy));
                     } else {
-                        pm.addPrivilege(
-                                XACMLPrivilegeUtils.policyToPrivilege(policy));
+                        if (XACMLConstants.USE_NEW_XACML3) {
+
+                        } else {
+                            pm.addPrivilege(
+                                    XACMLPrivilegeUtils.policyToPrivilege(policy));
+                        }
                     }
                 }
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,

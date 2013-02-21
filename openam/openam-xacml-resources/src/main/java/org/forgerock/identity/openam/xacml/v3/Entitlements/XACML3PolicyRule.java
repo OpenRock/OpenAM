@@ -23,21 +23,29 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.v3.Functions;
+package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
-import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import com.sun.identity.entitlement.xacml3.core.Rule;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:integer-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#integer”
- and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
- The function SHALL return “True” if and only if the two arguments represent the same number.
- */
+public class XACML3PolicyRule {
+    private FunctionArgument target;
+    private FunctionArgument condition;
+    private String ruleName;
+    private String effect;
 
-public class AllOf extends XACMLFunction {
 
-    public FunctionArgument evaluate( XACMLPIPObject pip){
-        return FunctionArgument.falseObject;
+
+    public XACML3PolicyRule(Rule rule) {
+        target = XACML3PrivilegeUtils.getTargetFunction(rule.getTarget());
+        ruleName = rule.getRuleId();
+        effect = rule.getEffect().value();
+        condition = XACML3PrivilegeUtils.getConditionFunction(rule.getCondition());
+
     }
+
+
+    public FunctionArgument evaluate() {
+
+    }
+
 }

@@ -23,21 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.v3.Functions;
+package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
-import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
-
-/*
-urn:oasis:names:tc:xacml:1.0:function:integer-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#integer”
- and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
- The function SHALL return “True” if and only if the two arguments represent the same number.
- */
-
-public class AllOf extends XACMLFunction {
-
-    public FunctionArgument evaluate( XACMLPIPObject pip){
-        return FunctionArgument.falseObject;
-    }
+public class XACML3PolicySet {
 }
