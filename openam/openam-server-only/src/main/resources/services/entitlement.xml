@@ -436,23 +436,24 @@
                             <Value>com.sun.identity.entitlement.URLResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="xacml3"
+                    <SubConfiguration name="XACML3Application"
                                       id="applicationType">
+                        id="applicationType">
                         <AttributeValuePair>
-                            <Attribute name="applicationClassName" />
-                            <Value>com.sun.identity.entitlement.WebServiceApplication</Value>
+                            <Attribute name="actions" />
+                            <Value>ACCESS=true</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="searchIndexImpl" />
-                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3SearchIndex</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="saveIndexImpl" />
-                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3SaveIndex</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="resourceComparator" />
-                            <Value>com.sun.identity.entitlement.URLResourceName</Value>
+                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3ResourceComparator</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
@@ -749,6 +750,36 @@
                             <Value>com.sun.identity.entitlement.DenyOverride</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+
+                    <SubConfiguration name="xacml3"
+                                      id="application">
+                    <AttributeValuePair>
+                        <Attribute name="applicationType" />
+                        <Value>XACML3Application</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="resources" />
+                        <Value>"*"</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="subjects" />
+                        <Value>com.sun.identity.entitlement.AnyUserSubject</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="conditions" />
+                        <Value>dnsName</Value>
+                        <Value>ipRange</Value>
+                        <Value>or</Value>
+                        <Value>and</Value>
+                        <Value>not</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="entitlementCombiner" />
+                        <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                    </AttributeValuePair>
+                </SubConfiguration>
+
+
                 </SubConfiguration>
                 <SubConfiguration name="subjectAttributesCollectors"
                     id="subjectAttributesCollectors">

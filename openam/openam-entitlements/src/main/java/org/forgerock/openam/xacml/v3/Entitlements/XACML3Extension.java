@@ -27,7 +27,6 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
 
 import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.xacml3.XACML3Interface;
 import com.sun.identity.entitlement.xacml3.core.Policy;
 
 /*
@@ -39,7 +38,8 @@ public class XACML3Extension implements XACML3Interface {
 
     public Privilege XACML3NewPolicy(Policy pol) {
 
-         return new XACML3Policy(pol);
+        XACML3Policy xPol = new XACML3Policy(pol);
+         return null;
 
     };
 

@@ -26,7 +26,6 @@
 
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.opensso.XACMLOpenSSOPrivilege;
 import com.sun.identity.entitlement.xacml3.core.AllOf;
 import com.sun.identity.entitlement.xacml3.core.Apply;
 import com.sun.identity.entitlement.xacml3.core.AnyOf;

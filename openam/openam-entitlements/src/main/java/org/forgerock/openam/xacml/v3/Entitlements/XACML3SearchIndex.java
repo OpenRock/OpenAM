@@ -23,13 +23,14 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package com.sun.identity.entitlement.xacml3;
+package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.xacml3.core.Policy;
+import com.sun.identity.entitlement.ResourceSearchIndexes;
+import com.sun.identity.entitlement.interfaces.ISearchIndex;
 
-public interface XACML3Interface {
-
-    Privilege XACML3NewPolicy(Policy pol);
+public class XACML3SearchIndex implements ISearchIndex {
+    public ResourceSearchIndexes getIndexes(String resource){
+         return null;
+    };
 
 }

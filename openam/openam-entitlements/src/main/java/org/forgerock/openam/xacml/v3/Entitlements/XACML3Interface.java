@@ -25,40 +25,11 @@
  */
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.xacml3.XACMLConstants;
-import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
+import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.xacml3.core.Policy;
-import com.sun.identity.entitlement.xacml3.core.PolicySet;
 
-import java.io.FileInputStream;
-import java.util.Set;
+public interface XACML3Interface {
 
-public class XACML3Test {
-
-    public static void main(String[] args) {
-        try {
-
-
-            FileInputStream fis = new FileInputStream("/Users/allan/A-SVN/xacml/PolicySet.xml");
-            PolicySet ps = XACMLPrivilegeUtils.streamToPolicySet(fis);
-
-            Set<Policy> policies
-                    = XACMLPrivilegeUtils.getPoliciesFromPolicySet(ps);
-
-            for (Policy policy : policies) {
-
-                XACML3Policy pol = new XACML3Policy(policy);
-
-                System.out.println("Done Parsing Policy");
-
-            }
-            System.out.println("ALL Done Parsing Policy");
-
-        } catch (Exception ex) {
-
-            System.out.println("Filed! -- " + ex);
-        }
-
-    }
+    Privilege XACML3NewPolicy(Policy pol);
 
 }

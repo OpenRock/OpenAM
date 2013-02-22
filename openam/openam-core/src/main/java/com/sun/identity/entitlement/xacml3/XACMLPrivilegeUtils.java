@@ -29,16 +29,7 @@
  */
 package com.sun.identity.entitlement.xacml3;
 
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementCondition;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.EntitlementSubject;
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ResourceAttribute;
-
-import com.sun.identity.entitlement.UserSubject;
+import com.sun.identity.entitlement.*;
 
 import com.sun.identity.entitlement.opensso.XACMLOpenSSOPrivilege;
 import com.sun.identity.entitlement.xacml3.core.AllOf;
@@ -56,6 +47,8 @@ import com.sun.identity.entitlement.xacml3.core.Rule;
 import com.sun.identity.entitlement.xacml3.core.Target;
 import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
 import com.sun.identity.entitlement.xacml3.core.Version;
+
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
 
 import com.sun.identity.shared.JSONUtils;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -77,6 +70,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3Interface;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xml.sax.InputSource;
@@ -89,6 +83,7 @@ import org.xml.sax.InputSource;
  */
 public class XACMLPrivilegeUtils {
     public static final boolean USE_NEW_XACML3 = true;
+    public static final String XACML3_ENTITLEMENT_APP = "xacml3";
 
     /**
      * Constructs XACMLPrivilegeUtils
@@ -792,13 +787,18 @@ public class XACMLPrivilegeUtils {
     public static Privilege policyToXACML3Privilege(Policy policy)
             throws EntitlementException {
         try {
-            XACML3Interface factory = (XACML3Interface)Class.forName("org.forgerock.identity.openam.xacml.v3.Entitlements.XACML3Extension").newInstance();
-            return factory.XACML3NewPolicy(policy);
+
+            XACML3Policy xPol = new XACML3Policy(policy);
+            Set<String> resourceNames = new HashSet<String>();
+            Set<String> actionValues = new HashSet<String>();
+
+            resourceNames.add("*");
+            actionValues.add("ACCESS");
 
             Privilege privilege = new XACMLOpenSSOPrivilege();
             privilege.setName(policy.getPolicyId());
-            privilege.setEntitlement(new Entitlement(applicationName, resourceNames, actionValues));
-            privilege.setSubject(es);
+            privilege.setEntitlement(new Entitlement(XACML3_ENTITLEMENT_APP, "*", actionValues));
+            privilege.setSubject(new AnyUserSubject());
             privilege.setCondition(null);
             privilege.setResourceAttributes(null);
             return privilege;
