@@ -42,7 +42,7 @@ public class SessionResourceTest {
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
         QueryResultHandler handler = mock(QueryResultHandler.class);
 
-        SessionResource resource = spy(new SessionResource());
+        SessionResource resource = spy(new SessionResource(mockManager));
         List<String> list = Arrays.asList(new String[]{badger, weasel});
         doReturn(list).when(resource).getAllServerIds();
 
@@ -64,7 +64,7 @@ public class SessionResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(badger);
 
-        SessionResource resource = spy(new SessionResource());
+        SessionResource resource = spy(new SessionResource(mockManager));
 
         // When
         resource.queryCollection(null, request, mockHandler);

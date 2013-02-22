@@ -17,7 +17,6 @@ package org.forgerock.openam.forgerockrest.session;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.sm.OrganizationConfigManager;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -28,8 +27,6 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.forgerockrest.ReadOnlyResource;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
@@ -66,8 +63,19 @@ public class SessionResource extends ReadOnlyResource {
 
     private SessionQueryManager queryManager;
 
+    /**
+     * Default constructor instantiates the SessionResource.
+     */
     public SessionResource() {
-        this.queryManager = new SessionQueryManager(new SessionQueryFactory());
+        this(new SessionQueryManager(new SessionQueryFactory()));
+    }
+
+    /**
+     * Dependency Injection constructor allowing the SessionResource dependency to be provided.
+     * @param sessionQueryManager No null.
+     */
+    public SessionResource(SessionQueryManager sessionQueryManager) {
+        this.queryManager = sessionQueryManager;
     }
 
     /**
