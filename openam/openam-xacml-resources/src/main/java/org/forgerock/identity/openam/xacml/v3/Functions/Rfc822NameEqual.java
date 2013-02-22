@@ -26,14 +26,18 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
+urn:oasis:names:tc:xacml:1.0:function:rfc822Name-equal
+This function SHALL take two arguments of data-type
+“urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name”
 and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
+It SHALL return “True” if and only if the two arguments are equal.
 Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+An RFC822 name consists of a local-part followed by "@" followed by a domain-part.
+The local-part is case-sensitive, while the domain-part (which is usually a DNS host name) is not case-sensitive.
+Perform the following operations:
+1. Normalize the domain-part of each argument to lower case
+2. Compare the expressions by applying the function
+“urn:oasis:names:tc:xacml:1.0:function:string-equal” to the normalized arguments.
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;

@@ -26,14 +26,15 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+urn:oasis:names:tc:xacml:1.0:function:integer-subtract
+functions SHALL take two arguments of the specified data-type, integer, or double,
+and SHALL return an element of integer or double data-type, respectively.
+However, the “add” and “multiply” functions MAY take more than two arguments.
+Each function evaluation operating on doubles SHALL proceed as specified by their logical counterparts
+ in IEEE 754 [IEEE754]. For all of these functions, if any argument is "Indeterminate",
+ then the function SHALL evaluate to "Indeterminate".
+ In the case of the divide functions, if the divisor is zero,
+ then the function SHALL evaluate to “Indeterminate”.
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;

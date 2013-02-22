@@ -26,14 +26,12 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+urn:oasis:names:tc:xacml:1.0:function:integer-to-double
+This function SHALL take one argument of data-type “http://www.w3.org/2001/XMLSchema#integer”
+and SHALL promote its value to an element of data-type
+“http://www.w3.org/2001/XMLSchema#double” with the same numeric value.
+If the integer argument is outside the range which can be represented by a double,
+the result SHALL be Indeterminate, with the status code “urn:oasis:names:tc:xacml:1.0:status:processing-error”.
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;

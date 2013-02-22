@@ -26,14 +26,18 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+urn:oasis:names:tc:xacml:1.0:function:n-of
+The first argument to this function SHALL be of data-type http://www.w3.org/2001/XMLSchema#integer.
+The remaining arguments SHALL be of data-type http://www.w3.org/2001/XMLSchema#boolean.
+The first argument specifies the minimum number of the remaining arguments that MUST evaluate to "True"
+for the expression to be considered "True".
+If the first argument is 0, the result SHALL be "True".
+If the number of arguments after the first one is less than the value of the first argument,
+then the expression SHALL result in "Indeterminate".
+The order of evaluation SHALL be: first evaluate the integer value, and then evaluate each subsequent argument.
+The evaluation SHALL stop and return "True" if the specified number of arguments evaluate to "True".
+The evaluation of arguments SHALL stop if it is determined that evaluating the remaining arguments
+will not satisfy the requirement.
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;

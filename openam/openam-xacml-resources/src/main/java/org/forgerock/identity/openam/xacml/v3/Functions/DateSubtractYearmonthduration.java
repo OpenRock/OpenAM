@@ -26,15 +26,19 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+urn:oasis:names:tc:xacml:3.0:function:date-subtract-yearMonthDuration
+This function SHALL take two arguments, the first SHALL be a
+“http://www.w3.org/2001/XMLSchema#date” and the second SHALL be a
+“http://www.w3.org/2001/XMLSchema#yearMonthDuration”.
+It SHALL return a result of “http://www.w3.org/2001/XMLSchema#date”.
+If the second argument is a positive duration,
+then this function SHALL return the value by adding the corresponding negative duration,
+as per the specification [XS] Appendix E.
+If the second argument is a negative duration,
+then the result SHALL be as if the function
+“urn:oasis:names:tc:xacml:1.0:function:date-add-yearMonthDuration”
+ had been applied to the corresponding positive duration.
+ */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;

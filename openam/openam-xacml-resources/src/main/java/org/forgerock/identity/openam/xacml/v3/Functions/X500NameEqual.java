@@ -26,15 +26,22 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
+urn:oasis:names:tc:xacml:1.0:function:x500Name-equal
+This function SHALL take two arguments of
+"urn:oasis:names:tc:xacml:1.0:data-type:x500Name"
+and SHALL return an "http://www.w3.org/2001/XMLSchema#boolean".
+It SHALL return “True” if and only if each Relative Distinguished Name (RDN) in the two arguments matches.
 Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+Two RDNs shall be said to match if and only if the result of the following operations is “True” .
+1. Normalize the two arguments according to IETF RFC 2253
+"Lightweight Directory Access Protocol (v3): UTF-8 String Representation of Distinguished Names".
+2. If any RDN contains multiple attributeTypeAndValue pairs,
+re-order the Attribute ValuePairs in that RDN in ascending order when compared as octet strings
+(described in ITU-T Rec. X.690 (1997 E) Section 11.6 "Set-of components").
+3. Compare RDNs using the rules in IETF RFC 3280
+ "Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL)
+ Profile", Section 4.1.2.4 "Issuer".
+ */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;

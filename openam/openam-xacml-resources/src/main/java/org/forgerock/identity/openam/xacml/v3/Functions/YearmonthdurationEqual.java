@@ -26,14 +26,13 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 /*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
+urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-equal
+This function SHALL take two arguments of data-type
+ "http://www.w3.org/2001/XMLSchema#yearMonthDuration”
+ and SHALL return an "http://www.w3.org/2001/XMLSchema#boolean".
+ This function shall perform its evaluation according to the "op:duration-equal" function [XF] Section 10.4.5.
+ Note that the lexical representation of each argument MUST be converted to a value expressed in fractional seconds
+ [XF] Section 10.3.2.
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
