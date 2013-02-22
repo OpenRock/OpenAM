@@ -25,7 +25,7 @@
  */
 package org.forgerock.identity.openam.xacml.v3.Functions;
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,10 +54,10 @@ public abstract class XACMLFunction extends FunctionArgument {
         arguments.addAll(args);
         return this;
     };
-    public Object getValue(XACMLPIPObject pip) {
+    public Object getValue(XACMLEvalContext pip) {
         return evaluate(pip).getValue(pip);
     };
-    abstract public FunctionArgument evaluate( XACMLPIPObject pip);
+    abstract public FunctionArgument evaluate( XACMLEvalContext pip);
 
     /* Protected methods only for subclasses */
 
@@ -229,7 +229,7 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:xpath-node-count","org.forgerock.identity.openam.xacml.v3.Functions.XpathNodeCount");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:xpath-node-equal","org.forgerock.identity.openam.xacml.v3.Functions.XpathNodeEqual");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:xpath-node-match","org.forgerock.identity.openam.xacml.v3.Functions.XpathNodeMatch");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:string-intersection","org.forgerock.identity.openam.xacml.v3.Functions.StringIntersection;
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:string-intersection","org.forgerock.identity.openam.xacml.v3.Functions.StringIntersection");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of","org.forgerock.identity.openam.xacml.v3.Functions.StringAtLeastOneMemberOf");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-union","org.forgerock.identity.openam.xacml.v3.Functions.StringUnion");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-subset","org.forgerock.identity.openam.xacml.v3.Functions.StringSubset");
@@ -252,7 +252,7 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-intersection","org.forgerock.identity.openam.xacml.v3.Functions.TimeIntersection");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-at-least-one-member-of","org.forgerock.identity.openam.xacml.v3.Functions.TimeAtLeastOneMemberOf");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-union","org.forgerock.identity.openam.xacml.v3.Functions.TimeUnion");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:time-subset","org.forgerock.identity.openam.xacml.v3.Functions.timeSubset;
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:time-subset","org.forgerock.identity.openam.xacml.v3.Functions.timeSubset");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-set-equals","org.forgerock.identity.openam.xacml.v3.Functions.TimeSetEquals");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:date-intersection","org.forgerock.identity.openam.xacml.v3.Functions.DateIntersection");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:date-at-least-one-member-of","org.forgerock.identity.openam.xacml.v3.Functions.DateAtLeastOneMemberOf");

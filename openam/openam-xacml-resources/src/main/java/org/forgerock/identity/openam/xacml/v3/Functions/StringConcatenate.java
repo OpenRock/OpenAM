@@ -36,14 +36,14 @@ This function SHALL take two or more arguments of data-type
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class StringConcatenate extends XACMLFunction {
 
     public StringConcatenate()  {
     }
 
-    public FunctionArgument evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip){
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() < 2) {

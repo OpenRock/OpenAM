@@ -33,13 +33,13 @@ It SHALL perform its evaluation according to the “op:date-equal” function [X
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DateEqual extends XACMLFunction {
 
     public DateEqual()  {
     }
-    public FunctionArgument evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip){
         FunctionArgument retVal = FunctionArgument.falseObject;
         if ( getArgCount() != 2) {
             return retVal;

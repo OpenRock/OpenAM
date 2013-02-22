@@ -26,10 +26,10 @@
 
 package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
-public class XACMLPIPObject {
+public class XACMLEvalContext {
     private XACML3Policy policyRef;
 
-    public   XACMLPIPObject(XACML3Policy pRef) {
+    public XACMLEvalContext(XACML3Policy pRef) {
          policyRef = pRef;
     }
 

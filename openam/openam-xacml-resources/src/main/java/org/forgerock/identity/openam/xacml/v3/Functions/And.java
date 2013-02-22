@@ -37,7 +37,7 @@ as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/c
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 
 public class And extends XACMLFunction {
@@ -45,7 +45,7 @@ public class And extends XACMLFunction {
     public And()  {
     }
 
-    public FunctionArgument evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip){
         FunctionArgument retVal =  FunctionArgument.trueObject;
 
         if ( getArgCount() == 0) {

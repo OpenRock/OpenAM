@@ -36,14 +36,14 @@ urn:oasis:names:tc:xacml:1.0:function:string- normalize-to-lower-case.
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class StringEqualIgnoreCase extends XACMLFunction {
 
     public StringEqualIgnoreCase()  {
     }
 
-    public FunctionArgument evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip){
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {

@@ -34,13 +34,13 @@ It SHALL perform its evaluation on doubles according to IEEE 754 [IEEE754].
 */
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DoubleEqual extends XACMLFunction {
 
     public DoubleEqual()  {
     }
-    public FunctionArgument evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip){
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {

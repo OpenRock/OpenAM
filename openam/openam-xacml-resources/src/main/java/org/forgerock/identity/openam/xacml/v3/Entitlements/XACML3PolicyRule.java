@@ -45,7 +45,7 @@ public class XACML3PolicyRule {
 
 
     public FunctionArgument evaluate() {
-
+         return FunctionArgument.indeterminateObject;
     }
 
 }

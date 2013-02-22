@@ -26,7 +26,7 @@
 package org.forgerock.identity.openam.xacml.v3.Functions;
 
 import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLPIPObject;
+import org.forgerock.identity.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 /*
 urn:oasis:names:tc:xacml:1.0:function:integer-equal
@@ -37,7 +37,7 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
 
 public class AllOf extends XACMLFunction {
 
-    public FunctionArgument evaluate( XACMLPIPObject pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip){
         return FunctionArgument.falseObject;
     }
 }

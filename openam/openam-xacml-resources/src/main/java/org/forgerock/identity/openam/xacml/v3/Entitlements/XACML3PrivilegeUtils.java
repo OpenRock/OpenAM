@@ -127,7 +127,7 @@ public class XACML3PrivilegeUtils {
         for (Object ob : obList) {
             if (ob instanceof VariableDefinition) {
                 VariableDefinition it = (VariableDefinition)ob;
-                varsMap.put (it.getVariableId(),XACML3PrivilegeUtils.getFunction((it.getExpression()));
+                varsMap.put (it.getVariableId(),XACML3PrivilegeUtils.getFunction((it.getExpression())));
             }
         }
         return varsMap;
@@ -192,7 +192,7 @@ public class XACML3PrivilegeUtils {
         } else if (clazz.equals(VariableReference.class)) {
             VariableReference vr = (VariableReference)je.getValue();
             XACMLFunction it = XACMLFunction.getInstance("urn:oasis:names:forgerock:xacml:1.0:function:VariableDereference");
-            it.addArgument(new DataValue(DataType.XACMLSTRING,vr.getVariableId());
+            it.addArgument(new DataValue(DataType.XACMLSTRING,vr.getVariableId()));
             retVal = it;
         }
          return retVal;

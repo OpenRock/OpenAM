@@ -49,5 +49,5 @@ public abstract class FunctionArgument {
     public String getType() {
         return dataType;
     }
-    public abstract Object getValue(XACMLPIPObject pip);
+    public abstract Object getValue(XACMLEvalContext pip);
 }
