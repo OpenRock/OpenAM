@@ -25,8 +25,8 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
-import org.forgerock.identity.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.identity.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
+import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
 import java.util.HashMap;
 import java.util.Map;
