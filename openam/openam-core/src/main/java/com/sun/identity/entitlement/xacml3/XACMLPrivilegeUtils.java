@@ -88,6 +88,8 @@ import org.xml.sax.InputSource;
  * </code>com.sun.identity.entitlement.xacml3.core.Policy</code>
  */
 public class XACMLPrivilegeUtils {
+    public static final boolean USE_NEW_XACML3 = true;
+
     /**
      * Constructs XACMLPrivilegeUtils
      */
@@ -785,6 +787,26 @@ public class XACMLPrivilegeUtils {
             }
         }
         return privileges;
+    }
+
+    public static Privilege policyToXACML3Privilege(Policy policy)
+            throws EntitlementException {
+        try {
+            XACML3Interface factory = (XACML3Interface)Class.forName("org.forgerock.identity.openam.xacml.v3.Entitlements.XACML3Extension").newInstance();
+            return factory.XACML3NewPolicy(policy);
+
+            Privilege privilege = new XACMLOpenSSOPrivilege();
+            privilege.setName(policy.getPolicyId());
+            privilege.setEntitlement(new Entitlement(applicationName, resourceNames, actionValues));
+            privilege.setSubject(es);
+            privilege.setCondition(null);
+            privilege.setResourceAttributes(null);
+            return privilege;
+
+        } catch (Exception ex) {
+            System.out.println("Something bad happened");
+        }
+        return null;
     }
 
     public static Privilege policyToPrivilege(Policy policy)

@@ -25,23 +25,12 @@
  */
 package org.forgerock.identity.openam.xacml.v3.Entitlements;
 
+import com.sun.identity.entitlement.ResourceSearchIndexes;
+import com.sun.identity.entitlement.interfaces.ISearchIndex;
 
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.xacml3.XACML3Interface;
-import com.sun.identity.entitlement.xacml3.core.Policy;
-
-/*
-*  This class is here to we can instantiate it from OpenAM without messing with Linking issues
-*
-*  It should return a new privilege object,  populated with the XACML3 policy
-*/
-public class XACML3Extension implements XACML3Interface {
-
-    public Privilege XACML3NewPolicy(Policy pol) {
-
-         return new XACML3Policy(pol);
-
+public class XACMLl3SearchIndex implements ISearchIndex {
+    ResourceSearchIndexes getIndexes(String resource){
+         return null;
     };
-
 
 }

@@ -136,8 +136,9 @@ public class CreateXACML extends AuthenticatedCommand {
                     if (XACMLPrivilegeUtils.isReferralPolicy(policy)) {
                         rpm.add(XACMLPrivilegeUtils.policyToReferral(policy));
                     } else {
-                        if (XACMLConstants.USE_NEW_XACML3) {
-
+                        if (XACMLPrivilegeUtils.USE_NEW_XACML3) {
+                            pm.addPrivilege(
+                                    XACMLPrivilegeUtils.policyToXACML3Privilege(policy));
                         } else {
                             pm.addPrivilege(
                                     XACMLPrivilegeUtils.policyToPrivilege(policy));
