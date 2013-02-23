@@ -60,6 +60,13 @@ public class XACML3Policy {
         return retVal;
     }
 
+    public Policy getPolicy() {
+        return this.policy;
+    }
+
+    public void setPolicy(Policy pol) {
+         this.policy = pol;
+    }
 
 
     /*

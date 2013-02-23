@@ -150,7 +150,13 @@ public class XACMLPrivilegeUtils {
     public static Policy privilegeToPolicy(Privilege privilege)  {
         Policy policy = null;
         try {
-            policy = privilegeToPolicyInternal(privilege);
+            Object context = privilege.getContext();
+            if (context != null)  {
+                XACML3Policy xp = (XACML3Policy) context;
+                policy = (Policy) xp.;
+            } else {
+                policy = privilegeToPolicyInternal(privilege);
+            }
         } catch (JAXBException je) {
             //TODO: log error, jaxbexception
         }
@@ -801,6 +807,7 @@ public class XACMLPrivilegeUtils {
             privilege.setSubject(new AnyUserSubject());
             privilege.setCondition(null);
             privilege.setResourceAttributes(null);
+            privilege.setContext(xPol);                        // Save the policy Structure
             return privilege;
 
         } catch (Exception ex) {
@@ -857,7 +864,6 @@ public class XACMLPrivilegeUtils {
         // FIXME: add support ResourceAttributes
         Set<ResourceAttribute> ras = null;
 
-       
         Privilege privilege = new XACMLOpenSSOPrivilege();
         privilege.setName(privilegeName);
         privilege.setEntitlement(entitlement);

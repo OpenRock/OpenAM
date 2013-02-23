@@ -103,6 +103,7 @@ public abstract class Privilege implements IPrivilege {
     private EntitlementSubject eSubject;
     private EntitlementCondition eCondition;
     private Set<ResourceAttribute> eResourceAttributes;
+    private Object policyContext;
 
     private String createdBy;
     private String lastModifiedBy;
@@ -178,6 +179,23 @@ public abstract class Privilege implements IPrivilege {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns the name of the privilege.
+     *
+     * @return name of the privilege.
+     */
+    public Object getContext() {
+        return policyContext;
+    }
+    /**
+     * Returns the name of the privilege.
+     *
+     * @return name of the privilege.
+     */
+    public void setContext(Object context) {
+         policyContext = context;
     }
 
     /**

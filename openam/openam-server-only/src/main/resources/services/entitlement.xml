@@ -61,7 +61,7 @@
                     syntax="boolean"
                     i18nKey="">
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="evalThreadSize"
@@ -758,7 +758,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="resources" />
-                        <Value>"*"</Value>
+                        <Value>*</Value>
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="subjects" />

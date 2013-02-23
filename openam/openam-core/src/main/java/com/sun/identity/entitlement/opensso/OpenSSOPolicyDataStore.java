@@ -39,6 +39,7 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.policy.Policy;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
@@ -274,13 +275,14 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             xml = xml.substring(10);
         }
 
-        Document doc = XMLUtils.getXMLDocument(
-            new ByteArrayInputStream(xml.getBytes("UTF8")));
         if (EntitlementConfiguration.getInstance(
                 SubjectUtils.createSubject(adminToken),
                 "/").xacmlPrivilegeEnabled()) {
             //TODO: create xacml policy from xml document
+            policy = XACMLPrivilegeUtils.streamToPolicySet(new ByteArrayInputStream(xml.getBytes("UTF8")));
         } else {
+            Document doc = XMLUtils.getXMLDocument(
+                    new ByteArrayInputStream(xml.getBytes("UTF8")));
             PolicyManager pm = new PolicyManager(adminToken, realm);
             Node rootNode = XMLUtils.getRootNode(doc, 
                 PolicyManager.POLICY_ROOT_NODE);
