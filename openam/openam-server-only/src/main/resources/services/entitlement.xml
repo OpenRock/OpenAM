@@ -444,15 +444,15 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="searchIndexImpl" />
-                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3SearchIndex</Value>
+                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="saveIndexImpl" />
-                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3SaveIndex</Value>
+                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="resourceComparator" />
-                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3ResourceComparator</Value>
+                            <Value>com.sun.identity.entitlement.ExactMatchResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
@@ -766,8 +766,6 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="conditions" />
-                        <Value>dnsName</Value>
-                        <Value>ipRange</Value>
                         <Value>or</Value>
                         <Value>and</Value>
                         <Value>not</Value>

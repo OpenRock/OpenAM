@@ -26,31 +26,14 @@
 
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.xacml3.core.AllOf;
-import com.sun.identity.entitlement.xacml3.core.Apply;
-import com.sun.identity.entitlement.xacml3.core.AnyOf;
-import com.sun.identity.entitlement.xacml3.core.AttributeValue;
-import com.sun.identity.entitlement.xacml3.core.AttributeDesignator;
-import com.sun.identity.entitlement.xacml3.core.AttributeSelector;
-import com.sun.identity.entitlement.xacml3.core.Condition;
-import com.sun.identity.entitlement.xacml3.core.Function;
-import com.sun.identity.entitlement.xacml3.core.VariableReference;
-import com.sun.identity.entitlement.xacml3.core.EffectType;
-import com.sun.identity.entitlement.xacml3.core.Match;
-import com.sun.identity.entitlement.xacml3.core.ObjectFactory;
-import com.sun.identity.entitlement.xacml3.core.Policy;
-import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import com.sun.identity.entitlement.xacml3.core.Rule;
-import com.sun.identity.entitlement.xacml3.core.Target;
-import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
-import com.sun.identity.entitlement.xacml3.core.Version;
+import com.sun.identity.entitlement.xacml3.core.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
 
+import com.sun.identity.entitlement.xacml3.core.AllOf;
+import com.sun.identity.entitlement.xacml3.core.AnyOf;
 import org.forgerock.openam.xacml.v3.Functions.*;
 
 /**
@@ -60,7 +43,7 @@ import org.forgerock.openam.xacml.v3.Functions.*;
 public class XACML3PrivilegeUtils {
 
 
-    static FunctionArgument getTargetFunction(Target target) {
+    static FunctionArgument getTargetFunction(Target target, Set<String> rSelectors) {
         List<AnyOf> anyOfList = target.getAnyOf();
 
         XACMLFunction retVal = XACMLFunction.getInstance("urn:oasis:names:tc:xacml:1.0:function:any-of");
@@ -78,6 +61,9 @@ public class XACML3PrivilegeUtils {
                     AttributeDesignator attrd = match.getAttributeDesignator();
                     if (attrd == null) { continue; };
                     DataDesignator dd = new DataDesignator(attrd.getDataType(),attrd.getCategory(),attrd.getAttributeId());
+                    if (attrd.getCategory().contains(":resource:")) {
+                        rSelectors.add(attrd.getAttributeId()+"="+attr.getContent().get(0));
+                    }
 
                     parent.addArgument(XACMLFunction.getInstance(mName).addArgument(dv).addArgument(dd));
 
@@ -173,6 +159,7 @@ public class XACML3PrivilegeUtils {
 
         return (getFunction(cond.getExpression()));
     }
+
 
 }
 

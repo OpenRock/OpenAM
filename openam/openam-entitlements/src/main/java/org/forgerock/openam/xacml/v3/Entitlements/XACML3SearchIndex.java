@@ -28,9 +28,11 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 
+import java.util.HashSet;
+
 public class XACML3SearchIndex implements ISearchIndex {
     public ResourceSearchIndexes getIndexes(String resource){
-         return null;
+         return new ResourceSearchIndexes(new HashSet<String>(),new HashSet(), new HashSet<String>());
     };
 
 }

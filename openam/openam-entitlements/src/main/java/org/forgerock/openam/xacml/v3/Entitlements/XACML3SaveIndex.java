@@ -28,9 +28,11 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 
+import java.util.HashSet;
+
 public class XACML3SaveIndex implements ISaveIndex {
     public ResourceSaveIndexes getIndexes(String resource) {
-        return null;
+        return new ResourceSaveIndexes(new HashSet<String>(),new HashSet<String>(), new HashSet<String>());
     };
 
 }

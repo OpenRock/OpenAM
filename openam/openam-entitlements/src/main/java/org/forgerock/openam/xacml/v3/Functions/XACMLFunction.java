@@ -74,12 +74,13 @@ public abstract class XACMLFunction extends FunctionArgument {
         }
         String cName = functions.get(name);
         XACMLFunction retVal = null;
-        if (cName != null) {
+        if (cName == null) {
+            cName = "org.forgerock.openam.xacml.v3.Functions.Unimplemented";
+        }
             try {
              retVal = (XACMLFunction) Class.forName(cName).newInstance();
             } catch (Exception ex) {
                retVal = null;
-            }
         }
         return retVal;
     }

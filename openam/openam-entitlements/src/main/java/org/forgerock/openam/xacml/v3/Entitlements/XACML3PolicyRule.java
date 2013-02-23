@@ -25,21 +25,27 @@
  */
 package org.forgerock.openam.xacml.v3.Entitlements;
 
+import com.sun.identity.entitlement.xacml3.core.ObligationExpressions;
 import com.sun.identity.entitlement.xacml3.core.Rule;
+
+import java.util.HashSet;
+import java.util.List;
 
 public class XACML3PolicyRule {
     private FunctionArgument target;
     private FunctionArgument condition;
+
     private String ruleName;
     private String effect;
 
 
 
     public XACML3PolicyRule(Rule rule) {
-        target = XACML3PrivilegeUtils.getTargetFunction(rule.getTarget());
+        target = XACML3PrivilegeUtils.getTargetFunction(rule.getTarget(),new HashSet<String>());
         ruleName = rule.getRuleId();
         effect = rule.getEffect().value();
         condition = XACML3PrivilegeUtils.getConditionFunction(rule.getCondition());
+
 
     }
 

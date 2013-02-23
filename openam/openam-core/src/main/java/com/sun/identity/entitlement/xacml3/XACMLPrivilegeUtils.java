@@ -153,7 +153,7 @@ public class XACMLPrivilegeUtils {
             Object context = privilege.getContext();
             if (context != null)  {
                 XACML3Policy xp = (XACML3Policy) context;
-                policy = (Policy) xp.;
+                policy = (Policy) xp.getPolicy();
             } else {
                 policy = privilegeToPolicyInternal(privilege);
             }
@@ -796,13 +796,19 @@ public class XACMLPrivilegeUtils {
 
             XACML3Policy xPol = new XACML3Policy(policy);
             Set<String> resourceNames = new HashSet<String>();
-            Set<String> actionValues = new HashSet<String>();
+            Map<String,Boolean> actionValues = new HashMap<String,Boolean>();
 
-            resourceNames.add("*");
-            actionValues.add("ACCESS");
+            actionValues.put("ACCESS",true);
+            resourceNames = xPol.getResourceSelectors();
+
+            Entitlement entitlement = new Entitlement(XACML3_ENTITLEMENT_APP, resourceNames, actionValues);
 
             Privilege privilege = new XACMLOpenSSOPrivilege();
-            privilege.setName(policy.getPolicyId());
+            String privilegeName = policyIdToPrivilegeName(policy.getPolicyId());
+            String description = policy.getDescription();
+
+            privilege.setDescription(description);
+            privilege.setName(privilegeName);
             privilege.setEntitlement(new Entitlement(XACML3_ENTITLEMENT_APP, "*", actionValues));
             privilege.setSubject(new AnyUserSubject());
             privilege.setCondition(null);

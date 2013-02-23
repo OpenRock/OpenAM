@@ -27,7 +27,9 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class XACML3Policy {
     private Policy policy;
@@ -37,14 +39,16 @@ public class XACML3Policy {
     private List<XACML3PolicyRule> rules;
     private java.util.Map<String,FunctionArgument> definedVars;
     private String ruleCombiner;
+    private Set<String> resourceSelectors;
 
 
     public XACML3Policy(Policy policy) {
         this.policy = policy;
         policyName = policy.getPolicyId();
         ruleCombiner = policy.getRuleCombiningAlgId();
+        resourceSelectors = new HashSet<String>();
 
-        target = XACML3PrivilegeUtils.getTargetFunction(policy.getTarget());
+        target = XACML3PrivilegeUtils.getTargetFunction(policy.getTarget(),resourceSelectors);
 
         definedVars =  XACML3PrivilegeUtils.getVariableDefinitions(policy);
 
@@ -68,16 +72,35 @@ public class XACML3Policy {
          this.policy = pol;
     }
 
+    public Set<String> getResourceSelectors() {
+         return resourceSelectors;
+    }
+    public void setResourceSelectors(Set<String> rSel) {
+        resourceSelectors = rSel;
+    }
 
     /*
      * After constructing the policy, we can parse the policy object,  extracting
      * the target info,  and then pulling each rule out, into a separate rule
      *
-     * 1) Extract the target function from the Policy
+     * if (target.evaluate() == true ) {
+     *
+     * for (Rule r : rules) {
+     *      r
+     * }
+     *
+     * }
      */
 
     public FunctionArgument evaluate() {
 
+        XACMLEvalContext pip = null;
+        Request xacmlR;
+
+        if (target.evaluate(pip).getValue(pip) == "false")  {
+            return FunctionArgument.indeterminateObject;
+        }
+        // Now we know the target applies
 
           return FunctionArgument.indeterminateObject;
     }
