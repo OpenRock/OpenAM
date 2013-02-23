@@ -111,47 +111,46 @@ public class XacmlPDPResource implements XACML3Constants {
         MimeHeaders headers = SAML2Utils.getHeaders(request);
 
         // Check Original Content
-        if (xacmlRequestInformation.getOriginalContent() == null) {
-                // Bad or no content.
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
+        if (xacmlRequestInformation.getContent() == null) {
+            // Bad or no content.
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204
+            return;
         }
 
-            debug.error("XACML Incoming Request:[" + xacmlRequestInformation.getOriginalContent() + "], " +
-                    "Length:[" + xacmlRequestInformation.getOriginalContent().length() + "]");
+        debug.error("XACML Incoming Request:[" + xacmlRequestInformation.getOriginalContent() + "], " +
+                "Length:[" + xacmlRequestInformation.getOriginalContent().length() + "]");
 
-            // ********************************************
-            // Process the PDP Request from the PEP.
-            String pepEntityID = null;    // TODO Need to resolve this.
+        // ********************************************
+        // Process the PDP Request from the PEP.
+        try {
+            Document requestDocument = (Document) xacmlRequestInformation.getContent();
 
-            try {
-                Document requestDocument = (Document) xacmlRequestInformation.getContent();
+            Response samlResponse =
+                    processSAML4XACMLRequest(xacmlRequestInformation,
+                            ((Node) xacmlRequestInformation.getAuthenticationContent()),
+                            request,
+                            requestDocument.getDocumentElement());
+            if (samlResponse != null) {
+                // TODO -- Determine response...
+                //xacmlRequestInformation.setXacmlStringResponse(samlResponse.toXMLString(true, true));
 
-                Response samlResponse =
-                        processSAML4XACMLRequest(xacmlRequestInformation,
-                                ((Node) xacmlRequestInformation.getAuthenticationContent()),
-                                request,
-                                requestDocument.getDocumentElement());
-                if (samlResponse != null) {
-                    // TODO -- Determine response...
-                    //xacmlRequestInformation.setXacmlStringResponse(samlResponse.toXMLString(true, true));
+                // *******************************************
+                // Set our Response Status per specification.
+                response.setStatus(HttpServletResponse.SC_OK);   // 200
+                xacmlRequestInformation.setRequestProcessed(true);
+                return;
 
-                    // *******************************************
-                    // Set our Response Status per specification.
-                    response.setStatus(HttpServletResponse.SC_OK);   // 200
-                    xacmlRequestInformation.setRequestProcessed(true);
-                    return;
-
-                } else {
-                    // Bad or no content.
-                    xacmlRequestInformation.setAuthenticated(false);
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
-                }
-            } catch (Exception se) {
-                debug.error(classMethod + "XACML Processing Exception", se);
-                // TODO Handle invalid.
+            } else {
                 // Bad or no content.
+                xacmlRequestInformation.setAuthenticated(false);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
             }
+        } catch (Exception se) {
+            debug.error(classMethod + "XACML Processing Exception", se);
+            // TODO Handle invalid.
+            // Bad or no content.
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);   // 204 // Fix this Return.
+        }
 
 
         // TODO Handle invalid.
@@ -194,8 +193,6 @@ public class XacmlPDPResource implements XACML3Constants {
         // TODO -- we  build up a Request Object from our JSON Map and send to normal XACML Processing.
 
         // TODO ....
-
-
 
 
     }
@@ -369,7 +366,7 @@ public class XacmlPDPResource implements XACML3Constants {
     private static XACMLAuthzDecisionQuery createXACML3AuthzDecisionQuery(Node node)
             throws SAML2Exception {
         Object obj = XACMLSDKUtils.getObjectInstance(XACMLConstants.XACML_AUTHZ_DECISION_QUERY,
-                                node.getOwnerDocument().getDocumentElement());
+                node.getOwnerDocument().getDocumentElement());
         if (obj == null) {
             // TODO Fix.....
             return null;
@@ -441,86 +438,85 @@ public class XacmlPDPResource implements XACML3Constants {
         //getRequestHandlerClass
 
 
-            // TODO Figure out how to implement this.
-            //samlResponse = handler.handleQuery(pdpEntityID, pepEntityID,
-            //        samlRequest, requestBodyElement);
+        // TODO Figure out how to implement this.
+        //samlResponse = handler.handleQuery(pdpEntityID, pepEntityID,
+        //        samlRequest, requestBodyElement);
 
 
+        // set response attributes
+        samlResponse.setID(SAML2Utils.generateID());
+        samlResponse.setVersion(SAML2Constants.VERSION_2_0);
+        samlResponse.setIssueInstant(new Date());
+        Issuer issuer = AssertionFactory.getInstance().createIssuer();
+        issuer.setValue(pdpEntityID);
+        samlResponse.setIssuer(issuer);
+        // end set Response Attributes
 
-            // set response attributes
-            samlResponse.setID(SAML2Utils.generateID());
-            samlResponse.setVersion(SAML2Constants.VERSION_2_0);
-            samlResponse.setIssueInstant(new Date());
-            Issuer issuer = AssertionFactory.getInstance().createIssuer();
-            issuer.setValue(pdpEntityID);
-            samlResponse.setIssuer(issuer);
-            // end set Response Attributes
+        //set Assertion attributes
+        List assertionList = samlResponse.getAssertion();
+        Assertion assertion = (Assertion) assertionList.get(0);
 
-            //set Assertion attributes
-            List assertionList = samlResponse.getAssertion();
-            Assertion assertion = (Assertion) assertionList.get(0);
+        assertion.setID(SAML2Utils.generateID());
+        assertion.setVersion(SAML2Constants.VERSION_2_0);
+        assertion.setIssueInstant(new Date());
+        assertion.setIssuer(issuer);
+        // end assertion set attributes
 
-            assertion.setID(SAML2Utils.generateID());
-            assertion.setVersion(SAML2Constants.VERSION_2_0);
-            assertion.setIssueInstant(new Date());
-            assertion.setIssuer(issuer);
-            // end assertion set attributes
-
-            // check if assertion needs to be encrypted,signed.
-            String wantAssertionEncrypted =
-                    SAML2Utils.getAttributeValueFromXACMLConfig(
-                            realm, SAML2Constants.PEP_ROLE,
-                            pepEntityID,
-                            SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+        // check if assertion needs to be encrypted,signed.
+        String wantAssertionEncrypted =
+                SAML2Utils.getAttributeValueFromXACMLConfig(
+                        realm, SAML2Constants.PEP_ROLE,
+                        pepEntityID,
+                        SAML2Constants.WANT_ASSERTION_ENCRYPTED);
 
 
-            XACMLAuthzDecisionQueryDescriptorElement
-                    pepDescriptor = SAML2Utils.
-                    getSAML2MetaManager().
-                    getPolicyEnforcementPointDescriptor(realm,
+        XACMLAuthzDecisionQueryDescriptorElement
+                pepDescriptor = SAML2Utils.
+                getSAML2MetaManager().
+                getPolicyEnforcementPointDescriptor(realm,
+                        pepEntityID);
+
+        EncInfo encInfo = null;
+        boolean wantAssertionSigned = pepDescriptor.isWantAssertionsSigned();
+
+        if (debug.messageEnabled()) {
+            debug.message(classMethod +
+                    " wantAssertionSigned :" + wantAssertionSigned);
+        }
+        if (wantAssertionSigned) {
+            signAssertion(realm, pdpEntityID, assertion);
+        }
+
+        if (wantAssertionEncrypted != null
+                && wantAssertionEncrypted.equalsIgnoreCase
+                (SAML2Constants.TRUE)) {
+            encInfo = KeyUtil.getPEPEncInfo(pepDescriptor, pepEntityID);
+
+            // encrypt the Assertion
+            EncryptedAssertion encryptedAssertion =
+                    assertion.encrypt(
+                            encInfo.getWrappingKey(),
+                            encInfo.getDataEncAlgorithm(),
+                            encInfo.getDataEncStrength(),
                             pepEntityID);
-
-            EncInfo encInfo = null;
-            boolean wantAssertionSigned = pepDescriptor.isWantAssertionsSigned();
-
+            if (encryptedAssertion == null) {
+                debug.error(classMethod + "Assertion encryption failed.");
+                throw new SAML2Exception("FailedToEncryptAssertion");
+            }
+            assertionList = new ArrayList();
+            assertionList.add(encryptedAssertion);
+            samlResponse.setEncryptedAssertion(assertionList);
+            //reset Assertion list
+            samlResponse.setAssertion(new ArrayList());
             if (debug.messageEnabled()) {
-                debug.message(classMethod +
-                        " wantAssertionSigned :" + wantAssertionSigned);
+                debug.message(classMethod + "Assertion encrypted.");
             }
-            if (wantAssertionSigned) {
-                signAssertion(realm, pdpEntityID, assertion);
-            }
-
-            if (wantAssertionEncrypted != null
-                    && wantAssertionEncrypted.equalsIgnoreCase
-                    (SAML2Constants.TRUE)) {
-                encInfo = KeyUtil.getPEPEncInfo(pepDescriptor, pepEntityID);
-
-                // encrypt the Assertion
-                EncryptedAssertion encryptedAssertion =
-                        assertion.encrypt(
-                                encInfo.getWrappingKey(),
-                                encInfo.getDataEncAlgorithm(),
-                                encInfo.getDataEncStrength(),
-                                pepEntityID);
-                if (encryptedAssertion == null) {
-                    debug.error(classMethod + "Assertion encryption failed.");
-                    throw new SAML2Exception("FailedToEncryptAssertion");
-                }
-                assertionList = new ArrayList();
-                assertionList.add(encryptedAssertion);
-                samlResponse.setEncryptedAssertion(assertionList);
-                //reset Assertion list
-                samlResponse.setAssertion(new ArrayList());
-                if (debug.messageEnabled()) {
-                    debug.message(classMethod + "Assertion encrypted.");
-                }
-            } else {
-                List assertionsList = new ArrayList();
-                assertionsList.add(assertion);
-                samlResponse.setAssertion(assertionsList);
-            }
-            signResponse(samlResponse, realm, pepEntityID, pdpEntityID);
+        } else {
+            List assertionsList = new ArrayList();
+            assertionsList.add(assertion);
+            samlResponse.setAssertion(assertionsList);
+        }
+        signResponse(samlResponse, realm, pepEntityID, pdpEntityID);
 
 
         return samlResponse;
@@ -780,4 +776,3 @@ public class XacmlPDPResource implements XACML3Constants {
 
 
 }
-

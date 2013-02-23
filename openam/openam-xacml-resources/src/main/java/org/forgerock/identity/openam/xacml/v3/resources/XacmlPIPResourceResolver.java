@@ -25,8 +25,8 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
 /**
  * XACML PIP Resource Interface.
@@ -45,7 +45,6 @@ public interface XacmlPIPResourceResolver extends XACML3Constants {
      * Put a new instance of a FunctionArgument based upon Category and Attribute ID, which
      * have been parsed upstream.
      *
-     * @param requestId
      * @param category
      * @param attributeId
      * @param dataType
@@ -54,28 +53,26 @@ public interface XacmlPIPResourceResolver extends XACML3Constants {
      *
      * @return
      */
-    public boolean put(String requestId, String category, String attributeId, String dataType, String value,
-                       boolean includeInResult);
+    public boolean put (String category, String attributeId, String dataType, Object value,
+                        boolean includeInResult);
 
     /**
      * Remove an instance of a FunctionArgument based upon Category and Attribute ID.
      *
-     * @param requestId
      * @param category
      * @param AttributeID
      * @return
      */
-    public boolean remove(String requestId, String category, String AttributeID);
+    public boolean remove(String category, String AttributeID);
 
     /**
      * Resolve a Policy Resource Request Function Argument by using the Category and Attribute ID.
      *
-     * @param requestId
      * @param category
      * @param AttributeID
      * @return
      */
-    public FunctionArgument resolve(String requestId, String category, String AttributeID);
+    public FunctionArgument resolve(String category, String AttributeID);
 
     /**
      * Clear out the Entire Map.

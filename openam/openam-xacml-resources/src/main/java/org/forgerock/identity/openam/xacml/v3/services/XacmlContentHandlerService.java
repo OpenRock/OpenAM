@@ -43,8 +43,6 @@ import org.forgerock.identity.openam.xacml.v3.resources.XacmlPDPResource;
 
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPingResource;
 import org.json.JSONException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.servlet.ServletConfig;
@@ -285,7 +283,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          ￼GET on the home location MUST return status code 200
          ￼
          Target
-          Response to GET request on the home location
+         Response to GET request on the home location
          ￼
          Predicate
          ￼ The HTTP status code in the [response] is 200
@@ -316,7 +314,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         /**
          * Id
-           urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
+         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
          ￼
          Normative Source
          The XACML entry point representation SHOULD contain a link to the PDP
@@ -611,7 +609,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         String requestURI = headerValues.get("uri");
         // determine AUTH Digest Method Details...
         if ( (StringUtils.isNotBlank(qop)) && (qop.equalsIgnoreCase("auth-int")) &&
-             (StringUtils.isNotBlank(requestBody)) ) {
+                (StringUtils.isNotBlank(requestBody)) ) {
             String entityBodyMd5 = DigestUtils.md5Hex(requestBody);
             ha2 = DigestUtils.md5Hex(method + ":" + requestURI + ":" + entityBodyMd5);
         } else {
@@ -645,8 +643,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************
         // Check for any Nulls on either side.
         if ( (clientResponse == null) || (clientResponse.isEmpty()) ||
-             (serverResponse == null) || (serverResponse.isEmpty()) ||
-             (!serverResponse.equals(clientResponse)) ) {
+                (serverResponse == null) || (serverResponse.isEmpty()) ||
+                (!serverResponse.equals(clientResponse)) ) {
             return null;
         } else {
             // Authenticated Digest is Valid, Allow Access.
@@ -740,9 +738,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request or content.
         if ((request.getContentLength() <= 0) &&
-            (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
+                (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
                 ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
-                 (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
+                        (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
             // ***********************************************************************************************
             // Knowing we have no Authentication at this point check the Request Path Information, provide the
             // Home Document to the Requester by Rendering our Response.
@@ -813,7 +811,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
         if ( (!xacmlRequestInformation.isAuthenticated()) &&
-             (xacmlRequestInformation.getAuthenticationContent() != null) ) {
+                (xacmlRequestInformation.getAuthenticationContent() != null) ) {
             // If the Content is XML Based, we have a DOM.
             if (requestContentType.commonType() == CommonType.XML) {
                 // **************************************************************
@@ -840,12 +838,12 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // *****************************************************************
                 // Render our Response
                 renderResponse(requestContentType,
-                     xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
+                        xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
             }
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
         // **********************************************************************
-        // Do Not Continue if we have authenticated or Trust Requester.
+        // Only Continue if we have authenticated or Trust Requester.
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized, Forbidden.
@@ -872,10 +870,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Check the Request Path Information.
         //
         if ((xacmlRequestInformation.getRequestURI() == null) ||
-            (xacmlRequestInformation.getRequestURI().trim().isEmpty()) ||
-            (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
-            (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
-            (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp/"))) {
+                (xacmlRequestInformation.getRequestURI().trim().isEmpty()) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
+                (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp/"))) {
 
             // TODO
 
@@ -941,7 +939,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param response
      */
     private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 400
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 403
         renderResponse(requestContentType, null, response);
     }
 
@@ -1003,10 +1001,18 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             parseJSONRequest(xacmlRequestInformation);
         }
         // **************************************
+        // Show Parsed Content
+        StringBuilder sb = this.showContentInformation(xacmlRequestInformation);
+        if (sb.length() > 0) {
+            debug.error(classMethod+"Common Resultant Map\n"+sb.toString());
+        }
+        // **************************************
         // Return our Request Information for
         // processing request.
         return xacmlRequestInformation;
     }
+
+
 
     /**
      * Private Helper to Parse the XML Request Body.
@@ -1020,140 +1026,34 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 (xacmlRequestInformation.getOriginalContent().isEmpty())) {
             return;
         }
-        // Get Document Builder Factory
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        // Leave off validation, namespaces and Schema, otherwise we will have false-positive validation
-        // failures.  Validation will be performed using XPath Navigation.
-        factory.setValidating(false);
-        factory.setNamespaceAware(false);
-        factory.setExpandEntityReferences(true);
-        factory.setIgnoringComments(true);
-        // unMarshal the XML String into a Document Object.
-        Document document = null;
+        final String classMethod = "XacmlContentHandlerService:parseXMLRequest: ";
+
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            ByteArrayInputStream inputStream =
-                    new ByteArrayInputStream(
-                            (xacmlRequestInformation.getOriginalContent().startsWith("<?") ?
-                                    xacmlRequestInformation.getOriginalContent().getBytes() :
-                                    (XML_HEADER + xacmlRequestInformation.getOriginalContent()).getBytes()));
-            document = builder.parse(inputStream);
-        } catch (SAXException se) {
-            debug.error("SAXException: " + se.getMessage());
-        } catch (ParserConfigurationException pce) {
-            debug.error("The underlying parser does not support the requested features: " + pce.getMessage());
-        } catch (FactoryConfigurationError fce) {
-            debug.error("Error occurred obtaining Document Builder Factory: " + fce.getMessage());
+            // The Original Content will be UnMarshaled into a Map Object stored in Content.
+            xacmlRequestInformation.setContent(XmlToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
+            xacmlRequestInformation.setParsedCorrectly(true);
         } catch (IOException ioe) {
-            debug.error("IO Exception occurred obtaining Document Builder Factory: " + ioe.getMessage());
-        }
-        // Save a Reference to our XML Document for later use.
-        xacmlRequestInformation.setContent(document);
-        if (document == null) {
-            return;
-        }
-        // ********************************************************
-        // Now dig using XPaths to perform a validation.
-        // We need to obtain the Request Node and the
-        // XACMLAuthzDecisionQuery wrapper if applicable.
-        //
-        Node soapEnvelopeNode;
-        Node requestNode;
-        Node xacmlAuthzDecisionQueryNode;
-
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
-
-        // Check for a SOAP Envelope.
-        try {
-            // Verify we have a Request.
-            XPathExpression expr = xpath.compile("/" + ENVELOPE);
-            soapEnvelopeNode = (Node) expr.evaluate(document, XPathConstants.NODE);
-            if (soapEnvelopeNode != null) {
-                // Indicate our Request Node is in fact present, either wrapped or not.
-                xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
-                for (int i = 0; i < soapEnvelopeNode.getAttributes().getLength(); i++) {
-                    debug.error("Node: " + soapEnvelopeNode.getAttributes().item(i).getNodeName() + " attribute: " + soapEnvelopeNode
-                            .getAttributes().item(i));
-
-                    // TODO Verify....
-                    // TODO
-
-                }
-            }
-        } catch (XPathExpressionException xee) {
-            // Our initial Expression for a Node was invalid, we have no Request Object.
-            // This could be a maintenance which has no request, but not part of specification yet...
-            // Document could be bad or suspect.
-            debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
-            return;
+            debug.error(classMethod+" Issue UnMarshaling Original Content to Common Map Object Exception: " + ioe
+                    .getMessage() + "], content will be ignored!",ioe);
+            xacmlRequestInformation.setContent(null);
+            xacmlRequestInformation.setParsedCorrectly(false);
+        }  catch (JSONException jsone) {
+            debug.error(classMethod+" Issue UnMarshaling Original Content to Common Map Object Exception: " + jsone
+                    .getMessage() + "], content will be ignored!",jsone);
+            xacmlRequestInformation.setContent(null);
+            xacmlRequestInformation.setParsedCorrectly(false);
         }
 
-        // Now check to see if we have an optional XACMLAuthzDecisionQueryNode wrapper for the request...
-        try {
-            // Check for we have a XACMLAuthzDecisionQueryNode.
-            XPathExpression expr = xpath.compile("/" + XACML_AUTHZ_QUERY);
-            xacmlAuthzDecisionQueryNode = (Node) expr.evaluate(document, XPathConstants.NODE);
-            if (xacmlAuthzDecisionQueryNode != null) {
-                // Save a Reference to our XML Node for later use.
-                xacmlRequestInformation.setAuthenticationContent(xacmlAuthzDecisionQueryNode);
-                for (int i = 0; i < xacmlAuthzDecisionQueryNode.getAttributes().getLength(); i++) {
-                    xacmlRequestInformation.getXacmlAuthzDecisionQuery().setByName(
-                            xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeName(),
-                            xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
-                    // Make me Message level....
-                    debug.error("Node: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeName() +
-                            " attribute: " + xacmlAuthzDecisionQueryNode.getAttributes().item(i).getNodeValue());
-                }
-                //
-                // Verify the Node attributes.
-                // They Must contain an ID, IssueInstant and Version fields are Required.
-                // Destination and Consent Fields are Optional.
-                //
-                if ((!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId())) ||
-                        (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getIssueInstant())) ||
-                        (!isRequiredFieldPresent(xacmlRequestInformation.getXacmlAuthzDecisionQuery().getVersion()))) {
-                    // Indicate Error in Request.
-                    debug.error(XACML_AUTHZ_QUERY + " Required Field Missing, must contain ID, " +
-                            "IssueInstant and Version.");
-                    return;
-                }
+        // ************************************
+        // Verify we have at least a
+        // Valid Request Node to Process.
 
-            } // End of Check for XACMLAuthzDecisionQuery Node Element.
-        } catch (XPathExpressionException xee) {
-            // Our initial Expression for a Node was invalid, we have no Request Object.
-            // This could be a maintenance which has no request, but not part of specification yet...
-            // Document could be bad or suspect.
-            debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
-            return;
-        }
+        /**
+         if (xacmlRequestInformation.isRequestNodePresent()) {
+         xacmlRequestInformation.setParsedCorrectly(true);
+         }
+         **/
 
-        // Verify we have a PEP Request
-        try {
-            // Verify we have a Request.
-            XPathExpression expr = xpath.compile("/" + REQUEST);
-            requestNode = (Node) expr.evaluate(document, XPathConstants.NODE);
-            if (requestNode != null) {
-                // Indicate our Request Node is in fact present, either wrapped or not.
-                xacmlRequestInformation.setRequestNodePresent(true);
-                for (int i = 0; i < requestNode.getAttributes().getLength(); i++) {
-                    debug.error("Node: " + requestNode.getAttributes().item(i).getNodeName() + " attribute: " + requestNode
-                            .getAttributes().item(i));
-
-                    // TODO Verify....
-                    // TODO
-
-                }
-            }
-        } catch (XPathExpressionException xee) {
-            // Our initial Expression for a Node was invalid, we have no Request Object.
-            // This could be a maintenance which has no request, but not part of specification yet...
-            // Document could be bad or suspect.
-            debug.error("XPathExpressException: " + xee.getMessage() + ", returning null invalid content!");
-            return;
-        }
-        // Valid Request to Process.
-        xacmlRequestInformation.setParsedCorrectly(true);
     }
 
     /**
@@ -1166,12 +1066,65 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 (xacmlRequestInformation.getOriginalContent().isEmpty())) {
             return;
         }
+        final String classMethod = "XacmlContentHandlerService:parseJSONRequest: ";
         try {
             // The Original Content will be UnMarshaled into a Map Object stored in Content.
             xacmlRequestInformation.setContent(JsonToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
             xacmlRequestInformation.setParsedCorrectly(true);
         } catch (IOException ioe) {
-            debug.error("parseJSONRequest Exception: " + ioe.getMessage() + "], content will be ignored!");
+            debug.error(classMethod+"parseJSONRequest Exception: " + ioe.getMessage() + "], content will be ignored!");
+            xacmlRequestInformation.setContent(null);
+            xacmlRequestInformation.setParsedCorrectly(false);
+        }
+    }
+
+    /**
+     *  Show the Parsed Content Information.
+     *
+     * @param xacmlRequestInformation
+     */
+    private StringBuilder showContentInformation(XACMLRequestInformation xacmlRequestInformation) {
+        StringBuilder sb = new StringBuilder();
+        if ( (xacmlRequestInformation != null) && (xacmlRequestInformation.getContent() != null) ) {
+            this.showContentInformation(xacmlRequestInformation.getContent(), sb, 1);
+            return sb;
+        }
+        return sb;
+    }
+
+    /**
+     *  Show the Parsed Content Information.
+     *
+     * @param contentObject
+     */
+    private void showContentInformation(Object contentObject, StringBuilder sb, int level) {
+        if (contentObject == null) {
+            return;
+        }
+        // Determine the Type of Object and Iterate Over the Contents Recursively...
+        if (contentObject instanceof Map) {
+            level++;
+            // Cast our Object.
+            Map<String,Object> contentMap = (Map<String,Object>) contentObject;
+            // Iterate over the Key Set
+            for(String key : contentMap.keySet()) {
+                sb.append(this.levelToDots(level)+" Element: "+key+", Content Type: "+contentMap.get(key)
+                        .getClass()
+                        .getName()
+                        +"\n");
+                this.showContentInformation(contentMap.get(key), sb, level);
+            }
+            level--;
+        } else if (contentObject instanceof List) {
+            // Cast our Object.
+            level++;
+            List<Object> contentList = (List<Object>) contentObject;
+            for (Object innerObject : contentList) {
+                this.showContentInformation(innerObject, sb, level);
+            }
+            level--;
+        } else {
+            sb.append(this.levelToDots(level)+" Content Value: "+contentObject.toString()+"\n");
         }
     }
 
@@ -1183,6 +1136,19 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      */
     private static boolean isRequiredFieldPresent(String value) {
         return ((value != null) && (!value.isEmpty()));
+    }
+
+    /**
+     * Simple private helper method to prefix a content level...
+     * @param level
+     * @return String - containing prefix for showing content level.
+     */
+    private String levelToDots(int level) {
+        StringBuilder levelPrefix = new StringBuilder().append(".");
+        for(int i = 0; i<level; i++) {
+            levelPrefix.append(".");
+        }
+        return levelPrefix.toString();
     }
 
 }

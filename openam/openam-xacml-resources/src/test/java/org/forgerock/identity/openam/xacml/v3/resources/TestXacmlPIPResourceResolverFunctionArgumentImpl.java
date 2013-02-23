@@ -26,6 +26,7 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -51,37 +52,41 @@ public class TestXacmlPIPResourceResolverFunctionArgumentImpl {
     @Test
     public void testUseCase_ResolverManipulation() {
 
-         // Test Constructors.
+        // Test Constructors.
         XacmlPIPResourceResolverFunctionArgumentImpl resolver =
-                            new XacmlPIPResourceResolverFunctionArgumentImpl();
+                new XacmlPIPResourceResolverFunctionArgumentImpl();
         assertNotNull(resolver);
-        assertNull(resolver.resolve("requestId", "category", "attributeId"));
+        assertNull(resolver.resolve("category", "attributeId"));
 
         // Add an Entry
-        resolver.put("1", "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
+        resolver.put("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
                 "urn:oasis:names:tc:xacml:3.0:ipc:subject:organization",
                 "http://www.w3.org/2001/XMLSchema#string", "Curtiss1", true);
 
         // Check the Size.
         assertEquals(resolver.size(), 1);
 
-        // Add an Entry
-        resolver.put("2", "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
-                "urn:oasis:names:tc:xacml:3.0:ipc:subject:organization",
-                "http://www.w3.org/2001/XMLSchema#string", "Curtiss2", true);
+        // Add another Entry
+        resolver.put("urn:oasis:names:tc:xacml:3.0:attribute-category:resource",
+                "urn:oasis:names:tc:xacml:3.0:ipc:resource:proprietary",
+                "http://www.w3.org/2001/XMLSchema#boolean", new Boolean(true), true);
 
         // Check the Size.
         assertEquals(resolver.size(),2);
 
+        // Update an Entry
+        resolver.put("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
+                "urn:oasis:names:tc:xacml:3.0:ipc:subject:organization",
+                "http://www.w3.org/2001/XMLSchema#string", "Curtiss2", true);
+
+
         // Now Find a FunctionArgument from our Resolver.
-        FunctionArgument functionArgument = resolver.resolve("1", "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
+        FunctionArgument functionArgument = resolver.resolve("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
                 "urn:oasis:names:tc:xacml:3.0:ipc:subject:organization");
         assertNotNull(functionArgument);
         // I am the PIP Resource Resolver,
         // so get actual Data Value.
-        assertEquals("Curtiss1", functionArgument.getValue(null));
-
-
+        assertEquals("Curtiss2", functionArgument.getValue(null));
 
     }
 

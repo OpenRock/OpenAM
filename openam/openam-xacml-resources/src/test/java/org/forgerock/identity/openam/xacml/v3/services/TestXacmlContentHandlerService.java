@@ -53,7 +53,7 @@ public class TestXacmlContentHandlerService {
 
     private static ServletTester servletTester;
 
-    private final static String testAuthzDecisionQuery_ResourceName = "test_data/xacml3_authzDecisionQuery.xml";
+    private final static String testAuthzDecisionQuery_ResourceName = "test_data/xacml2_authzDecisionQuery.xml";
 
     private final static String testSOAPEnvelope_ResourceName = "test_data/request-curtiss.xml";
 
@@ -399,10 +399,10 @@ public class TestXacmlContentHandlerService {
         request.setContent(testData);
 
         try {
-            // Check for a 403 Forbidden.
+            // Check for a 401 Not Authenticated.
             HttpTester response = new HttpTester();
             response.parse(servletTester.getResponses(request.generate()));
-            assertEquals(response.getStatus(),403);
+            assertEquals(response.getStatus(),401);
             assertNotNull(response.getHeader("Content-Type"));
             assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
 
@@ -432,10 +432,10 @@ public class TestXacmlContentHandlerService {
         request.setContent(testData);
 
         try {
-            // Check for a 403 Forbidden.
+            // Check for a 401 Not Authenticated.
             HttpTester response = new HttpTester();
             response.parse(servletTester.getResponses(request.generate()));
-            assertEquals(response.getStatus(),403);
+            assertEquals(response.getStatus(),401);
             assertNotNull(response.getHeader("Content-Type"));
             assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
 

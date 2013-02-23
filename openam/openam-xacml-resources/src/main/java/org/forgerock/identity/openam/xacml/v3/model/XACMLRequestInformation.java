@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -95,9 +96,10 @@ public class XACMLRequestInformation implements Serializable {
      */
     private String originalContent;
     /**
-     * Content, can be either XML DOM or a JSON Object in form of a Map depending upon the specified ContentType.
+     * Content, is Marshaled into a common Map Collection, which can be queried using JoSQL.
      */
-    private Object content;
+    private Map<String,Object> content;   // TODO This needs to be refactored to List<Map<String,Object>>
+    // TODO :: To Support multiple Requests.
     /**
      * Optional HTTP Digest Authorization Request
      */
@@ -351,11 +353,11 @@ public class XACMLRequestInformation implements Serializable {
         this.originalContent = originalContent;
     }
 
-    public Object getContent() {
+    public Map<String,Object> getContent() {
         return content;
     }
 
-    public void setContent(Object content) {
+    public void setContent(Map<String,Object> content) {
         this.content = content;
     }
 
@@ -526,7 +528,7 @@ public class XACMLRequestInformation implements Serializable {
                 return POJOToXmlUtility.toXML(this.getXacmlResponse());
             } catch(Exception exception) {
                 debug.error(this.getClass().getSimpleName()+" Exception performing POJOToXmlUtility.toXML: " +
-                        ""+exception.getMessage(),exception);
+                        exception.getMessage(),exception);
                 return null;
             }
         } else {
@@ -534,7 +536,7 @@ public class XACMLRequestInformation implements Serializable {
                 return POJOToJsonUtility.toJSON(this.getXacmlResponse());
             } catch(Exception exception) {
                 debug.error(this.getClass().getSimpleName()+" Exception performing POJOToJsonUtility.toXML: " +
-                        ""+exception.getMessage(),exception);
+                        exception.getMessage(),exception);
                 return null;
             }
         }
@@ -542,7 +544,7 @@ public class XACMLRequestInformation implements Serializable {
 
     public Response getXacmlResponse() {
         if ( (this.xacmlResponse == null) || (this.xacmlResponse.getResult() == null) ||
-             (this.xacmlResponse.getResult().isEmpty()) ) {
+                (this.xacmlResponse.getResult().isEmpty()) ) {
             return new XACMLDefaultResponse();
         } else {
             return this.xacmlResponse;
