@@ -27,13 +27,24 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeType;
+import com.sun.identity.session.util.RestrictedTokenAction;
+import com.sun.identity.session.util.RestrictedTokenContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
+
+import javax.security.auth.Subject;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * 
  */
 public class XACMLOpenSSOPrivilege extends OpenSSOPrivilege {
+    private XACML3Policy xPolicy;
 
     public XACMLOpenSSOPrivilege() {
        super();
@@ -44,6 +55,28 @@ public class XACMLOpenSSOPrivilege extends OpenSSOPrivilege {
         return PrivilegeType.XACML3_OPENSSO;
     }
 
+    @Override
+    public List<Entitlement> evaluate(
+            final Subject adminSubject,
+            final String realm,
+            final Subject subject,
+            final String applicationName,
+            final String resourceName,
+            final Set<String> actionNames,
+            final Map<String, Set<String>> environment,
+            final boolean recursive,
+            final Object context
+    ) throws EntitlementException {
+        List<Entitlement> results = null;
+
+        try {
+           // xPolicy.evaluate();
+        } catch (Exception ex) {
+            // exception
+        }
+
+        return null;
+    }
 
     /*
      TODO: override to evaluate full blown xacml policy

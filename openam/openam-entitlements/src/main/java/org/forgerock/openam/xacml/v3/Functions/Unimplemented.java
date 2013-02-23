@@ -23,30 +23,25 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
-package org.forgerock.openam.xacml.v3.Entitlements;
-
-
+package org.forgerock.openam.xacml.v3.Functions;
 
 /*
-    This class Encapsulates a DataValue from the XACML policy.
-    In this case, we have the actual Data in the object
+urn:oasis:names:tc:xacml:1.0:function:round
+functions SHALL take a single argument of the specified data-type.
+The round and floor functions SHALL take a single argument of data-type
+“http://www.w3.org/2001/XMLSchema#double” and return a value of the data-type
+“http://www.w3.org/2001/XMLSchema#double”.
+*/
 
- */
+import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
-public class DataValue extends FunctionArgument {
-    private Object data;
+public class Unimplemented extends XACMLFunction {
 
-    public DataValue(String type, Object value) {
-        setType(type);
-        data = value;
+    public Unimplemented()  {
     }
-
-    public FunctionArgument evaluate(XACMLEvalContext pip) {
-        return this;
-    };
-
-    public Object getValue(XACMLEvalContext pip) {
-        return data;
+    public FunctionArgument evaluate( XACMLEvalContext pip){
+        return FunctionArgument.falseObject;
     }
 }

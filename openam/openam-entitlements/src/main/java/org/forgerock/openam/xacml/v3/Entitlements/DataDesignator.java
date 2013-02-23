@@ -44,9 +44,13 @@ public class DataDesignator extends FunctionArgument {
         setType(type);
         this.category = category;
         this.attributeID = attributeID;
-    };
+    }
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) {
+        return pip.resolve(category,attributeID);
+    }
 
     public Object getValue(XACMLEvalContext pip) {
-        return pip.resolve(category,attributeID).getValue(pip);
+        return evaluate(pip).getValue(pip);
     }
 }

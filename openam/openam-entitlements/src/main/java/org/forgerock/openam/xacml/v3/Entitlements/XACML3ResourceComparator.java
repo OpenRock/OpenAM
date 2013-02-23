@@ -29,8 +29,23 @@ import java.util.Comparator;
 
 public class XACML3ResourceComparator implements Comparator {
 
-    public int compare(Object t, Object t1) {
-        return 0;
+    public int compare(Object t1, Object t2) {
+        String s1 = (String) t1;
+        String s2 = (String) t1;
+
+        if (s1 == null) {
+            if (s2 != null) {
+                return -1;
+            } else {
+                return 0;
+            }
+        } else {
+            if (s2 == null) {
+                return 1;
+            }
+        }
+
+        return s1.compareToIgnoreCase(s2);
     };
 
 }

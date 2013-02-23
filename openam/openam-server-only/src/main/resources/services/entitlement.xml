@@ -438,7 +438,6 @@
                     </SubConfiguration>
                     <SubConfiguration name="XACML3Application"
                                       id="applicationType">
-                        id="applicationType">
                         <AttributeValuePair>
                             <Attribute name="actions" />
                             <Value>ACCESS=true</Value>

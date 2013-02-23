@@ -70,6 +70,8 @@ public class XACML3Policy {
      */
 
     public FunctionArgument evaluate() {
+
+
           return FunctionArgument.indeterminateObject;
     }
 

@@ -108,7 +108,7 @@ public class OpenSSOPrivilege extends Privilege {
         return results;
     }
 
-    private List<Entitlement> internalEvaluate(
+    protected List<Entitlement> internalEvaluate(
         Subject adminSubject,
         String realm,
         Subject subject,
