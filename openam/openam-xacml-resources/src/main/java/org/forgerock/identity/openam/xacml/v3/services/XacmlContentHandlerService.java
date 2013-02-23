@@ -27,6 +27,7 @@ package org.forgerock.identity.openam.xacml.v3.services;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 
+import com.sun.identity.entitlement.xacml3.core.Response;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.xacml.client.XACMLRequestProcessor;
@@ -38,10 +39,8 @@ import org.forgerock.identity.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.model.AuthenticationDigest;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
-import org.forgerock.identity.openam.xacml.v3.resources.XacmlHomeResource;
-import org.forgerock.identity.openam.xacml.v3.resources.XacmlPDPResource;
+import org.forgerock.identity.openam.xacml.v3.resources.*;
 
-import org.forgerock.identity.openam.xacml.v3.resources.XacmlPingResource;
 import org.json.JSONException;
 import org.xml.sax.SAXException;
 
@@ -52,11 +51,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.XMLConstants;
-import javax.xml.parsers.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.xpath.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -808,6 +805,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
             return;
         }
+
+        // TODO : Address this check below, since PDPResource has now changed...
+
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
         if ( (!xacmlRequestInformation.isAuthenticated()) &&
@@ -820,14 +820,14 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 // be performed naturally since the request is wrapped in a
                 // PEP Authentication outer request.
                 // Response is located within the XacmlRequestInformation Object.
-                XacmlPDPResource.processPDP_XMLRequest(xacmlRequestInformation, request, response);
+                //XacmlPDPResource.processPDP_XMLRequest(xacmlRequestInformation, request, response);
                 // TODO -- Analyze Response.
 
             } else {
                 // **************************************************************
                 // Else, our Content is assumed to be JSON, but we can still have
                 // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
-                XacmlPDPResource.processPDP_JSONRequest(xacmlRequestInformation, request, response);
+                //XacmlPDPResource.processPDP_JSONRequest(xacmlRequestInformation, request, response);
                 // TODO -- Analyze Response.
 
             }
@@ -842,6 +842,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             }
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
+        /* **********************************************************************
+               // TODO : Re-enable authentication......
         // **********************************************************************
         // Only Continue if we have authenticated or Trust Requester.
         if (!xacmlRequestInformation.isAuthenticated()) {
@@ -853,6 +855,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             renderResponse(requestContentType, null, response);
             return;
         }
+        * **********************************************************************/
+
         // ******************************************************************
         // Check for a existence of a XACML Request, for a POST, we must have
         // Correct Request Content and if no Request Object in XML or JSON
@@ -875,10 +879,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
                 (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp/"))) {
 
-            // TODO
-
-            // TODO Process PDP Request, Hook into existing code base here......
-            //xacmlRequestProcessor.processRequest()
+            // ***********************************************************
+            // Perform the Evaluation:
+            XacmlPDPResource xacmlPDPResource = new XacmlPDPResourceImpl();
+            xacmlRequestInformation.setXacmlResponse(xacmlPDPResource.XACMLEvaluate(xacmlRequestInformation));
 
         } else {
             // No Valid Request URI Found, render Bad Request.
@@ -1002,24 +1006,23 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // **************************************
         // Show Parsed Content
-        StringBuilder sb = this.showContentInformation(xacmlRequestInformation);
+        StringBuilder sb = this.dumpContentInformation(xacmlRequestInformation);
         if (sb.length() > 0) {
             debug.error(classMethod+"Common Resultant Map\n"+sb.toString());
         }
+        // ****************************************
+        // Build out our Xacml PIP Resource Object.
+        this.buildXacmlPIPResourceForRequests(xacmlRequestInformation);
         // **************************************
         // Return our Request Information for
         // processing request.
         return xacmlRequestInformation;
     }
 
-
-
     /**
      * Private Helper to Parse the XML Request Body.
      *
-     * @param xacmlRequestInformation To indicate the XACMLRequestInformation's request Node
-     *                                does not exist, the XACMLRequestInformation.isRequestNodePresent() will
-     *                                return false, which indicates an Invalid XACML Request.
+     * @param xacmlRequestInformation
      */
     private void parseXMLRequest(XACMLRequestInformation xacmlRequestInformation) {
         if ((xacmlRequestInformation.getOriginalContent() == null) ||
@@ -1043,17 +1046,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             xacmlRequestInformation.setContent(null);
             xacmlRequestInformation.setParsedCorrectly(false);
         }
-
-        // ************************************
-        // Verify we have at least a
-        // Valid Request Node to Process.
-
-        /**
-         if (xacmlRequestInformation.isRequestNodePresent()) {
-         xacmlRequestInformation.setParsedCorrectly(true);
-         }
-         **/
-
     }
 
     /**
@@ -1079,25 +1071,139 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
+     *  Build Up our Xacml PIP Resource For Requests Object within our XacmlRequestInformation Object.
+     *
+     *  Additional Elements will be set within the Xacml Request Information Object for UpStream Callers.
+     *
+     * @param xacmlRequestInformation
+     */
+    private void buildXacmlPIPResourceForRequests(XACMLRequestInformation xacmlRequestInformation) {
+        if ( (xacmlRequestInformation == null) || (xacmlRequestInformation.getContent() == null) ) {
+            return;
+        }
+        // Recursively Iterate to Build up the PIP Resource Object
+        if (xacmlRequestInformation.getContent() == null) {
+            // Initialize our PIP Resource Resolver.
+            xacmlRequestInformation.setPipResourceResolver((new XacmlPIPResourceResolverFunctionArgumentImpl()));
+        }
+        // Now Iterate over the Content Parsed Object.
+        this.buildXacmlPIPResourceForRequests(xacmlRequestInformation, xacmlRequestInformation.getContent());
+    }
+
+    /**
+     *  Parse Content Information from Map Object to see the XacmlPIPResourceResolver Object
+     *
+     *  TODO : Currently working this area.
+     *
+     * @param contentObject
+     */
+    private boolean buildXacmlPIPResourceForRequests(XACMLRequestInformation xacmlRequestInformation,
+                                                  Object contentObject) {
+        if (contentObject == null) {
+            return false;
+        }
+        String currentCategory = null;
+
+        // Determine the Type of Object and Iterate Over the Contents Recursively...
+        if (contentObject instanceof Map) {
+            // Cast our Object.
+            Map<String, Object> contentMap = (Map<String, Object>) contentObject;
+            // Iterate over the Key Set
+            for (String key : contentMap.keySet()) {
+                // TODO : When we go Java 7 or above use a String Switch here...
+                if (key.equalsIgnoreCase(REQUEST)) {
+                    // Get the Request Immediate Attributes.
+                    if (!(contentMap.get(key) instanceof Map)) {
+                        debug.error("Request does not contain a Map Object, improperly parsed Object, " +
+                                "ignoring Request!");
+                        return false;
+                    }
+                    // TODO : Handle Multiple Requests.
+                    xacmlRequestInformation.setRequestNodePresent(true);
+                    for (String requestAttributes : contentMap.keySet()) {
+
+
+                    }
+
+                } else if ((key.equalsIgnoreCase(ATTRIBUTES)) && (contentMap.get(key) instanceof List)) {
+                    processAttributes(currentCategory,  xacmlRequestInformation, (List)contentMap.get(key));
+
+
+                }
+
+                /**
+                 if ((contentMap.get(key) instanceof Map) || (contentMap.get(key) instanceof List)) {
+                 System.out.println("Element Key: " + key + ", Type: " + contentMap.get(key).getClass().getName());
+                 this.buildXacmlPIPResourceForRequests(xacmlRequestInformation, contentMap.get(key),
+                 currentCategory, currentAttributeId);
+                 } else {
+                 System.out.println("Element Key: " + key + ", Value: " + contentMap.get(key));
+                 }
+                 }
+
+
+                 } else if (contentObject instanceof List) {
+                 // Cast our Object.
+                 List<Object> contentList = (List<Object>) contentObject;
+                 for (Object innerObject : contentList) {
+                 if ( (innerObject instanceof Map) || (innerObject instanceof List) ) {
+                 this.buildXacmlPIPResourceForRequests(xacmlRequestInformation, innerObject,
+                 currentCategory, currentAttributeId);
+                 } else {
+
+                 }
+                 }
+                 } else {
+
+                 //sb.append(this.levelToDots(level)+" Content Value: "+contentObject.toString()+"\n");
+                 }
+                 **/
+            }
+        }
+
+        return false;
+    }
+
+    private void processAttributes(String currentCategory,  XACMLRequestInformation xacmlRequestInformation,
+                                   List attributes) {
+
+        System.out.println("Attributes: ");
+        for (Object innerObject : attributes) {
+            if (innerObject instanceof Map) {
+                Map<String, Object> attribute = (Map<String, Object>) innerObject;
+                for (String attributeKey : attribute.keySet()) {
+
+                    System.out.println("  Attribute: " +"Key: "+attributeKey+", " +
+                            "" + attribute.get(attributeKey).getClass().getName());
+
+                }
+            } else {
+                System.out.println("???? Attribute: " + innerObject.toString());
+            }
+        }
+    }
+
+
+    /**
      *  Show the Parsed Content Information.
      *
      * @param xacmlRequestInformation
      */
-    private StringBuilder showContentInformation(XACMLRequestInformation xacmlRequestInformation) {
+    private StringBuilder dumpContentInformation(XACMLRequestInformation xacmlRequestInformation) {
         StringBuilder sb = new StringBuilder();
         if ( (xacmlRequestInformation != null) && (xacmlRequestInformation.getContent() != null) ) {
-            this.showContentInformation(xacmlRequestInformation.getContent(), sb, 1);
+            this.dumpContentInformation(xacmlRequestInformation.getContent(), sb, 0);
             return sb;
         }
         return sb;
     }
 
     /**
-     *  Show the Parsed Content Information.
+     *  Dump the Parsed Content Information.
      *
      * @param contentObject
      */
-    private void showContentInformation(Object contentObject, StringBuilder sb, int level) {
+    private void dumpContentInformation(Object contentObject, StringBuilder sb, int level) {
         if (contentObject == null) {
             return;
         }
@@ -1112,7 +1218,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                         .getClass()
                         .getName()
                         +"\n");
-                this.showContentInformation(contentMap.get(key), sb, level);
+                this.dumpContentInformation(contentMap.get(key), sb, level);
             }
             level--;
         } else if (contentObject instanceof List) {
@@ -1120,7 +1226,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             level++;
             List<Object> contentList = (List<Object>) contentObject;
             for (Object innerObject : contentList) {
-                this.showContentInformation(innerObject, sb, level);
+                this.dumpContentInformation(innerObject, sb, level);
             }
             level--;
         } else {
@@ -1144,7 +1250,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @return String - containing prefix for showing content level.
      */
     private String levelToDots(int level) {
-        StringBuilder levelPrefix = new StringBuilder().append(".");
+        StringBuilder levelPrefix = new StringBuilder();
         for(int i = 0; i<level; i++) {
             levelPrefix.append(".");
         }

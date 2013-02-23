@@ -34,13 +34,6 @@ import com.sun.identity.entitlement.xacml3.XACMLConstants;
  * @author jeff.schenk@forgerock.com
  */
 public interface XACML3Constants extends XACMLConstants {
-
-    /**
-     * XACML 3 Core Package Information.
-     */
-    public static final String XACML3_CORE_PKG
-            = "com.sun.identity.entitlement.xacml3.core";
-
     /**
      *  XACML 3 Default Namespace.
      */
@@ -55,20 +48,25 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String NAME_META_ALIAS_IN_URI = "metaAlias";
 
     /**
-     * Digest Authentication Global Constants.
+     * Digest Authentication Constants.
      */
     public static final String authenticationMethods = "auth,auth-int";   // See http://tools.ietf.org/html/rfc2617
     public static final String USERNAME = "username";
     /**
-     * Common Globals Definitions
+     * Common Key Definitions
      */
     public static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
     public static final String AUTHORIZATION = "authorization";
     public static final String DIGEST = "Digest";
     public static final String REQUEST = "Request";
+    public static final String ATTRIBUTES = "Attributes";
+
     public static final String ENVELOPE = "Envelope";
     public static final String XSI_TYPE_ATTR = "xsi:type";
     public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
+
+
+
     public static final String METAALIAS_KEY = "/metaAlias";
 
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";

@@ -26,7 +26,7 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.entitlement.xacml3.core.Response;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 
@@ -46,7 +46,11 @@ import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPDPResource extends XACML3Constants {
+public class XacmlPDPResourceImpl implements XacmlPDPResource, XACML3Constants {
+    /**
+     * Define our Static resource Bundle for our debugger.
+     */
+    private static Debug debug = Debug.getInstance("amXACML");
 
     /**
      * Provide a PDP Evaluation Method to return a XACML 3 Response Object.
@@ -54,6 +58,16 @@ public interface XacmlPDPResource extends XACML3Constants {
      * @param xacmlRequestInformation
      * @return Response
      */
-    public Response XACMLEvaluate(XACMLRequestInformation xacmlRequestInformation);
+    public Response XACMLEvaluate(XACMLRequestInformation xacmlRequestInformation) {
+        Response response = new Response();
+
+
+        // TODO : Finish Implemetation...
+
+        return response;
+    }
+
+
+
 
 }
