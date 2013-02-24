@@ -204,6 +204,13 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
+        <!-- Required for Client Request Tool -->
+        <!-- Commons -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.2</version>
+        </dependency>
         <!-- Servlet Context -->
         <dependency>
             <groupId>javax.servlet</groupId>

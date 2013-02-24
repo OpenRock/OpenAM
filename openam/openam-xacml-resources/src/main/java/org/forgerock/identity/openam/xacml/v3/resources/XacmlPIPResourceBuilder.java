@@ -190,7 +190,14 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                             } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_ISSUE_INSTANT)) {
                                 xacmlRequestInformation.getXacmlAuthzDecisionQuery().setIssueInstant(
                                         (String) contentMap.get(key));
+                            } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_DESTINATION_NAME)) {
+                                xacmlRequestInformation.getXacmlAuthzDecisionQuery().setDestination(
+                                        (String) contentMap.get(key));
+                            } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_CONSTENT_NAME)) {
+                                xacmlRequestInformation.getXacmlAuthzDecisionQuery().setConsent(
+                                        (String) contentMap.get(key));
                             }
+
                             // SOAP Node Attributes
                         } else if ((removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_ENVELOPE)) ||
                                 (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_HEADER)) ||
