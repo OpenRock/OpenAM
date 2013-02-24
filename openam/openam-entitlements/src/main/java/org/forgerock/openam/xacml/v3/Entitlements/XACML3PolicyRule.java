@@ -25,6 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Entitlements;
 
+import com.sun.identity.entitlement.xacml3.core.AdviceExpressions;
 import com.sun.identity.entitlement.xacml3.core.ObligationExpressions;
 import com.sun.identity.entitlement.xacml3.core.Rule;
 
@@ -37,6 +38,8 @@ public class XACML3PolicyRule {
 
     private String ruleName;
     private String effect;
+    private ObligationExpressions obligations;
+    private AdviceExpressions advices;
 
 
 
@@ -46,12 +49,41 @@ public class XACML3PolicyRule {
         effect = rule.getEffect().value();
         condition = XACML3PrivilegeUtils.getConditionFunction(rule.getCondition());
 
-
+        obligations = rule.getObligationExpressions();
+        advices = rule.getAdviceExpressions();
     }
 
 
-    public FunctionArgument evaluate() {
-         return FunctionArgument.indeterminateObject;
+    public XACML3Decision evaluate(XACMLEvalContext pip) {
+
+        XACML3Decision result = new XACML3Decision();
+
+        FunctionArgument evalResult = target.evaluate(pip);
+
+        if (evalResult.isTrue())        {    // we Dont match,  so evaluate
+            evalResult = condition.evaluate(pip);
+            if (evalResult.isTrue())        {    // we Match Target,  and Condition
+                result.setStatus(XACML3Decision.XACML3DecisionStatus.TRUE_VALUE);
+                result.setEffect(effect);
+                if (obligations != null) {
+                    result.setObligations(obligations);
+                }
+                if (advices != null) {
+                    result.setAdvices(advices);
+                }
+                return result;
+            }
+        }
+
+        if (evalResult.isIndeterminate()) {
+            result.setStatus(XACML3Decision.XACML3DecisionStatus.INDETERMINATE);
+        } else if (evalResult.isNotApplicable()) {
+            result.setStatus(XACML3Decision.XACML3DecisionStatus.NOTAPPLICABLE);
+        } else if (evalResult.isFalse()) {
+            result.setStatus(XACML3Decision.XACML3DecisionStatus.FALSE_VALUE);
+        }
+
+        return result;
     }
 
 }

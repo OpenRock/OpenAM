@@ -1274,17 +1274,33 @@ public class XACMLPrivilegeUtils {
     public static PolicySet streamToPolicySet(InputStream stream) throws JAXBException {
         //FIXME: remove
         PrivilegeManager.debug.error(
-            "XACMLProvilegeUtils.streamToPolicySet(), core_pkg:"
-                    + XACMLConstants.XACML3_CORE_PKG, null);
+                "XACMLProvilegeUtils.streamToPolicySet(), core_pkg:"
+                        + XACMLConstants.XACML3_CORE_PKG, null);
         if (stream == null) {
             return null;
         }
         JAXBContext jc = JAXBContext.newInstance(
-                    XACMLConstants.XACML3_CORE_PKG);
-                
+                XACMLConstants.XACML3_CORE_PKG);
+
         Unmarshaller um = jc.createUnmarshaller();
         JAXBElement je = (JAXBElement)um.unmarshal(XMLUtils.createSAXSource(new InputSource(stream)));
         PolicySet ps = (PolicySet)je.getValue();
+        return ps;
+    }
+    public static Policy streamToPolicy(InputStream stream) throws JAXBException {
+        //FIXME: remove
+        PrivilegeManager.debug.error(
+                "XACMLProvilegeUtils.streamToPolicy(), core_pkg:"
+                        + XACMLConstants.XACML3_CORE_PKG, null);
+        if (stream == null) {
+            return null;
+        }
+        JAXBContext jc = JAXBContext.newInstance(
+                XACMLConstants.XACML3_CORE_PKG);
+
+        Unmarshaller um = jc.createUnmarshaller();
+        JAXBElement je = (JAXBElement)um.unmarshal(XMLUtils.createSAXSource(new InputSource(stream)));
+        Policy ps = (Policy)je.getValue();
         return ps;
     }
 

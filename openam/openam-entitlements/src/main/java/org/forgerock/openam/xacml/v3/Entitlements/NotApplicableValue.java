@@ -23,16 +23,28 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.ResourceSaveIndexes;
-import com.sun.identity.entitlement.interfaces.ISaveIndex;
 
-import java.util.HashSet;
 
-public class XACML3SaveIndex implements ISaveIndex {
-    public ResourceSaveIndexes getIndexes(String resource) {
-        return new ResourceSaveIndexes(new HashSet<String>(),new HashSet<String>(), new HashSet<String>());
+/*
+    This class Encapsulates a DataValue from the XACML policy.
+    In this case, we have the actual Data in the object
+
+ */
+
+public class NotApplicableValue extends FunctionArgument {
+
+    public NotApplicableValue() {
+    }
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) {
+        return this;
     };
 
+    public Object getValue(XACMLEvalContext pip) {
+        return this;
+    }
 }
+

@@ -279,7 +279,7 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
                 SubjectUtils.createSubject(adminToken),
                 "/").xacmlPrivilegeEnabled()) {
             //TODO: create xacml policy from xml document
-            policy = XACMLPrivilegeUtils.streamToPolicySet(new ByteArrayInputStream(xml.getBytes("UTF8")));
+            policy = XACMLPrivilegeUtils.streamToPolicy(new ByteArrayInputStream(xml.getBytes("UTF8")));
         } else {
             Document doc = XMLUtils.getXMLDocument(
                     new ByteArrayInputStream(xml.getBytes("UTF8")));

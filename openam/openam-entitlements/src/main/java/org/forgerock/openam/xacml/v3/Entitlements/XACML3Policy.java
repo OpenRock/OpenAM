@@ -79,30 +79,31 @@ public class XACML3Policy {
         resourceSelectors = rSel;
     }
 
-    /*
-     * After constructing the policy, we can parse the policy object,  extracting
-     * the target info,  and then pulling each rule out, into a separate rule
-     *
-     * if (target.evaluate() == true ) {
-     *
-     * for (Rule r : rules) {
-     *      r
-     * }
-     *
-     * }
-     */
+    public XACML3Decision evaluate(XACMLEvalContext pip) {
 
-    public FunctionArgument evaluate() {
+        XACML3Decision result = new XACML3Decision();
+        boolean indeterminate = true;
 
-        XACMLEvalContext pip = null;
-        Request xacmlR;
+        FunctionArgument evalResult = target.evaluate(pip);
 
-        if (target.evaluate(pip).getValue(pip) == "false")  {
-            return FunctionArgument.indeterminateObject;
+        if (evalResult.isTrue())        {    // we  match,  so evaluate
+            for (XACML3PolicyRule r : rules) {
+                XACML3Decision decision = r.evaluate(pip);
+                if (decision.getStatus() ==  XACML3Decision.XACML3DecisionStatus.TRUE_VALUE) {
+                    return decision;
+                }
+                if (decision.getStatus() ==  XACML3Decision.XACML3DecisionStatus.FALSE_VALUE) {
+                    indeterminate = false;
+                }
+            }
         }
-        // Now we know the target applies
+        if (indeterminate) {
+            result.setStatus(XACML3Decision.XACML3DecisionStatus.INDETERMINATE);
+        } else  {
+            result.setStatus(XACML3Decision.XACML3DecisionStatus.FALSE_VALUE);
+        }
 
-          return FunctionArgument.indeterminateObject;
+        return result;
     }
 
 

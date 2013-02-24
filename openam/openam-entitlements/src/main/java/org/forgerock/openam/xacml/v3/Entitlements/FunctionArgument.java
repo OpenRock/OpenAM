@@ -39,7 +39,8 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 public abstract class FunctionArgument {
     public static FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN,"true");
     public static FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN,"false");
-    public static FunctionArgument indeterminateObject = new DataValue(DataType.XACMLBOOLEAN,"indeterminate");
+    public static FunctionArgument indeterminateObject = new IndeterminateValue();
+    public static FunctionArgument notApplicableObject = new NotApplicableValue();
 
     private String dataType;
 
@@ -49,6 +50,43 @@ public abstract class FunctionArgument {
     public String getType() {
         return dataType;
     }
+    public boolean isTrue() {
+        if (this instanceof DataValue) {
+            if (this.getType().equals(DataType.XACMLBOOLEAN) && this.getValue(null).equals("true")) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public boolean isFalse() {
+        if (this instanceof DataValue) {
+            if (this.getType().equals(DataType.XACMLBOOLEAN) && this.getValue(null).equals("false")) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public boolean isIndeterminate() {
+        if (this == FunctionArgument.indeterminateObject) {
+            return true ;
+        } else {
+            return false;
+        }
+    }
+    public boolean isNotApplicable() {
+        if (this == FunctionArgument.notApplicableObject) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public abstract FunctionArgument evaluate(XACMLEvalContext pip);
     public abstract Object getValue(XACMLEvalContext pip);
 }

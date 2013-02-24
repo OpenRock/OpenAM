@@ -141,7 +141,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
                 policy = pm.getPolicy(privilegeName);
             } else {
                 PolicyDataStore pdb = PolicyDataStore.getInstance();
-                policy = (Policy)pdb.getPolicy(dsameUserSubject, getRealm(),
+                policy = pdb.getPolicy(dsameUserSubject, getRealm(),
                     privilegeName);
             }
 

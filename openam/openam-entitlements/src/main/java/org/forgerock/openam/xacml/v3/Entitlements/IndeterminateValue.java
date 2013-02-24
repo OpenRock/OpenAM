@@ -23,16 +23,28 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.ResourceSearchIndexes;
-import com.sun.identity.entitlement.interfaces.ISearchIndex;
 
-import java.util.HashSet;
 
-public class XACML3SearchIndex implements ISearchIndex {
-    public ResourceSearchIndexes getIndexes(String resource){
-         return new ResourceSearchIndexes(new HashSet<String>(),new HashSet(), new HashSet<String>());
+/*
+    This class Encapsulates a DataValue from the XACML policy.
+    In this case, we have the actual Data in the object
+
+ */
+
+public class IndeterminateValue extends FunctionArgument {
+
+    public IndeterminateValue() {
+    }
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) {
+        return this;
     };
 
+    public Object getValue(XACMLEvalContext pip) {
+        return this;
+    }
 }
+
