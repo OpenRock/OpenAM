@@ -124,6 +124,12 @@ public class XACMLRequestInformation implements Serializable {
     private String requestScheme;
     private String requestServerName;
     private int requestLocalPort;
+    /**
+     *  Additional Request Attributes contained within Request.
+     */
+    private boolean request_ReturnPolicyIdList;
+    private boolean request_CombinedDecision;
+    private String request_NameSpace;
 
     /**
      * XACMLAuthzDecisionQuery Inner Class.
@@ -146,7 +152,7 @@ public class XACMLRequestInformation implements Serializable {
         private String id;
 
         private static final String VERSION_NAME = "version";
-        private String version;
+        private int version;
 
         private static final String ISSUE_INSTANT_NAME = "issueinstant";
         private String issueInstant;
@@ -168,11 +174,11 @@ public class XACMLRequestInformation implements Serializable {
             this.id = id;
         }
 
-        public String getVersion() {
+        public int getVersion() {
             return version;
         }
 
-        public void setVersion(String version) {
+        public void setVersion(int version) {
             this.version = version;
         }
 
@@ -207,24 +213,24 @@ public class XACMLRequestInformation implements Serializable {
          * @param nodeValue
          * @return boolean - indicator true if field set correctly, otherwise false.
          */
-        public boolean setByName(final String nodeName, final String nodeValue) {
-            if ((nodeName == null) || (nodeName.isEmpty()) || (nodeValue == null) || (nodeValue.isEmpty())) {
+        public boolean setByName(final String nodeName, final Object nodeValue) {
+            if ((nodeName == null) || (nodeName.isEmpty()) || (nodeValue == null) ) {
                 return false;
             }
             if (nodeName.toLowerCase().contains(ID_NAME)) {
-                this.setId(nodeValue);
+                this.setId((String)nodeValue);
                 return true;
             } else if (nodeName.toLowerCase().contains(VERSION_NAME)) {
-                this.setVersion(nodeValue);
+                this.setVersion((Integer)nodeValue);
                 return true;
             } else if (nodeName.toLowerCase().contains(DESTINATION_NAME)) {
-                this.setDestination(nodeValue);
+                this.setDestination((String)nodeValue);
                 return true;
             } else if (nodeName.toLowerCase().contains(CONSTENT_NAME)) {
-                this.setConsent(nodeValue);
+                this.setConsent((String)nodeValue);
                 return true;
             } else if (nodeName.toLowerCase().contains(ISSUE_INSTANT_NAME)) {
-                this.setIssueInstant(nodeValue);
+                this.setIssueInstant((String)nodeValue);
                 return true;
             }
             // Indicate Field Not Set.
@@ -264,6 +270,20 @@ public class XACMLRequestInformation implements Serializable {
     private Response xacmlResponse = new Response();
 
     /**
+     * Constructor, with minimal Data, used for special usages.
+     *
+     * @param contentType
+     *
+     */
+    public XACMLRequestInformation(ContentType contentType) {
+        this.contentType = contentType;
+        this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
+        // Instantiate a new PIP Resource for our Request for eventual Evaluation of Request against
+        // our current Policy Base.
+        this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl());
+    }
+
+    /**
      * Default Constructor.
      *
      * @param contentType
@@ -301,7 +321,7 @@ public class XACMLRequestInformation implements Serializable {
         this.setAuthenticationHeader(request.getHeader(XACML3Constants.AUTHORIZATION));
         // Instantiate a new PIP Resource for our Request for eventual Evaluation of Request against
         // our current Policy Base.
-
+        this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl());
     }
 
 
@@ -375,10 +395,6 @@ public class XACMLRequestInformation implements Serializable {
 
     public XACMLAuthzDecisionQuery getXacmlAuthzDecisionQuery() {
         return xacmlAuthzDecisionQuery;
-    }
-
-    public void setXacmlAuthzDecisionQuery(XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery) {
-        this.xacmlAuthzDecisionQuery = xacmlAuthzDecisionQuery;
     }
 
     public void setAuthenticated(boolean authenticated) {
@@ -505,6 +521,30 @@ public class XACMLRequestInformation implements Serializable {
         this.pipResourceResolver = pipResourceResolver;
     }
 
+    public boolean isRequest_ReturnPolicyIdList() {
+        return request_ReturnPolicyIdList;
+    }
+
+    public void setRequest_ReturnPolicyIdList(boolean request_ReturnPolicyIdList) {
+        this.request_ReturnPolicyIdList = request_ReturnPolicyIdList;
+    }
+
+    public boolean isRequest_CombinedDecision() {
+        return request_CombinedDecision;
+    }
+
+    public void setRequest_CombinedDecision(boolean request_CombinedDecision) {
+        this.request_CombinedDecision = request_CombinedDecision;
+    }
+
+    public String getRequest_NameSpace() {
+        return request_NameSpace;
+    }
+
+    public void setRequest_NameSpace(String request_NameSpace) {
+        this.request_NameSpace = request_NameSpace;
+    }
+
     // **********************************************
     // Response Fields for Request
     // **********************************************
@@ -573,6 +613,11 @@ public class XACMLRequestInformation implements Serializable {
         final StringBuffer sb = new StringBuffer();
         sb.append("XACMLRequestInformation");
         sb.append("{requestProcessed=").append(requestProcessed);
+        sb.append(", authenticated=").append(authenticated);
+        sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
+        sb.append(", authenticationContent=").append(authenticationContent);
+        sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
+
         sb.append(", parsedCorrectly=").append(parsedCorrectly);
         sb.append(", metaAlias='").append(metaAlias).append('\'');
         sb.append(", pdpEntityID='").append(pdpEntityID).append('\'');
@@ -580,10 +625,7 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", soapEnvelopeNodePresent=").append(soapEnvelopeNodePresent);
         sb.append(", requestNodePresent=").append(requestNodePresent);
         sb.append(", contentType=").append(contentType);
-        sb.append(", originalContent='").append(originalContent).append('\'');
-        sb.append(", content=").append(content);
-        sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
-        sb.append(", authenticationContent=").append(authenticationContent);
+
         sb.append(", requestMethod='").append(requestMethod).append('\'');
         sb.append(", requestAuthenticationType='").append(requestAuthenticationType).append('\'');
         sb.append(", requestUserPrincipal=").append(requestUserPrincipal);
@@ -596,10 +638,18 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", requestScheme='").append(requestScheme).append('\'');
         sb.append(", requestServerName='").append(requestServerName).append('\'');
         sb.append(", requestLocalPort=").append(requestLocalPort);
-        sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
-        sb.append(", authenticated=").append(authenticated);
-        sb.append(", pipResourceResolver=").append(pipResourceResolver);
-        sb.append(", xacmlResponse=").append(xacmlResponse);
+        sb.append(", request_ReturnPolicyIdList=").append(request_ReturnPolicyIdList);
+        sb.append(", request_CombinedDecision=").append(request_CombinedDecision);
+        sb.append(", request_NameSpace='").append(request_NameSpace).append('\'');
+
+        // Keep Verbosity down...
+        //sb.append(", originalContent='").append(originalContent).append('\'');
+        //sb.append(", content=").append(content);
+        //sb.append(", xacmlResponse=").append(xacmlResponse);
+
+        sb.append(", pipResourceResolver Size=");
+        sb.append( (pipResourceResolver==null)?"null":pipResourceResolver.size() );
+
         sb.append('}');
         return sb.toString();
     }

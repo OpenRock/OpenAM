@@ -74,7 +74,7 @@ public class TestXacmlRequestInformationObject {
     private static final String testConsent = "/openam/xacml/pdp/consent/ID_1e469be0-ecc4-11da-8ad9-0800200c9a66/";
     private static final String testIssueInstant = "2001-12-17T09:30:47.0Z";
     private static final String testDestination = "/openam/xacml/pdp/consent/ID_1e469be0-ecc4-11da-8ad9-0800200c9a66/";
-    private static final String testVersion = "2.0";
+    private static final int testVersion = 2;
 
     private HttpServletRequest mockedTestRequest = Mockito.mock(HttpServletRequest.class);
 

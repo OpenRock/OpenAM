@@ -35,6 +35,16 @@ import com.sun.identity.entitlement.xacml3.XACMLConstants;
  */
 public interface XACML3Constants extends XACMLConstants {
     /**
+     * Current Standards Schema Resource Name.
+     */
+    public static final String xacmlCoreSchemaResourceName =
+            "xsd/xacml-core-v3-schema-wd-17.xsd";
+    /**
+     * XML Core Schema Resource Name.
+     */
+    public static final String xmlCoreSchemaResourceName =
+            "xsd/xml.xsd";
+    /**
      *  XACML 3 Default Namespace.
      */
     public static final String XACML3_NAMESPACE = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
@@ -59,31 +69,35 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String AUTHORIZATION = "authorization";
     public static final String DIGEST = "Digest";
     public static final String REQUEST = "Request";
+
+    public static final String REQUEST_COMBINED_DECISION = "CombinedDecision";
+    public static final String REQUEST_RETURN_POLICY_ID_LIST = "ReturnPolicyIdList";
+    public static final String REQUEST_XMLNS = "xmlns";
+
+    public static final String ATTRIBUTE_CATEGORY = "Category";
     public static final String ATTRIBUTES = "Attributes";
+    public static final String ATTRIBUTE_ID = "AttributeId";
+    public static final String ATTRIBUTE_VALUE = "AttributeValue";
+    public static final String ATTRIBUTE_INCLUDE_IN_RESULT = "IncludeInResult";
+    public static final String ATTRIBUTE_VALUE_CONTENT = "content";
+    public static final String ATTRIBUTE_VALUE_DATATYPE = "DataType";
 
-    public static final String ENVELOPE = "Envelope";
-    public static final String XSI_TYPE_ATTR = "xsi:type";
-    public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";   // [SAML4XACML]
+    public static final String SOAP_ENVELOPE = "Envelope";
+    public static final String SOAP_HEADER = "Header";
+    public static final String SOAP_BODY = "Body";
 
+    // [SAML4XACML] Constants
+    public static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";
+    public static final String XACML_AUTHZ_QUERY_ID = "ID";
+    public static final String XACML_AUTHZ_QUERY_VERSION = "Version";
+    public static final String XACML_AUTHZ_QUERY_ISSUE_INSTANT = "IssueInstant";
 
-
-    public static final String METAALIAS_KEY = "/metaAlias";
+    public static final String XACML_AUTHZ_QUERY_DESTINATION_NAME = "Destination";
+    public static final String XACML_AUTHZ_QUERY_CONSTENT_NAME = "Consent";
 
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
 
     public static final String PDP_AUTHORIZATION_ENDPOINT = "/xacml/pdp/"+AUTHORIZATION;
-
-    /**
-     * Current Standards Schema Resource Name.
-     */
-    public static final String xacmlCoreSchemaResourceName =
-            "xsd/xacml-core-v3-schema-wd-17.xsd";
-
-    /**
-     * XML Core Schema Resource Name.
-     */
-    public static final String xmlCoreSchemaResourceName =
-            "xsd/xml.xsd";
 
     /**
      * RESTful XACML 3.0 Name Space Definitions.

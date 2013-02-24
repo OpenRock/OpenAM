@@ -1,0 +1,92 @@
+/**
+ *
+ ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ ~
+ ~ Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ ~
+ ~ The contents of this file are subject to the terms
+ ~ of the Common Development and Distribution License
+ ~ (the License). You may not use this file except in
+ ~ compliance with the License.
+ ~
+ ~ You can obtain a copy of the License at
+ ~ http://forgerock.org/license/CDDLv1.0.html
+ ~ See the License for the specific language governing
+ ~ permission and limitations under the License.
+ ~
+ ~ When distributing Covered Code, include this CDDL
+ ~ Header Notice in each file and include the License file
+ ~ at http://forgerock.org/license/CDDLv1.0.html
+ ~ If applicable, add the following below the CDDL Header,
+ ~ with the fields enclosed by brackets [] replaced by
+ ~ your own identifying information:
+ ~ "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ */
+package org.forgerock.identity.openam.xacml.v3.resources;
+
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
+import org.forgerock.identity.openam.xacml.v3.commons.XmlToMapUtility;
+import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
+import org.json.JSONException;
+import org.junit.runner.RunWith;
+import org.mortbay.jetty.testing.HttpTester;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import static org.testng.Assert.*;
+
+
+/**
+ * XACML PIP Resource Builder Test Suite
+ *
+ * @author Jeff.Schenk@ForgeRock.com
+ */
+@RunWith(PowerMockRunner.class)
+public class TestXacmlPIPResourceBuilder {
+
+    private final static String testSOAPEnvelope_ResourceName = "test_data/request-curtiss.xml";
+
+    @BeforeClass
+    public void before() throws Exception {
+    }
+
+    @AfterClass
+    public void after() throws Exception {
+    }
+
+    @Test
+    public void testUseCase_Building_PIP_MAP() {
+
+        String testData = XACML3Utils.getResourceContents(testSOAPEnvelope_ResourceName);
+        assertNotNull(testData);
+        XACMLRequestInformation xacmlRequestInformation
+                = new XACMLRequestInformation(ContentType.XML);
+        xacmlRequestInformation.setOriginalContent(testData);
+
+        try {
+            // The Original Content will be UnMarshaled into a Map Object stored in XACMLRequestInformation Content.
+            xacmlRequestInformation.setContent(XmlToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()));
+            xacmlRequestInformation.setParsedCorrectly(true);
+        } catch (Exception exception) {
+            xacmlRequestInformation.setContent(null);
+            xacmlRequestInformation.setParsedCorrectly(false);
+        }
+
+        assertTrue(xacmlRequestInformation.isParsedCorrectly());
+        assertNotNull(xacmlRequestInformation.getContent());
+
+        // Now perform Test Builder functions
+        assertTrue(XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation));
+
+        System.out.println("\n\n"+xacmlRequestInformation);
+
+    }
+
+}
