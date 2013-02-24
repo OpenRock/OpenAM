@@ -146,10 +146,10 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                         if (requestAttributes instanceof Map) {
                             buildXacmlPIPResourceForRequests(xacmlRequestInformation,
                                     requestMap.get(requestAttributes), key);
-                            //continue;
+                            continue;
                         } else if (requestAttributes instanceof List) {
                             processAttributes(xacmlRequestInformation, null, requestMap.get(requestAttributes));
-                            //continue;
+                            continue;
                         } else {
                             // Save All Applicable Request Node Attributes.
                             // Cast our Object.
@@ -157,17 +157,19 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                             // Determine our attribute name context.
                             if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_COMBINED_DECISION)) {
                                 xacmlRequestInformation.setRequest_CombinedDecision(
-                                        ((Boolean) requestMap.get(attributeName)).booleanValue());
+                                        ((Boolean) requestMap.get(requestAttributes)).booleanValue());
                             } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_RETURN_POLICY_ID_LIST)) {
-                                xacmlRequestInformation.setRequest_CombinedDecision(
-                                        ((Boolean) requestMap.get(attributeName)).booleanValue());
+                                xacmlRequestInformation.setRequest_ReturnPolicyIdList(
+                                        ((Boolean) requestMap.get(requestAttributes)).booleanValue());
                             } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_XMLNS)) {
-                                xacmlRequestInformation.setRequest_NameSpace((String) requestMap.get(attributeName));
+                                xacmlRequestInformation.setRequest_NameSpace((String) requestMap.get(requestAttributes));
                             } else if (removeNamespace(attributeName).equalsIgnoreCase(ATTRIBUTES)) {
+                                // process our Attributes for this Request...
                                 processAttributes(xacmlRequestInformation, null, requestMap.get(attributeName));
                             } else {
                                 debug.error("Unknown Request Attribute Found: " + attributeName + ", " +
                                         "" + requestMap.get(attributeName));
+                                // TODO : Should
                             }
                         }
                     } // End of Inner For Each Loop.
@@ -194,6 +196,9 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                 (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_HEADER)) ||
                                 (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_BODY))) {
                             // Ignore, nothing we need at this point!
+                        } else {
+                            System.out.println(currentEmbeddedKey + "......" + key + ", " + contentMap.get(key).getClass()
+                                    .getName() + " " + contentMap.get(key));
                         }
                     } // End of Inner Else
                 } // End of Outer Else
@@ -219,7 +224,6 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
      */
     private static void processAttributes(XACMLRequestInformation xacmlRequestInformation, String currentCategory,
                                           Object attributes) {
-
         // *********************************
         // Initialize our internal variables
         // for saving object data.
@@ -254,7 +258,7 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                         } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_VALUE)) {
                             if (attributeMap.get(attributeKey) instanceof Map) {
                                 Map<String, Object> valueMap = (Map<String, Object>) attributeMap.get(attributeKey);
-                                for (String valueKey : attributeMap.keySet()) {
+                                for (String valueKey : valueMap.keySet()) {
                                      if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE)) {
                                          dataType = (String) valueMap.get(valueKey);
                                      } else if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_CONTENT)) {
@@ -269,11 +273,13 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                 // TODO : Should the Request be Flagged?
                                 continue;
                             }
+
                         } // End of Check for specific Element Names.
 
                         // Check for List Object, if so, process Request Attributes...
                         if (attributeMap.get(attributeKey) instanceof List) {
-                            processAttributes(xacmlRequestInformation, currentCategory, attributeMap.get(attributeKey));
+                            processAttributes(xacmlRequestInformation, currentCategory,
+                                    attributeMap.get(attributeKey));
                         } else {
                             debug.error(className+" Unknown Attribute Key Attribute Type Found: " +
                                     attributes.getClass().getName() +

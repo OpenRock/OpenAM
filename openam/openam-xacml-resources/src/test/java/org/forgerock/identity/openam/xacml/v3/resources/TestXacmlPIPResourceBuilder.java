@@ -84,6 +84,7 @@ public class TestXacmlPIPResourceBuilder {
 
         // Now perform Test Builder functions
         assertTrue(XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation));
+        assertEquals(xacmlRequestInformation.getPipResourceResolver().size(), 19);
 
         System.out.println("\n\n"+xacmlRequestInformation);
 
