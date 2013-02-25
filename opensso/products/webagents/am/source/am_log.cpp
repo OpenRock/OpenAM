@@ -25,6 +25,9 @@
  * $Id: am_log.cpp,v 1.5 2008/07/15 20:12:38 subbae Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 
 #include "am_log.h"
@@ -424,6 +427,9 @@ am_log_set_debug_file_size(const long debugFileSize)
         status = AM_SERVICE_NOT_INITIALIZED;
     } else if(debugFileSize > DEBUG_FILE_MIN_SIZE) {
         Log::setDebugFileSize(debugFileSize);
+        status = AM_SUCCESS;
+    } else {
+        Log::setDebugFileSize(DEBUG_FILE_MIN_SIZE);
         status = AM_SUCCESS;
     }
     return status;

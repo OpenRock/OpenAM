@@ -29,6 +29,9 @@
  * Standard logging package for DSAME Remote Client SDK.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef LOG_H
 #define LOG_H
@@ -36,7 +39,9 @@
 #include <cstdarg>
 #include <string>
 #include <vector>
-
+#ifndef _MSC_VER
+#include <semaphore.h>
+#endif
 #include <am_log.h>
 #include "internal_macros.h"
 #include "internal_exception.h"
@@ -343,16 +348,28 @@ private:
     static am_status_t pSetLevelsFromString(
 		    const std::string& moduleLevelString) throw();
 
-    static bool setAuditLogFile(const std::string& name,
-                    bool localAuditLogRotate,
-                    long localAuditFileSize) throw();
+    static bool setAuditLogFile(const std::string& name) throw();
     
     static bool logRotation;
     static long maxLogFileSize;
-    static int currentLogFileSize;
-    
-    // Local Audit log related variables.
-    static int currentAuditLogFileSize;
+    static bool auditLogRotation;
+    static long maxAuditLogFileSize;
+
+    static void writeLog(const char *hdr, const char *logMsg);
+    static void writeAuditLog(const char *hdr, const char *logMsg);
+
+#ifndef _MSC_VER
+    static ino_t logInode;
+    static sem_t *logRtLock;
+    static ino_t alogInode;
+    static sem_t *alogRtLock;
+#else
+    static HANDLE logRtLock;
+    static HANDLE alogRtLock;
+#endif
+
+    static std::string logFileName;
+    static std::string auditLogFileName;
 
 };
 

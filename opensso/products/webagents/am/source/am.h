@@ -121,8 +121,8 @@ AM_BEGIN_EXTERN_C
 /*
 * Agent debug File minimum size
 */
-#define DEBUG_FILE_MIN_SIZE 3000
-#define DEBUG_FILE_DEFAULT_SIZE 10000000
+#define DEBUG_FILE_MIN_SIZE 1048576 /* 1 MB */
+#define DEBUG_FILE_DEFAULT_SIZE 10485760 /* 10 MB */
 
 /*
 * Audit Disposition
@@ -130,7 +130,7 @@ AM_BEGIN_EXTERN_C
 #define AUDIT_DISPOSITION_ALL "ALL"
 #define AUDIT_DISPOSITION_LOCAL "LOCAL"
 #define AUDIT_DISPOSITION_REMOTE "REMOTE"
-#define LOCAL_AUDIT_FILE_DEFAULT_SIZE 52428800
+#define LOCAL_AUDIT_FILE_DEFAULT_SIZE 52428800 /* 5 MB */
 
 /*
  * This function must be called at the end of the program to

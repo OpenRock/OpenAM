@@ -24,19 +24,25 @@
  *
  * $Id: log.cpp,v 1.8 2009/12/04 19:30:21 subbae Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #if (defined(WINNT) || defined(_AMD64_))
 #include <stdio.h>
 #include <stdlib.h>
 #include <process.h>
+#include <io.h>
 #define	getpid	_getpid
 #define vsnprintf _vsnprintf
 #else
 #include <unistd.h>
+#include <fcntl.h>
 #endif
 #include <cerrno>
-#include<sys/types.h>
-#include<sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <cstdio>
 #include <stdexcept>
 
@@ -60,6 +66,49 @@
 #define REMOTE_LOG "RemoteLog"
 #define ALL_LOG "all"
 
+#ifdef _MSC_VER
+#define TEMP_SIZE 8192
+
+static void debug(const char *format, ...) {
+    char tmp[TEMP_SIZE], *p = tmp;
+    va_list args;
+    va_start(args, format);
+    p += vsnprintf(p, sizeof (tmp), format, args);
+    va_end(args);
+    while (p > tmp && isspace(p[-1]))
+        p--;
+    *p++ = '\n';
+    *p = '\0';
+    OutputDebugStringA(tmp);
+}
+
+static void rotate_log(HANDLE file, const char *fn, size_t ms) {
+    BY_HANDLE_FILE_INFORMATION info;
+    size_t fsize = 0;
+    if (GetFileInformationByHandle(file, &info)) {
+        fsize = info.nFileSizeHigh;
+        fsize <<= 32;
+        fsize += info.nFileSizeLow;
+    }
+    if ((fsize + 1024) > ms) {
+        char tmp[MAX_PATH];
+        unsigned int idx = 1;
+        do {
+            ZeroMemory(&tmp[0], sizeof (tmp));
+            sprintf_s(tmp, sizeof (tmp), "%s.%d", fn, idx);
+            idx++;
+        } while (_access(tmp, 0) == 0);
+        if (CopyFileA(fn, tmp, FALSE)) {
+            SetFilePointer(file, 0, NULL, FILE_BEGIN);
+            SetEndOfFile(file);
+        } else {
+            debug("Could not copy %s file, error: %d", fn, GetLastError());
+        }
+    }
+}
+
+#endif
+
 USING_PRIVATE_NAMESPACE
 
 const Log::ModuleId Log::ALL_MODULES = 0;
@@ -71,21 +120,42 @@ bool Log::initialized = false;
 bool Log::remoteInitialized = false;
 bool Log::logRotation = true;
 long Log::maxLogFileSize = 0;
-int Log::currentLogFileSize = 0;
-int Log::currentAuditLogFileSize = 0;
-std::string logFileName;
-std::string auditLogFileName;
+bool Log::auditLogRotation = true;
+long Log::maxAuditLogFileSize = 0;
+std::string Log::logFileName = "";
+std::string Log::auditLogFileName = "";
+
+#ifndef _MSC_VER
+#define LOG_LOCK "/am_log_lock"
+#define ALOG_LOCK "/am_alog_lock"
+#define LOG_LOCK_DESTROY(name)         do {\
+        sem_t *sem = sem_open(name, O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP); \
+        if (sem != SEM_FAILED) {sem_post(sem);sem_close(sem);} sem_unlink(name);} while (0)
+ino_t Log::logInode = 0;
+sem_t *Log::logRtLock = NULL;
+ino_t Log::alogInode = 0;
+sem_t *Log::alogRtLock = NULL;
+#else
+#define LOG_LOCK "Global\\am_log_lock"
+#define ALOG_LOCK "Global\\am_alog_lock"
+HANDLE Log::logRtLock = NULL;
+HANDLE Log::alogRtLock = NULL;
+#endif
 
 Log::ModuleId Log::allModule, Log::remoteModule;
 am_log_logger_func_t Log::loggerFunc = NULL;
-
 
 #define getLevelString(x) \
 (x == Log::LOG_AUTH_REMOTE)?sizeof(levelLabels) - 2:(x == Log::LOG_AUTH_LOCAL)?sizeof(levelLabels) - 1:static_cast<std::size_t>(x)
 
 namespace {
+#ifndef _MSC_VER
     std::FILE *logFile = stderr;
     std::FILE *auditLogFile = stderr;
+#else
+    HANDLE logFile = INVALID_HANDLE_VALUE;
+    HANDLE auditLogFile = INVALID_HANDLE_VALUE;
+#endif
     const char *levelLabels[] = {
       "None", "Error", "Warning", "Info", "Debug", "MaxDebug", "Always",
 	"Auth-Remote", "Auth-Local"
@@ -119,9 +189,54 @@ am_status_t Log::initialize()
 	    (*moduleList)[remoteModule].level = 
 		static_cast<Level>(LOG_AUTH_REMOTE|LOG_AUTH_LOCAL);
 
-            initialized = true;
-	    status = AM_SUCCESS;
-
+#ifndef _MSC_VER
+            LOG_LOCK_DESTROY(LOG_LOCK);
+            logRtLock = sem_open(LOG_LOCK, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP, 1);
+            LOG_LOCK_DESTROY(ALOG_LOCK);
+            alogRtLock = sem_open(ALOG_LOCK, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP, 1);
+            if (logRtLock != SEM_FAILED && alogRtLock != SEM_FAILED) {
+                initialized = true;
+                status = AM_SUCCESS;
+            } else {
+                if (moduleList) {
+                    delete moduleList;
+                    moduleList = NULL;
+                }
+                initialized = false;
+                status = AM_FAILURE;
+                LOG_LOCK_DESTROY(LOG_LOCK);
+                LOG_LOCK_DESTROY(ALOG_LOCK);
+            }
+#else
+            logRtLock = CreateMutexA(NULL, FALSE, LOG_LOCK);
+            if (logRtLock == NULL && GetLastError() == ERROR_ACCESS_DENIED) {
+                logRtLock = OpenMutexA(SYNCHRONIZE, FALSE, LOG_LOCK);
+            }
+            alogRtLock = CreateMutexA(NULL, FALSE, ALOG_LOCK);
+            if (alogRtLock == NULL && GetLastError() == ERROR_ACCESS_DENIED) {
+                alogRtLock = OpenMutexA(SYNCHRONIZE, FALSE, ALOG_LOCK);
+            }
+            if (logRtLock != NULL && alogRtLock != NULL) {
+                initialized = true;
+                status = AM_SUCCESS;
+            } else {
+                if (moduleList) {
+                    delete moduleList;
+                    moduleList = NULL;
+                }
+                initialized = false;
+                status = AM_FAILURE;
+                if (logRtLock != NULL) {
+                    CloseHandle(logRtLock);
+                    logRtLock = NULL;
+                }
+                if (alogRtLock != NULL) {
+                    CloseHandle(alogRtLock);
+                    alogRtLock = NULL;
+                }
+            }
+#endif
+            
 	} catch (std::exception&) {
 	    if (moduleList) {
 		delete moduleList;
@@ -146,58 +261,50 @@ am_status_t Log::initialize(const Properties& properties)
         status = initialize();
 
     if (status == AM_SUCCESS) {
-	// initialize log file name and level from properties. 
-	try {
-	    ScopeLock myLock(*lockPtr);
-	    logFileName = 
-		properties.get(AM_AGENT_DEBUG_FILE_PROPERTY, "", false);
-	    logRotation = 
-	        properties.getBool(AM_AGENT_DEBUG_FILE_ROTATE_PROPERTY, true);
-	    maxLogFileSize = 
-	        properties.getPositiveNumber(AM_AGENT_DEBUG_FILE_SIZE_PROPERTY, 
+        // initialize log file name and level from properties. 
+        try {
+            ScopeLock myLock(*lockPtr);
+            logFileName = properties.get(AM_AGENT_DEBUG_FILE_PROPERTY, "", false);
+            logRotation = properties.getBool(AM_AGENT_DEBUG_FILE_ROTATE_PROPERTY, true);
+            maxLogFileSize = properties.getPositiveNumber(AM_AGENT_DEBUG_FILE_SIZE_PROPERTY,
                     DEBUG_FILE_DEFAULT_SIZE);
             if (maxLogFileSize < DEBUG_FILE_MIN_SIZE) {
-               maxLogFileSize = DEBUG_FILE_MIN_SIZE;
+                maxLogFileSize = DEBUG_FILE_MIN_SIZE;
             }
 
-            auditLogFileName =
-                properties.get(AM_AUDIT_LOCAL_LOG_FILE_PROPERTY, "", false);
-
-	    if (! pSetLogFile(logFileName)) {
-		log(ALL_MODULES, LOG_ERROR,
-		    "Unable to open agent debug file: '%s', errno = %d",
-		    logFileName.c_str(), errno);
-            }
-
-            if (!setAuditLogFile(
-                   auditLogFileName,
-                   properties.getBool(
-                       AM_AUDIT_LOCAL_LOG_ROTATE_PROPERTY, true),
-                   properties.getPositiveNumber(
-                       AM_AUDIT_LOCAL_LOG_FILE_SIZE_PROPERTY, LOCAL_AUDIT_FILE_DEFAULT_SIZE))) 
-            {
+            if (!pSetLogFile(logFileName)) {
                 log(ALL_MODULES, LOG_ERROR,
-                    "Unable to open local audit file: '%s', errno = %d",
-                    auditLogFileName.c_str(), errno);
+                        "Unable to open agent debug file: '%s', errno = %d",
+                        logFileName.c_str(), errno);
+            }
+
+            auditLogFileName = properties.get(AM_AUDIT_LOCAL_LOG_FILE_PROPERTY, "", false);
+            auditLogRotation = properties.getBool(AM_AUDIT_LOCAL_LOG_ROTATE_PROPERTY, true);
+            maxAuditLogFileSize = properties.getPositiveNumber(AM_AUDIT_LOCAL_LOG_FILE_SIZE_PROPERTY,
+                    LOCAL_AUDIT_FILE_DEFAULT_SIZE);
+            if (maxAuditLogFileSize < DEBUG_FILE_MIN_SIZE) {
+                maxAuditLogFileSize = DEBUG_FILE_MIN_SIZE;
+            }
+
+            if (!setAuditLogFile(auditLogFileName)) {
+                log(ALL_MODULES, LOG_ERROR,
+                        "Unable to open local audit file: '%s', errno = %d",
+                        auditLogFileName.c_str(), errno);
             }
 
             // if no log level specified, set default to "all:LOG_INFO".
-	    std::string logLevels = 
-		properties.get(AM_AGENT_DEBUG_LEVEL_PROPERTY, "all:3", false);
-	    status = pSetLevelsFromString(logLevels); 
-	}
-	catch (NSPRException& exn) {
-	    status = AM_NSPR_ERROR;
-	}
-	catch (std::bad_alloc& exb) {
-	    status = AM_NO_MEMORY;
-	}
-	catch (std::exception& exs) {
-	    status = AM_INVALID_ARGUMENT;
-	}
-	catch (...) {
-	    status = AM_FAILURE;
-	}
+            std::string logLevels =
+                    properties.get(AM_AGENT_DEBUG_LEVEL_PROPERTY, "all:3", false);
+            status = pSetLevelsFromString(logLevels);
+        } catch (NSPRException& exn) {
+            status = AM_NSPR_ERROR;
+        } catch (std::bad_alloc& exb) {
+            status = AM_NO_MEMORY;
+        } catch (std::exception& exs) {
+            status = AM_INVALID_ARGUMENT;
+        } catch (...) {
+            status = AM_FAILURE;
+        }
     }
     return status;
 }
@@ -273,7 +380,6 @@ void Log::shutdown()
 
         {
         ScopeLock mylock(*lockPtr);
-	pSetLogFile("");
         if (moduleList) {
             initialized = false;
             delete moduleList;
@@ -286,6 +392,20 @@ void Log::shutdown()
 	    delete rmtLogSvc;
             rmtLogSvc = NULL;
         }
+
+#ifndef _MSC_VER
+        LOG_LOCK_DESTROY(LOG_LOCK);
+        LOG_LOCK_DESTROY(ALOG_LOCK);
+#else
+        if (logRtLock != NULL) {
+            CloseHandle(logRtLock);
+            logRtLock = NULL;
+        }
+        if (alogRtLock != NULL) {
+            CloseHandle(alogRtLock);
+            alogRtLock = NULL;
+        }
+#endif
     } 
 }
 
@@ -315,141 +435,49 @@ bool Log::setLogFile(const std::string& name)
     return pSetLogFile(name);
 }
 
-bool Log::pSetLogFile(const std::string& name)
-    throw()
-{
-    bool okay = true;
-    std::string newName;
-    FILE *newLogFile = NULL;
-    int retValue = 0;
-
+bool Log::pSetLogFile(const std::string& name) throw () {
+    bool okay = false;
     if (name.size() > 0) {
-     if (logRotation) {
-          char hdr[100];
-          PRUint32 len;
-          int counter = 1;
-          bool fileExists = true;
-
-          if (logFile == stderr) { 
-	     // Open the log file for the first time
-             newLogFile = std::fopen(name.c_str(), "a");
-             if (newLogFile != NULL) {
-                 logFile = newLogFile;
-             } else {
-	       okay = false;
-	     }
-	  } else { 
-	     // Start the process of log rotation
-	     while (fileExists) {
-                len = PR_snprintf(hdr, sizeof(hdr), "%d", counter);
-                if (len > 0) {
-                   std::string appendString(hdr);
-                   newName = name + "-" + appendString;
-                }
-                if ((PR_Access(newName.c_str(),PR_ACCESS_EXISTS))==PR_SUCCESS) {
-	            counter++;
-                } else {
-                    fileExists = false;
-                }
-             }
-             std::fflush(logFile);
-             std::fclose(logFile);
-	     retValue = rename(name.c_str(), newName.c_str());
-	     if (retValue != -1) {
-	         newLogFile = std::fopen(name.c_str(), "a");
-	         if (newLogFile != NULL) {
-		     logFile = newLogFile;
-		     currentLogFileSize = 0;
-	         } else {
-		    logFile = stderr;
-                 }
-             } else {
-		logFile = stderr;
-	     }
-          }
-       } else {
-	   // logRotation is false, just create one log file and write to it
-	   newLogFile = std::fopen(name.c_str(), "a");
-	   if (newLogFile != NULL) {
-	       logFile = newLogFile;
-	   } else {
-	       okay = false;
-	   }
-       }
-    } else {
-      okay = false;
+#ifndef _MSC_VER
+        if (logFile == NULL || logFile == stderr) {
+            logFile = std::fopen(name.c_str(), "a+");
+        }
+        if (logFile != NULL) {
+            okay = true;
+        }
+#else
+        if (logFile == INVALID_HANDLE_VALUE) {
+            logFile = CreateFileA(name.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                    NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        }
+        if (logFile != INVALID_HANDLE_VALUE) {
+            okay = true;
+        }
+#endif
     }
-
     return okay;
 }
 
-bool Log::setAuditLogFile(const std::string& name,
-     bool localAuditLogRotate,
-     long localAuditFileSize)
-throw () {
-    bool okay = true;
-    std::string newName;
-    FILE *newAuditLogFile = NULL;
-    int retValue = 0;
-
+bool Log::setAuditLogFile(const std::string& name) throw () {
+    bool okay = false;
     if (name.size() > 0) {
-        if (localAuditLogRotate) {
-            char hdr[100];
-            PRUint32 len;
-            int counter = 1;
-            bool fileExists = true;
-
-            if (auditLogFile == stderr) {
-                // Open the log file for the first time
-                newAuditLogFile = std::fopen(name.c_str(), "a");
-                if (newAuditLogFile != NULL) {
-                    auditLogFile = newAuditLogFile;
-                } else {
-                    okay = false;
-                }
-            } else {
-                // Start the process of log rotation
-                while (fileExists) {
-                    len = PR_snprintf(hdr, sizeof (hdr), "%d", counter);
-                    if (len > 0) {
-                        std::string appendString(hdr);
-                        newName = name + "-" + appendString;
-                    }
-                    if ((PR_Access(newName.c_str(), PR_ACCESS_EXISTS)) == 
-                            PR_SUCCESS) {
-                        counter++;
-                    } else {
-                        fileExists = false;
-                    }
-                }
-                std::fflush(auditLogFile);
-                std::fclose(auditLogFile);
-                retValue = rename(name.c_str(), newName.c_str());
-                if (retValue != -1) {
-                    newAuditLogFile = std::fopen(name.c_str(), "a");
-                    if (newAuditLogFile != NULL) {
-                        auditLogFile = newAuditLogFile;
-                        currentAuditLogFileSize = 0;
-                    } else {
-                        auditLogFile = stderr;
-                    }
-                } else {
-                    auditLogFile = stderr;
-                }
-            }
-        } else {
-            // localAuditLogRotate is false, just create one log file and write to it
-            newAuditLogFile = std::fopen(name.c_str(), "a");
-            if (newAuditLogFile != NULL) {
-                auditLogFile = newAuditLogFile;
-            } else {
-                okay = false;
-            }
+#ifndef _MSC_VER
+        if (auditLogFile == NULL || auditLogFile == stderr) {
+            auditLogFile = std::fopen(name.c_str(), "a+");
         }
-    } else {
-        okay = false;
+        if (auditLogFile != NULL) {
+            okay = true;
+        }
+#else
+        if (auditLogFile == INVALID_HANDLE_VALUE) {
+            auditLogFile = CreateFileA(name.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                    NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        }
+        if (auditLogFile != INVALID_HANDLE_VALUE) {
+            okay = true;
+        }
+#endif
     }
-
     return okay;
 }
 
@@ -699,7 +727,7 @@ void Log::vlog(ModuleId module, Level level, const char *format,
 		char hdr[100];
 		len = PR_snprintf(hdr, sizeof(hdr), 
 				  "%d-%02d-%02d %02d:%02d:%02d.%03d"
-				  "%8s %u:%p %s: %%s\n",
+				  " %8s %u:%p %s: %%s\r\n",
 				  now.tm_year, now.tm_month+1, now.tm_mday,
 				  now.tm_hour, now.tm_min, now.tm_sec, 
 				  now.tm_usec / 1000,
@@ -707,30 +735,8 @@ void Log::vlog(ModuleId module, Level level, const char *format,
 				  getpid(), PR_GetCurrentThread(),
 				  (*moduleList)[module].name.c_str());
 		if (len > 0) {
-                  if (logRotation) {
-                    if ((currentLogFileSize + 1000) < maxLogFileSize) {
-		       std::fprintf(logFile, hdr, logMsg);
-		       std::fflush(logFile);
-                    } else {
-    		      ScopeLock scopeLock(*lockPtr);
-                      currentLogFileSize = ftell(logFile);
-                      if ((currentLogFileSize + 1000) > maxLogFileSize) {
-                         // Open a new log file
-	                 if (!pSetLogFile(logFileName)) {
-		                 log(ALL_MODULES, LOG_ERROR,
-		                 "Unable to open log file: '%s', errno = %d",
-		                 logFileName.c_str(), errno);
-	                }
-                      }
-		      std::fprintf(logFile, hdr, logMsg);
-		      std::fflush(logFile);
-                    }
-                    currentLogFileSize = ftell(logFile);
-                  } else {
-		      std::fprintf(logFile, hdr, logMsg);
-		      std::fflush(logFile);
-                  }
-		}
+                    writeLog(hdr, logMsg);
+                }
 	     }
 	}
 
@@ -766,12 +772,8 @@ void Log::vlog(ModuleId module, Level level, const char *format,
  * Log url access audit message to local audit log file.
  *
  */
-void Log::doLocalAuditLog(ModuleId module,
-        Level level,
-        const char* auditLogMsg,
-        bool localAuditLogRotate,
-        long localAuditFileSize)
-throw () {
+void Log::doLocalAuditLog(ModuleId module, Level level, const char* auditLogMsg,
+        bool localAuditLogRotate, long localAuditFileSize) throw () {
     if (initialized) {
 
         // get time.
@@ -783,7 +785,7 @@ throw () {
         char hdr[100];
         len = PR_snprintf(hdr, sizeof (hdr),
                 "%d-%02d-%02d %02d:%02d:%02d.%03d"
-                "%8s %u:%p %s: %%s\n",
+                " %8s %u:%p %s: %%s\r\n",
                 now.tm_year, now.tm_month + 1, now.tm_mday,
                 now.tm_hour, now.tm_min, now.tm_sec,
                 now.tm_usec / 1000,
@@ -791,39 +793,9 @@ throw () {
                 getpid(), PR_GetCurrentThread(),
                 "LocalAuditLog");
         if (len > 0) {
-
-            if (localAuditLogRotate) {
-                if ((currentAuditLogFileSize + 1000) < 
-                        localAuditFileSize) {
-                    std::fprintf(auditLogFile, hdr, auditLogMsg);
-                    std::fflush(auditLogFile);
-                } else {
-                    ScopeLock scopeLock(*lockPtr);
-                    currentAuditLogFileSize = ftell(auditLogFile);
-                    if ((currentAuditLogFileSize + 1000) > 
-                            localAuditFileSize) {
-                        // Open a new log file
-                        if (!setAuditLogFile(auditLogFileName,
-                                              localAuditLogRotate,
-                                              localAuditFileSize)) {
-                            log(ALL_MODULES, LOG_ERROR,
-                                    "Unable to open audit log file: "
-                                    "'%s', errno = %d",
-                                    auditLogFileName.c_str(), errno);
-                        }
-                    }
-                    std::fprintf(auditLogFile, hdr, auditLogMsg);
-                    std::fflush(auditLogFile);
-                }
-                currentAuditLogFileSize = ftell(auditLogFile);
-            } else {
-                std::fprintf(auditLogFile, hdr, auditLogMsg);
-                std::fflush(auditLogFile);
-            }
+            writeAuditLog(hdr, auditLogMsg);
         }
     }
-
-    return;
 }
 
 // log a message to remote server with a user token id given 
@@ -1063,3 +1035,219 @@ am_status_t Log::setDebugFileRotate(bool debugFileRotate)
     logRotation = debugFileRotate;
     return status;
 }
+
+#ifndef _MSC_VER
+
+void Log::writeLog(const char *hdr, const char *logMsg) {
+    struct flock fl;
+    struct stat st;
+    memset(&fl, 0, sizeof (fl));
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0L;
+    fl.l_len = 0L;
+    if (hdr == NULL) return;
+    if (logFile != NULL && logFile != stderr) {
+        if (logRotation) {
+            /* check log file/size and try to rotate it only when size > maxLogFileSize */
+            if (stat(logFileName.c_str(), &st) == 0 && (st.st_size + 1024) > maxLogFileSize) {
+                sem_wait(logRtLock);
+                struct flock rl;
+                memset(&rl, 0, sizeof (rl));
+                rl.l_whence = SEEK_SET;
+                rl.l_start = 0L;
+                rl.l_len = 0L;
+                rl.l_type = F_WRLCK;
+                /* re-check if someone has changed file right before we have entered here */
+                if (stat(logFileName.c_str(), &st) != 0 || st.st_ino != logInode) {
+                    logFile = std::freopen(logFileName.c_str(), "a+", logFile);
+                    logInode = st.st_ino;
+                }
+                if (logFile != NULL) {
+                    fcntl(fileno(logFile), F_GETLK, &rl);
+                    /* rotate only when its not locked by some other writer */
+                    if (rl.l_type == F_UNLCK) {
+                        unsigned int idx = 1;
+                        char tmp[4096];
+                        do {
+                            memset(&tmp[0], 0, sizeof (tmp));
+                            snprintf(tmp, sizeof (tmp), "%s.%d", logFileName.c_str(), idx);
+                            idx++;
+                        } while (access(tmp, F_OK) == 0);
+                        if (rename(logFileName.c_str(), tmp) != 0) {
+                            fprintf(stderr, "Could not rotate log file %s (error: %d)\n", logFileName.c_str(), errno);
+                        }
+                    }
+                } else {
+                    fprintf(stderr, "Could not reopen log file %s (error: %d)\n",
+                            logFileName.c_str(), errno);
+                }
+                sem_post(logRtLock);
+            }
+        }
+        /* check if file is rotated, reopen if so */
+        if (stat(logFileName.c_str(), &st) != 0 || st.st_ino != logInode) {
+            logFile = std::freopen(logFileName.c_str(), "a+", logFile);
+            logInode = st.st_ino;
+        }
+        fl.l_type = F_WRLCK;
+        if (logFile != NULL) {
+            if (fcntl(fileno(logFile), F_SETLKW, &fl) != -1) {
+                std::fprintf(logFile, hdr, logMsg == NULL ? "(null)" : logMsg);
+                std::fflush(logFile);
+                fl.l_type = F_UNLCK;
+                fcntl(fileno(logFile), F_SETLKW, &fl);
+            }
+        } else {
+            fprintf(stderr, "Could not reopen log file %s (error: %d), redirecting output to stderr\n", logFileName.c_str(), errno);
+            std::fprintf(stderr, hdr, logMsg == NULL ? "(null)" : logMsg);
+        }
+    } else {
+        std::fprintf(stderr, hdr, logMsg == NULL ? "(null)" : logMsg);
+    }
+}
+
+void Log::writeAuditLog(const char *hdr, const char *logMsg) {
+    struct flock fl;
+    struct stat st;
+    memset(&fl, 0, sizeof (fl));
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0L;
+    fl.l_len = 0L;
+    if (hdr == NULL) return;
+    if (auditLogFile != NULL && auditLogFile != stderr) {
+        if (auditLogRotation) {
+            /* check log file/size and try to rotate it only when size > maxAuditLogFileSize */
+            if (stat(auditLogFileName.c_str(), &st) == 0 && (st.st_size + 1024) > maxAuditLogFileSize) {
+                sem_wait(alogRtLock);
+                struct flock rl;
+                memset(&rl, 0, sizeof (rl));
+                rl.l_whence = SEEK_SET;
+                rl.l_start = 0L;
+                rl.l_len = 0L;
+                rl.l_type = F_WRLCK;
+                /* re-check if someone has changed file right before we have entered here */
+                if (stat(auditLogFileName.c_str(), &st) != 0 || st.st_ino != alogInode) {
+                    auditLogFile = std::freopen(auditLogFileName.c_str(), "a+", auditLogFile);
+                    alogInode = st.st_ino;
+                }
+                if (auditLogFile != NULL) {
+                    fcntl(fileno(auditLogFile), F_GETLK, &rl);
+                    /* rotate only when its not locked by some other writer */
+                    if (rl.l_type == F_UNLCK) {
+                        unsigned int idx = 1;
+                        char tmp[4096];
+                        do {
+                            memset(&tmp[0], 0, sizeof (tmp));
+                            snprintf(tmp, sizeof (tmp), "%s.%d", auditLogFileName.c_str(), idx);
+                            idx++;
+                        } while (access(tmp, F_OK) == 0);
+                        if (rename(auditLogFileName.c_str(), tmp) != 0) {
+                            fprintf(stderr, "Could not rotate log file %s (error: %d)\n", auditLogFileName.c_str(), errno);
+                        }
+                    }
+                } else {
+                    fprintf(stderr, "Could not reopen log file %s (error: %d)\n",
+                            auditLogFileName.c_str(), errno);
+                }
+                sem_post(alogRtLock);
+            }
+        }
+        /* check if file is rotated, reopen if so */
+        if (stat(auditLogFileName.c_str(), &st) != 0 || st.st_ino != alogInode) {
+            auditLogFile = std::freopen(auditLogFileName.c_str(), "a+", auditLogFile);
+            alogInode = st.st_ino;
+        }
+        fl.l_type = F_WRLCK;
+        if (auditLogFile != NULL) {
+            if (fcntl(fileno(auditLogFile), F_SETLKW, &fl) != -1) {
+                std::fprintf(auditLogFile, hdr, logMsg == NULL ? "(null)" : logMsg);
+                std::fflush(auditLogFile);
+                fl.l_type = F_UNLCK;
+                fcntl(fileno(auditLogFile), F_SETLKW, &fl);
+            }
+        } else {
+            fprintf(stderr, "Could not reopen log file %s (error: %d), redirecting output to stderr\n", auditLogFileName.c_str(), errno);
+            std::fprintf(stderr, hdr, logMsg == NULL ? "(null)" : logMsg);
+        }
+    } else {
+        std::fprintf(stderr, hdr, logMsg == NULL ? "(null)" : logMsg);
+    }
+}
+
+#else
+
+void Log::writeLog(const char *hdr, const char *logMsg) {
+    int msg_size = 0;
+    DWORD written, pos;
+    if (hdr == NULL) return;
+    if (logFile == INVALID_HANDLE_VALUE) {
+        logFile = CreateFileA(logFileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    }
+    if (logFile != INVALID_HANDLE_VALUE) {
+        if (logRotation) {
+            if (WaitForSingleObject(logRtLock, INFINITE) == WAIT_OBJECT_0) {
+                rotate_log(logFile, logFileName.c_str(), maxLogFileSize);
+                ReleaseMutex(logRtLock);
+            }
+        }
+        if ((pos = SetFilePointer(logFile, 0, NULL, FILE_END)) != INVALID_SET_FILE_POINTER) {
+            char workbuf[TEMP_SIZE];
+            msg_size = _snprintf(workbuf, sizeof (workbuf), hdr, logMsg == NULL ? "(null)" : logMsg);
+            if (msg_size < 0) {
+                msg_size = TEMP_SIZE - 1;
+            }
+            if (msg_size > 0 && LockFile(logFile, pos, 0, msg_size, 0)) {
+                workbuf[msg_size] = 0;
+                if (!WriteFile(logFile, (LPVOID) workbuf, msg_size, &written, NULL)) {
+                    debug("%s file write failed, error: %d", logFileName.c_str(), GetLastError());
+                }
+                FlushFileBuffers(logFile);
+                UnlockFile(logFile, pos, 0, msg_size, 0);
+            }
+        } else {
+            debug("%s set file pointer failed, error: %d", logFileName.c_str(), GetLastError());
+        }
+    } else {
+        debug("%s file open failed, error: %d", logFileName.c_str(), GetLastError());
+    }
+}
+
+void Log::writeAuditLog(const char *hdr, const char *logMsg) {
+    int msg_size = 0;
+    DWORD written, pos;
+    if (hdr == NULL) return;
+    if (auditLogFile == INVALID_HANDLE_VALUE) {
+        auditLogFile = CreateFileA(auditLogFileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    }
+    if (auditLogFile != INVALID_HANDLE_VALUE) {
+        if (auditLogRotation) {
+            if (WaitForSingleObject(alogRtLock, INFINITE) == WAIT_OBJECT_0) {
+                rotate_log(auditLogFile, auditLogFileName.c_str(), maxAuditLogFileSize);
+                ReleaseMutex(alogRtLock);
+            }
+        }
+        if ((pos = SetFilePointer(auditLogFile, 0, NULL, FILE_END)) != INVALID_SET_FILE_POINTER) {
+            char workbuf[TEMP_SIZE];
+            msg_size = _snprintf(workbuf, sizeof (workbuf), hdr, logMsg == NULL ? "(null)" : logMsg);
+            if (msg_size < 0) {
+                msg_size = TEMP_SIZE - 1;
+            }
+            if (msg_size > 0 && LockFile(auditLogFile, pos, 0, msg_size, 0)) {
+                workbuf[msg_size] = 0;
+                if (!WriteFile(auditLogFile, (LPVOID) workbuf, msg_size, &written, NULL)) {
+                    debug("%s file write failed, error: %d", auditLogFileName.c_str(), GetLastError());
+                }
+                FlushFileBuffers(auditLogFile);
+                UnlockFile(auditLogFile, pos, 0, msg_size, 0);
+            }
+        } else {
+            debug("%s set file pointer failed, error: %d", auditLogFileName.c_str(), GetLastError());
+        }
+    } else {
+        debug("%s file open failed, error: %d", auditLogFileName.c_str(), GetLastError());
+    }
+}
+
+#endif
