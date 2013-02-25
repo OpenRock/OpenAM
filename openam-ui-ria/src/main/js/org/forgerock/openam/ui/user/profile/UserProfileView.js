@@ -40,7 +40,6 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
 ], function(AbstractView, validatorsManager, uiUtils, userDelegate, router, navigation, eventManager, constants, conf) {
     var UserProfileView = AbstractView.extend({
         template: "templates/openam/UserProfileTemplate.html",
-        baseTemplate: "templates/openam/DefaultBaseTemplate.html",
         delegate: userDelegate,
         events: {
             "click input[name=saveButton]": "formSubmit",
@@ -66,7 +65,7 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
         },
         
         render: function(args, callback) {
-
+            
             this.parentRender(function() {
                 validatorsManager.bindValidators(this.$el);
                     
@@ -76,11 +75,11 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
                     callback();
                 }
                 
-                if (!window.location.hash.match(/#([a-zA-Z\/_.@]+)/)) {
-                    window.location.hash = "profile/";
+                if (window.location.hash !== "#" + router.getLink(router.configuration.routes.profile)) {
+                    eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.profile });
                 }
                 
-            });            
+            });
         },
         
         reloadData: function() {

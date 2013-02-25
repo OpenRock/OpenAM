@@ -24,20 +24,43 @@
  *
  */
 package org.forgerock.openam.forgerockrest.dispatcher;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.powermock.api.support.membermodification.MemberMatcher.constructor;
+import static org.powermock.api.support.membermodification.MemberMatcher.field;
+import static org.powermock.api.support.membermodification.MemberModifier.suppress;
 import static org.testng.Assert.*;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.saml2.jaxb.metadata.SSODescriptorType;
+import com.sun.identity.sm.*;
+import org.forgerock.json.resource.*;
+import org.forgerock.openam.forgerockrest.IdentityResource;
+import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.junit.runner.RunWith;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 import org.forgerock.openam.forgerockrest.RestDispatcher;
 import org.forgerock.json.resource.servlet.HttpServlet;
+import org.omg.CORBA.PUBLIC_MEMBER;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.*;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -45,44 +68,43 @@ import java.util.Enumeration;
  *
  * @author alin.brici@forgerock.com
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(RestDispatcher.class)
+@SuppressStaticInitializationFor("com.sun.identity.sm.OrganizationConfigManager")
+
+class OrgnazationConfigManagerTest extends OrganizationConfigManager{
+    public OrgnazationConfigManagerTest(SSOToken token, String realm) throws SMSException {
+        super(token, realm);
+    }
+}
+
 public class RestDispatcherTest {
     private static ServletTester servletTester;
 
-    private final static String resourceName = "/subrealm/realms/newRealm";
-
-    @BeforeClass
-    public void before() throws Exception {
-
-        servletTester = new ServletTester();
-        servletTester.addServlet(HttpServlet.class, "/json");
-        servletTester.start();
-    }
-
-    @AfterClass
-    public void after() throws Exception {
-        servletTester.stop();
-    }
+    private final static String resourceName = "/realm/subrealm/users/demo";
 
     @Test
-    public void testGetUser() {
-
-        String hold = null;
-        HttpTester request = new HttpTester();
-        request.setMethod("GET");
-        request.addHeader("Host", "example.org");
-        request.setURI("/json/users/demo");
-        request.setVersion("HTTP/1.1");
-
+    public void testGetRequestDetails() {
+        //TODO Mock OrganizationConfigManger
+        /*suppress(constructor(OrganizationConfigManager.class));
+        Map<String, String> details = new HashMap<String, String>(3);
+        Map<String, String> parsedDetails = new HashMap<String, String>(3);
         try {
-            // Check for a 411 No Content Length Provided.
-            HttpTester response = new HttpTester();
-            hold = response.parse(servletTester.getResponses(request.generate()));
 
-            //assertEquals(response.getStatus(),404);
+            details.put("realmPath", "/realm/subrealm");
+            details.put("resourceName", "/users");
+            details.put("resourceId", "demo");
+            OrganizationConfigManager ocm = Whitebox.newInstance(OrgnazationConfigManagerTest.class);
+            whenNew(OrganizationConfigManager.class).withArguments(any(SSOToken.class), anyString()).thenReturn(ocm);
+            RestDispatcher rD = RestDispatcher.getInstance();
+            parsedDetails = Whitebox.invokeMethod(RestDispatcher.class, "getRequestDetails", resourceName);
+
+            assertTrue(parsedDetails.equals(details));
+
         } catch (IOException ioe) {
 
         } catch (Exception e) {
 
-        }
+        } */
     }
 }
