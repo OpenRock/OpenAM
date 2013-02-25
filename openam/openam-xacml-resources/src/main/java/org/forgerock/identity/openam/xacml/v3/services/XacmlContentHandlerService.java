@@ -774,6 +774,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // Return.
             return;
         } // End of outer if Check for content
+
+        // Start of InterOp Hack to eliminate any type of authentication...
+        if (!true) {
+
         // ******************************************************************
         // Obtain our Request Content Data.
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
@@ -807,6 +811,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
 
         // TODO : Address this check below, since PDPResource has now changed...
+
+
 
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
@@ -842,8 +848,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             }
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
-        /* **********************************************************************
-               // TODO : Re-enable authenticated check......
+        } else {
+            xacmlRequestInformation.setAuthenticated(true);
+        } // End of InterOP Hack....
 
         // **********************************************************************
         // Only Continue if we have authenticated or Trust Requester.
@@ -856,7 +863,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             renderResponse(requestContentType, null, response);
             return;
         }
-        * **********************************************************************/
 
         // ******************************************************************
         // Check for a existence of a XACML Request, for a POST, we must have

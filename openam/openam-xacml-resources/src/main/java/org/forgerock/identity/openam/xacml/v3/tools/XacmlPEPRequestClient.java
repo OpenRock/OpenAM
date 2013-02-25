@@ -38,25 +38,79 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import sun.security.pkcs11.wrapper.CK_VERSION;
 
 import java.io.IOException;
 
 /**
  * Xacml PEP Client Request
- *
+ * <p/>
  * Provides a way to perform Xacml PEP Client Requests to our specified OpenAM PDP end point.
  *
  * @author jeff.schenk@forgerock.com
  */
 public class XacmlPEPRequestClient {
-
+    private static final String OUR_VERSION = "ForgeRock Incorporated -- XacmlPEPRequestClient Tool Version 10.2.0, " +
+            "2013.";
 
     /**
      * @param args
      * @throws IOException
-     *
      */
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
+        // Initialize and set the Defaults...
+        System.out.println(OUR_VERSION+"\n\n");
+        System.out.flush();
+
+        String url = null;
+        String method = "POST";
+        String principal = null;
+        String credential = null;
+        ContentType contentType = ContentType.XML;
+        String requestFileName = null;
+
+        // Determine if we have any arguments or not....
+        if ((args == null) || (args.length <= 0)) {
+            System.out.println("No arguments specified!");
+            usage();
+            System.exit(0);
+        }
+
+        // Spin through our Arguments, building up our required variables...
+        int argumentIndex = args.length;
+        for(int i = 0; i<args.length; i++) {
+            if (args[i] == null) {
+                continue;
+            }
+            // Need a Java 7 String Switch!
+
+            if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--url")) ) {
+                argumentIndex = argumentIndex - 2;
+                url = args[i+1];
+            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--method")) ) {
+                argumentIndex = argumentIndex - 2;
+                method = args[i+1];
+            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--principal")) ) {
+                argumentIndex = argumentIndex - 2;
+                method = args[i+1];
+            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--credential")) ) {
+                argumentIndex = argumentIndex - 2;
+                method = args[i+1];
+            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--contenttype")) ) {
+                argumentIndex = argumentIndex - 2;
+                method = args[i+1];
+            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--requestfile")) ) {
+                argumentIndex = argumentIndex - 2;
+            } else {
+               // Invalid Argument...
+               continue;
+            }
+
+        } // End of Argument For Each Loop.
+
+
+
 
         try {
             postMethod();
@@ -81,9 +135,36 @@ public class XacmlPEPRequestClient {
 
     }
 
+    /**
+     * Simple Usage Method.
+     */
+    private static void usage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Required Arguments:\n");
+        sb.append(" --url <specify full URL of OpenAM PDP>\n");
+        sb.append(" --method <specify GET or POST>\n");
+        sb.append(" --principal <specify the username access PDP>\n");
+        sb.append(" --credential <specify the password to access PDP>\n");
+        sb.append(" --contenttype <specify valid content type of request:" + ContentType.JSON.toString() + " or " +
+                ContentType.XML.toString() + " >\n");
+        sb.append(" --requestfile <specify File path of Request Source, in JSON or XML format>\n");
+
+        sb.append("\nExample: \n\n");
+        sb.append("XacmlPEPRequestClient \\ \n");
+        sb.append(" --url http://localhost:18080/openam/xacml/pdp/authorize \\ \n");
+        sb.append(" --method POST \\ \n");
+        sb.append(" --principal amadmin \\\n");
+        sb.append(" --credential cangetin \\\n");
+        sb.append(" --contenttype " + ContentType.XML.toString() + " \\ \n");
+        sb.append(" --requestfile /Users/jaschenk/MyWorkspaces/OPENAM/branches/openam_10.2.0_xacml3_JAS/openam/openam-xacml-resources/src/test/resources/test_data/request-curtiss.xml\n");
+        // Show Usage...
+        System.out.println(sb.toString());
+    }
+
 
     /**
      * Perform a POST Method to our PDP.
+     *
      * @throws IOException
      */
     public static void postMethod() throws IOException {
@@ -133,6 +214,7 @@ public class XacmlPEPRequestClient {
 
     /**
      * Perform a GET Method to our PDP.
+     *
      * @throws IOException
      */
     public static void getMethod() throws IOException {
@@ -167,8 +249,6 @@ public class XacmlPEPRequestClient {
 
                 String responseBody = httpclient2.execute(httpGet, responseHandler);
                 System.out.println("responseBody : " + responseBody);
-
-
 
 
             }
@@ -228,7 +308,6 @@ public class XacmlPEPRequestClient {
         }
 
     }
-
 
 
 }
