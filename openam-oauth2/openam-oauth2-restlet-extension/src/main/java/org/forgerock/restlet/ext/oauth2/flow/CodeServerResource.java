@@ -21,6 +21,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.SessionClientImpl;
@@ -33,10 +34,11 @@ public class CodeServerResource implements ResponseType {
 
     public CoreToken createToken(Map<String, String> data){
         DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
-        return store.createAuthorizationCode(OAuth2Utils.stringToSet(data.get("scope")),
-                data.get("realm"),
-                data.get("userName"),
-                new SessionClientImpl(data.get("clientID"), data.get("redirectURI")));
+        return store.createAuthorizationCode(OAuth2Utils.stringToSet(data.get(OAuth2Constants.CoreTokenParams.SCOPE)),
+                data.get(OAuth2Constants.CoreTokenParams.REALM),
+                data.get(OAuth2Constants.CoreTokenParams.USERNAME),
+                new SessionClientImpl(data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
+                        data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI)));
 
     }
 

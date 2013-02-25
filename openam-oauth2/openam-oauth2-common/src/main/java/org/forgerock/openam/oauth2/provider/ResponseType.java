@@ -21,6 +21,10 @@
  * your own identifying information:
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
+/**
+ * "Portions Copyrighted 2012-2013 ForgeRock Inc"
+ *
+ */
 
 package org.forgerock.openam.oauth2.provider;
 

@@ -125,9 +125,6 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             Set<String> data = new HashSet<String>();
             response.putAll(executeExtraDataScopePlugin(data ,token));
 
-            if (checkIfRefreshTokenIsRequired(getRequest())){
-                //response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN));
-            }
             return new JacksonRepresentation<Map>(response);
         }
     }

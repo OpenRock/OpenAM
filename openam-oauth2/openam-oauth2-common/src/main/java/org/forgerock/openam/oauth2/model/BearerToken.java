@@ -19,7 +19,10 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
+ */
+/*
+ * "Portions Copyrighted 2012-2013 ForgeRock Inc"
  */
 
 package org.forgerock.openam.oauth2.model;
@@ -33,7 +36,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 
 /**
- * Implementation of AccessToken
+ * Implementation of BearerToken
  */
 public class BearerToken extends CoreToken {
 
@@ -59,12 +62,11 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String parent, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime) {
-        super(id, userID, realm, String.valueOf(expireTime), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN,
-                OAuth2Constants.Bearer.BEARER);
-        super.put("scope", scope);
-        super.put("clientID", client.getClientId());
-        super.put("redirectURI", client.getClientId());
-        super.put("parent", parent);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN);
+        super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, client.getClientId());
+        super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, client.getRedirectUri());
+        super.put(OAuth2Constants.CoreTokenParams.PARENT, parent);
     }
 
     /**
@@ -72,8 +74,6 @@ public class BearerToken extends CoreToken {
      *
      * @param id
      *            Id of the access token
-     * @param parent
-     *            Id of the parent token
      * @param userID
      *            UserID of the user creating the token
      * @param client
@@ -87,12 +87,11 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime, String issued) {
-        super(id, userID, realm, String.valueOf(expireTime), OAuth2Constants.Token.OAUTH_CODE_TYPE,
-                OAuth2Constants.Bearer.BEARER);
-        super.put("scope", scope);
-        super.put("clientID", client.getClientId());
-        super.put("redirectURI", client.getClientId());
-        super.put("issued", issued);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_CODE_TYPE);
+        super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, client.getClientId());
+        super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, client.getRedirectUri());
+        super.put(OAuth2Constants.CoreTokenParams.ISSUED, issued);
     }
 
     /**
@@ -116,12 +115,11 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String parent, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime, String tokenType) {
-        super(id, userID, realm, String.valueOf(expireTime), tokenType,
-                OAuth2Constants.Bearer.BEARER);
-        super.put("scope", scope);
-        super.put("clientID", client.getClientId());
-        super.put("redirectURI", client.getRedirectUri());
-        super.put("parent", parent);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, tokenType);
+        super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, client.getClientId());
+        super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, client.getRedirectUri());
+        super.put(OAuth2Constants.CoreTokenParams.PARENT, parent);
     }
 
     /**
@@ -147,13 +145,12 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String parent, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime, String refreshToken, String tokenType) {
-        super(id, userID, realm, String.valueOf(expireTime), tokenType,
-                OAuth2Constants.Bearer.BEARER);
-        super.put("scope", scope);
-        super.put("clientID", client.getClientId());
-        super.put("redirectURI", client.getRedirectUri());
-        super.put("parent", parent);
-        super.put("refreshToken", refreshToken);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, tokenType);
+        super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, client.getClientId());
+        super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, client.getRedirectUri());
+        super.put(OAuth2Constants.CoreTokenParams.PARENT, parent);
+        super.put(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN, refreshToken);
     }
 
     /**
@@ -175,8 +172,8 @@ public class BearerToken extends CoreToken {
     public Map<String, Object> convertToMap(){
         Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(rb.getString(OAuth2Constants.Params.ACCESS_TOKEN), getTokenID());
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE));
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), getExpireTime());
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (getExpireTime() - System.currentTimeMillis())/1000);
         return tokenMap;
     }
 
@@ -186,11 +183,11 @@ public class BearerToken extends CoreToken {
      */
     public Map<String, Object> getTokenInfo() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, getTokenID());
-        tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
-        tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, getExpireTime());
-        tokenMap.put(OAuth2Constants.Params.REALM, getRealm());
-        tokenMap.put(OAuth2Constants.Params.SCOPE, this.getParameter(OAuth2Constants.CoreTokenParams.SCOPE));
+        tokenMap.put(rb.getString(OAuth2Constants.Params.ACCESS_TOKEN), getTokenID());
+        tokenMap.put(rb.getString(OAuth2Constants.Params.TOKEN_TYPE), getTokenType());
+        tokenMap.put(rb.getString(OAuth2Constants.Params.EXPIRES_IN), (getExpireTime() - System.currentTimeMillis())/1000);
+        tokenMap.put(rb.getString(OAuth2Constants.Params.REALM), getRealm());
+        tokenMap.put(rb.getString(OAuth2Constants.Params.SCOPE), getScope());
         return tokenMap;
     }
 

@@ -26,15 +26,9 @@ package org.forgerock.openam.oauth2.model;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import com.sun.identity.shared.OAuth2Constants;
-
 /**
  * Implements the common methods and attributes of all standard OAuth 2 tokens
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public interface Token {
     /**
      * Get the string representation of the identifier of this token
@@ -43,8 +37,7 @@ public interface Token {
      * 
      * @return unique identifier of the represented token
      */
-    @JsonProperty(OAuth2Constants.Params.ACCESS_TOKEN)
-    public String getToken();
+    public String getTokenID();
 
     /**
      * Get tokens UserID
@@ -52,7 +45,6 @@ public interface Token {
      * @return
      *          ID of user
      */
-    @JsonIgnore
     public String getUserID();
 
     /**
@@ -69,7 +61,6 @@ public interface Token {
      * @return
      *          the {@link SessionClient} for the token
      */
-    @JsonIgnore
     public SessionClient getClient();
 
     /**
@@ -78,7 +69,6 @@ public interface Token {
      * @return
      *          Set of strings that are the tokens scope
      */
-    @JsonIgnore
     public Set<String> getScope();
 
     /**
@@ -86,7 +76,6 @@ public interface Token {
      * 
      * @return long representation of the maximum valid date.
      */
-    @JsonIgnore
     public long getExpireTime();
 
     /**
@@ -99,9 +88,43 @@ public interface Token {
     public boolean isExpired();
 
     /**
+     * Returns the token type
+     *
+     * @return The type of token. For example {@link BearerToken}
+     */
+    public String getTokenType();
+
+    /**
+     * Returns the name of the token
+     *
+     * @return The name of token. Will be either access_token, code, refresh_token
+     */
+    public String getTokenName();
+
+    /**
+     * Returns the client_id associated token
+     *
+     * @return The client_id associated with token
+     */
+    public String getClientID();
+
+    /**
+     * Returns the redirect_uri associated token
+     *
+     * @return The  redirect_uri associated with token
+     */
+    public String getRedirectURI();
+
+    /**
      * Converts the token to Map
      *
      * @return new Map representation of this AccessToken
      */
     public Map<String, Object> convertToMap();
+
+    /**
+     * Gets information about the token for the tokeninfo end point
+     * @return
+     */
+    public Map<String, Object> getTokenInfo();
 }

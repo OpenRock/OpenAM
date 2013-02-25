@@ -91,12 +91,12 @@ public class AuthorizeServerResource extends AbstractFlow {
             Set<String> requestedResponseTypes = OAuth2Utils.stringToSet(OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class));
             Map<String, CoreToken> listOfTokens = new HashMap<String, CoreToken>();
             Map<String, String> data = new HashMap<String, String>();
-            data.put("tokenType", client.getClient().getAccessTokenType());
-            data.put("scope", checkedScope.toString());
-            data.put("realm", OAuth2Utils.getRealm(getRequest()));
-            data.put("userName", resourceOwner.getIdentifier());
-            data.put("clientID", sessionClient.getClientId());
-            data.put("redirectURI", sessionClient.getRedirectUri());
+            data.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, client.getClient().getAccessTokenType());
+            data.put(OAuth2Constants.CoreTokenParams.SCOPE, checkedScope.toString());
+            data.put(OAuth2Constants.CoreTokenParams.REALM, OAuth2Utils.getRealm(getRequest()));
+            data.put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwner.getIdentifier());
+            data.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, sessionClient.getClientId());
+            data.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, sessionClient.getRedirectUri());
 
 
             if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()){
@@ -183,7 +183,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                 result.add(p);
             }
             //if access token add extra fields
-            if (entry.getValue().getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).equalsIgnoreCase(OAuth2Constants.Params.ACCESS_TOKEN)){
+            if (entry.getValue().getTokenName().equalsIgnoreCase(OAuth2Constants.Params.ACCESS_TOKEN)){
                 for (Map.Entry<String, Object> entryInMap : token.entrySet()) {
                     p = new Parameter(entryInMap.getKey(), entryInMap.getValue().toString());
                     if (!result.contains(p)){
