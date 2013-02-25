@@ -798,8 +798,11 @@ public class XACMLPrivilegeUtils {
             Set<String> resourceNames = new HashSet<String>();
             Map<String,Boolean> actionValues = new HashMap<String,Boolean>();
 
-            actionValues.put("ACCESS",true);
+            actionValues.put("ACCESS", true);
             resourceNames = xPol.getResourceSelectors();
+            if (resourceNames.isEmpty()) {
+                resourceNames.add("xacml3");
+            }
 
             Entitlement entitlement = new Entitlement(XACML3_ENTITLEMENT_APP, resourceNames, actionValues);
 
@@ -809,7 +812,7 @@ public class XACMLPrivilegeUtils {
 
             privilege.setDescription(description);
             privilege.setName(privilegeName);
-            privilege.setEntitlement(new Entitlement(XACML3_ENTITLEMENT_APP, "*", actionValues));
+            privilege.setEntitlement(entitlement);
             privilege.setSubject(new AnyUserSubject());
             privilege.setCondition(null);
             privilege.setResourceAttributes(null);
@@ -941,7 +944,7 @@ public class XACMLPrivilegeUtils {
             policies.add(policy);
         }
         PolicySet policySet = policiesToPolicySetInternal(realm, policies);
-        return policySet; 
+        return policySet;
     }
 
     public static PolicySet newPolicySet(String realm)

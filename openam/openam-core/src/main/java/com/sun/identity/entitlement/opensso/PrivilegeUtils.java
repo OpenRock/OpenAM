@@ -126,7 +126,7 @@ public class PrivilegeUtils {
         Set<IPrivilege> privileges = new HashSet<IPrivilege>();
         if (policyObject instanceof
                 com.sun.identity.entitlement.xacml3.core.Policy) {
-             Privilege p = XACMLPrivilegeUtils.policyToPrivilege(
+             Privilege p = XACMLPrivilegeUtils.policyToXACML3Privilege(
                 (com.sun.identity.entitlement.xacml3.core.Policy)policyObject);
              privileges.add(p);
         } else if (policyObject instanceof Policy) {

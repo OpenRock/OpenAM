@@ -61,8 +61,8 @@ public class XACML3PrivilegeUtils {
                     AttributeDesignator attrd = match.getAttributeDesignator();
                     if (attrd == null) { continue; };
                     DataDesignator dd = new DataDesignator(attrd.getDataType(),attrd.getCategory(),attrd.getAttributeId());
-                    if (attrd.getCategory().contains(":resource:")) {
-                        rSelectors.add(attrd.getAttributeId()+"="+attr.getContent().get(0));
+                    if (attrd.getCategory().contains(":resource")) {
+                        rSelectors.add(attrd.getAttributeId());
                     }
 
                     parent.addArgument(XACMLFunction.getInstance(mName).addArgument(dv).addArgument(dd));
