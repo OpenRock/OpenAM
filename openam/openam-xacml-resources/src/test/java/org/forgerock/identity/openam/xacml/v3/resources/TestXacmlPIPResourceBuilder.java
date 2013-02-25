@@ -26,6 +26,7 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.JsonToMapUtility;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.forgerock.identity.openam.xacml.v3.commons.XmlToMapUtility;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
@@ -52,6 +53,7 @@ import static org.testng.Assert.*;
 public class TestXacmlPIPResourceBuilder {
 
     private final static String testSOAPEnvelope_ResourceName = "test_data/request-curtiss.xml";
+    private final static String testJSON_ResourceName = "test_data/request-curtiss.json";
 
     @BeforeClass
     public void before() throws Exception {
@@ -62,7 +64,7 @@ public class TestXacmlPIPResourceBuilder {
     }
 
     @Test
-    public void testUseCase_Building_PIP_MAP() {
+    public void testUseCase_Building_PIP_MAP_FROM_XML_CONTENT() {
 
         String testData = XACML3Utils.getResourceContents(testSOAPEnvelope_ResourceName);
         assertNotNull(testData);
@@ -86,7 +88,41 @@ public class TestXacmlPIPResourceBuilder {
         assertTrue(XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation));
         assertEquals(xacmlRequestInformation.getPipResourceResolver().size(), 19);
 
-        System.out.println("\n\n"+xacmlRequestInformation);
+        System.out.println("\nXML Content Result:\n\n" + xacmlRequestInformation);
+
+        System.out.flush();
+
+    }
+
+    @Test
+    public void testUseCase_Building_PIP_MAP_FROM_JSON_CONTENT() {
+
+        String testData = XACML3Utils.getResourceContents(testJSON_ResourceName);
+        assertNotNull(testData);
+        XACMLRequestInformation xacmlRequestInformation
+                = new XACMLRequestInformation(ContentType.JSON);
+        xacmlRequestInformation.setOriginalContent(testData);
+
+        try {
+            // The Original Content will be UnMarshaled into a Map Object stored in XACMLRequestInformation Content.
+            xacmlRequestInformation.setContent(JsonToMapUtility.fromString(xacmlRequestInformation.getOriginalContent()
+            ));
+            xacmlRequestInformation.setParsedCorrectly(true);
+        } catch (Exception exception) {
+            xacmlRequestInformation.setContent(null);
+            xacmlRequestInformation.setParsedCorrectly(false);
+        }
+
+        assertTrue(xacmlRequestInformation.isParsedCorrectly());
+        assertNotNull(xacmlRequestInformation.getContent());
+
+        // Now perform Test Builder functions
+        assertTrue(XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation));
+        assertEquals(xacmlRequestInformation.getPipResourceResolver().size(), 19);
+
+        System.out.println("\nJSON Content Result:\n\n" + xacmlRequestInformation);
+
+        System.out.flush();
 
     }
 

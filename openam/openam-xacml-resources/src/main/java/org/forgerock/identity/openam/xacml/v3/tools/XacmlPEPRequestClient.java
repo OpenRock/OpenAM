@@ -93,15 +93,20 @@ public class XacmlPEPRequestClient {
                 method = args[i+1];
             } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--principal")) ) {
                 argumentIndex = argumentIndex - 2;
-                method = args[i+1];
+                principal = args[i+1];
             } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--credential")) ) {
                 argumentIndex = argumentIndex - 2;
-                method = args[i+1];
+                credential = args[i+1];
             } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--contenttype")) ) {
                 argumentIndex = argumentIndex - 2;
-                method = args[i+1];
+                if (args[i+1].equalsIgnoreCase("xml")) {
+                    contentType = ContentType.XML;
+                } else if (args[i+1].equalsIgnoreCase("json")) {
+                    contentType = ContentType.JSON;
+                }
             } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--requestfile")) ) {
                 argumentIndex = argumentIndex - 2;
+                requestFileName = args[i+1];
             } else {
                // Invalid Argument...
                continue;
@@ -109,7 +114,7 @@ public class XacmlPEPRequestClient {
 
         } // End of Argument For Each Loop.
 
-
+        // Verify and Show what we will be using....
 
 
         try {

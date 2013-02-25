@@ -1008,7 +1008,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if (contentType.commonType().equals(CommonType.XML)) {
             parseXMLRequest(xacmlRequestInformation);
         } else {
-            // Only can be JSON at this point in Data FLow.
+            // Only can be JSON at this point in Data FLow...
             parseJSONRequest(xacmlRequestInformation);
         }
         // **************************************

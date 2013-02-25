@@ -74,12 +74,18 @@ public interface XACML3Constants extends XACMLConstants {
     public static final String REQUEST_RETURN_POLICY_ID_LIST = "ReturnPolicyIdList";
     public static final String REQUEST_XMLNS = "xmlns";
 
+    public static final String REQUEST_ENVIRONMENT = "Environment";
+    public static final String REQUEST_RESOURCE = "Resource";
+    public static final String REQUEST_SUBJECT = "Subject";
+
+    public static final String ATTRIBUTE = "Attribute";
     public static final String ATTRIBUTE_CATEGORY = "Category";
     public static final String ATTRIBUTES = "Attributes";
     public static final String ATTRIBUTE_ID = "AttributeId";
     public static final String ATTRIBUTE_VALUE = "AttributeValue";
     public static final String ATTRIBUTE_INCLUDE_IN_RESULT = "IncludeInResult";
     public static final String ATTRIBUTE_VALUE_CONTENT = "content";
+    public static final String ATTRIBUTE_VALUE_VALUE = "Value";
     public static final String ATTRIBUTE_VALUE_DATATYPE = "DataType";
 
     public static final String SOAP_ENVELOPE = "Envelope";
