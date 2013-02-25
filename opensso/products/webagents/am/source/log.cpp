@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #endif
+#include <stdint.h>
 #include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -84,11 +85,9 @@ static void debug(const char *format, ...) {
 
 static void rotate_log(HANDLE file, const char *fn, size_t ms) {
     BY_HANDLE_FILE_INFORMATION info;
-    size_t fsize = 0;
+    uint64_t fsize = 0;
     if (GetFileInformationByHandle(file, &info)) {
-        fsize = info.nFileSizeHigh;
-        fsize <<= 32;
-        fsize += info.nFileSizeLow;
+        fsize = ((DWORDLONG) (((DWORD) (info.nFileSizeLow)) | (((DWORDLONG) ((DWORD) (info.nFileSizeHigh))) << 32)));
     }
     if ((fsize + 1024) > ms) {
         char tmp[MAX_PATH];
@@ -394,9 +393,25 @@ void Log::shutdown()
         }
 
 #ifndef _MSC_VER
+        if (logFile != NULL && logFile != stderr) {
+            std::fclose(logFile);
+            logFile = NULL;
+        }
+        if (auditLogFile != NULL && auditLogFile != stderr) {
+            std::fclose(auditLogFile);
+            auditLogFile = NULL;
+        }
         LOG_LOCK_DESTROY(LOG_LOCK);
         LOG_LOCK_DESTROY(ALOG_LOCK);
 #else
+        if (logFile != INVALID_HANDLE_VALUE) {
+            CloseHandle(logFile);
+            logFile = INVALID_HANDLE_VALUE;
+        }
+        if (auditLogFile != INVALID_HANDLE_VALUE) {
+            CloseHandle(auditLogFile);
+            auditLogFile = INVALID_HANDLE_VALUE;
+        }
         if (logRtLock != NULL) {
             CloseHandle(logRtLock);
             logRtLock = NULL;
