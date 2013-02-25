@@ -19,7 +19,12 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ */
+
+/**
+ * "Portions Copyrighted 2012-2013 ForgeRock Inc"
+ *
  */
 
 package org.forgerock.openam.oauth2.provider.impl;
@@ -173,7 +178,7 @@ public class ScopeImpl implements Scope {
         String scope = token.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
         Set<String> scopeSet = OAuth2Utils.stringToSet(scope);
 
-        //if an openid scope return the id_token
+        // if an openid scope return the id_token
         if (scopeSet.contains("openid")){
             //TODO create a real id token
             map.put("id_token", "XXXX");
