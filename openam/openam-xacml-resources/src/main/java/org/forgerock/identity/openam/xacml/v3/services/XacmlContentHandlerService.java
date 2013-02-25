@@ -849,7 +849,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
         } else {
-            xacmlRequestInformation.setAuthenticated(true);
+            xacmlRequestInformation.setAuthenticated(true); // TODO : Remove me....
         } // End of InterOP Hack....
 
         // **********************************************************************
@@ -869,7 +869,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Correct Request Content and if no Request Object in XML or JSON
         // form.
         if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
-                (xacmlRequestInformation.isRequestNodePresent()) ) {
+             (!xacmlRequestInformation.isRequestNodePresent()) ) {
             // No Request Node found within the document, not valid request.
             this.renderBadRequest(requestContentType, response);
             return;
