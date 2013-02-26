@@ -72,6 +72,7 @@ public final class RealmResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
 
     private Set subRealms = null;
+    private RequestDetailsParser parser;
     private String realmPath = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
@@ -80,12 +81,11 @@ public final class RealmResource implements CollectionResourceProvider {
      * Creates a new empty backend.
      */
     public RealmResource() {
-        // No implementation required.
-        this.realmPath = null;
+        this(new RequestDetailsParser(new OrganizationConfigManagerFactory()), null);
     }
 
-    public RealmResource(String realmPath) {
-        this.subRealms = subRealms;
+    public RealmResource(RequestDetailsParser parser, String realmPath) {
+        this.parser = parser;
         this.realmPath = realmPath;
     }
 

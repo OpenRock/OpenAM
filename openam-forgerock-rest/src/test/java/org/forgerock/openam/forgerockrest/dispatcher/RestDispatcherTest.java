@@ -25,42 +25,16 @@
  */
 package org.forgerock.openam.forgerockrest.dispatcher;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
-import static org.powermock.api.support.membermodification.MemberMatcher.constructor;
-import static org.powermock.api.support.membermodification.MemberMatcher.field;
-import static org.powermock.api.support.membermodification.MemberModifier.suppress;
-import static org.testng.Assert.*;
-
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.saml2.jaxb.metadata.SSODescriptorType;
-import com.sun.identity.sm.*;
-import org.forgerock.json.resource.*;
-import org.forgerock.openam.forgerockrest.IdentityResource;
-import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
-import org.junit.runner.RunWith;
-import org.mortbay.jetty.testing.HttpTester;
-import org.mortbay.jetty.testing.ServletTester;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
 import org.forgerock.openam.forgerockrest.RestDispatcher;
-import org.forgerock.json.resource.servlet.HttpServlet;
-import org.omg.CORBA.PUBLIC_MEMBER;
+import org.junit.runner.RunWith;
+import org.mortbay.jetty.testing.ServletTester;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.io.*;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 
 /**
@@ -72,6 +46,8 @@ import java.util.regex.Pattern;
 @PrepareForTest(RestDispatcher.class)
 @SuppressStaticInitializationFor("com.sun.identity.sm.OrganizationConfigManager")
 
+// Alin: extending something in order to test it makes me very nervious, as it implies the code is
+// poorly structured (protected methods and hidden detail) and not compatible with being unit tested.
 class OrgnazationConfigManagerTest extends OrganizationConfigManager{
     public OrgnazationConfigManagerTest(SSOToken token, String realm) throws SMSException {
         super(token, realm);
