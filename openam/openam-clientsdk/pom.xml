@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+* Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -142,6 +142,7 @@
                     -->
                     <artifactSet>
                         <includes>
+                            <include>org.forgerock.commons:forgerock-util</include>
                             <include>org.forgerock.openam:openam-core</include>
                             <include>org.forgerock.openam:openam-shared</include>
                             <include>org.forgerock.openam:openam-dtd-schema</include>
@@ -480,6 +481,7 @@
                         </transformer>
                     </transformers>
                     <createSourcesJar>${generate.clientsdk.sources}</createSourcesJar>
+                    <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                 </configuration>
             </plugin>
         </plugins>

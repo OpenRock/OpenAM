@@ -128,6 +128,7 @@
         <opendj.server.version>2.4.6</opendj.server.version>
         <opendj.sdk.version>3.0.0-OPENAMp3</opendj.sdk.version>
 
+        <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
@@ -1528,6 +1529,11 @@
                 <artifactId>i18n-core</artifactId>
                 <version>1.4.0</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-util</artifactId>
+                <version>${commons.forgerock-util.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -1569,6 +1575,11 @@
                 <version>20090211</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>3.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

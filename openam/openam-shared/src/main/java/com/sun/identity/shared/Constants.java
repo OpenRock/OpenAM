@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.shared;
@@ -1152,6 +1152,9 @@ public interface Constants {
     static final String AM_DISTAUTH_SITES =
             "openam.auth.distauth.sites";
 
+    static final String AM_VERSION_HEADER_ENABLED =
+            "openam.auth.version.header.enabled";
+
     /**
      * Key name for site ID list in naming table.
      */
@@ -1239,4 +1242,11 @@ public interface Constants {
      */
     public static final String REMOTE_SESSION_CACHE_DURATION =
         "openam.remote.session.cache.duration";
+
+    /**
+     * AMSetupFilter will redirect to this external URL in case the configuration store
+     * is not available but the bootstrap file exists
+     */
+    public static final String CONFIG_STORE_DOWN_REDIRECT_URL =
+        "openam.configstore.down.redirect.url";
 }

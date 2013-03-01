@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.authentication.distUI;
@@ -89,6 +89,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.authentication.service.protocol.RemoteCookie;
 import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
 import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
+import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * A default implementation of <code>LoginViewBean</code> auth Login UI.
@@ -275,7 +276,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Expires", "0");
-        response.setHeader("X-DSAMEVersion", AuthClientUtils.getDSAMEVersion());
+        if (AuthClientUtils.isVersionHeaderEnabled()) {
+            response.setHeader("X-DSAMEVersion", AuthClientUtils.getDSAMEVersion());
+        }
         
         // get request ( GET ) parameters for 'login' process
         reqDataHash = AuthClientUtils.parseRequestParameters(request);
@@ -434,7 +437,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             rb =  rbCache.getResBundle(bundleName, locale);
             if(ac != null){
                 ac.setLocale(locale);
-                ac.setClientHostName(AuthClientUtils.getClientIPAddress(request));
+                ac.setClientHostName(ClientUtils.getClientIPAddress(request));
             }
             
             if ((errorTemplate==null)||(errorTemplate.length() == 0)) {            
