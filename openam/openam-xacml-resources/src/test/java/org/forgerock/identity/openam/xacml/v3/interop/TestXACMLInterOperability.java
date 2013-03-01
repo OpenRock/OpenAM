@@ -25,22 +25,13 @@
  */
 package org.forgerock.identity.openam.xacml.v3.interop;
 
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService;
 import org.junit.runner.RunWith;
-import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Scanner;
-
-import static org.testng.Assert.*;
 
 
 /**

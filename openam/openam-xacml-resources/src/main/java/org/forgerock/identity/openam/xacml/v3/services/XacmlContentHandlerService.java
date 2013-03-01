@@ -143,11 +143,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static Debug debug;
 
     /**
-     * Defined and established Handlers.
-     */
-    private static HashMap handlers = new HashMap();
-
-    /**
      * Preserve our Servlet Context PlaceHolder,
      * for referencing Artifacts.
      */
@@ -255,7 +250,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      */
     @Override
     public String getServletInfo() {
-        return "This ForgeRock OpenAM XACML v3 Servlet/Restlet Implementation, Standards per OASIS, 2013.";
+        return "ForgeRock OpenAM XACML v3 Servlet/Restlet Implementation, Standards per OASIS, 2013.";
     }
 
     /**
@@ -848,9 +843,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         //
 
         // PDP Evaluation?
-        if ( (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
+        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
              (xacmlRequestInformation.getRequestURI().trim().
-                     toLowerCase().contains("/openam/xacml/pdp/".toLowerCase()))) {
+                     toLowerCase().contains("/openam/xacml/pdp/".toLowerCase())) ) {
             // ***********************************************************
             // Perform the PEP Request Evaluation:
             XacmlPDPResource xacmlPDPResource = new XacmlPDPResourceImpl();
@@ -881,6 +876,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // XACML v3 Home Document / Discovery?
         } else if (this.processHomeRequest(xacmlRequestInformation, request, response)) {
             return;
+
+        // Bad Request...
         } else {
             // No Valid Request URI Found, render Bad Request.
             this.renderBadRequest(requestContentType, response);
@@ -971,9 +968,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // **************************************
         // Show Parsed Content for debugging if
         // applicable.
-        StringBuilder sb = XacmlPIPResourceBuilder.dumpContentInformation(xacmlRequestInformation);
-        if (sb.length() > 0) {
-            debug.error(classMethod+"Request Map====>\n"+sb.toString());
+        if (debug.messageEnabled()) {
+            StringBuilder sb = XacmlPIPResourceBuilder.dumpContentInformation(xacmlRequestInformation);
+            if (sb.length() > 0) {
+                debug.error(classMethod+"Request Map====>\n"+sb.toString());
+            }
         }
         // ****************************************
         // Build out our Xacml PIP Resource Object.
@@ -1046,19 +1045,30 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      * @param xacmlStringResponse
      * @param response
      */
-    private void renderResponse(final ContentType contentType, final String xacmlStringResponse, HttpServletResponse response) {
+    private void renderResponse(final ContentType contentType, final String xacmlStringResponse,
+                                HttpServletResponse response) {
+        OutputStream outputStream = null;
         try {
             response.setContentType(contentType.applicationType());
             response.setCharacterEncoding("UTF-8");
             if ((xacmlStringResponse != null) && (!xacmlStringResponse.trim().isEmpty())) {
+                outputStream = response.getOutputStream();
                 response.setContentLength(xacmlStringResponse.length());
-                response.getOutputStream().write(xacmlStringResponse.getBytes());
-                response.getOutputStream().close();
+                outputStream.write(xacmlStringResponse.getBytes());
             } else {
                 response.setContentLength(0);
             }
         } catch (IOException ioe) {
             // Debug
+        } finally {
+            try {
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            } catch(IOException ioe) {
+                // Do Nothing...
+            }
+
         }
     }
 

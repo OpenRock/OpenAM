@@ -69,7 +69,6 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         }
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(category, attributeId, includeInResult);
-
         this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value));
         return true;
     }
@@ -130,6 +129,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      * Provide the String Equivalent of Object in String form for Debugging/Logging.
      * @return String
      */
+    @Override
     public String toString() {
        StringBuilder sb = new StringBuilder();
 

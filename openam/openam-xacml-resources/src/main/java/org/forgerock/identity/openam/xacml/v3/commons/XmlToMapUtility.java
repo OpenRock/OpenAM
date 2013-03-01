@@ -103,12 +103,23 @@ public class XmlToMapUtility {
         if ((args == null) || (args.length < 1)) {
             return;
         }
-        for (String argument : args) {
-            InputStream inputStream = new FileInputStream(new File(argument));
-            String rawContent = new Scanner(inputStream).useDelimiter("\\A").next();
+        InputStream inputStream = null;
+        try {
+            for (String argument : args) {
+                inputStream = new FileInputStream(new File(argument));
+                String rawContent = new Scanner(inputStream).useDelimiter("\\A").next();
 
-            Map<String, Object> mapObjects = fromString(rawContent);
-            System.out.println("XML to JSON Value: " + mapObjects);
+                Map<String, Object> mapObjects = fromString(rawContent);
+                System.out.println("XML to JSON Value: " + mapObjects);
+            }
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
+            }
         }
     }
 

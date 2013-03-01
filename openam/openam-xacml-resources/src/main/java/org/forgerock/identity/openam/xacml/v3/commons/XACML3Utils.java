@@ -25,18 +25,22 @@
  */
 package org.forgerock.identity.openam.xacml.v3.commons;
 
-import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -73,7 +77,15 @@ public class XACML3Utils implements XACML3Constants {
                 return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
             }
         } catch (Exception e) {
-            // TODO
+            // Do nothing...
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
+            }
         }
         // Catch All.
         return null;
@@ -156,62 +168,99 @@ public class XACML3Utils implements XACML3Constants {
     }
 
     /**
-     * Returns first Element with given local name in samlp name space inside
-     * SOAP message.
+     * Simple Helper Method to read File in as a Stream
      *
-     * @param messageBody XML Element.
-     * @param localName   local name of the Element to be returned.
-     * @return first Element matching the local name.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
-     *          if the Element could not be found or there is
-     *          SOAP Fault present.
+     * @param resourceFileName -- File Name of Contents to be consumed as a String.
+     * @return String containing the Resource Contents or null if issue.
      */
-    public static Element getSamlpElement(
-            Element messageBody, String localName) throws SAML2Exception {
-        if (messageBody == null) {
-            return null;
-        }
-        NodeList nlBody = messageBody.getChildNodes();
-        if (nlBody == null) {
-            debug.error("XACML3Utils.getSamlpElement: empty body");
-            throw new SAML2Exception(bundle.getString("missingBody"));
-        }
-        int blength = nlBody.getLength();
-        if (blength <= 0) {
-            debug.error("XACML3Utils.getSamlpElement: empty body");
-            throw new SAML2Exception(bundle.getString("missingBody"));
-        }
-        Element retElem = null;
-        Node node = null;
-        for (int i = 0; i < blength; i++) {
-            node = (Node) nlBody.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
+    public static String getFileContents(final String resourceFileName) {
+        InputStream inputStream = null;
+        try {
+            if ( (resourceFileName == null) || (resourceFileName.isEmpty()) ) {
+              return null;
             }
-            String nlName = node.getLocalName();
-            if (nlName == null) {
-                nlName = node.getNodeName();
+            File file = new File(resourceFileName);
+            if ( (file.exists()) && (file.canRead()) )
+            {
+                inputStream = new FileInputStream(resourceFileName);
+                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
             }
-            if (debug.messageEnabled()) {
-                debug.message("SAML2Utils.getSamlpElement: node=" +
-                        nlName + ", nsURI=" + node.getNamespaceURI());
-            }
-            if ((nlName != null) && (nlName.equals("Fault"))) {
-                throw new SAML2Exception(SAML2Utils.bundle.getString(
-                        "soapFaultInSOAPResponse"));
-            } else if ((nlName != null) && (nlName.equals(localName) &&
-                    SAML2Constants.PROTOCOL_NAMESPACE.equals(
-                            node.getNamespaceURI()))) {
-                retElem = (Element) node;
-                break;
+        } catch (Exception e) {
+            // Do Nothing...
+        }
+        finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
             }
         }
-        if (retElem == null) {
-            throw new SAML2Exception(bundle.getString("elementNotFound") +
-                    localName);
-        }
-        return retElem;
+        // Catch All.
+        return null;
     }
 
+    /**
+     * Return the Request Body Content.
+     *
+     * @param request
+     * @return String - Request Content Body.
+     */
+    public static String getRequestBody(final HttpServletRequest request) {
+        // Get the body content of the HTTP request,
+        // remember we have no normal WS* SOAP Body, just String
+        // data either XML or JSON.
+        InputStream inputStream = null;
+        try {
+            inputStream = request.getInputStream();
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        } catch (IOException ioe) {
+            // Do Nothing...
+        } catch (NoSuchElementException nse) {   // runtime exception.
+            //Do Nothing...
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return the Response Body Content.
+     *
+     * @param response
+     * @return String - Request Content Body.
+     */
+    public static String getResponseBody(HttpResponse response) {
+        // Get the body content of the HTTP Response,
+        // remember we have no normal WS* SOAP Body, just String
+        // data either XML or JSON.
+        InputStream inputStream = null;
+        try {
+            inputStream = response.getEntity().getContent();
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        } catch (IOException ioe) {
+            // Do Nothing...
+        } catch (NoSuchElementException nse) {   // runtime exception.
+            //Do Nothing...
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
+            }
+        }
+        return null;
+    }
 
 }

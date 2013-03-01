@@ -26,18 +26,21 @@ package org.forgerock.identity.openam.xacml.v3.tools;
 
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.*;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.DigestScheme;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Xacml PEP Client Request
@@ -46,7 +49,6 @@ import java.io.IOException;
  * to our specified OpenAM PDP end point.
  *
  * @author jeff.schenk@forgerock.com
- *
  * @since 10.2.0
  */
 public class XacmlPEPRequestClient {
@@ -94,7 +96,6 @@ public class XacmlPEPRequestClient {
      * @param principal
      * @param credential
      * @param contentType
-     *
      */
     public XacmlPEPRequestClient(String url, String method, String principal, String credential, ContentType contentType) {
         this.url = url;
@@ -112,17 +113,20 @@ public class XacmlPEPRequestClient {
      */
     public String performRequest() throws Exception {
         String response = null;
-            if (this.method.equalsIgnoreCase("GET")) {
-                response = this.getMethod();
-            } else if (this.method.equalsIgnoreCase("POST")) {
-                response = this.postMethod();
-            } else {
-                throw new IllegalArgumentException("Specified Method is not GET or POST, please re-specify Method!");
-            }
+        if (this.method.equalsIgnoreCase("GET")) {
+            response = this.getMethod();
+        } else if (this.method.equalsIgnoreCase("POST")) {
+            response = this.postMethod();
+        } else {
+            throw new IllegalArgumentException("Specified Method is not GET or POST, please re-specify Method!");
+        }
         // Return our Response.
         return response;
     }
 
+    /**
+     * Standard Getter's and Setter's...
+     */
 
     public String getUrl() {
         return url;
@@ -182,7 +186,7 @@ public class XacmlPEPRequestClient {
         try {
             // Initially send request without credentials returns "HTTP/1.1 401 Unauthorized".
             HttpResponse response = httpclient.execute(httpGet);
-            System.out.println("Initial GET Request Response: "+response.getStatusLine());
+            System.out.println("Initial GET Request Response: " + response.getStatusLine());
 
             // Initially Return Status should be a 401.
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
@@ -196,7 +200,7 @@ public class XacmlPEPRequestClient {
                 // Parse realm, nonce sent by server.
                 DigestScheme digestScheme = new DigestScheme();
                 digestScheme.processChallenge(authHeader);
-                UsernamePasswordCredentials creds =  new UsernamePasswordCredentials(this.getPrincipal(), this.getCredential());
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getPrincipal(), this.getCredential());
                 httpGet.addHeader(digestScheme.authenticate(creds, httpGet));
 
                 // Obtain Response from Negotiated Authentication/Authorization.
@@ -204,9 +208,9 @@ public class XacmlPEPRequestClient {
                 // Process Final Response.
                 return getFinalResponseContent(response);
             } else {
-                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should "+
-                "have received an initial "+HttpStatus.SC_UNAUTHORIZED+", however we received a "+
-                        response.getStatusLine()+", this is a incorrect Data Flow, Server side is suspect!");
+                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should " +
+                        "have received an initial " + HttpStatus.SC_UNAUTHORIZED + ", however we received a " +
+                        response.getStatusLine() + ", this is a incorrect Data Flow, Server side is suspect!");
             }
         } catch (MalformedChallengeException e) {
             e.printStackTrace();
@@ -237,7 +241,7 @@ public class XacmlPEPRequestClient {
         try {
             // Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
             HttpResponse response = httpclient.execute(httpPost);
-            System.out.println("Initial POST Request Response: "+response.getStatusLine());
+            System.out.println("Initial POST Request Response: " + response.getStatusLine());
 
             // Initially Return Status should be a 401.
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
@@ -254,14 +258,23 @@ public class XacmlPEPRequestClient {
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getPrincipal(), this.getCredential());
                 httpPost.addHeader(digestScheme.authenticate(creds, httpPost));
 
+                // Obtain Content from a File, if applicable, and stuff into Request.
+                if ((this.getRequestFileName() != null) && (!this.getRequestFileName().isEmpty())) {
+                    String content = XACML3Utils.getFileContents(this.getRequestFileName());
+                    if (content != null) {
+                        HttpEntity httpEntity = new ByteArrayEntity(content.getBytes(Charset.forName("UTF-8")));
+                        // Associate our Content Entity to our POST Method Request.
+                        httpPost.setEntity(httpEntity);
+                    }
+                }
                 // Obtain Response from Negotiated Authentication/Authorization.
                 response = httpclient2.execute(httpPost);
                 // Process Final Response.
                 return getFinalResponseContent(response);
             } else {
-                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should "+
-                        "have received an initial "+HttpStatus.SC_UNAUTHORIZED+", however we received a "+
-                        response.getStatusLine()+", this is a incorrect Data Flow, Server side is suspect!");
+                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should " +
+                        "have received an initial " + HttpStatus.SC_UNAUTHORIZED + ", however we received a " +
+                        response.getStatusLine() + ", this is a incorrect Data Flow, Server side is suspect!");
             }
         } catch (MalformedChallengeException e) {
             e.printStackTrace();
@@ -276,17 +289,19 @@ public class XacmlPEPRequestClient {
 
     /**
      * Private Helper Method to obtain the Response Content.
+     *
      * @param response
      * @return
      * @throws IOException
      */
     private String getFinalResponseContent(HttpResponse response) throws IOException {
-        System.out.println("Final GET Request Response: "+response.getStatusLine());
-        if ( (response.getEntity().getContentLength()>0) &&
-             (response.getEntity().getContent() != null) ) {
+        System.out.println("Final GET Request Response: " + response.getStatusLine());
+        if ((response.getEntity().getContentLength() > 0) &&
+            (response.getEntity().getContent() != null) ) {
             // Show our response Content.
-            System.out.println("");
-            return "";
+            String content =  XACML3Utils.getResponseBody(response);
+            System.out.println("Response Content: "+content);
+            return content;
         } else {
             // Show our response Content.
             System.out.println("No Response Data Available.");
@@ -359,13 +374,12 @@ public class XacmlPEPRequestClient {
      * @return
      */
     private boolean validate(String name, String value) {
-        System.out.println("Validating: Property Name: "+name+", Value:["+value+"]");
+        System.out.println("Validating: Property Name: " + name + ", Value:[" + value + "]");
 
         // TODO : Validation of command line argument parameters.
 
         return true;
     }
-
 
 
     /**
@@ -395,10 +409,10 @@ public class XacmlPEPRequestClient {
         // Perform the Appropriate Operation.
         try {
             String xacmlResponse = xacmlPEPRequestClient.performRequest();
-            System.out.println("XACML Response: "+xacmlResponse);
+            System.out.println("XACML Response: " + xacmlResponse);
             System.out.println("\nDone.");
-        } catch(Exception e) {
-            System.err.println("Exception occurred performing Request: "+e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Exception occurred performing Request: " + e.getMessage());
             e.printStackTrace();
         }
     }

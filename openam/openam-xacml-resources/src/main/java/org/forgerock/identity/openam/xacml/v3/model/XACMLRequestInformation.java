@@ -27,10 +27,7 @@ package org.forgerock.identity.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
-import org.forgerock.identity.openam.xacml.v3.commons.POJOToJsonUtility;
-import org.forgerock.identity.openam.xacml.v3.commons.POJOToXmlUtility;
+import org.forgerock.identity.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolver;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolverFunctionArgumentImpl;
 
@@ -315,7 +312,7 @@ public class XACMLRequestInformation implements Serializable {
         // Save our Original Content...
         // Get Raw Content Body.
         if (request.getContentLength() > 0) {
-            this.originalContent = this.getRequestBody(request);
+            this.originalContent = XACML3Utils.getRequestBody(request);
         }
         // Pull our Authentication Header if One Exists as a response from an initial Digest.
         this.setAuthenticationHeader(request.getHeader(XACML3Constants.AUTHORIZATION));
@@ -652,27 +649,6 @@ public class XACMLRequestInformation implements Serializable {
 
         sb.append('}');
         return sb.toString();
-    }
-
-    /**
-     * Return the Request Body Content.
-     *
-     * @param request
-     * @return String - Request Content Body.
-     */
-    private String getRequestBody(final HttpServletRequest request) {
-        // Get the body content of the HTTP request,
-        // remember we have no normal WS* SOAP Body, just String
-        // data either XML or JSON.
-        try {
-            InputStream inputStream = request.getInputStream();
-            return new Scanner(inputStream).useDelimiter("\\A").next();
-        } catch (IOException ioe) {
-            // Do Nothing...
-        } catch (NoSuchElementException nse) {   // runtime exception.
-            //Do Nothing...
-        }
-        return null;
     }
 
     /**
