@@ -28,10 +28,7 @@ package org.forgerock.identity.openam.xacml.v3.tools;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AUTH;
-import org.apache.http.auth.AuthenticationException;
-import org.apache.http.auth.MalformedChallengeException;
-import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.*;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -39,105 +36,371 @@ import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
-import sun.security.pkcs11.wrapper.CK_VERSION;
 
 import java.io.IOException;
 
 /**
  * Xacml PEP Client Request
  * <p/>
- * Provides a way to perform Xacml PEP Client Requests to our specified OpenAM PDP end point.
+ * Provides a Command Line/Shell Tool to perform XACML PEP Client Requests
+ * to our specified OpenAM PDP end point.
  *
  * @author jeff.schenk@forgerock.com
+ *
+ * @since 10.2.0
  */
 public class XacmlPEPRequestClient {
     private static final String OUR_VERSION = "ForgeRock Incorporated -- XacmlPEPRequestClient Tool Version 10.2.0, " +
             "2013.";
 
+    private String url = null;
+    private String method = "POST";
+    private String principal = null;
+    private String credential = null;
+    private ContentType contentType = ContentType.XML;
+    private String requestFileName = null;
+
     /**
+     * Default Constructor.
+     */
+    public XacmlPEPRequestClient() {
+    }
+
+    /**
+     * Constructor with all Parameters specified.
+     *
+     * @param url
+     * @param method
+     * @param principal
+     * @param credential
+     * @param contentType
+     * @param requestFileName
+     */
+    public XacmlPEPRequestClient(String url, String method, String principal, String credential, ContentType contentType, String requestFileName) {
+        this.url = url;
+        this.method = method;
+        this.principal = principal;
+        this.credential = credential;
+        this.contentType = contentType;
+        this.requestFileName = requestFileName;
+    }
+
+    /**
+     * Constructor with all Parameters specified, except for the Request Content File Name, which will
+     * assume a zero byte content length when sending the request.
+     *
+     * @param url
+     * @param method
+     * @param principal
+     * @param credential
+     * @param contentType
+     *
+     */
+    public XacmlPEPRequestClient(String url, String method, String principal, String credential, ContentType contentType) {
+        this.url = url;
+        this.method = method;
+        this.principal = principal;
+        this.credential = credential;
+        this.contentType = contentType;
+        this.requestFileName = null;
+    }
+
+    /**
+     * Method to perform the XACML Request to the specified OpenAM Server URL.
+     *
+     * @return String - XACML Response.
+     */
+    public String performRequest() throws Exception {
+        String response = null;
+            if (this.method.equalsIgnoreCase("GET")) {
+                response = this.getMethod();
+            } else if (this.method.equalsIgnoreCase("POST")) {
+                response = this.postMethod();
+            } else {
+                throw new IllegalArgumentException("Specified Method is not GET or POST, please re-specify Method!");
+            }
+        // Return our Response.
+        return response;
+    }
+
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(String principal) {
+        this.principal = principal;
+    }
+
+    public String getCredential() {
+        return credential;
+    }
+
+    public void setCredential(String credential) {
+        this.credential = credential;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getRequestFileName() {
+        return requestFileName;
+    }
+
+    public void setRequestFileName(String requestFileName) {
+        this.requestFileName = requestFileName;
+    }
+
+    /**
+     * Perform a GET Method to our PDP.
+     *
+     * @throws IOException
+     */
+    private String getMethod() throws IllegalAccessException, IOException {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        DefaultHttpClient httpclient2 = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(this.getUrl());
+
+        // Set Headers
+        httpGet.setHeader("content-type", this.getContentType().applicationType());
+
+        System.out.println("GET Requesting: " + httpGet.getURI());
+
+        try {
+            // Initially send request without credentials returns "HTTP/1.1 401 Unauthorized".
+            HttpResponse response = httpclient.execute(httpGet);
+            System.out.println("Initial GET Request Response: "+response.getStatusLine());
+
+            // Initially Return Status should be a 401.
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+
+                // Obtain current "WWW-Authenticate" header from PDP response
+                // WWW-Authenticate:Digest realm="OpenAM_XACML_PDP_Realm", qop="auth",
+                //   nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
+                Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
+                System.out.println("Received Authentication Header: " + authHeader);
+
+                // Parse realm, nonce sent by server.
+                DigestScheme digestScheme = new DigestScheme();
+                digestScheme.processChallenge(authHeader);
+                UsernamePasswordCredentials creds =  new UsernamePasswordCredentials(this.getPrincipal(), this.getCredential());
+                httpGet.addHeader(digestScheme.authenticate(creds, httpGet));
+
+                // Obtain Response from Negotiated Authentication/Authorization.
+                response = httpclient2.execute(httpGet);
+                // Process Final Response.
+                return getFinalResponseContent(response);
+            } else {
+                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should "+
+                "have received an initial "+HttpStatus.SC_UNAUTHORIZED+", however we received a "+
+                        response.getStatusLine()+", this is a incorrect Data Flow, Server side is suspect!");
+            }
+        } catch (MalformedChallengeException e) {
+            e.printStackTrace();
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        } finally {
+            httpclient.getConnectionManager().shutdown();
+            httpclient2.getConnectionManager().shutdown();
+        }
+        return null;
+    }
+
+
+    /**
+     * Perform a POST Method to our PDP.
+     *
+     * @throws IOException
+     */
+    private String postMethod() throws IllegalAccessException, IOException {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        DefaultHttpClient httpclient2 = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(this.getUrl());
+        // Set Headers
+        httpPost.setHeader("content-type", this.getContentType().applicationType());
+
+        System.out.println("POST Requesting : " + httpPost.getURI());
+
+        try {
+            // Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
+            HttpResponse response = httpclient.execute(httpPost);
+            System.out.println("Initial POST Request Response: "+response.getStatusLine());
+
+            // Initially Return Status should be a 401.
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+
+                // Obtain current "WWW-Authenticate" header from PDP response
+                // WWW-Authenticate:Digest realm="My Test Realm", qop="auth",
+                //   nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
+                Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
+                System.out.println("Received Authentication Header: " + authHeader);
+
+                // Parse realm, nonce sent by server.
+                DigestScheme digestScheme = new DigestScheme();
+                digestScheme.processChallenge(authHeader);
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getPrincipal(), this.getCredential());
+                httpPost.addHeader(digestScheme.authenticate(creds, httpPost));
+
+                // Obtain Response from Negotiated Authentication/Authorization.
+                response = httpclient2.execute(httpPost);
+                // Process Final Response.
+                return getFinalResponseContent(response);
+            } else {
+                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should "+
+                        "have received an initial "+HttpStatus.SC_UNAUTHORIZED+", however we received a "+
+                        response.getStatusLine()+", this is a incorrect Data Flow, Server side is suspect!");
+            }
+        } catch (MalformedChallengeException e) {
+            e.printStackTrace();
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        } finally {
+            httpclient.getConnectionManager().shutdown();
+            httpclient2.getConnectionManager().shutdown();
+        }
+        return null;
+    }
+
+    /**
+     * Private Helper Method to obtain the Response Content.
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private String getFinalResponseContent(HttpResponse response) throws IOException {
+        System.out.println("Final GET Request Response: "+response.getStatusLine());
+        if ( (response.getEntity().getContentLength()>0) &&
+             (response.getEntity().getContent() != null) ) {
+            // Show our response Content.
+            System.out.println("");
+            return "";
+        } else {
+            // Show our response Content.
+            System.out.println("No Response Data Available.");
+            return "";
+        }
+    }
+
+    /**
+     * Helper Method to perform Command Line Arguments.
+     */
+    private int parseCommandLineArguments(String[] args) {
+        int validationErrors = 0;
+        int argumentIndex = args.length;
+        // Spin through our Arguments, building up our required variables...
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] == null) {
+                continue;
+            }
+
+            // Need a Java 7 String Switch!
+
+            if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--url"))) {
+                argumentIndex = argumentIndex - 2;
+                this.url = args[i + 1];
+                if (!validate("url", this.url)) {
+                    validationErrors++;
+                }
+            } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--method"))) {
+                argumentIndex = argumentIndex - 2;
+                this.method = args[i + 1];
+                if (!validate("method", this.method)) {
+                    validationErrors++;
+                }
+            } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--principal"))) {
+                argumentIndex = argumentIndex - 2;
+                this.principal = args[i + 1];
+                if (!validate("principal", this.principal)) {
+                    validationErrors++;
+                }
+            } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--credential"))) {
+                argumentIndex = argumentIndex - 2;
+                this.credential = args[i + 1];
+                if (!validate("credential", this.credential)) {
+                    validationErrors++;
+                }
+            } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--contenttype"))) {
+                argumentIndex = argumentIndex - 2;
+                if (args[i + 1].equalsIgnoreCase("xml")) {
+                    this.contentType = ContentType.XML;
+                } else if (args[i + 1].equalsIgnoreCase("json")) {
+                    this.contentType = ContentType.JSON;
+                }
+            } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--requestfile"))) {
+                argumentIndex = argumentIndex - 2;
+                this.requestFileName = args[i + 1];
+                if (!validate("requestFileName", this.requestFileName)) {
+                    validationErrors++;
+                }
+            }
+        }
+        // Return with the number of validation errors.
+        return validationErrors;
+    }
+
+    /**
+     * Validate the parameter specified from command line.
+     *
+     * @param name
+     * @param value
+     * @return
+     */
+    private boolean validate(String name, String value) {
+        System.out.println("Validating: Property Name: "+name+", Value:["+value+"]");
+
+        // TODO : Validation of command line argument parameters.
+
+        return true;
+    }
+
+
+
+    /**
+     * Main -- Invoked using Command Line Tools.
+     *
      * @param args
      * @throws IOException
      */
     public static void main(String[] args) {
+        // Construct our Utility Tool class.
+        XacmlPEPRequestClient xacmlPEPRequestClient = new XacmlPEPRequestClient();
         // Initialize and set the Defaults...
-        System.out.println(OUR_VERSION+"\n\n");
+        System.out.println(OUR_VERSION + "\n\n");
         System.out.flush();
-
-        String url = null;
-        String method = "POST";
-        String principal = null;
-        String credential = null;
-        ContentType contentType = ContentType.XML;
-        String requestFileName = null;
-
         // Determine if we have any arguments or not....
         if ((args == null) || (args.length <= 0)) {
             System.out.println("No arguments specified!");
             usage();
             System.exit(0);
         }
-
-        // Spin through our Arguments, building up our required variables...
-        int argumentIndex = args.length;
-        for(int i = 0; i<args.length; i++) {
-            if (args[i] == null) {
-                continue;
-            }
-            // Need a Java 7 String Switch!
-
-            if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--url")) ) {
-                argumentIndex = argumentIndex - 2;
-                url = args[i+1];
-            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--method")) ) {
-                argumentIndex = argumentIndex - 2;
-                method = args[i+1];
-            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--principal")) ) {
-                argumentIndex = argumentIndex - 2;
-                principal = args[i+1];
-            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--credential")) ) {
-                argumentIndex = argumentIndex - 2;
-                credential = args[i+1];
-            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--contenttype")) ) {
-                argumentIndex = argumentIndex - 2;
-                if (args[i+1].equalsIgnoreCase("xml")) {
-                    contentType = ContentType.XML;
-                } else if (args[i+1].equalsIgnoreCase("json")) {
-                    contentType = ContentType.JSON;
-                }
-            } else if ( (argumentIndex >= 2) && (args[i].equalsIgnoreCase("--requestfile")) ) {
-                argumentIndex = argumentIndex - 2;
-                requestFileName = args[i+1];
-            } else {
-               // Invalid Argument...
-               continue;
-            }
-
-        } // End of Argument For Each Loop.
-
-        // Verify and Show what we will be using....
-
-
+        // Parse the Command Line Argument.
+        if (xacmlPEPRequestClient.parseCommandLineArguments(args) > 0) {
+            System.out.println("Validation Errors Exist based upon specified Command Line Arguments.");
+            usage();
+            System.exit(0);
+        }
+        // Perform the Appropriate Operation.
         try {
-            postMethod();
-        } catch (IOException e) {
-            System.out.println("POST Exception: " + e.getMessage());
+            String xacmlResponse = xacmlPEPRequestClient.performRequest();
+            System.out.println("XACML Response: "+xacmlResponse);
+            System.out.println("\nDone.");
+        } catch(Exception e) {
+            System.err.println("Exception occurred performing Request: "+e.getMessage());
             e.printStackTrace();
         }
-
-        try {
-            getJSONMethod();
-        } catch (IOException e) {
-            System.out.println("POST Exception: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        try {
-            getMethod();
-        } catch (Exception e) {
-            System.out.println("GET Exception: " + e.getMessage());
-            e.printStackTrace();
-        }
-
     }
 
     /**
@@ -152,7 +415,7 @@ public class XacmlPEPRequestClient {
         sb.append(" --credential <specify the password to access PDP>\n");
         sb.append(" --contenttype <specify valid content type of request:" + ContentType.JSON.toString() + " or " +
                 ContentType.XML.toString() + " >\n");
-        sb.append(" --requestfile <specify File path of Request Source, in JSON or XML format>\n");
+        sb.append(" [--requestfile] <specify optional File path of Request Source, in JSON or XML format>\n");
 
         sb.append("\nExample: \n\n");
         sb.append("XacmlPEPRequestClient \\ \n");
@@ -165,154 +428,5 @@ public class XacmlPEPRequestClient {
         // Show Usage...
         System.out.println(sb.toString());
     }
-
-
-    /**
-     * Perform a POST Method to our PDP.
-     *
-     * @throws IOException
-     */
-    public static void postMethod() throws IOException {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        DefaultHttpClient httpclient2 = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://localhost:18080/openam/xacml/pdp/authorize");
-        httpPost.setHeader("content-type", "application/xml");
-        System.out.println("Requesting : " + httpPost.getURI());
-
-        try {
-            //Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
-            HttpResponse response = httpclient.execute(httpPost);
-            System.out.println(response.getStatusLine());
-
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-
-                //Get current current "WWW-Authenticate" header from response
-                // WWW-Authenticate:Digest realm="My Test Realm", qop="auth",
-                //nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
-                Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                System.out.println("authHeader = " + authHeader);
-
-                DigestScheme digestScheme = new DigestScheme();
-
-                //Parse realm, nonce sent by server.
-                digestScheme.processChallenge(authHeader);
-
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("username", "password");
-                httpPost.addHeader(digestScheme.authenticate(creds, httpPost));
-
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-                String responseBody = httpclient2.execute(httpPost, responseHandler);
-                System.out.println("responseBody : " + responseBody);
-            }
-
-        } catch (MalformedChallengeException e) {
-            e.printStackTrace();
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        } finally {
-            httpclient.getConnectionManager().shutdown();
-            httpclient2.getConnectionManager().shutdown();
-        }
-
-    }
-
-    /**
-     * Perform a GET Method to our PDP.
-     *
-     * @throws IOException
-     */
-    public static void getMethod() throws IOException {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        DefaultHttpClient httpclient2 = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet("http://localhost:18080/openam/xacml/pdp/authorize");
-        httpGet.setHeader("content-type", "application/xml");
-        System.out.println("Requesting : " + httpGet.getURI());
-
-        try {
-            //Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
-            HttpResponse response = httpclient.execute(httpGet);
-            System.out.println(response.getStatusLine());
-
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-
-                //Get current current "WWW-Authenticate" header from response
-                // WWW-Authenticate:Digest realm="OpenAM_XACML_PDP_Realm", qop="auth",
-                //nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
-                Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                System.out.println("authHeader = " + authHeader);
-
-                DigestScheme digestScheme = new DigestScheme();
-
-                //Parse realm, nonce sent by server.
-                digestScheme.processChallenge(authHeader);
-
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("username", "password");
-                httpGet.addHeader(digestScheme.authenticate(creds, httpGet));
-
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-                String responseBody = httpclient2.execute(httpGet, responseHandler);
-                System.out.println("responseBody : " + responseBody);
-
-
-            }
-
-        } catch (MalformedChallengeException e) {
-            e.printStackTrace();
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        } finally {
-            httpclient.getConnectionManager().shutdown();
-            httpclient2.getConnectionManager().shutdown();
-        }
-
-    }
-
-    public static void getJSONMethod() throws IOException {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        DefaultHttpClient httpclient2 = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet("http://localhost:18080/openam/xacml/pdp/authorize");
-        httpGet.setHeader("content-type", "application/json");
-        System.out.println("Requesting : " + httpGet.getURI());
-
-        try {
-            //Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
-            HttpResponse response = httpclient.execute(httpGet);
-            System.out.println(response.getStatusLine());
-
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-
-                //Get current current "WWW-Authenticate" header from response
-                // WWW-Authenticate:Digest realm="OpenAM_XACML_PDP_Realm", qop="auth",
-                //nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
-                Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                System.out.println("authHeader = " + authHeader);
-
-                DigestScheme digestScheme = new DigestScheme();
-
-                //Parse realm, nonce sent by server.
-                digestScheme.processChallenge(authHeader);
-
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("username", "password");
-                httpGet.addHeader(digestScheme.authenticate(creds, httpGet));
-
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-                String responseBody = httpclient2.execute(httpGet, responseHandler);
-                System.out.println("responseBody : " + responseBody);
-            }
-
-        } catch (MalformedChallengeException e) {
-            e.printStackTrace();
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        } finally {
-            httpclient.getConnectionManager().shutdown();
-            httpclient2.getConnectionManager().shutdown();
-        }
-
-    }
-
 
 }

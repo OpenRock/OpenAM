@@ -115,7 +115,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
     }
 
     /**
-     * Provide the Size of our
+     * Provide the Size of our Map Object.
      * @return
      */
     public int size() {
@@ -124,5 +124,18 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         } else {
             return this.resourceResolutionMap.size();
         }
+    }
+
+    /**
+     * Provide the String Equivalent of Object in String form for Debugging/Logging.
+     * @return String
+     */
+    public String toString() {
+       StringBuilder sb = new StringBuilder();
+
+        // TODO :  Implement.
+
+        // return String representation of our Internal Map Object.
+       return sb.toString();
     }
 }

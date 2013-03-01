@@ -27,13 +27,10 @@ package org.forgerock.identity.openam.xacml.v3.services;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 
-import com.sun.identity.entitlement.xacml3.core.Response;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.xacml.client.XACMLRequestProcessor;
 import com.sun.identity.xacml.common.XACMLException;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 
 import org.forgerock.identity.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.model.AuthenticationDigest;
@@ -43,6 +40,9 @@ import org.forgerock.identity.openam.xacml.v3.resources.*;
 
 import org.json.JSONException;
 import org.xml.sax.SAXException;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -597,8 +597,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // of the Digest.
         String method = request.getMethod();
         // TODO This needs to be fixed.
-        String ha1 = DigestUtils.md5Hex(USERNAME + ":" + realm + ":" + "password");
-        // TODO, Get from a PIP Implementation.
+        String credential = headerValues.get(USERNAME);
+        if ( (credential == null)||(credential.isEmpty()) ) {
+            debug.error(classMethod+"Unable to obtain the PEP's Credentials: No '"+USERNAME+"' Header and Value " +
+                    "Specified.");
+        }
+        // Obtain the password from the User Directory PIP.
+        String ha1 = DigestUtils.md5Hex(credential + ":" + realm + ":" + "cangetin");
 
         // Obtain values to compute.
         String qop = headerValues.get("qop");
@@ -737,68 +742,46 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if ((request.getContentLength() <= 0) &&
                 (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
                 ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
-                        (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
-            // ***********************************************************************************************
-            // Knowing we have no Authentication at this point check the Request Path Information, provide the
-            // Home Document to the Requester by Rendering our Response.
-            if ((xacmlRequestInformation.getRequestURI() == null) ||
-                    (xacmlRequestInformation.getRequestURI().isEmpty()) ||
-                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
-                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
-                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/home")) ||
-                    (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status"))) {
-                // All other EndPoints Require Authentication to obtain access.
-                try {
-                    renderServerOKResponse(requestContentType, XacmlHomeResource.getHome(xacmlRequestInformation,
-                            request), response);
-                } catch (JSONException jsonException) {
-                    // If any Exceptions, Force Unauthorized and show exception for debugging.
-                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
-                    // This Starts the Authorization via Digest Flow...
-                    this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                }
-            } else if (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/ping")) {
-                try{
-                    renderServerOKResponse(requestContentType, XacmlPingResource.getPing(xacmlRequestInformation,
-                            request), response);
-                } catch (JSONException jsonException) {
-                    // If any Exceptions, Force Unauthorized and show exception for debugging.
-                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
-                    // This Starts the Authorization via Digest Flow...
-                    this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                }
-            } else {
-                // Not the Correct Path, then indicated Unauthorized.
-                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+                 (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
+            // With No Content or Authentication and a GET, proceed to Respond with our Home Document.
+            if (this.processHomeRequest(xacmlRequestInformation, request, response)) {
+                return;
             }
-            // Return.
-            return;
-        } // End of outer if Check for content
+        } // End of outer if Check for GET and no authentication Information.
 
-        // Start of InterOp Hack to eliminate any type of authentication...
-        if (!true) {
+        // **************************************************************************************
+        // All Request Processing beyond this point required PEP to be Authenticated (AUTHn)
+        // and Authorized (AUTHz). Next methods determine if PEP request is allowed to continue.
+        // **************************************************************************************
+
+        // **************************************************************************************
+        // Other Authentication and Authorization algorithm's such as SAML, OpenID and ...
+        // TODO : Add code to pull in an AA Plugin or Connect to a Framework Component.
+        // **************************************************************************************
 
         // ******************************************************************
         // Obtain our Request Content Data.
+        // Did we receive a valid WWW Authentication header using Digest?
+        //
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
-                (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
-            AuthenticationDigest authenticationDigestResponse =
+            (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
+                AuthenticationDigest authenticationDigestResponse =
                     authenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
                             xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
-            // If we receive a valid authenticationDigestResponse Object, we have successfully Authenticated the
-            // Client.
-            if (authenticationDigestResponse == null) {
-                // Not Authenticated.
-                // This Starts the Authorization via Digest Flow...
-                this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
-                return;
-            } else {
-                // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
-                xacmlRequestInformation.setAuthenticated(true);
-            }
+                // If we receive a valid authenticationDigestResponse Object, we have successfully Authenticated the
+                // Client.
+                if (authenticationDigestResponse == null) {
+                    // Not Authenticated.
+                    // This Starts the Authorization via Digest Flow...
+                    this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
+                    return;
+                } else {
+                    // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
+                    xacmlRequestInformation.setAuthenticated(true);
+                }
         } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
             // **************************************************************
-            // if no XACML saml Wrapper, then reject request as UnAuthorized.
+            // If no [SAML4XACML] Wrapper, then reject request as UnAuthorized.
             //
             // We only support currently WWW Authenticate capabilities
             // + Digest, Basic Authentication is not supported per OASIS  Specification.
@@ -806,54 +789,37 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             // + XACMLAuthzDecisionQuery Wrapper Of Request.
             //
             // This will begin the Authorization Digest Flow...
-            this.renderUnAuthorized(xacmlRequestInformation.getRealm(), requestContentType, response);
+            this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
             return;
         }
-
-        // TODO : Address this check below, since PDPResource has now changed...
-
-
 
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
         if ( (!xacmlRequestInformation.isAuthenticated()) &&
-                (xacmlRequestInformation.getAuthenticationContent() != null) ) {
-            // If the Content is XML Based, we have a DOM.
-            if (requestContentType.commonType() == CommonType.XML) {
-                // **************************************************************
-                // Content is XML and Nodes are Available to be consumed.
-                // So perform the PDP Request from the PEP, Authentication will
-                // be performed naturally since the request is wrapped in a
-                // PEP Authentication outer request.
-                // Response is located within the XacmlRequestInformation Object.
-                //XacmlPDPResource.processPDP_XMLRequest(xacmlRequestInformation, request, response);
-                // TODO -- Analyze Response.
+              (xacmlRequestInformation.getAuthenticationContent() != null) ) {
 
-            } else {
-                // **************************************************************
-                // Else, our Content is assumed to be JSON, but we can still have
-                // a xacml-samlp:XACMLAuthzDecisionQuery, but in JSON format.
-                //XacmlPDPResource.processPDP_JSONRequest(xacmlRequestInformation, request, response);
-                // TODO -- Analyze Response.
 
-            }
-            // **************************************************
-            // Determine if the Authentication Wrapper provided
-            // a Request which was already satisfied.
-            if ( (xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
-                // *****************************************************************
-                // Render our Response
-                renderResponse(requestContentType,
-                        xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
-            }
+            // TODO : AME-302 Address processing a XACMLAuthzDecisionQuery Wrapper to
+            // TODO : Authorize and Authenticate the PEP sending the request.
+
+
+
+        }
+        // **************************************************
+        // Determine if the Authentication Wrapper provided
+        // a Request which was already satisfied.
+        if ((xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
+
+             // TODO : AME-302
+
+            // *****************************************************************
+            // Render our Response
+            renderResponse(requestContentType,
+                    xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
-        } else {
-            xacmlRequestInformation.setAuthenticated(true); // TODO : Remove me....
-        } // End of InterOP Hack....
-
         // **********************************************************************
-        // Only Continue if we have authenticated or Trust Requester.
+        // Only Continue if we have authenticated or Trust PEP.
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized, Forbidden.
@@ -871,7 +837,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
              (!xacmlRequestInformation.isRequestNodePresent()) ) {
             // No Request Node found within the document, not valid request.
-            this.renderBadRequest(requestContentType, response);
+            this.renderBadPOSTNoContentRequest(requestContentType, response);
             return;
         }
         // ******************************************************************
@@ -880,93 +846,84 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         //
         // Check the Request Path Information.
         //
-        if ((xacmlRequestInformation.getRequestURI() == null) ||
-                (xacmlRequestInformation.getRequestURI().trim().isEmpty()) ||
-                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
-                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
-                (xacmlRequestInformation.getRequestURI().trim().contains("/openam/xacml/pdp/"))) {
 
+        // PDP Evaluation?
+        if ( (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
+             (xacmlRequestInformation.getRequestURI().trim().
+                     toLowerCase().contains("/openam/xacml/pdp/".toLowerCase()))) {
             // ***********************************************************
-            // Perform the Evaluation:
+            // Perform the PEP Request Evaluation:
             XacmlPDPResource xacmlPDPResource = new XacmlPDPResourceImpl();
             xacmlRequestInformation.setXacmlResponse(xacmlPDPResource.XACMLEvaluate(xacmlRequestInformation));
 
+            // *****************************************************************
+            // Render our Response, response Setting should be set prior, if not
+            // it will set a default Indeterminate Result Response.
+            String responseContent = xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType);
+            renderServerOKResponse(requestContentType, responseContent, response);
+            return;
+
+        // OpenAM Monitoring?
+        } else if (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/ping")) {
+                try{
+                    // TODO : Perform ForgeRock Proprietary Ping Request, addition to specification.
+                    renderServerOKResponse(xacmlRequestInformation.getContentType(),
+                            XacmlPingResource.getPing(xacmlRequestInformation, request), response);
+                    return;
+                } catch (JSONException jsonException) {
+                    // If any Exceptions, show exception for debugging.
+                    debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
+                    // No Valid Request URI Found, render Bad Request.
+                    this.renderBadRequest(requestContentType, response);
+                    return;
+                }
+
+        // XACML v3 Home Document / Discovery?
+        } else if (this.processHomeRequest(xacmlRequestInformation, request, response)) {
+            return;
         } else {
             // No Valid Request URI Found, render Bad Request.
             this.renderBadRequest(requestContentType, response);
             return;
         }
-        // *****************************************************************
-        // Render our Response, response Setting should be set prior, if not
-        // it will set a default Indeterminate Result Response.
-        String responseContent = xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType);
-        renderServerOKResponse(requestContentType, responseContent, response);
     }
 
-    // ******************************************************************************************************
-    // Common Rendering Response Methods
-    // ******************************************************************************************************
-
     /**
-     * Private Helper Method to Render Response Content.
+     * Process the Home Document Discover Request.
+     * If this method returns, false, the request was invalid.
      *
-     * @param contentType
-     * @param xacmlStringResponse
+     * @param xacmlRequestInformation
+     * @param request
      * @param response
+     * @return boolean - True indicates response returned.
+     * @throws ServletException
+     * @throws IOException
      */
-    private void renderResponse(final ContentType contentType, final String xacmlStringResponse, HttpServletResponse response) {
-        try {
-            response.setContentType(contentType.applicationType());
-            response.setCharacterEncoding("UTF-8");
-            if ((xacmlStringResponse != null) && (!xacmlStringResponse.trim().isEmpty())) {
-                response.setContentLength(xacmlStringResponse.length());
-                response.getOutputStream().write(xacmlStringResponse.getBytes());
-                response.getOutputStream().close();
-            } else {
-                response.setContentLength(0);
+    private boolean processHomeRequest(XACMLRequestInformation xacmlRequestInformation, HttpServletRequest request,
+                                       HttpServletResponse response) throws ServletException, IOException {
+        String classMethod = "XacmlContentHandlerService:processHomeRequest";
+        // ***********************************************************************************************
+        // Check the Request Path End-Point Information, provide the Home Document to the PEP Requester
+        // by Rendering our Response.
+        if ((xacmlRequestInformation.getRequestURI() == null) ||
+                (xacmlRequestInformation.getRequestURI().isEmpty()) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/home")) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status"))) {
+            try {
+                renderServerOKResponse(xacmlRequestInformation.getContentType(),
+                        XacmlHomeResource.getHome(xacmlRequestInformation, request), response);
+                return true;
+            } catch (JSONException jsonException) {
+                // If any Exceptions, Force Unauthorized and show exception for debugging.
+                debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
             }
-        } catch (IOException ioe) {
-            // Debug
         }
+        // Return, indicate URI Request from PEP was Invalid.
+        return false;
     }
 
-    /**
-     * Simple Helper Method to provide common Not Authorized render Method.
-     *
-     * @param requestContentType
-     * @param response
-     */
-    private void renderUnAuthorized(final String realm, final ContentType requestContentType,
-                                    HttpServletResponse response) {
-        response.addHeader(WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader(realm));
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401
-        renderResponse(requestContentType, null, response);
-    }
-
-    /**
-     * Simple Helper Method to provide common Not Authorized render Method.
-     *
-     * @param requestContentType
-     * @param response
-     */
-    private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 403
-        renderResponse(requestContentType, null, response);
-    }
-
-    /**
-     * Simple Helper Method to provide common OK for Server PDP Status.
-     *
-     * @param requestContentType
-     * @param responseContent
-     * @param response
-     */
-    private void renderServerOKResponse(final ContentType requestContentType,
-                                        String responseContent, HttpServletResponse response) {
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);  // 200
-        renderResponse(requestContentType, responseContent, response);
-    }
 
     /**
      * Provide common Entry point Method for Parsing Initial Requests
@@ -1076,6 +1033,82 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             xacmlRequestInformation.setContent(null);
             xacmlRequestInformation.setParsedCorrectly(false);
         }
+    }
+
+    // ******************************************************************************************************
+    // Common Rendering Response Methods
+    // ******************************************************************************************************
+
+    /**
+     * Private Helper Method to Render Response Content.
+     *
+     * @param contentType
+     * @param xacmlStringResponse
+     * @param response
+     */
+    private void renderResponse(final ContentType contentType, final String xacmlStringResponse, HttpServletResponse response) {
+        try {
+            response.setContentType(contentType.applicationType());
+            response.setCharacterEncoding("UTF-8");
+            if ((xacmlStringResponse != null) && (!xacmlStringResponse.trim().isEmpty())) {
+                response.setContentLength(xacmlStringResponse.length());
+                response.getOutputStream().write(xacmlStringResponse.getBytes());
+                response.getOutputStream().close();
+            } else {
+                response.setContentLength(0);
+            }
+        } catch (IOException ioe) {
+            // Debug
+        }
+    }
+
+    /**
+     * Simple Helper Method to provide common Not Authorized render Method.
+     *
+     * @param requestContentType
+     * @param response
+     */
+    private void renderUnAuthorized(final String realm, final ContentType requestContentType,
+                                    HttpServletResponse response) {
+        response.addHeader(WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader(realm));
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401
+        renderResponse(requestContentType, null, response);
+    }
+
+    /**
+     * Simple Helper Method to provide common Not Authorized render Method.
+     *
+     * @param requestContentType
+     * @param response
+     */
+    private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 403
+        renderResponse(requestContentType, null, response);
+    }
+
+    /**
+     * Simple Helper Method to provide common on POST, and when no Content Specified.
+     *
+     * @param requestContentType
+     * @param response
+     */
+    private void renderBadPOSTNoContentRequest(final ContentType requestContentType, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);  // 204
+        renderResponse(requestContentType, null, response);
+    }
+
+    /**
+     * Simple Helper Method to provide common OK for Server PDP Status.
+     *
+     * @param requestContentType
+     * @param responseContent
+     * @param response
+     */
+    private void renderServerOKResponse(final ContentType requestContentType,
+                                        String responseContent, HttpServletResponse response) {
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK);  // 200
+        renderResponse(requestContentType, responseContent, response);
     }
 
 }

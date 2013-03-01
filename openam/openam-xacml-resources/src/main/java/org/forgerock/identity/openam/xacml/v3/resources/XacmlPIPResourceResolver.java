@@ -25,7 +25,7 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
+
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
 /**
@@ -39,7 +39,7 @@ import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPIPResourceResolver extends XACML3Constants {
+public interface XacmlPIPResourceResolver extends XacmlPIPResource {
 
     /**
      * Put a new instance of a FunctionArgument based upon Category and Attribute ID, which
@@ -80,9 +80,15 @@ public interface XacmlPIPResourceResolver extends XACML3Constants {
     public void clear();
 
     /**
-     * Provide the Size of our
+     * Provide the Size of our Map Object.
      * @return
      */
     public int size();
+
+    /**
+     * Provide the String Equivalent of Object in String form for Debugging/Logging.
+     * @return String
+     */
+    public String toString();
 
 }

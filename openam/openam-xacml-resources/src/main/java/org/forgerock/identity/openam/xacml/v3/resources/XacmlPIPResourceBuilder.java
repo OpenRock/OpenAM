@@ -169,19 +169,19 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                 processAttributes(xacmlRequestInformation, null, requestMap.get(attributeName));
                             } else if (
                                     (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) &&
-                                    ( (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_ENVIRONMENT)) ||
-                                      (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_RESOURCE)) ||
-                                      (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_SUBJECT)) ) ) {
+                                            ((removeNamespace(attributeName).equalsIgnoreCase(REQUEST_ENVIRONMENT)) ||
+                                                    (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_RESOURCE)) ||
+                                                    (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_SUBJECT)))) {
                                 // Process these Attributes as Outer Objects.
                                 Map<String, Object> innerMap = (Map<String, Object>) requestMap.get(attributeName);
                                 String innerCategory = null;
                                 for (String innerKey : innerMap.keySet()) {
                                     if (innerKey.equalsIgnoreCase(ATTRIBUTE_CATEGORY)) {
                                         innerCategory = (String) innerMap.get(innerKey);
-                                    } else if ( (innerKey.equalsIgnoreCase(ATTRIBUTE)) &&
-                                                (innerMap.get(innerKey) instanceof List) ) {
-                                             processAttributes(xacmlRequestInformation,
-                                                     innerCategory,innerMap.get(innerKey));
+                                    } else if ((innerKey.equalsIgnoreCase(ATTRIBUTE)) &&
+                                            (innerMap.get(innerKey) instanceof List)) {
+                                        processAttributes(xacmlRequestInformation,
+                                                innerCategory, innerMap.get(innerKey));
                                     } else {
                                         debug.error("Unknown Request Attribute Found: " + attributeName + ", Type: " +
                                                 innerMap.get(innerKey).getClass().getName() +
@@ -189,10 +189,10 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                     }
                                 } // End of Inner For Each Loop.
                             } else {
+                                // Show any stragglers, if applicable.
                                 debug.error("Unknown Request Attribute Found: " + attributeName + ", Type: " +
                                         requestMap.get(attributeName).getClass().getName() +
                                         ", Value: " + requestMap.get(attributeName));
-                                // TODO : Fix stragglers, if necessary...
                             }
                         }
                     } // End of Inner For Each Loop.
@@ -225,9 +225,11 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                         } else if ((removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_ENVELOPE)) ||
                                 (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_HEADER)) ||
                                 (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_BODY))) {
-                            // Ignore, nothing we need at this point!
+                            xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
+                            // Nothing else we need at this point!
                         } else {
-                            debug.error(className+" Logic Issue, Unknown Embedded Key: "+currentEmbeddedKey + ", " +
+                            // Show any stragglers, if applicable.
+                            debug.error(className + " Logic Issue, Unknown Embedded Key: " + currentEmbeddedKey + ", " +
                                     "InnerKey: " + key + ", " +
                                     "Type: " + contentMap.get(key).getClass().getName() + " " + contentMap.get(key));
                         }
@@ -265,13 +267,13 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
 
         // Obtain our Attributes Contents.
         if (attributes instanceof List) {
-            for (Object attribute : (List)attributes) {
+            for (Object attribute : (List) attributes) {
                 if (attribute instanceof Map) {
                     Map<String, Object> attributeMap = (Map<String, Object>) attribute;
                     for (String attributeKey : attributeMap.keySet()) {
 
                         // Do we have a pending Attribute to write?
-                        if ( (attributeId != null) && (attributeValue != null) )  {
+                        if ((attributeId != null) && (attributeValue != null)) {
                             xacmlRequestInformation.getPipResourceResolver().
                                     put(currentCategory, attributeId, dataType, attributeValue, includeInResult);
                             attributeId = null;
@@ -280,10 +282,10 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
 
                         // Check the Attribute Element Names...
                         if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_CATEGORY)) {
-                            currentCategory = new String((String)attributeMap.get(attributeKey));
+                            currentCategory = new String((String) attributeMap.get(attributeKey));
                             continue;
                         } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_INCLUDE_IN_RESULT)) {
-                            includeInResult = ((Boolean)attributeMap.get(attributeKey)).booleanValue();
+                            includeInResult = ((Boolean) attributeMap.get(attributeKey)).booleanValue();
                             continue;
                         } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_ID)) {
                             attributeId = (String) attributeMap.get(attributeKey);
@@ -292,27 +294,28 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                             if (attributeMap.get(attributeKey) instanceof Map) {
                                 Map<String, Object> valueMap = (Map<String, Object>) attributeMap.get(attributeKey);
                                 for (String valueKey : valueMap.keySet()) {
-                                     if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE)) {
-                                         dataType = (String) valueMap.get(valueKey);
-                                     } else if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_CONTENT)) {
-                                         attributeValue = valueMap.get(valueKey);
-                                     } else {
-                                         debug.error(className+" Not handling Attribute Found: " + valueKey + ", " +
-                                                 attributes.getClass().getName() +
-                                                 ", should be a Map Object, Ignoring.");
-                                     }
+                                    if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE)) {
+                                        dataType = (String) valueMap.get(valueKey);
+                                    } else if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_CONTENT)) {
+                                        attributeValue = valueMap.get(valueKey);
+                                    } else {
+                                        // Show any stragglers, if applicable.
+                                        debug.error(className + " Not handling Attribute Found: " + valueKey + ", " +
+                                                attributes.getClass().getName() +
+                                                ", should be a Map Object, Ignoring.");
+                                    }
                                 }
                                 continue;
                             } else {
-                                debug.error(className+" No routine for handling Attribute Value Type Found: " +
+                                // Show any stragglers, if applicable.
+                                debug.error(className + " No routine for handling Attribute Value Type Found: " +
                                         attributes.getClass().getName() +
                                         ", should be a Map Object, Ignoring.");
-                                // TODO : Should the Request be Flagged?
                                 continue;
                             }
                         } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE)) {
-                             processAttributes(xacmlRequestInformation, currentCategory, attributeMap.get(attributeKey));
-                             continue;
+                            processAttributes(xacmlRequestInformation, currentCategory, attributeMap.get(attributeKey));
+                            continue;
                         } // End of Check for specific Element Names.
 
                         // Check for Inner List Object, if so, process Request Attributes...
@@ -321,53 +324,52 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                     attributeMap.get(attributeKey));
                         } else if (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) {
                             // Do we have a pending Attribute to write?
-                            if ( (attributeId != null) && (attributeValue != null) )  {
+                            if ((attributeId != null) && (attributeValue != null)) {
                                 xacmlRequestInformation.getPipResourceResolver().
                                         put(currentCategory, attributeId, dataType, attributeValue, includeInResult);
                                 attributeId = null;
                                 attributeValue = null;
                             }
                             // Determine the Inner Object for eventual Attribute Write to PIP.
-                            if (attributeKey.equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE) ) {
+                            if (attributeKey.equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE)) {
                                 dataType = (String) attributeMap.get(attributeKey);
-                               continue;
-                            } else if (attributeKey.equalsIgnoreCase(ATTRIBUTE_VALUE_VALUE) ) {
-                               attributeValue = attributeMap.get(attributeKey);
-                               continue;
+                                continue;
+                            } else if (attributeKey.equalsIgnoreCase(ATTRIBUTE_VALUE_VALUE)) {
+                                attributeValue = attributeMap.get(attributeKey);
+                                continue;
                             } else {
-                                debug.error(className+" Unknown Attribute Key: "+attributeKey+", Attribute Type Found: " +
+                                // Show any stragglers, if applicable.
+                                debug.error(className + " Unknown Attribute Key: " + attributeKey + ", Attribute Type Found: " +
                                         attributeMap.get(attributeKey).getClass().getName() +
-                                        ", for Category: "+currentCategory);
-                                // TODO : Should the Request be Flagged?
+                                        ", for Category: " + currentCategory);
                             }
                         } else {
-                            debug.error(className+" Unknown Attribute Key: "+attributeKey+", Attribute Type Found: " +
+                            // Show any stragglers, if applicable.
+                            debug.error(className + " Unknown Attribute Key: " + attributeKey + ", Attribute Type Found: " +
                                     attributeMap.get(attributeKey).getClass().getName() +
                                     ", should be a List Object, Ignoring.");
-                            // TODO : Should the Request be Flagged?
                         }
 
                     } // End Of Inner Map For Each loop.
                 } else {
-                    debug.error(className+" No routine for handling Attribute Type Found: " +
+                    // Show any stragglers, if applicable.
+                    debug.error(className + " No routine for handling Attribute Type Found: " +
                             attributes.getClass().getName() +
                             ", should be a Map Object, Ignoring.");
-                    // TODO : Should the Request be Flagged?
                 }
             } // End of List For Each Loop.
         } else {
-            debug.error(className+" Unknown Attributes Type Found: " +
+            // Show any stragglers, if applicable.
+            debug.error(className + " Unknown Attributes Type Found: " +
                     attributes.getClass().getName() +
                     ", should be a List Object, Ignoring.");
-            // TODO : Should the Request be Flagged?
         }
         // *****************************************************
         // Check if we have a final pending Attribute to write?
-        if ( (attributeId != null) && (attributeValue != null) )  {
+        if ((attributeId != null) && (attributeValue != null)) {
             xacmlRequestInformation.getPipResourceResolver().
                     put(currentCategory, attributeId, dataType, attributeValue, includeInResult);
         }
-
     }
 
     /**
