@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
  */
 package org.forgerock.openam.oauth2.provider;
 

@@ -54,13 +54,14 @@
    <para>This release of OpenAM runs in the following web application
    containers.</para>
    <listitem>
-    <para>Apache Tomcat 6.0.x, 7.0.x</para>
+    <para>Apache Tomcat 6.0.x, 7.0.x (ForgeRock's preferred web container for
+    OpenAM)</para>
    </listitem>
    <listitem>
     <para>GlassFish v2</para>
    </listitem>
    <listitem>
-    <para>IBM WebSphere 8, 8.5</para>
+    <para>IBM WebSphere 8.0, 8.5</para>
    </listitem>
    <listitem>
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
@@ -117,8 +118,7 @@
     2008 R2)</para>
    </listitem>
    <listitem>
-    <!-- TODO: Version pending test results -->
-    <para>IBM Tivoli Directory Server</para>
+    <para>IBM Tivoli Directory Server 6.3</para>
    </listitem>
    <listitem>
     <para>OpenDS, version 2 or later</para>
