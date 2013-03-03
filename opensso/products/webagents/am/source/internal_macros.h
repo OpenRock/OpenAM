@@ -25,6 +25,9 @@
  * $Id: internal_macros.h,v 1.6 2008/09/13 01:11:53 robertis Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef INTERNAL_MACROS_H
 #define INTERNAL_MACROS_H
@@ -37,6 +40,14 @@
 #define	BEGIN_PRIVATE_NAMESPACE	namespace PRIVATE_NAMESPACE_NAME {
 #define END_PRIVATE_NAMESPACE	}
 #define USING_PRIVATE_NAMESPACE	using namespace PRIVATE_NAMESPACE_NAME;
+
+#ifndef NULL
+#ifdef __cplusplus
+#define NULL    0
+#else
+#define NULL    ((void *)0)
+#endif
+#endif
 
 extern const char *POLICY_SERVICE;
 extern const char *POLICY_RESPONSE;

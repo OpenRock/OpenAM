@@ -29,6 +29,9 @@
  * Template class for managing a hash tables of typed objects.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef HASH_TABLE_H
 #define HASH_TABLE_H
@@ -361,7 +364,7 @@ HashTable<Element>::find(const std::string& key)
     EntryType entry = findEntry(key);
     ElementType value;
 
-    if (entry != NULL) {
+    if (entry) {
 	value = entry->getValue();
     }
 
@@ -385,7 +388,7 @@ HashTable<Element>::find_cac(const std::string& key)
     EntryType entry = findEntry_cac(key);
     ElementType value;
 
-    if (entry != NULL) {
+    if (entry) {
 	value = entry->getValue();
     }
 
@@ -408,7 +411,7 @@ HashTable<Element>::insert(const std::string& key,
     ElementType oldValue;
 
     // Check if entry already exists return the old value.
-    if (entry != NULL) {
+    if (entry) {
 	oldValue = entry->getValue();
 	entry->setValue(newValue);
 	entry->setExpirationTime(PR_Now() + entryLifeTime);
@@ -429,7 +432,7 @@ HashTable<Element>::remove(const std::string& key)
     EntryType entry = buckets[bucketNumber].remove(key);
     ElementType oldValue;
 
-    if (entry != NULL) {
+    if (entry) {
 	oldValue = entry->getValue();
     }
 

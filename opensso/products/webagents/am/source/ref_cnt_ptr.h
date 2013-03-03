@@ -28,14 +28,16 @@
  *
  * These class together provide thread-safe, strongly typed, reference
  * counting pointers.
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef REF_CNT_PTR_H
 #define REF_CNT_PTR_H
 
 #include "internal_macros.h"
 #include "mutex.h"
-#include "nspr_exception.h"
 
 BEGIN_PRIVATE_NAMESPACE
 
@@ -43,14 +45,9 @@ BEGIN_PRIVATE_NAMESPACE
 // This is the base class of all reference counted objects.  It provides
 // the synchronized bookkeeping functionality needed by the pointer class.
 //
-// NOTE: The two constructors will throw NSPRExceptions if they are unable
-// to create the required PRLock objects.
-//
 class RefCntObj {
 public:
     RefCntObj();
-    RefCntObj(const RefCntObj& rhs);
-
     virtual ~RefCntObj() = 0;
 
     RefCntObj& operator=(const RefCntObj& rhs);
@@ -60,122 +57,107 @@ public:
 
 private:
     Mutex lock;
-    PRInt32 refCnt;
+    unsigned int refCnt;
 };
 
-inline RefCntObj::RefCntObj()
-    : lock(), refCnt(0)
-{
+inline RefCntObj::RefCntObj() : lock(), refCnt(0) {
 }
 
-inline RefCntObj::RefCntObj(const RefCntObj&)
-    : lock(), refCnt(0)
-{
+inline RefCntObj::~RefCntObj() {
 }
 
-inline RefCntObj::~RefCntObj()
-{
-}
-
-inline RefCntObj& RefCntObj::operator=(const RefCntObj&)
-{
+inline RefCntObj& RefCntObj::operator=(const RefCntObj&) {
     return *this;
 }
 
 
 //
 // This template is used to instantiate reference counted pointers to any
-// data type.
+// data type. Follows an implementation of the "safe bool idiom".
 //
-// NOTE:  The class does not provide a conversion operator to the "dumb"
-// version of the pointer to avoid a variety of situations that can result
-// in corruption of the reference count.  As a result, users of the this
-// class must use the '.' (dot) operator when dereference a smart pointer.
-//
+
 template<typename T> class RefCntPtr {
+private:
+    T *pointer;
+    typedef T* RefCntPtr::*unspecified_bool_type;
+
 public:
-    explicit RefCntPtr(T *realPtr = NULL);
+    explicit RefCntPtr(T *realPtr = 0);
     RefCntPtr(const RefCntPtr& rhs);
     ~RefCntPtr();
 
     RefCntPtr& operator=(const RefCntPtr& rhs);
     RefCntPtr& operator=(T *rhs);
 
-    T& operator*() const { return *pointer; }
-    T *operator->() const { return pointer; }
+    T& operator*() const {
+        return *pointer;
+    }
 
-    struct NestedObj {}; // Empty nested class used for pointer conversion.
+    T *operator->() const {
+        return pointer;
+    }
 
-    //
-    // The following conversion will allow you to test a RefCntPtr
-    // against NULL.
-    //
-    operator const NestedObj *() const { return reinterpret_cast<NestedObj *>(pointer); }
-
-private:
-    T *pointer;
+    operator unspecified_bool_type() const {
+        return pointer != 0 ? &RefCntPtr::pointer : 0;
+    }
 };
 
 template<typename T>
-RefCntPtr<T>::RefCntPtr(T* realPointer)
-    : pointer(realPointer)
-{
-    if (static_cast<T *>(NULL) != pointer) {
-	pointer->addRef();
+RefCntPtr<T>::RefCntPtr(T* realPointer) : pointer(realPointer) {
+    if (pointer) {
+        pointer->addRef();
     }
 }
 
 template<typename T>
-RefCntPtr<T>::RefCntPtr(const RefCntPtr<T>& rhs)
-    : pointer(rhs.pointer)
-{
-    if (static_cast<T *>(NULL) != pointer) {
-	pointer->addRef();
+RefCntPtr<T>::RefCntPtr(const RefCntPtr<T>& rhs) : pointer(rhs.pointer) {
+    if (pointer) {
+        pointer->addRef();
     }
 }
 
 template<typename T>
-RefCntPtr<T>::~RefCntPtr()
-{
-    if (static_cast<T *>(NULL) != pointer) {
-	pointer->removeRef();
+RefCntPtr<T>::~RefCntPtr() {
+    if (pointer) {
+        pointer->removeRef();
     }
+    pointer = 0;
 }
 
 template<typename T>
-RefCntPtr<T>& RefCntPtr<T>::operator=(const RefCntPtr<T>& rhs)
-{
-    if (pointer != rhs.pointer) {
-	//
-	// The reference to the right-hand object must be incremented
-	// before decrementing the reference to the left-hand object
-	// in case the assignment being performed is of the form:
-	//
-	// lhs = lhs->next;
-	//
-	if (static_cast<T *>(NULL) != rhs.pointer) {
-	    rhs.pointer->addRef();
-	}
-	if (static_cast<T *>(NULL) != pointer) {
-	    pointer->removeRef();
-	}
-	pointer = rhs.pointer;
+RefCntPtr<T>& RefCntPtr<T>::operator=(const RefCntPtr<T>& rhs) {
+    if (pointer == rhs.pointer) {
+        return *this;
     }
 
+    T* tmp_ptr = pointer;
+    pointer = rhs.pointer;
+    if (pointer) {
+        pointer->addRef();
+    }
+    // removeRef second to prevent any deletion of any object which might
+    // be referenced by the other object. i.e RefCntPtr is child of the
+    // original pointer.
+    if (tmp_ptr) {
+        tmp_ptr->removeRef();
+    }
     return *this;
 }
 
 template<typename T>
-RefCntPtr<T>& RefCntPtr<T>::operator=(T *rhs)
-{
-    if (static_cast<T *>(NULL) != rhs) {
-	rhs->addRef();
+RefCntPtr<T>& RefCntPtr<T>::operator=(T *rhs) {
+    if (pointer == rhs) {
+        return *this;
     }
-    if (static_cast<T *>(NULL) != pointer) {
-	pointer->removeRef();
-    }
-    pointer = rhs;
 
+    T* tmp_ptr = pointer;
+    pointer = rhs;
+    if (pointer) {
+        pointer->addRef();
+    }
+    if (tmp_ptr) {
+        tmp_ptr->removeRef();
+    }
     return *this;
 }
 
