@@ -132,10 +132,14 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
     @Override
     public String toString() {
        StringBuilder sb = new StringBuilder();
-
-        // TODO :  Implement.
-
-        // return String representation of our Internal Map Object.
+       for(XacmlPIPResourceIdentifier key : this.resourceResolutionMap.keySet()) {
+           FunctionArgument functionArgument = this.resourceResolutionMap.get(key);
+           sb.append("Category: "+key.getCategory()+", Attribute Id: "+key.getAttributeId()+", " +
+                   "Included In Result: "+key.isIncludeInResult()+"\n");
+           sb.append("    Type: "+functionArgument.getType()+", Value: "+functionArgument.getValue(null));
+           sb.append("\n");
+       }
+       // return String representation of our Internal Map Object.
        return sb.toString();
     }
 }

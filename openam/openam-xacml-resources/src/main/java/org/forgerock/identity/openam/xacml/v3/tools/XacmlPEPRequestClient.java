@@ -30,8 +30,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.*;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -39,8 +41,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * Xacml PEP Client Request
@@ -207,9 +215,13 @@ public class XacmlPEPRequestClient {
                 response = httpclient2.execute(httpGet);
                 // Process Final Response.
                 return getFinalResponseContent(response);
+            }
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                return getFinalResponseContent(response);
             } else {
                 throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should " +
-                        "have received an initial " + HttpStatus.SC_UNAUTHORIZED + ", however we received a " +
+                        "have received an initial " + HttpStatus.SC_UNAUTHORIZED + " or " + HttpStatus.SC_OK + ", " +
+                        " depending upon specified URI, however we received a " +
                         response.getStatusLine() + ", this is a incorrect Data Flow, Server side is suspect!");
             }
         } catch (MalformedChallengeException e) {
@@ -272,7 +284,7 @@ public class XacmlPEPRequestClient {
                 // Process Final Response.
                 return getFinalResponseContent(response);
             } else {
-                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send GET Request, we should " +
+                throw new IllegalAccessException("Unable to Access OpenAM XACML PDP to Send POST Request, we should " +
                         "have received an initial " + HttpStatus.SC_UNAUTHORIZED + ", however we received a " +
                         response.getStatusLine() + ", this is a incorrect Data Flow, Server side is suspect!");
             }
@@ -288,6 +300,67 @@ public class XacmlPEPRequestClient {
     }
 
     /**
+     * Perform a PUT Method to our PDP.
+     *
+     * @throws IOException
+     */
+    private String putMethod() throws IllegalAccessException, IOException {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpPut httpPut = new HttpPut(this.getUrl());
+        // Set Headers
+        httpPut.setHeader("content-type", this.getContentType().applicationType());
+        System.out.println("PUT Requesting : " + httpPut.getURI());
+
+        try {
+            // Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
+            HttpResponse response = httpclient.execute(httpPut);
+            System.out.println("Initial PUT Request Response: " + response.getStatusLine());
+
+            // Until OpenAM Implements, we will received a 501, No Implementation.
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
+                System.out.println("Correctly Received a Not Implemented Yet Response: "+response
+                        .getStatusLine());
+            } else {
+                System.out.println("Received a Response we have not Implemented yet!: "+response.getStatusLine());
+            }
+        } finally {
+            httpclient.getConnectionManager().shutdown();
+        }
+        return null;
+    }
+
+    /**
+     * Perform a DELETE Method to our PDP.
+     *
+     * @throws IOException
+     */
+    private String deleteMethod() throws IllegalAccessException, IOException {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpDelete httpDelete = new HttpDelete(this.getUrl());
+        // Set Headers
+        httpDelete.setHeader("content-type", this.getContentType().applicationType());
+        System.out.println("PUT Requesting : " + httpDelete.getURI());
+
+        try {
+            // Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
+            HttpResponse response = httpclient.execute(httpDelete);
+            System.out.println("Initial DELETE Request Response: " + response.getStatusLine());
+
+            // Until OpenAM Implements, we will received a 501, No Implementation.
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
+                System.out.println("Correctly Received a Not Implemented Yet Response: "+response
+                        .getStatusLine());
+            } else {
+                System.out.println("Received a Response we have not Implemented yet!: "+response.getStatusLine());
+            }
+        } finally {
+            httpclient.getConnectionManager().shutdown();
+        }
+        return null;
+    }
+
+
+    /**
      * Private Helper Method to obtain the Response Content.
      *
      * @param response
@@ -297,10 +370,10 @@ public class XacmlPEPRequestClient {
     private String getFinalResponseContent(HttpResponse response) throws IOException {
         System.out.println("Final GET Request Response: " + response.getStatusLine());
         if ((response.getEntity().getContentLength() > 0) &&
-            (response.getEntity().getContent() != null) ) {
+                (response.getEntity().getContent() != null)) {
             // Show our response Content.
-            String content =  XACML3Utils.getResponseBody(response);
-            System.out.println("Response Content: "+content);
+            String content = getResponseBody(response);
+            System.out.println("Response Content: " + content);
             return content;
         } else {
             // Show our response Content.
@@ -325,39 +398,54 @@ public class XacmlPEPRequestClient {
 
             if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--url"))) {
                 argumentIndex = argumentIndex - 2;
-                this.url = args[i + 1];
-                if (!validate("url", this.url)) {
+                try {
+                    URL parsedURL = new URL(args[i + 1]);
+                    if (parsedURL != null) {
+                        this.url = parsedURL.toExternalForm();
+                    }
+                } catch (MalformedURLException mue) {
+                    System.err.println("Invalid URL Specified!");
                     validationErrors++;
                 }
             } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--method"))) {
                 argumentIndex = argumentIndex - 2;
-                this.method = args[i + 1];
-                if (!validate("method", this.method)) {
+                if ((args[i + 1].equalsIgnoreCase("GET")) ||
+                        (args[i + 1].equalsIgnoreCase("POST")) ||
+                        (args[i + 1].equalsIgnoreCase("PUT")) ||
+                        (args[i + 1].equalsIgnoreCase("DELETE"))) {
+                    this.method = args[i + 1];
+                } else {
+                    System.err.println("Invalid Method Specified!");
                     validationErrors++;
                 }
+
+
             } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--principal"))) {
                 argumentIndex = argumentIndex - 2;
                 this.principal = args[i + 1];
-                if (!validate("principal", this.principal)) {
-                    validationErrors++;
-                }
+
             } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--credential"))) {
                 argumentIndex = argumentIndex - 2;
                 this.credential = args[i + 1];
-                if (!validate("credential", this.credential)) {
-                    validationErrors++;
-                }
+
             } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--contenttype"))) {
                 argumentIndex = argumentIndex - 2;
                 if (args[i + 1].equalsIgnoreCase("xml")) {
                     this.contentType = ContentType.XML;
                 } else if (args[i + 1].equalsIgnoreCase("json")) {
                     this.contentType = ContentType.JSON;
+                } else {
+                    System.err.println("Invalid Content Type!");
+                    validationErrors++;
                 }
+
             } else if ((argumentIndex >= 2) && (args[i].equalsIgnoreCase("--requestfile"))) {
                 argumentIndex = argumentIndex - 2;
-                this.requestFileName = args[i + 1];
-                if (!validate("requestFileName", this.requestFileName)) {
+                File requestFile = new File(args[i+1]);
+                if ( (requestFile.exists() && (requestFile.canRead()) ) ) {
+                    this.requestFileName = requestFile.getAbsolutePath();
+                } else {
+                    System.err.println("Request FileName does not Exist or Unreadable!");
                     validationErrors++;
                 }
             }
@@ -365,22 +453,6 @@ public class XacmlPEPRequestClient {
         // Return with the number of validation errors.
         return validationErrors;
     }
-
-    /**
-     * Validate the parameter specified from command line.
-     *
-     * @param name
-     * @param value
-     * @return
-     */
-    private boolean validate(String name, String value) {
-        System.out.println("Validating: Property Name: " + name + ", Value:[" + value + "]");
-
-        // TODO : Validation of command line argument parameters.
-
-        return true;
-    }
-
 
     /**
      * Main -- Invoked using Command Line Tools.
@@ -442,5 +514,37 @@ public class XacmlPEPRequestClient {
         // Show Usage...
         System.out.println(sb.toString());
     }
+
+    /**
+     * Return the Response Body Content.
+     *
+     * @param response
+     * @return String - Request Content Body.
+     */
+    private static String getResponseBody(HttpResponse response) {
+        // Get the body content of the HTTP Response,
+        // remember we have no normal WS* SOAP Body, just String
+        // data either XML or JSON.
+        InputStream inputStream = null;
+        try {
+            inputStream = response.getEntity().getContent();
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        } catch (IOException ioe) {
+            // Do Nothing...
+        } catch (NoSuchElementException nse) {   // runtime exception.
+            //Do Nothing...
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
+            }
+        }
+        return null;
+    }
+
 
 }

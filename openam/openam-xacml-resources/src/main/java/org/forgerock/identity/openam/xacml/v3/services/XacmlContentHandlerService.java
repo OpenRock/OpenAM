@@ -268,6 +268,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
          */
         processRequest(request, response);
 
+        // GET operations to PDP.
+
         /**
          * Id: urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status
          ￼
@@ -348,47 +350,37 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         /**
          * ￼
-         Id
-         ￼
+         Id   ￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:status
          ￼
-         Normative Source
-         ￼
+         Normative Source     ￼
          POST on the PDP with a valid XACML request MUST return status code 200
          ￼
          Target
-         ￼
          Response to POST request on the PDP location with valid XACML request in the body
          ￼
          Predicate
-         ￼
          The HTTP status code in the [response] is 200
          ￼
          Prescription Level
-         ￼
          mandatory
          */
 
 
         /**
-         * Id
-         ￼
+         * Id￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:body
          ￼
          Normative Source
-         ￼
          POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
          ￼
          Target
-         ￼
          Response to POST request on the PDP location with valid XACML request in the body
          ￼
          Predicate
-         ￼
          The HTTP body in the [response] is a valid XACML response
          ￼
          Prescription Level
-         ￼
          mandatory
          */
 
@@ -396,72 +388,57 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         /**
          * ￼
          Id
-         ￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:invalid
          ￼
          Normative Source
-         ￼
          POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
          ￼
          Target
-         ￼
          Response to POST request on the PDP location with invalid XACML request in the body
          ￼
          Predicate
-         ￼
          The HTTP status code in the [response] is 400
          ￼
          Prescription Level
-         ￼
          mandatory
          */
 
 
         /**
          * Id
-         ￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:status
          ￼
          Normative Source
-         ￼
          POST on the PDP with a valid XACML request MUST return status code 200
          ￼
          Target
-         ￼
          Response to POST request on the PDP location with valid XACML request wrapped in a
          xacml-samlp:XACMLAuthzDecisionQuery in the body
          ￼
          Predicate
-         ￼
          The HTTP status code in the [response] is 200
          ￼
          Prescription Level
-         ￼
          optional
          */
 
 
         /**
          * Id
-         ￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:body
          ￼
          Normative Source
-         ￼
          POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
          ￼
          Target
-         ￼
          Response to POST request on the PDP location with valid XACML request wrapped in a
          xacml-samlp:XACMLAuthzDecisionQuery in the body
          ￼
          Predicate
-         ￼
          The HTTP body in the [response] is a valid XACML response wrapped in a
          samlp:Response
          ￼
          Prescription Level
-         ￼
          optional
          */
 
@@ -469,24 +446,19 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         /**
          * ￼
          Id
-         ￼
          urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:invalid
          ￼
          Normative Source
-         ￼
          POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
          ￼
          Target
-         ￼
          Response to POST request on the PDP location with invalid XACML request
          wrapped in a xacml-samlp:XACMLAuthzDecisionQuery in the body
          ￼
          Predicate
-         ￼
          The HTTP status code in the [response] is 400
          ￼
          Prescription Level
-         ￼
          optional
          */
 
@@ -494,13 +466,15 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);    // TODO Future
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Put Method Not Implemented.
+        this.renderNotImplemented(resp);
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doDelete(req, resp);    // TODO Future
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Delete Method Not Implemented.
+        this.renderNotImplemented(resp);
     }
 
     // ******************************************************************************************************
@@ -734,11 +708,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************************
         // Check for any HTTP Digest Authorization Request or content.
-        if ((request.getContentLength() <= 0) &&
-                (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
+        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
                 ((xacmlRequestInformation.getAuthenticationHeader() == null) ||
-                 (xacmlRequestInformation.getAuthenticationHeader().isEmpty()))) {
-            // With No Content or Authentication and a GET, proceed to Respond with our Home Document.
+                 (xacmlRequestInformation.getAuthenticationHeader().isEmpty())) ) {
+            // With No Authentication Header and a GET, attempt to Respond with our Home Document.
             if (this.processHomeRequest(xacmlRequestInformation, request, response)) {
                 return;
             }
@@ -817,10 +790,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Only Continue if we have authenticated or Trust PEP.
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
-            // Not Authenticated nor Authorized, Forbidden.
+            // Not Authenticated nor Authorized.
             response.setCharacterEncoding("UTF-8");
             response.setContentLength(0);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403.
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401.
             renderResponse(requestContentType, null, response);
             return;
         }
@@ -828,11 +801,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************
         // Check for a existence of a XACML Request, for a POST, we must have
         // Correct Request Content and if no Request Object in XML or JSON
-        // form.
+        // form we render a Bad POST Request.
         if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
              (!xacmlRequestInformation.isRequestNodePresent()) ) {
-            // No Request Node found within the document, not valid request.
-            this.renderBadPOSTNoContentRequest(requestContentType, response);
+            // No Request Node found within the document, bad request.
+            this.renderBadRequest(requestContentType, response);
             return;
         }
         // ******************************************************************
@@ -905,9 +878,10 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if ((xacmlRequestInformation.getRequestURI() == null) ||
                 (xacmlRequestInformation.getRequestURI().isEmpty()) ||
                 (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
-                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/pdp")) ||
                 (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/home")) ||
-                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status"))) {
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status")) ||
+                (xacmlRequestInformation.getRequestURI().trim().
+                        toLowerCase().contains("/openam/xacml/pdp/".toLowerCase())) ) {
             try {
                 renderServerOKResponse(xacmlRequestInformation.getContentType(),
                         XacmlHomeResource.getHome(xacmlRequestInformation, request), response);
@@ -917,7 +891,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 debug.error(classMethod + " JSON Exception Occurred: " + jsonException.getMessage(), jsonException);
             }
         }
-        // Return, indicate URI Request from PEP was Invalid.
+        // Return, indicate URI Request from PEP was not satisfied by a Home Request.
         return false;
     }
 
@@ -968,12 +942,12 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // **************************************
         // Show Parsed Content for debugging if
         // applicable.
-        if (debug.messageEnabled()) {
+        //if (debug.messageEnabled()) {    // TODO : Replace to Message Level for debugging.
             StringBuilder sb = XacmlPIPResourceBuilder.dumpContentInformation(xacmlRequestInformation);
             if (sb.length() > 0) {
-                debug.error(classMethod+"Request Map====>\n"+sb.toString());
+                debug.error(classMethod+"Parsed Request Map====>\n"+sb.toString());
             }
-        }
+        //}
         // ****************************************
         // Build out our Xacml PIP Resource Object.
         XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation);
@@ -1086,24 +1060,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     }
 
     /**
-     * Simple Helper Method to provide common Not Authorized render Method.
+     * Simple Helper Method to provide common Bad Request render Method.
      *
      * @param requestContentType
      * @param response
      */
     private void renderBadRequest(final ContentType requestContentType, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 403
-        renderResponse(requestContentType, null, response);
-    }
-
-    /**
-     * Simple Helper Method to provide common on POST, and when no Content Specified.
-     *
-     * @param requestContentType
-     * @param response
-     */
-    private void renderBadPOSTNoContentRequest(final ContentType requestContentType, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);  // 204
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 400
         renderResponse(requestContentType, null, response);
     }
 
@@ -1121,4 +1084,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         renderResponse(requestContentType, responseContent, response);
     }
 
+    /**
+     * Simple Helper Method to provide common Not Implemented render Method.
+     *
+     * @param response
+     */
+    private void renderNotImplemented(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);  // 501
+        response.setContentLength(0);
+    }
 }

@@ -31,12 +31,9 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -214,37 +211,6 @@ public class XACML3Utils implements XACML3Constants {
         InputStream inputStream = null;
         try {
             inputStream = request.getInputStream();
-            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
-        } catch (IOException ioe) {
-            // Do Nothing...
-        } catch (NoSuchElementException nse) {   // runtime exception.
-            //Do Nothing...
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ioe) {
-                    // Do nothing...
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Return the Response Body Content.
-     *
-     * @param response
-     * @return String - Request Content Body.
-     */
-    public static String getResponseBody(HttpResponse response) {
-        // Get the body content of the HTTP Response,
-        // remember we have no normal WS* SOAP Body, just String
-        // data either XML or JSON.
-        InputStream inputStream = null;
-        try {
-            inputStream = response.getEntity().getContent();
             Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
         } catch (IOException ioe) {

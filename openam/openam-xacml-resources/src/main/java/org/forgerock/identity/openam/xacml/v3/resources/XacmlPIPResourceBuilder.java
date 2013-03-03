@@ -85,7 +85,7 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
     public static StringBuilder dumpContentInformation(XACMLRequestInformation xacmlRequestInformation) {
         StringBuilder sb = new StringBuilder();
         if ((xacmlRequestInformation != null) && (xacmlRequestInformation.getContent() != null)) {
-            dumpContentInformation(xacmlRequestInformation.getContent(), sb, 0);
+            dumpContentInformation(xacmlRequestInformation.getContent(), 0);
             return sb;
         }
         return sb;
@@ -114,7 +114,7 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
 
                 // TODO : When we go Java 7 or above use a String Switch here...
 
-                // Start Checking for SOAP Envelop, SOAP Body, XACMLAuthzDecisionQuery, Request.
+                // Start Checking for SOAP Envelop, Body or XACMLAuthzDecisionQuery, Request.
                 if (key.toLowerCase().contains(SOAP_ENVELOPE.toLowerCase())) {
                     xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
                     // Recursively access Inner or Embedded Contents...
@@ -140,11 +140,14 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                     // **************************
                     // Process Request Contents
                     // TODO : Handle Multiple Requests.
+                    // Make our XacmlRequestInformation Request object to an array to contain all relevant
+                    // bundled requests.
                     xacmlRequestInformation.setRequestNodePresent(true);
                     Map requestMap = (Map) contentMap.get(key);
                     for (Object requestAttributes : requestMap.keySet()) {
                         // Process Attributes
                         if (requestAttributes instanceof Map) {
+                            // Use Recursion to process our Inner Collection.
                             buildXacmlPIPResourceForRequests(xacmlRequestInformation,
                                     requestMap.get(requestAttributes), key);
                             continue;
@@ -199,6 +202,7 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
 
                 } else {
                     if (contentMap.get(key) instanceof Collection) {
+                        // Use Recursion to process our Inner Collection.
                         buildXacmlPIPResourceForRequests(xacmlRequestInformation,
                                 contentMap.get(key), key);
                     } else {
@@ -314,12 +318,14 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                 continue;
                             }
                         } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE)) {
+                            // Use Recursion to process our Attribute Object.
                             processAttributes(xacmlRequestInformation, currentCategory, attributeMap.get(attributeKey));
                             continue;
                         } // End of Check for specific Element Names.
 
                         // Check for Inner List Object, if so, process Request Attributes...
                         if (attributeMap.get(attributeKey) instanceof List) {
+                            // Use Recursion to process our Inner attribute List.
                             processAttributes(xacmlRequestInformation, currentCategory,
                                     attributeMap.get(attributeKey));
                         } else if (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) {
@@ -377,9 +383,10 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
      *
      * @param contentObject
      */
-    private static void dumpContentInformation(Object contentObject, StringBuilder sb, int level) {
+    private static String dumpContentInformation(Object contentObject, int level) {
+        StringBuilder sb = new StringBuilder();
         if (contentObject == null) {
-            return;
+            return null;
         }
         // Determine the Type of Object and Iterate Over the Contents Recursively...
         if (contentObject instanceof Map) {
@@ -392,20 +399,20 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                         .getClass()
                         .getName()
                         + "\n");
-                dumpContentInformation(contentMap.get(key), sb, level);
+                sb.append(dumpContentInformation(contentMap.get(key), level));
             }
             level--;
         } else if (contentObject instanceof List) {
             // Cast our Object.
-            level++;
             List<Object> contentList = (List<Object>) contentObject;
             for (Object innerObject : contentList) {
-                dumpContentInformation(innerObject, sb, level);
+                sb.append(dumpContentInformation(innerObject, level));
             }
-            level--;
         } else {
             sb.append(levelToDots(level) + " Content Value: " + contentObject.toString() + "\n");
         }
+        // Return built so far...
+        return sb.toString();
     }
 
     /**
