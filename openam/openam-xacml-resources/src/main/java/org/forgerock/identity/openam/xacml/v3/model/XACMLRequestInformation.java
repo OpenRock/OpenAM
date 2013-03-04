@@ -93,7 +93,8 @@ public class XACMLRequestInformation implements Serializable {
      */
     private String originalContent;
     /**
-     * Content, is Marshaled into a common Map Collection, which can be queried using JoSQL.
+     * Content, is Marshaled into a common Map Collection, which can be queried using JoSQL,
+     * but currently not using JoSQL, until license review.
      */
     private Map<String,Object> content;   // TODO This needs to be refactored to List<Map<String,Object>>
     // TODO :: To Support multiple Requests.
@@ -101,11 +102,6 @@ public class XACMLRequestInformation implements Serializable {
      * Optional HTTP Digest Authorization Request
      */
     private String authenticationHeader;
-    /**
-     * Content, can be either XML or JSON depending upon the specified ContentType.
-     * If this object is Null, we have an Anonymous/Guest Request.
-     */
-    private Object authenticationContent;
     /**
      *  Information obtained from actual HTTPServletRequest Object.
      */
@@ -130,6 +126,11 @@ public class XACMLRequestInformation implements Serializable {
 
     /**
      * XACMLAuthzDecisionQuery Inner Class.
+     *
+     * This object is never null, however if no "id" field/property exists for this
+     * Object, this indicates that the XACMLAuthzDecisionQuery Object
+     * does not exist in the Request.
+     *
      * <p/>
      * If this is an XACMLAuthzDecisionQuery, then the following fields
      * will be populated during Parsing of the XACMLAuthzDecisionQuery wrapper Document.
@@ -143,6 +144,7 @@ public class XACMLRequestInformation implements Serializable {
      * example: IssueInstant="2001-12-17T09:30:47.0Z"
      * &lt;attribute name="Destination" type="anyURI" use="optional"/>
      * &lt;attribute name="Consent" type="anyURI" use="optional"/>
+     *
      */
     public class XACMLAuthzDecisionQuery {
         private static final String ID_NAME = "id";
@@ -251,7 +253,7 @@ public class XACMLRequestInformation implements Serializable {
     /**
      * Wrapper Object for the XACMLAuthzDecisionQuery Element Attributes
      */
-    XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery;
+    XACMLAuthzDecisionQuery xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
     /**
      * Indicates if this Request has been authenticated or not.
      */
@@ -274,7 +276,6 @@ public class XACMLRequestInformation implements Serializable {
      */
     public XACMLRequestInformation(ContentType contentType) {
         this.contentType = contentType;
-        this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
         // Instantiate a new PIP Resource for our Request for eventual Evaluation of Request against
         // our current Policy Base.
         this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl());
@@ -295,7 +296,6 @@ public class XACMLRequestInformation implements Serializable {
         this.metaAlias = metaAlias;
         this.pdpEntityID = pdpEntityID;
         this.realm = realm;
-        this.xacmlAuthzDecisionQuery = new XACMLAuthzDecisionQuery();
         // Save our Request Information.
         this.requestMethod = request.getMethod();
         this.requestAuthenticationType = request.getAuthType();
@@ -396,14 +396,6 @@ public class XACMLRequestInformation implements Serializable {
 
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
-    }
-
-    public Object getAuthenticationContent() {
-        return authenticationContent;
-    }
-
-    public void setAuthenticationContent(Object authenticationContent) {
-        this.authenticationContent = authenticationContent;
     }
 
     public boolean isRequestNodePresent() {
@@ -612,8 +604,8 @@ public class XACMLRequestInformation implements Serializable {
         sb.append("{requestProcessed=").append(requestProcessed);
         sb.append(", authenticated=").append(authenticated);
         sb.append(", authenticationHeader='").append(authenticationHeader).append('\'');
-        sb.append(", authenticationContent=").append(authenticationContent);
         sb.append(", xacmlAuthzDecisionQuery=").append(xacmlAuthzDecisionQuery);
+        sb.append(", contentType=").append(contentType);
 
         sb.append(", parsedCorrectly=").append(parsedCorrectly);
         sb.append(", metaAlias='").append(metaAlias).append('\'');
@@ -621,7 +613,6 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", realm='").append(realm).append('\'');
         sb.append(", soapEnvelopeNodePresent=").append(soapEnvelopeNodePresent);
         sb.append(", requestNodePresent=").append(requestNodePresent);
-        sb.append(", contentType=").append(contentType);
 
         sb.append(", requestMethod='").append(requestMethod).append('\'');
         sb.append(", requestAuthenticationType='").append(requestAuthenticationType).append('\'');
@@ -639,10 +630,11 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", request_CombinedDecision=").append(request_CombinedDecision);
         sb.append(", request_NameSpace='").append(request_NameSpace).append('\'');
 
-        // Keep Verbosity down...
-        //sb.append(", originalContent='").append(originalContent).append('\'');
-        //sb.append(", content=").append(content);
-        //sb.append(", xacmlResponse=").append(xacmlResponse);
+        // Keep Verbosity down, show content size...
+        sb.append(", originalContent Length='").append((originalContent==null)?0:originalContent.length()).append
+                ('\'');
+        sb.append(", content #Elements=").append((content==null)?0:content.size());
+        sb.append(", xacmlResponse=").append(xacmlResponse);
 
         sb.append(", pipResourceResolver Size=");
         sb.append( (pipResourceResolver==null)?"null":pipResourceResolver.size() );

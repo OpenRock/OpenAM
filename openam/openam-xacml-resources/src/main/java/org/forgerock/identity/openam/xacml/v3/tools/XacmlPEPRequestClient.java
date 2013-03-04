@@ -40,8 +40,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
+import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -188,12 +190,16 @@ public class XacmlPEPRequestClient {
 
         // Set Headers
         httpGet.setHeader("content-type", this.getContentType().applicationType());
-
         System.out.println("GET Requesting: " + httpGet.getURI());
 
         try {
-            // Initially send request without credentials returns "HTTP/1.1 401 Unauthorized".
+            // Initial request without credentials returns "HTTP/1.1 401 Unauthorized, if using Digest Auth.."
             HttpResponse response = httpclient.execute(httpGet);
+            if ( (this.getCredential() == null) ||
+                    (this.getCredential().equalsIgnoreCase(XACML3Constants.ANONYMOUS)) ) {
+                System.out.println("GET Request Response: " + response.getStatusLine());
+                return getFinalResponseContent(response);
+            }
             System.out.println("Initial GET Request Response: " + response.getStatusLine());
 
             // Initially Return Status should be a 401.
@@ -247,12 +253,16 @@ public class XacmlPEPRequestClient {
         HttpPost httpPost = new HttpPost(this.getUrl());
         // Set Headers
         httpPost.setHeader("content-type", this.getContentType().applicationType());
-
         System.out.println("POST Requesting : " + httpPost.getURI());
 
         try {
-            // Initial request without credentials returns "HTTP/1.1 401 Unauthorized"
+            // Initial request without credentials returns "HTTP/1.1 401 Unauthorized, if using Digest Auth.."
             HttpResponse response = httpclient.execute(httpPost);
+            if ( (this.getCredential() == null) ||
+                 (this.getCredential().equalsIgnoreCase(XACML3Constants.ANONYMOUS)) ) {
+                System.out.println("POST Request Response: " + response.getStatusLine());
+                return getFinalResponseContent(response);
+            }
             System.out.println("Initial POST Request Response: " + response.getStatusLine());
 
             // Initially Return Status should be a 401.
@@ -272,7 +282,7 @@ public class XacmlPEPRequestClient {
 
                 // Obtain Content from a File, if applicable, and stuff into Request.
                 if ((this.getRequestFileName() != null) && (!this.getRequestFileName().isEmpty())) {
-                    String content = XACML3Utils.getFileContents(this.getRequestFileName());
+                    String content = getFileContents(this.getRequestFileName());
                     if (content != null) {
                         HttpEntity httpEntity = new ByteArrayEntity(content.getBytes(Charset.forName("UTF-8")));
                         // Associate our Content Entity to our POST Method Request.
@@ -368,12 +378,12 @@ public class XacmlPEPRequestClient {
      * @throws IOException
      */
     private String getFinalResponseContent(HttpResponse response) throws IOException {
-        System.out.println("Final GET Request Response: " + response.getStatusLine());
+        System.out.println("Final Request Response: " + response.getStatusLine());
         if ((response.getEntity().getContentLength() > 0) &&
                 (response.getEntity().getContent() != null)) {
             // Show our response Content.
             String content = getResponseBody(response);
-            System.out.println("Response Content: " + content);
+            System.out.println("XACML Response Content: " + content);
             return content;
         } else {
             // Show our response Content.
@@ -480,8 +490,7 @@ public class XacmlPEPRequestClient {
         }
         // Perform the Appropriate Operation.
         try {
-            String xacmlResponse = xacmlPEPRequestClient.performRequest();
-            System.out.println("XACML Response: " + xacmlResponse);
+            xacmlPEPRequestClient.performRequest();
             System.out.println("\nDone.");
         } catch (Exception e) {
             System.err.println("Exception occurred performing Request: " + e.getMessage());
@@ -543,6 +552,40 @@ public class XacmlPEPRequestClient {
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Simple Helper Method to read File in as a Stream
+     *
+     * @param resourceFileName -- File Name of Contents to be consumed as a String.
+     * @return String containing the Resource Contents or null if issue.
+     */
+    public static String getFileContents(final String resourceFileName) {
+        InputStream inputStream = null;
+        try {
+            if ( (resourceFileName == null) || (resourceFileName.isEmpty()) ) {
+                return null;
+            }
+            File file = new File(resourceFileName);
+            if ( (file.exists()) && (file.canRead()) )
+            {
+                inputStream = new FileInputStream(resourceFileName);
+                return (inputStream != null) ? new Scanner(inputStream).useDelimiter("\\A").next() : null;
+            }
+        } catch (Exception e) {
+            // Do Nothing...
+        }
+        finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                    // Do nothing...
+                }
+            }
+        }
+        // Catch All.
         return null;
     }
 

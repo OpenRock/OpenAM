@@ -25,9 +25,23 @@
  */
 package org.forgerock.identity.openam.xacml.v3.services;
 
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.common.SystemConfigurationUtil;
 
+import com.sun.identity.log.LogConstants;
+import com.sun.identity.log.LogRecord;
+import com.sun.identity.log.Logger;
+import com.sun.identity.log.messageid.LogMessageProvider;
+import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.security.AdminDNAction;
+import com.sun.identity.security.AdminPasswordAction;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.xacml.client.XACMLRequestProcessor;
 import com.sun.identity.xacml.common.XACMLException;
@@ -55,11 +69,13 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
+import java.security.AccessController;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * XACML v3 Resource Router
@@ -111,6 +127,7 @@ import java.util.concurrent.TimeUnit;
  * @author Jeff.Schenk@forgerock.com
  */
 public class XacmlContentHandlerService extends HttpServlet implements XACML3Constants {
+    private static String LOG_PROVIDER = "amXACML";
     /**
      * Initialize our Resource Bundle.
      */
@@ -143,6 +160,18 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static Debug debug;
 
     /**
+     * Access Logging
+     */
+    private static final String amXACMLErrorLogFile = "amXACML.error";
+    private static final String amXACMLLogFile = "amXACML.access";
+
+    private static Logger logger = null;
+    private static Logger errorLogger = null;
+    private static LogMessageProvider logProvider = null;
+
+    private static boolean logStatus = false;
+
+    /**
      * Preserve our Servlet Context PlaceHolder,
      * for referencing Artifacts.
      */
@@ -166,6 +195,23 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static ScheduledExecutorService nonceRefreshExecutor;
 
     /**
+     * SSO Token Manager Instance Reference.
+     */
+    private static SSOTokenManager ssoManager = null;
+
+    /**
+     * This token is used to satisfy the admin interfaces
+     */
+    private static SSOToken adminToken = null;
+
+    /**
+     * OpenAM Admin DN and Credentials...
+     * TODO : Credentials should be obfuscated!
+     */
+    private static String dsameAdminDN = null;
+    private static String dsameAdminPassword = null;
+
+    /**
      * Initialize our Servlet/Restlet Request Handler for All
      * XACML v3 Requests.
      *
@@ -185,6 +231,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             debug.error("Unable to obtain Reference to XACMLRequestProcessor for Core Functionality, unable to process XACML Requests.");
             xacmlRequestProcessor = null;
         }
+        // *****************************************************
+        // Initialize our OpenAM principal and credentials
+        // for performing administrative functions if necessary.
+        dsameAdminDN = (String) AccessController
+                .doPrivileged(new AdminDNAction());
+        dsameAdminPassword = (String) AccessController
+                .doPrivileged(new AdminPasswordAction());
         // ***************************************************
         // Acquire MaxContent Length
         try {
@@ -489,8 +542,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private String generateAuthenticateHeader(String realm) {
         StringBuilder header = new StringBuilder();
         header.append("Digest realm=\"").append(realm).append("\",");
-        if (!StringUtils.isBlank(authenticationMethods)) {
-            header.append("qop=\"").append(authenticationMethods).append("\",");
+        if (!StringUtils.isBlank(AUTHENTICATION_METHOD)) {
+            header.append("qop=\"").append(AUTHENTICATION_METHOD).append("\",");
         }
         header.append("algorithm=\"").append("md5").append("\",");
         header.append("nonce=\"").append(nonce).append("\",");
@@ -565,27 +618,22 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Obtain Each Value for Authentication
         // of the Digest.
         String method = request.getMethod();
-        // TODO This needs to be fixed.
         String credential = headerValues.get(USERNAME);
         if ( (credential == null)||(credential.isEmpty()) ) {
-            debug.error(classMethod+"Unable to obtain the PEP's Credentials: No '"+USERNAME+"' Header and Value " +
-                    "Specified.");
+            debug.error(classMethod+"Unable to obtain the PEP's Credentials: No '"+USERNAME+"' Header Value " +
+                    "Supplied by Client.");
+            return null;
         }
+
         // Obtain the password from the User Directory PIP.
-        String ha1 = DigestUtils.md5Hex(credential + ":" + realm + ":" + "cangetin");
+        String ha1 = DigestUtils.md5Hex(credential + ":" + realm + ":" + "cangetin");   // TODO : FIX ME, LookUp.
 
         // Obtain values to compute.
         String qop = headerValues.get("qop");
         String ha2;
         String requestURI = headerValues.get("uri");
-        // determine AUTH Digest Method Details...
-        if ( (StringUtils.isNotBlank(qop)) && (qop.equalsIgnoreCase("auth-int")) &&
-                (StringUtils.isNotBlank(requestBody)) ) {
-            String entityBodyMd5 = DigestUtils.md5Hex(requestBody);
-            ha2 = DigestUtils.md5Hex(method + ":" + requestURI + ":" + entityBodyMd5);
-        } else {
-            ha2 = DigestUtils.md5Hex(method + ":" + requestURI);
-        }
+        // Only use AUTH Digest Method Details, never AUTH-INT
+        ha2 = DigestUtils.md5Hex(method + ":" + requestURI);
         AuthenticationDigest authenticationDigest = new AuthenticationDigest(method, ha1, qop, ha2, requestURI, realm);
         // ******************************************
         // Now consume the Server Response.
@@ -607,10 +655,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************
         // Show both calculated and received value from client.
-        if (debug.messageEnabled()) {
-            debug.message("*** Server Response: "+serverResponse);
-            debug.message("*** Client Response: "+clientResponse);
-        }
+        //if (debug.messageEnabled()) {
+            debug.error("*** Server Response: "+serverResponse+", *** Client Response: "+clientResponse);
+        //}
         // ******************************************************
         // Check for any Nulls on either side.
         if ( (clientResponse == null) || (clientResponse.isEmpty()) ||
@@ -747,24 +794,29 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
                     xacmlRequestInformation.setAuthenticated(true);
                 }
-        } else if (xacmlRequestInformation.getAuthenticationContent() == null) {
+        } else if (xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId() == null) {
             // **************************************************************
             // If no [SAML4XACML] Wrapper, then reject request as UnAuthorized.
             //
             // We only support currently WWW Authenticate capabilities
-            // + Digest, Basic Authentication is not supported per OASIS  Specification.
+            // + Digest, Basic Authentication is not supported per OASIS Specification.
+            //
             // Or Content whose contents contains a wrapper in either XML or JSON.
             // + XACMLAuthzDecisionQuery Wrapper Of Request.
             //
-            // This will begin the Authorization Digest Flow...
+            // ******************************************************************
+            // Not Authenticated nor Authorized.
+            // This Starts the Authorization via Digest Flow...
             this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
             return;
         }
 
+        // Check for other Authentication Patterns Here...
+
         // ******************************************************************
         // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
         if ( (!xacmlRequestInformation.isAuthenticated()) &&
-              (xacmlRequestInformation.getAuthenticationContent() != null) ) {
+              (xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId() != null) ) {
 
 
             // TODO : AME-302 Address processing a XACMLAuthzDecisionQuery Wrapper to
@@ -787,7 +839,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
         // **********************************************************************
-        // Only Continue if we have authenticated or Trust PEP.
+        // Only Continue if we have authenticated or Trust the PEP.
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized.
@@ -797,6 +849,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
             renderResponse(requestContentType, null, response);
             return;
         }
+
+        // ******************************************************************************************************
+        // PEP must be Authenticated and Authorized proceeding past this code point
+        // ******************************************************************************************************
+AUTHORIZED:
 
         // ******************************************************************
         // Check for a existence of a XACML Request, for a POST, we must have
@@ -1093,4 +1150,119 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);  // 501
         response.setContentLength(0);
     }
+
+    // ******************************************************************************************************
+    // Methods for Access Logging
+    // ******************************************************************************************************
+
+    private Logger getLogger() {
+        if (logger == null) {
+            logger = (Logger) Logger.getLogger(amXACMLLogFile);
+        }
+        return logger;
+    }
+
+    private LogMessageProvider getLogMessageProvider()
+            throws Exception {
+
+        if (logProvider == null) {
+            logProvider =
+                    MessageProviderFactory.getProvider(LOG_PROVIDER);
+        }
+        return logProvider;
+    }
+
+    private void logIt(InternalSession sess, String id) {
+        if (!logStatus) {
+            return;
+        }
+        try {
+            String sidString = sess.getID().toString();
+            String clientID = sess.getClientID();
+            String uidData = null;
+            if ((clientID == null) || (clientID.length() < 1)) {
+                uidData = "N/A";
+            } else {
+                StringTokenizer st = new StringTokenizer(clientID, ",");
+                uidData = (st.hasMoreTokens()) ? st.nextToken() : clientID;
+            }
+            String[] data = {uidData};
+            LogRecord lr =
+                    getLogMessageProvider().createLogRecord(id, data, null);
+
+            lr.addLogInfo(LogConstants.LOGIN_ID_SID, sidString);
+
+            String amCtxID = sess.getProperty(Constants.AM_CTX_ID);
+            String clientDomain = sess.getClientDomain();
+            String ipAddress = sess.getProperty("Host");
+            String hostName = sess.getProperty("HostName");
+
+            lr.addLogInfo(LogConstants.CONTEXT_ID, amCtxID);
+            lr.addLogInfo(LogConstants.LOGIN_ID, clientID);
+            lr.addLogInfo(LogConstants.LOG_LEVEL, lr.getLevel().toString());
+            lr.addLogInfo(LogConstants.DOMAIN, clientDomain);
+            lr.addLogInfo(LogConstants.IP_ADDR, ipAddress);
+            lr.addLogInfo(LogConstants.HOST_NAME, hostName);
+            getLogger().log(lr, getSessionServiceToken());
+        } catch (Exception ex) {
+            debug.error("XacmlContentHandlerService.logIt(): " +
+                    "Cannot write to the session log file: ", ex);
+        }
+    }
+
+    private void logSystemMessage(String msgID, Level level) {
+
+        if (!logStatus) {
+            return;
+        }
+        if (errorLogger == null) {
+            errorLogger =
+                    (Logger) Logger.getLogger(amXACMLErrorLogFile);
+        }
+        try {
+            String[] data = {msgID};
+            LogRecord lr =
+                    getLogMessageProvider().createLogRecord(msgID,
+                            data,
+                            null);
+            SSOToken serviceToken = getSessionServiceToken();
+            lr.addLogInfo(LogConstants.LOGIN_ID_SID,
+                    serviceToken.getTokenID().toString());
+            lr.addLogInfo(LogConstants.LOGIN_ID,
+                    serviceToken.getPrincipal().getName());
+            errorLogger.log(lr, serviceToken);
+        } catch (Exception ex) {
+            debug.error("SessionService.logSystemMessage(): " +
+                    "Cannot write to the session error " +
+                    "log file: ", ex);
+        }
+    }
+
+    // ******************************************************************************************************
+    // Methods for Security Session Token and associated Managers.
+    // ******************************************************************************************************
+
+    private SSOTokenManager getSSOTokenManager() throws SSOException {
+        if (ssoManager == null) {
+            ssoManager = SSOTokenManager.getInstance();
+        }
+        return ssoManager;
+    }
+
+    private SSOToken getSessionServiceToken() throws Exception {
+        return ((SSOToken) AccessController.doPrivileged(
+                AdminTokenAction.getInstance()));
+    }
+
+    private SSOToken getAdminToken() throws SSOException {
+        if (adminToken == null) {
+
+            adminToken = getSSOTokenManager().createSSOToken(
+                    new AuthPrincipal(dsameAdminDN), dsameAdminPassword);
+            return adminToken;
+        }
+
+        return adminToken;
+    }
+
 }

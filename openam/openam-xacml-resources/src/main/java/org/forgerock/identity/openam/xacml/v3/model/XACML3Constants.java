@@ -60,8 +60,9 @@ public interface XACML3Constants extends XACMLConstants {
     /**
      * Digest Authentication Constants.
      */
-    public static final String authenticationMethods = "auth,auth-int";   // See http://tools.ietf.org/html/rfc2617
+    public static final String AUTHENTICATION_METHOD = "auth";   // See http://tools.ietf.org/html/rfc2617, only AUTH.
     public static final String USERNAME = "username";
+    public static final String ANONYMOUS = "anonymous";
     /**
      * Common Key Definitions
      */
