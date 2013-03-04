@@ -72,7 +72,6 @@ public final class RealmResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
 
     private Set subRealms = null;
-    private RequestDetailsParser parser;
     private String realmPath = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
@@ -81,11 +80,12 @@ public final class RealmResource implements CollectionResourceProvider {
      * Creates a new empty backend.
      */
     public RealmResource() {
-        this(new RequestDetailsParser(new OrganizationConfigManagerFactory()), null);
+        // No implementation required.
+        this.realmPath = null;
     }
 
-    public RealmResource(RequestDetailsParser parser, String realmPath) {
-        this.parser = parser;
+    public RealmResource(String realmPath) {
+        this.subRealms = subRealms;
         this.realmPath = realmPath;
     }
 
@@ -131,9 +131,9 @@ public final class RealmResource implements CollectionResourceProvider {
         String realm = jVal.get("realm").asString();
 
         try {
-            if (realm.isEmpty()) {
+            if (realm == null || realm.isEmpty()) {
                 handler.handleError(new BadRequestException("No realm name provided."));
-            } else if (realm != null && !realm.startsWith("/")) {
+            } else if (!realm.startsWith("/")) {
                 realm = "/" + realm;
             }
             if (!realmPath.equalsIgnoreCase("/")) {
@@ -164,7 +164,7 @@ public final class RealmResource implements CollectionResourceProvider {
                         + realm + ":" + smse);
                 handler.handleError(nf);
             } catch (ForbiddenException fe) {
-                //User does not have authorization
+                // Usr does not have authorization
                 RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 handler.handleError(fe);

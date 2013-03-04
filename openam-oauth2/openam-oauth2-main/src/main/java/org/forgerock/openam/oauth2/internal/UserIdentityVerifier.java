@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.internal;
@@ -29,7 +29,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
-
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import org.restlet.Request;
@@ -47,12 +47,9 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param parameters
-     *            OpenAM boot properties
+     *
      */
-    public UserIdentityVerifier(OpenAMParameters parameters) {
-        super(parameters);
+    public UserIdentityVerifier() {
     }
 
     @Override
@@ -105,7 +102,6 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
         if (null == identifier || null == secret) {
             result = RESULT_MISSING;
         } else {
-            // result = verify(identifier, secret);
             OpenAMUser user = authenticate(request, identifier, secret);
             if (null != user) {
                 result = RESULT_VALID;
@@ -127,7 +123,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
             OAuth2Utils.DEBUG.warning("UserIdentityVerifier:: No SSO Token in request", e);
         }
         if (token == null){
-            return authenticate(username, password);
+            return authenticate(username, password, OAuth2Utils.getRealm(request));
         } else {
             try {
                 return new OpenAMUser(token.getProperty("UserId"), token);

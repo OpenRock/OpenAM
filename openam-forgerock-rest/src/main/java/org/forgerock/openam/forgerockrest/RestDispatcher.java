@@ -74,10 +74,6 @@ public final class RestDispatcher {
 
     }
 
-    // TODO - Alin: Does this class need to be static? Is it harmful to have multiple instances of it?
-    // By hiding the constructor, we have less options for dependency injection, and thus mock based testing.
-    // The alternative is to provide a public setter, but this is somewhat awkward as places a non-obvious dependency
-    // on the class before it can be used.
     public final static RestDispatcher getInstance() {
         if (instance == null) instance = new RestDispatcher();
         return instance;
@@ -303,8 +299,6 @@ public final class RestDispatcher {
         return false;
     }
 
-    // TODO - Alin: this code can now be replaced with a call to delegate to the RequestDetailsParser
-    // for processing of the resource name.
     /**
      * Parse Realm Path, Resource Name, and Resource ID
      *
@@ -321,9 +315,9 @@ public final class RestDispatcher {
         String lastNonBlank = null;
         String lastNonBlankID = null;
         String tmp = null;
-        StringBuilder realmPath = new StringBuilder("/"); //fqdn path to resource
-        StringBuilder resourceID = null; //resource id
-        StringBuilder endpoint = null; //defined endpoint
+        StringBuilder realmPath = new StringBuilder("/"); // fqdn path to resource
+        StringBuilder resourceID = null; // resource id
+        StringBuilder endpoint = null; // defined endpoint
 
         OrganizationConfigManager ocm = null;
 

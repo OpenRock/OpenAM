@@ -230,7 +230,7 @@ public class IPCondition implements Condition {
      * @see #DNS_NAME
      * @see #REQUEST_IP
      * @see #REQUEST_DNS_NAME
-     * @see com.sun.identity.policy.ConditionDecision
+     * @see com.sun.identity.policy.
      */
     public ConditionDecision getConditionDecision(SSOToken token, Map env) 
             throws PolicyException, SSOException {

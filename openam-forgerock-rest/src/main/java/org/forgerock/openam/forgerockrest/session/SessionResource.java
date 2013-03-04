@@ -20,7 +20,11 @@ import com.iplanet.services.naming.WebtopNaming;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -28,7 +32,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.forgerockrest.ReadOnlyResource;
+import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 
@@ -53,7 +57,7 @@ import java.util.Map;
  *
  * @author robert.wapshott@forgerock.com
  */
-public class SessionResource extends ReadOnlyResource {
+public class SessionResource implements CollectionResourceProvider {
 
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
@@ -151,9 +155,9 @@ public class SessionResource extends ReadOnlyResource {
 
                 handler.handleResource(new Resource("Sessions", "0", new JsonValue(map)));
             }
-
-            handler.handleResult(new QueryResult());
         }
+
+        handler.handleResult(new QueryResult());
     }
 
     /**
@@ -202,5 +206,40 @@ public class SessionResource extends ReadOnlyResource {
         float seconds = Long.parseLong(timeleft);
         float mins = seconds / 60;
         return Math.round(mins);
+    }
+
+    private NotSupportedException generateException(String type) {
+        return new NotSupportedException(type + " are not supported for this Resource");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Creates"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
+            ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Deletes"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void patchInstance(ServerContext ctx, String resId, PatchRequest request,
+            ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Patches"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
+            ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Updates"));
     }
 }
