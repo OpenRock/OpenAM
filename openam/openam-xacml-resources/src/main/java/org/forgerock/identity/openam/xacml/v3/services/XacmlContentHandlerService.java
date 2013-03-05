@@ -43,8 +43,6 @@ import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.xacml.client.XACMLRequestProcessor;
-import com.sun.identity.xacml.common.XACMLException;
 
 import org.forgerock.identity.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.model.AuthenticationDigest;
@@ -178,12 +176,6 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private static ServletContext servletCtx;
 
     /**
-     * Establish our Core Request Processor to handle
-     * all assertions and responses.
-     */
-    private static XACMLRequestProcessor xacmlRequestProcessor;
-
-    /**
      * XACML Schemata for Validation.
      */
     private static Schema xacmlSchema;
@@ -223,14 +215,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Acquire our Logging Interface.
         debug = Debug.getInstance("amXACML");
         // ******************************************************
-        // Acquire Servlet Context and XACML Request Processor.
+        // Acquire Servlet Context.
         servletCtx = config.getServletContext();
-        try {
-            xacmlRequestProcessor = XACMLRequestProcessor.getInstance();
-        } catch (XACMLException xacmlException) {
-            debug.error("Unable to obtain Reference to XACMLRequestProcessor for Core Functionality, unable to process XACML Requests.");
-            xacmlRequestProcessor = null;
-        }
+
         // *****************************************************
         // Initialize our OpenAM principal and credentials
         // for performing administrative functions if necessary.
@@ -238,6 +225,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 .doPrivileged(new AdminDNAction());
         dsameAdminPassword = (String) AccessController
                 .doPrivileged(new AdminPasswordAction());
+
         // ***************************************************
         // Acquire MaxContent Length
         try {
@@ -624,7 +612,11 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     "Supplied by Client.");
             return null;
         }
-
+        // ***************************************************
+        // Here we need to perform a look up of the Credential
+        // from the configured XACML Store to obtain the password
+        // to push into the MD5 Algorithm via Digest Utilities.
+        // TODO :
         // Obtain the password from the User Directory PIP.
         String ha1 = DigestUtils.md5Hex(credential + ":" + realm + ":" + "cangetin");   // TODO : FIX ME, LookUp.
 
@@ -655,9 +647,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         }
         // ******************************************************
         // Show both calculated and received value from client.
-        //if (debug.messageEnabled()) {
+        if (debug.messageEnabled()) {
             debug.error("*** Server Response: "+serverResponse+", *** Client Response: "+clientResponse);
-        //}
+        }
         // ******************************************************
         // Check for any Nulls on either side.
         if ( (clientResponse == null) || (clientResponse.isEmpty()) ||
@@ -765,8 +757,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         } // End of outer if Check for GET and no authentication Information.
 
         // **************************************************************************************
-        // All Request Processing beyond this point required PEP to be Authenticated (AUTHn)
-        // and Authorized (AUTHz). Next methods determine if PEP request is allowed to continue.
+        // Continue with Authentication and Authorization of the PEP.
         // **************************************************************************************
 
         // **************************************************************************************
@@ -775,7 +766,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // **************************************************************************************
 
         // ******************************************************************
-        // Obtain our Request Content Data.
+        // Check for Authentication Digest.
         // Did we receive a valid WWW Authentication header using Digest?
         //
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
@@ -793,30 +784,13 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 } else {
                     // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
                     xacmlRequestInformation.setAuthenticated(true);
-                }
-        } else if (xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId() == null) {
-            // **************************************************************
-            // If no [SAML4XACML] Wrapper, then reject request as UnAuthorized.
-            //
-            // We only support currently WWW Authenticate capabilities
-            // + Digest, Basic Authentication is not supported per OASIS Specification.
-            //
-            // Or Content whose contents contains a wrapper in either XML or JSON.
-            // + XACMLAuthzDecisionQuery Wrapper Of Request.
-            //
-            // ******************************************************************
-            // Not Authenticated nor Authorized.
-            // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
-            return;
-        }
-
-        // Check for other Authentication Patterns Here...
-
+                } // End of Inner Else.
         // ******************************************************************
-        // Check for any XACMLAuthzDecisionQuery Request in either Flavor.
-        if ( (!xacmlRequestInformation.isAuthenticated()) &&
-              (xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId() != null) ) {
+        // Check for any XACMLAuthzDecisionQuery Request?
+        } else if (xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId() != null) {
+
+            debug.error("Processing XACMLAuthzDecisionQuery Wrapper Value: "+
+                    xacmlRequestInformation.getXacmlAuthzDecisionQuery().toString() );
 
 
             // TODO : AME-302 Address processing a XACMLAuthzDecisionQuery Wrapper to
@@ -831,6 +805,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         if ((xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
 
              // TODO : AME-302
+            // Check for other Authentication Patterns Here...
+
 
             // *****************************************************************
             // Render our Response
@@ -840,6 +816,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
 
         // **********************************************************************
         // Only Continue if we have authenticated or Trust the PEP.
+IS_AUTHENTICATED:
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized.
@@ -853,7 +830,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // ******************************************************************************************************
         // PEP must be Authenticated and Authorized proceeding past this code point
         // ******************************************************************************************************
-AUTHORIZED:
+MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
 
         // ******************************************************************
         // Check for a existence of a XACML Request, for a POST, we must have
@@ -999,12 +976,12 @@ AUTHORIZED:
         // **************************************
         // Show Parsed Content for debugging if
         // applicable.
-        //if (debug.messageEnabled()) {    // TODO : Replace to Message Level for debugging.
+        if (debug.messageEnabled()) {
             StringBuilder sb = XacmlPIPResourceBuilder.dumpContentInformation(xacmlRequestInformation);
             if (sb.length() > 0) {
                 debug.error(classMethod+"Parsed Request Map====>\n"+sb.toString());
             }
-        //}
+        }
         // ****************************************
         // Build out our Xacml PIP Resource Object.
         XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation);
@@ -1155,6 +1132,10 @@ AUTHORIZED:
     // Methods for Access Logging
     // ******************************************************************************************************
 
+    /**
+     * Private Helper to Obtain the Logger for our AM XACML Log File.
+     * @return
+     */
     private Logger getLogger() {
         if (logger == null) {
             logger = (Logger) Logger.getLogger(amXACMLLogFile);
@@ -1162,6 +1143,12 @@ AUTHORIZED:
         return logger;
     }
 
+    /**
+     * Obtain a Log Message Provider.
+     *
+     * @return LogMessageProvider
+     * @throws Exception
+     */
     private LogMessageProvider getLogMessageProvider()
             throws Exception {
 
@@ -1172,6 +1159,12 @@ AUTHORIZED:
         return logProvider;
     }
 
+    /**
+     * Private Helper method to Log Explicit Operations being performed.
+     *
+     * @param sess
+     * @param id
+     */
     private void logIt(InternalSession sess, String id) {
         if (!logStatus) {
             return;
@@ -1210,6 +1203,11 @@ AUTHORIZED:
         }
     }
 
+    /**
+     * Private Helper Method to Log System Messages
+     * @param msgID
+     * @param level
+     */
     private void logSystemMessage(String msgID, Level level) {
 
         if (!logStatus) {
@@ -1242,6 +1240,12 @@ AUTHORIZED:
     // Methods for Security Session Token and associated Managers.
     // ******************************************************************************************************
 
+    /**
+     * Obtain our SSO Token Manager
+     *
+     * @return SSOTokenManager
+     * @throws SSOException
+     */
     private SSOTokenManager getSSOTokenManager() throws SSOException {
         if (ssoManager == null) {
             ssoManager = SSOTokenManager.getInstance();
@@ -1249,11 +1253,22 @@ AUTHORIZED:
         return ssoManager;
     }
 
+    /**
+     * Obtain a Session Service Token
+     *
+     * @return SSOToken
+     * @throws Exception
+     */
     private SSOToken getSessionServiceToken() throws Exception {
         return ((SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance()));
     }
 
+    /**
+     * Obtain a Internal Admin SSO Token
+     * @return SSOToken - Admin Token.
+     * @throws SSOException
+     */
     private SSOToken getAdminToken() throws SSOException {
         if (adminToken == null) {
 
