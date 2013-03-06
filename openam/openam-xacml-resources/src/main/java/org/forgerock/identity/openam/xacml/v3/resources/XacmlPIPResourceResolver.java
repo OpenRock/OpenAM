@@ -93,10 +93,10 @@ public interface XacmlPIPResourceResolver extends XacmlPIPResource {
      */
     public String toString();
 
-    public Set<String> getResourceNames();
     /**
-     * Provide the String Equivalent of Object in String form for Debugging/Logging.
-     * @return String
+     * Obtain All Resource Names.
+     * @return  Set<String>
      */
+    public Set<String> getResourceNames();
 
 }
