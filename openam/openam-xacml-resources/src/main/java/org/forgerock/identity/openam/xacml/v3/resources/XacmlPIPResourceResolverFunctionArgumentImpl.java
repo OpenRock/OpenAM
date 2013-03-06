@@ -26,11 +26,15 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 
+import com.sun.identity.entitlement.xacml3.core.Response;
+import com.sun.identity.entitlement.xacml3.core.Result;
+import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3Decision;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EvalContextInterface;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * XACML PIP Resource In-Memory Resource Bucket Service.
@@ -43,15 +47,21 @@ import java.util.Map;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResourceResolver {
+public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResourceResolver ,XACML3EvalContextInterface {
 
     private Map<XacmlPIPResourceIdentifier, FunctionArgument> resourceResolutionMap;
+    private  XACMLRequestInformation parent;
 
     /**
      * Default Constructor.
      */
-    public XacmlPIPResourceResolverFunctionArgumentImpl() {
+     XacmlPIPResourceResolverFunctionArgumentImpl() {
         this.clear();
+    }
+
+    public XacmlPIPResourceResolverFunctionArgumentImpl(XACMLRequestInformation parent) {
+        this.clear();
+        this.parent = parent;
     }
 
     /**
@@ -69,6 +79,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         }
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(category, attributeId, includeInResult);
+
         this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value));
         return true;
     }
@@ -114,7 +125,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
     }
 
     /**
-     * Provide the Size of our Map Object.
+     * Provide the Size of our
      * @return
      */
     public int size() {
@@ -124,22 +135,22 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
             return this.resourceResolutionMap.size();
         }
     }
+    public Set<String>  getResourceNames() {
 
-    /**
-     * Provide the String Equivalent of Object in String form for Debugging/Logging.
-     * @return String
-     */
-    @Override
-    public String toString() {
-       StringBuilder sb = new StringBuilder();
-       for(XacmlPIPResourceIdentifier key : this.resourceResolutionMap.keySet()) {
-           FunctionArgument functionArgument = this.resourceResolutionMap.get(key);
-           sb.append("Category: "+key.getCategory()+", Attribute Id: "+key.getAttributeId()+", " +
-                   "Included In Result: "+key.isIncludeInResult()+"\n");
-           sb.append("    Type: "+functionArgument.getType()+", Value: "+functionArgument.getValue(null));
-           sb.append("\n");
-       }
-       // return String representation of our Internal Map Object.
-       return sb.toString();
+        Set<String> retVal = new HashSet<String>();
+        Set<XacmlPIPResourceIdentifier> keys = resourceResolutionMap.keySet();
+        for (XacmlPIPResourceIdentifier it : keys){
+            String category = it.getCategory();
+            if (category.contains(":resource")){
+                retVal.add(it.getAttributeId());
+            }
+
+        }
+        return retVal;
     }
+    public List<Result> getResult( ) {
+        Response resp = parent.getXacmlResponse();
+        return resp.getResult();
+    };
+
 }

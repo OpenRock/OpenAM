@@ -27,6 +27,7 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,10 +39,9 @@ import java.util.Set;
 */
 
 public class XACML3Decision {
-    public enum XACML3DecisionStatus  {FALSE_VALUE, TRUE_VALUE, INDETERMINATE, NOTAPPLICABLE };
 
-    private  XACML3DecisionStatus status;
-    private String effect;
+    private DecisionType decision;
+    private Status status;
     private ObligationExpressions obligations;
     private AdviceExpressions advices;
 
@@ -49,18 +49,25 @@ public class XACML3Decision {
 
     }
 
-    public XACML3DecisionStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
-    public void setStatus(XACML3DecisionStatus stat) {
-        status = stat;
+    public void setStatus(String stat) {
+        status = new Status();
+        StatusCode sc = new StatusCode();
+        sc.setValue("urn:oasis:names:tc:xacml:1.0:status:ok");
+        if (stat != null) {
+            status.setStatusMessage(stat);
+        }
     }
-    public String getEffect() {
-        return effect;
+
+    public DecisionType getDecision() {
+        return decision;
     }
-    public void setEffect(String eff) {
-        effect = eff;
+    public void setDecision(String dec) {
+        decision = DecisionType.fromValue(dec);
     }
+
     public ObligationExpressions getObligations() {
         return obligations;
     }

@@ -79,11 +79,12 @@ public class OpenSSOPrivilege extends Privilege {
         final String applicationName,
         final String resourceName,
         final Set<String> actionNames,
-        final Map<String, Set<String>> environment,
+        final Object env,
         final boolean recursive,
         final Object context
     ) throws EntitlementException {
         List<Entitlement> results = null;
+        final Map<String, Set<String>> environment = (Map<String, Set<String>>) env;
         
         try {
             results = (List<Entitlement>) RestrictedTokenContext.doUsing(context,
@@ -188,7 +189,7 @@ public class OpenSSOPrivilege extends Privilege {
         return jo;
     }
 
-    protected void init(JSONObject jo) {
+    protected void init(JSONObject jo) throws JSONException {
         policyName = jo.optString("policyName");
     }
 

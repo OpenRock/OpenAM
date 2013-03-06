@@ -46,8 +46,10 @@ public class BooleanEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
-        if ( s.equalsIgnoreCase((String) getArg(1).getValue(pip))) {
+        Object s = getArg(0).getValue(pip);
+        Object ob = getArg(1).getValue(pip);
+
+        if ( s.toString().equalsIgnoreCase(ob.toString())) {
             retVal = FunctionArgument.trueObject;
         } else {
             retVal = FunctionArgument.falseObject;

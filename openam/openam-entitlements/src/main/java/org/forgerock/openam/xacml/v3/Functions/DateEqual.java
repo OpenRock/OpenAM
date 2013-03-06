@@ -33,7 +33,10 @@ It SHALL perform its evaluation according to the “op:date-equal” function [X
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+
+import java.util.Date;
 
 public class DateEqual extends XACMLFunction {
 
@@ -44,13 +47,14 @@ public class DateEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
 
-        Double arg0 = Double.parseDouble(s);
-        String s1 = (String)getArg(1).getValue(pip);
-        Double arg1 = Double.parseDouble(s1);
+        String s1 = (String)getArg(0).getValue(pip);
+        String s2 = (String)getArg(1).getValue(pip);
 
-        if( arg0.equals(arg1)) {
+        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
+        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+
+        if( d1.equals(d2)) {
             retVal = FunctionArgument.trueObject;
         };
         return retVal;

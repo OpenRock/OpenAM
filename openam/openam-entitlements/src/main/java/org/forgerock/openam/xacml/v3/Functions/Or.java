@@ -50,7 +50,11 @@ public class Or extends XACMLFunction {
         int args = getArgCount();
 
         for (int i=0;i<args;i++) {
-            Boolean v = (Boolean)getArg(i).getValue(pip);
+            Object ob = getArg(i).getValue(pip);
+            if (ob == null) {
+                return  FunctionArgument.indeterminateObject;
+            }
+            Boolean v = Boolean.getBoolean((String)ob);
             if (v.booleanValue() == true) {
                 return    FunctionArgument.trueObject;
             }

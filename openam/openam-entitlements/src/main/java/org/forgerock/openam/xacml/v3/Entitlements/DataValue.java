@@ -34,9 +34,14 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
  */
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class DataValue extends FunctionArgument {
     private Object data;
 
+    public DataValue() {
+    }
     public DataValue(String type, Object value) {
         setType(type);
         data = value;
@@ -49,4 +54,26 @@ public class DataValue extends FunctionArgument {
     public Object getValue(XACMLEvalContext pip) {
         return data;
     }
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject jo = super.toJSONObject();
+        jo.put("value",data);
+        return jo;
+    }
+    protected void init(JSONObject jo) throws JSONException {
+        super.init(jo);
+        this.data = jo.optString("value");
+        return;
+    };
+
+    public String toXML(String type) {
+        /*
+             Handle Match AnyOf and AllOf specially
+        */
+        String retVal = "<AttributeValue DataType=" + getType() + data + "</AttributeValue>";
+
+        return retVal;
+    }
+
+
+
 }

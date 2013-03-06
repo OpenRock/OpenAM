@@ -28,6 +28,8 @@ package org.forgerock.identity.openam.xacml.v3.resources;
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
+import java.util.Set;
+
 /**
  * XACML PIP Resource Interface.
  * <p/>
@@ -90,5 +92,11 @@ public interface XacmlPIPResourceResolver extends XacmlPIPResource {
      * @return String
      */
     public String toString();
+
+    public Set<String> getResourceNames();
+    /**
+     * Provide the String Equivalent of Object in String form for Debugging/Logging.
+     * @return String
+     */
 
 }

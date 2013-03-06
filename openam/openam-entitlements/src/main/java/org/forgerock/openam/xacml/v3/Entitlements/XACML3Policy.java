@@ -25,11 +25,14 @@
  */
 package org.forgerock.openam.xacml.v3.Entitlements;
 
+import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.xacml3.core.*;
+import org.forgerock.openam.xacml.v3.Functions.XACMLFunction;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class XACML3Policy {
     private Policy policy;
@@ -54,6 +57,9 @@ public class XACML3Policy {
 
         rules =  XACML3PrivilegeUtils.getRules(policy);
 
+    }
+
+    public XACML3Policy() {
     }
 
     public FunctionArgument getDefinedVariable(String variableID){
@@ -81,33 +87,102 @@ public class XACML3Policy {
 
     public XACML3Decision evaluate(XACMLEvalContext pip) {
 
-        XACML3Decision result = new XACML3Decision();
+        Result result = new Result();
         boolean indeterminate = true;
+
+        pip.setPolicy(this);
 
         FunctionArgument evalResult = target.evaluate(pip);
 
         if (evalResult.isTrue())        {    // we  match,  so evaluate
             for (XACML3PolicyRule r : rules) {
                 XACML3Decision decision = r.evaluate(pip);
-                if (decision.getStatus() ==  XACML3Decision.XACML3DecisionStatus.TRUE_VALUE) {
+
+                if (decision.getDecision().value().equals("Permit")) {
+                    pip.setResult(decision);
                     return decision;
                 }
-                if (decision.getStatus() ==  XACML3Decision.XACML3DecisionStatus.FALSE_VALUE) {
+                if (decision.getDecision().value().equals("Deny")) {
                     indeterminate = false;
                 }
             }
         }
         if (indeterminate) {
-            result.setStatus(XACML3Decision.XACML3DecisionStatus.INDETERMINATE);
+            result.setDecision(DecisionType.fromValue("Indeterminate"));
         } else  {
-            result.setStatus(XACML3Decision.XACML3DecisionStatus.FALSE_VALUE);
+            result.setDecision(DecisionType.fromValue("Deny"));
         }
 
-        return result;
+        return null;
     }
 
 
-    /*
-     *
-     */
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject jo = new JSONObject();
+        jo.put("classname",this.getClass().getName());
+
+        jo.put("policyName", policyName);
+        jo.put("ruleCombiner", ruleCombiner);
+        jo.put("target", target.toJSONObject() );
+
+
+        Set<String> keys = definedVars.keySet();
+        JSONObject dv = new JSONObject();
+
+        for (String k: keys) {
+            dv.put(k, definedVars.get(k).toJSONObject());
+        }
+        jo.put("definedVars",dv) ;
+
+        for (XACML3PolicyRule r: rules) {
+            jo.append("rules", r.toJSONObject());
+        }
+
+        return jo;
+    }
+
+    public void init(JSONObject jo) throws JSONException {
+        policyName = jo.optString("policyName");
+        ruleCombiner = jo.optString("ruleCombiner");
+
+        target = FunctionArgument.getInstance(jo.getJSONObject("target"));
+        definedVars = new HashMap<String, FunctionArgument>();
+
+        JSONObject dv = jo.getJSONObject("definedVars");
+        Iterator iter =  dv.keys();
+        while (iter.hasNext()) {
+            String s = (String)iter.next();
+            definedVars.put(s,FunctionArgument.getInstance(dv.getJSONObject(s)));
+        }
+
+        rules = new ArrayList<XACML3PolicyRule>() ;
+
+        JSONArray array = jo.getJSONArray("rules");
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject json = (JSONObject)array.get(i);
+            rules.add(XACML3PolicyRule.getInstance(json));
+        }
+    }
+
+    static public XACML3Policy getInstance(JSONObject jo)  {
+        String className = jo.optString("classname");
+        try {
+            Class clazz = Class.forName(className);
+            XACML3Policy farg = (XACML3Policy)clazz.newInstance();
+            farg.init(jo);
+
+            return farg;
+        } catch (InstantiationException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        } catch (IllegalAccessException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        } catch (ClassNotFoundException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        } catch (JSONException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        }
+        return null;
+    }
+
+
 }

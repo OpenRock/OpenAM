@@ -38,6 +38,38 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
 public class AllOf extends XACMLFunction {
 
     public FunctionArgument evaluate( XACMLEvalContext pip){
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = FunctionArgument.trueObject;
+
+        for (int i = 0; i < getArgCount(); i++) {
+             FunctionArgument res = getArg(i).evaluate(pip);
+            if (!res.isTrue()) {
+                retVal = FunctionArgument.falseObject;
+            }
+        }
+        return retVal;
     }
+    public String toXML(String type) {
+        String retVal = "";
+        /*
+             Handle Match AnyOf and AllOf specially
+        */
+
+        if (type.equals("Match")) {
+            retVal = "<AllOf>" ;
+        } else if (type.equals("Allow")) {
+            retVal = "<Allow FunctionId=\"" + functionID + "\">" ;
+        }
+
+        for (FunctionArgument arg : arguments){
+            retVal = retVal + arg.toXML(type);
+        }
+        if (type.equals("Match")) {
+            retVal = retVal + "</AllOf>" ;
+        } else if (type.equals("Allow")) {
+            retVal = retVal + "</Allow>" ;
+        }
+
+        return retVal;
+    }
+
 }

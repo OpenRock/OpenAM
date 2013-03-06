@@ -33,6 +33,9 @@ import com.sun.identity.entitlement.PrivilegeType;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.security.auth.Subject;
 import java.util.List;
@@ -63,20 +66,31 @@ public class XACMLOpenSSOPrivilege extends OpenSSOPrivilege {
             final String applicationName,
             final String resourceName,
             final Set<String> actionNames,
-            final Map<String, Set<String>> environment,
+            final Object env,
             final boolean recursive,
             final Object context
     ) throws EntitlementException {
         List<Entitlement> results = null;
-
         try {
-           // xPolicy.evaluate();
+            XACML3Policy pol = (XACML3Policy) getContext();
+             Object result = pol.evaluate((XACMLEvalContext) env);
         } catch (Exception ex) {
+            System.out.println("Exception = " + ex.getMessage()) ;
             // exception
         }
 
         return null;
     }
+
+    protected void init(JSONObject jo) throws JSONException {
+        super.init(jo);
+        JSONObject contx = jo.getJSONObject("xacmlPolicy");
+        if (contx != null) {
+            setContext(XACML3Policy.getInstance(contx));
+        }
+    }
+
+
 
     /*
      TODO: override to evaluate full blown xacml policy
@@ -88,7 +102,7 @@ public class XACMLOpenSSOPrivilege extends OpenSSOPrivilege {
         Map<String, Set<String>> environment,
         boolean recursive
     ) throws EntitlementException {
-        return null; 
+        return null;
     }
     */
 

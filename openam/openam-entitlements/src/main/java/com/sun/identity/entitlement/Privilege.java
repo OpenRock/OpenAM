@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -281,7 +283,7 @@ public abstract class Privilege implements IPrivilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Set<String>> environment,
+        Object environment,
         boolean recursive,
         Object context) throws EntitlementException;
 
@@ -361,10 +363,14 @@ public abstract class Privilege implements IPrivilege {
         jo.put("lastModifiedDate", lastModifiedDate);
         jo.put("creationDate", creationDate);
 
+        Object obj = getContext();
+        if (obj != null) {
+            jo.put("xacmlPolicy",((XACML3Policy)obj).toJSONObject());
+        }
         return jo;
     }
 
-    protected abstract void init(JSONObject jo);
+    protected abstract void init(JSONObject jo) throws JSONException;
 
     public static Privilege getInstance(JSONObject jo) {
         String className = jo.optString("className");

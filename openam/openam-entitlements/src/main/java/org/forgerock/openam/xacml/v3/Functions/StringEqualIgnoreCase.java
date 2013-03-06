@@ -49,8 +49,13 @@ public class StringEqualIgnoreCase extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
-        if ( s.equalsIgnoreCase((String) getArg(1).getValue(pip))) {
+        String s1 = (String)getArg(0).getValue(pip);
+        String s2 = (String) getArg(1).getValue(pip);
+
+        if ((s1 == null ) || (s2== null)) {
+             return FunctionArgument.indeterminateObject;
+        }
+        if ( s1.equalsIgnoreCase(s2)) {
             retVal = FunctionArgument.trueObject;
         } else {
             retVal = FunctionArgument.falseObject;

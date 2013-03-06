@@ -44,6 +44,40 @@ public class AnyOf extends XACMLFunction {
     public AnyOf()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip){
-        return FunctionArgument.falseObject;
+
+        FunctionArgument retVal = FunctionArgument.falseObject;
+
+        for (int i = 0; i < getArgCount(); i++) {
+            FunctionArgument res = getArg(i).evaluate(pip);
+            if (res.isTrue()) {
+                retVal = FunctionArgument.trueObject;
+                break;
+            }
+        }
+        return retVal;
     }
+    public String toXML(String type) {
+        String retVal = "";
+        /*
+             Handle Match AnyOf and AllOf specially
+        */
+
+        if (type.equals("Match")) {
+            retVal = "<AnyOf>" ;
+        } else if (type.equals("Allow")) {
+            retVal = "<Allow FunctionId=\"" + functionID + "\">" ;
+        }
+
+        for (FunctionArgument arg : arguments){
+            retVal = retVal + arg.toXML(type);
+        }
+        if (type.equals("Match")) {
+            retVal = retVal + "</AnyOf>" ;
+        } else if (type.equals("Allow")) {
+            retVal = retVal + "</Allow>" ;
+        }
+
+        return retVal;
+    }
+
 }

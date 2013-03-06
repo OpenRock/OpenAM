@@ -71,7 +71,7 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
         // Recursively Iterate to Build up the PIP Resource Object
         if (xacmlRequestInformation.getContent() == null) {
             // Initialize our PIP Resource Resolver.
-            xacmlRequestInformation.setPipResourceResolver((new XacmlPIPResourceResolverFunctionArgumentImpl()));
+            xacmlRequestInformation.setPipResourceResolver((new XacmlPIPResourceResolverFunctionArgumentImpl(xacmlRequestInformation)));
         }
         // Now Iterate over the Content Parsed Object.
         return buildXacmlPIPResourceForRequests(xacmlRequestInformation, xacmlRequestInformation.getContent(), null);

@@ -27,15 +27,21 @@
 package org.forgerock.openam.xacml.v3.Entitlements;
 
 
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.shared.JSONUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import sun.tools.tree.NewArrayExpression;
 
 /*
-    This class is the parent class for Function Arguments.
-    It has three subclasses.
-        DataValue for known values
-        DataDesignator for values to fetch at runtime
-        XACMLFunction as a parent class for all functions
+   This class is the parent class for Function Arguments.
+   It has three subclasses.
+       DataValue for known values
+       DataDesignator for values to fetch at runtime
+       XACMLFunction as a parent class for all functions
 
- */
+*/
 public abstract class FunctionArgument {
     public static FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN,"true");
     public static FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN,"false");
@@ -43,12 +49,19 @@ public abstract class FunctionArgument {
     public static FunctionArgument notApplicableObject = new NotApplicableValue();
 
     private String dataType;
+    private String issuer ;
 
     public void setType(String type) {
         this.dataType = type;
     }
     public String getType() {
         return dataType;
+    }
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+    public String getIssuer() {
+        return issuer;
     }
     public boolean isTrue() {
         if (this instanceof DataValue) {
@@ -87,6 +100,47 @@ public abstract class FunctionArgument {
         }
     }
 
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject jo = new JSONObject();
+
+        jo.put("className", getClass().getName());
+        jo.put("dataType",dataType);
+        jo.put("issuer",issuer);
+        return jo;
+    }
+
+    protected void init(JSONObject jo) throws JSONException {
+        this.dataType = jo.optString("dataType");
+        this.issuer = jo.optString("issuer");
+        return;
+    };
+
+    public static FunctionArgument getInstance(JSONObject jo) {
+        String className = jo.optString("className");
+        try {
+            Class clazz = Class.forName(className);
+            FunctionArgument farg = (FunctionArgument)clazz.newInstance();
+            farg.init(jo);
+
+            return farg;
+        } catch (InstantiationException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        } catch (IllegalAccessException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        } catch (ClassNotFoundException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        } catch (JSONException ex) {
+            PrivilegeManager.debug.error("FunctionArgument.getInstance", ex);
+        }
+        return null;
+    }
+
+    /*
+    return the    jaxbElement for the Function.
+    */
+    public String toXML(String type) {
+        return "";
+    };
     public abstract FunctionArgument evaluate(XACMLEvalContext pip);
     public abstract Object getValue(XACMLEvalContext pip);
 }

@@ -62,8 +62,9 @@ public class XACML3NameIndexGenerator implements ISaveIndex {
             pathIndexes.add(resName);
 
             Set<String> pathParentIndexes = new HashSet<String>();
+            pathParentIndexes.add(resName);
 
-            return new ResourceSaveIndexes(hostIndexes, pathIndexes,
+        return new ResourceSaveIndexes(hostIndexes, pathIndexes,
                     pathParentIndexes);
     }
 }

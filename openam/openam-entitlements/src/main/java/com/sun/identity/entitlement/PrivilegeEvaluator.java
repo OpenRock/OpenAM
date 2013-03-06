@@ -58,7 +58,8 @@ class PrivilegeEvaluator {
     private Subject subject;
     private String applicationName;
     private String resourceName;
-    private Map<String, Set<String>> envParameters;
+    // private Map<String, Set<String>> envParameters;
+    private Object envParameters;
     private ResourceSearchIndexes indexes;
     private List<List<Entitlement>> resultQ = new
         LinkedList<List<Entitlement>>();
@@ -139,7 +140,7 @@ class PrivilegeEvaluator {
         String applicationName,
         String resourceName,
         Set<String> actions,
-        Map<String, Set<String>> envParameters,
+        Object envParameters,
         boolean recursive
     ) throws EntitlementException {
         long start = PRIVILEGE_EVAL_MONITOR_INIT.start();
@@ -172,10 +173,10 @@ class PrivilegeEvaluator {
             debug.message("[PolicyEval] applicationName: " + applicationName, null);
             debug.message("[PolicyEval] resourceName: " + resourceName, null);
             debug.message("[PolicyEval] actions: " + actionNames, null);
-            if ((envParameters != null) && !envParameters.isEmpty()) {
-                debug.message("[PolicyEval] envParameters: " +
-                    envParameters.toString(), null);
-            }
+           // if ((envParameters != null) && !envParameters.isEmpty()) {
+           //     debug.message("[PolicyEval] envParameters: " +
+           //         envParameters.toString(), null);
+           // }
         }
 
         PRIVILEGE_EVAL_MONITOR_INIT.end(start);
@@ -209,7 +210,7 @@ class PrivilegeEvaluator {
         Subject subject,
         String applicationName,
         Entitlement entitlement,
-        Map<String, Set<String>> envParameters
+        Object envParameters
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
             entitlement.getResourceName(), 
@@ -252,7 +253,7 @@ class PrivilegeEvaluator {
         Subject subject,
         String applicationName,
         String resourceName,
-        Map<String, Set<String>> envParameters,
+        Object envParameters,
         boolean recursive
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,

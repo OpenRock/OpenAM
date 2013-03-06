@@ -35,65 +35,72 @@ package org.forgerock.openam.xacml.v3.Entitlements;
  */
 
 
+import com.sun.identity.entitlement.xacml3.core.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class DataDesignator extends FunctionArgument {
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+
+public class DataAssignment extends FunctionArgument {
     private String category;
     private String attributeID;
+    private FunctionArgument expression;
     private boolean presence;
 
-    public DataDesignator() {
+    public DataAssignment() {
     }
-    public DataDesignator(String type, String category, String attributeID,boolean presence) {
-        setType(type);
-        this.category = category;
-        this.attributeID = attributeID;
-        this.presence = presence;
-    }
-
-    public FunctionArgument evaluate(XACMLEvalContext pip) {
-        return pip.resolve(category,attributeID);
+    public DataAssignment(AttributeAssignmentExpression att) {
+        this.category = att.getCategory();
+        this.attributeID = att.getAttributeId();
+        this.expression = XACML3PrivilegeUtils.getAssignmentFunction(att);
     }
 
-    public Object getValue(XACMLEvalContext pip) {
-        FunctionArgument fArg = evaluate(pip);
-        if (fArg == null) {
-            return "false";
-        }
-        Object ob = fArg.getValue(pip);
-        if (ob == null)  {
-            return "false";
-        }
-        return ob.toString();
-    }
+    public  FunctionArgument evaluate(XACMLEvalContext pip) {
+        return FunctionArgument.notApplicableObject;
+    };
+    public  Object getValue(XACMLEvalContext pip) {
+        return FunctionArgument.notApplicableObject;
+    };
 
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = super.toJSONObject();
         jo.put("category",category);
         jo.put("attributeID",attributeID);
+        jo.put("expression",expression.toJSONObject());
         return jo;
     }
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
         this.category = jo.optString("category");
         this.attributeID = jo.optString("attributeID");
+        this.expression = FunctionArgument.getInstance(jo.getJSONObject("expression")) ;
         return;
     };
+
+    public AttributeAssignmentExpression getXACML(XACMLEvalContext pip) {
+        ObjectFactory objectFactory = new ObjectFactory();
+        AttributeAssignmentExpression ret = new AttributeAssignmentExpression();
+        ret.setCategory(category);
+        ret.setAttributeId(attributeID);
+        AttributeValue av = new AttributeValue();
+        av.getContent().add(expression.getValue(pip));
+        ret.setExpression(objectFactory.createAttributeValue(av));
+        return ret;
+    }
 
 
     public String toXML(String type) {
         /*
              Handle Match AnyOf and AllOf specially
         */
-        String retVal = "<AttributeDesignator DataType=\"" + getType() + "\" "
-                + "AttributeId=\"" + attributeID + "\" "
-                + "Category=\"" + category + "\" "
-                + "MustBePresent=\"" + presence + "\" >" ;
+        String retVal = "<AttributeAssignmentExpression AttributeId=\"" + attributeID + "\" >";
+        retVal = retVal + expression.toXML("Allow");
+        retVal = retVal + "</AttributeAssignmentExpression>";
 
         return retVal;
     }
-
 
 
 }

@@ -26,17 +26,53 @@
 
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-public class XACMLEvalContext {
-    private XACML3Policy policyRef;
+import com.sun.identity.entitlement.xacml3.core.DecisionType;
+import com.sun.identity.entitlement.xacml3.core.Obligation;
+import com.sun.identity.entitlement.xacml3.core.Obligations;
+import com.sun.identity.entitlement.xacml3.core.Result;
 
-    public XACMLEvalContext(XACML3Policy pRef) {
-         policyRef = pRef;
+import java.util.List;
+
+public class XACMLEvalContext  {
+    private XACML3Policy policyRef;
+    private XACML3EvalContextInterface pip;
+
+    public XACMLEvalContext() {
+        policyRef = null;
     }
+    public XACMLEvalContext(XACML3Policy pRef) {
+        policyRef = pRef;
+    }
+
+    public void setPip(XACML3EvalContextInterface pip) {
+        this.pip = pip;
+    };
+
+    public void setPolicy(XACML3Policy pol) {
+        this.policyRef = pol;
+    };
 
     public FunctionArgument getDefinedVariable(String variableID){
          return policyRef.getDefinedVariable(variableID);
     }
     public FunctionArgument resolve(String category, String AttributeID) {
-        return null;
+        return pip.resolve(category, AttributeID);
+    }
+    public void setResult(XACML3Decision decision)  {
+        List<Result> results = pip.getResult();
+        Result r = new Result();
+        r.setStatus(decision.getStatus());
+        r.setDecision(decision.getDecision());
+        /*
+        Obligations obs = new Obligations();
+        List<Obligation> ob = obs.getObligation();
+        Obligation newOb = new Obligation();
+        newOb.
+        ob.addAll(decision.getObligations());
+
+        r.setObligations(decision.getObligations());
+
+          */
+
     }
 }

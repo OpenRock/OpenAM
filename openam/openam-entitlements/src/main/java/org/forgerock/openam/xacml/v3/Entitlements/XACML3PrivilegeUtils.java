@@ -28,8 +28,10 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 
 import com.sun.identity.entitlement.xacml3.core.AllOf;
@@ -60,7 +62,7 @@ public class XACML3PrivilegeUtils {
 
                     AttributeDesignator attrd = match.getAttributeDesignator();
                     if (attrd == null) { continue; };
-                    DataDesignator dd = new DataDesignator(attrd.getDataType(),attrd.getCategory(),attrd.getAttributeId());
+                    DataDesignator dd = new DataDesignator(attrd.getDataType(),attrd.getCategory(),attrd.getAttributeId(),attrd.isMustBePresent());
                     if (attrd.getCategory().contains(":resource")) {
                         rSelectors.add(attrd.getAttributeId());
                     }
@@ -138,7 +140,7 @@ public class XACML3PrivilegeUtils {
         } else if (clazz.equals(AttributeDesignator.class)) {
 
             AttributeDesignator attr = (AttributeDesignator)je.getValue();
-            DataDesignator dd = new DataDesignator(attr.getDataType(),attr.getCategory(),attr.getAttributeId());
+            DataDesignator dd = new DataDesignator(attr.getDataType(),attr.getCategory(),attr.getAttributeId(),attr.isMustBePresent());
             retVal = dd;
 
         } else if (clazz.equals(Function.class)) {
@@ -159,7 +161,36 @@ public class XACML3PrivilegeUtils {
 
         return (getFunction(cond.getExpression()));
     }
+    public static FunctionArgument getAssignmentFunction(AttributeAssignmentExpression assign) {
+
+        return (getFunction(assign.getExpression()));
+    }
+
+    public static Date stringToDate(String dateString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(
+                "yyyy-MM-dd:HH:mm:ss.SSSS");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateString = dateString.replace("T", ":");
+        Date retVal = new Date();
+        try {
+            retVal = sdf. parse(dateString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+    public static String dateToString(Date date){
+
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss.SSS");
+        sdf1.setTimeZone(TimeZone.getTimeZone("GMT"));
+        sdf2.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        String retVal = sdf1.format (date) + "T" + sdf2.format(date);
+        return retVal;
+    }
 
 
 }
-

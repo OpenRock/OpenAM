@@ -835,7 +835,7 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
         // Correct Request Content and if no Request Object in XML or JSON
         // form we render a Bad POST Request.
         if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
-             (!xacmlRequestInformation.isRequestNodePresent()) ) {
+                (!xacmlRequestInformation.isRequestNodePresent()) ) {
             // No Request Node found within the document, bad request.
             this.renderBadRequest(requestContentType, response);
             return;

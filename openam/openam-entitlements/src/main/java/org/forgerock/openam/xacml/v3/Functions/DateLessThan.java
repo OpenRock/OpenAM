@@ -37,13 +37,30 @@ as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/c
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+
+import java.util.Date;
 
 public class DateLessThan extends XACMLFunction {
 
     public DateLessThan()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip){
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+
+        String s1 = (String)getArg(0).getValue(pip);
+        String s2 = (String)getArg(1).getValue(pip);
+
+        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
+        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+
+        if( d1.before(d2) || d1.equals(d2)) {
+            retVal = FunctionArgument.trueObject;
+        };
+        return retVal;
     }
 }

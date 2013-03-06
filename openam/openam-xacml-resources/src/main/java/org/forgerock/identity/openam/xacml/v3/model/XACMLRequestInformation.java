@@ -278,7 +278,7 @@ public class XACMLRequestInformation implements Serializable {
         this.contentType = contentType;
         // Instantiate a new PIP Resource for our Request for eventual Evaluation of Request against
         // our current Policy Base.
-        this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl());
+        this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl(this));
     }
 
     /**
@@ -318,7 +318,7 @@ public class XACMLRequestInformation implements Serializable {
         this.setAuthenticationHeader(request.getHeader(XACML3Constants.AUTHORIZATION));
         // Instantiate a new PIP Resource for our Request for eventual Evaluation of Request against
         // our current Policy Base.
-        this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl());
+        this.setPipResourceResolver(new XacmlPIPResourceResolverFunctionArgumentImpl(this));
     }
 
 

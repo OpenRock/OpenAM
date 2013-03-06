@@ -416,12 +416,12 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Set<String>> environment,
+        Object env,
         boolean recursive,
         Object context
     ) throws EntitlementException {
         List<Entitlement> results = null;
-
+        Map<String,Set<String>> environment = (Map<String,Set<String>>) env;
         if (!active) {
             return Collections.EMPTY_LIST;
         }

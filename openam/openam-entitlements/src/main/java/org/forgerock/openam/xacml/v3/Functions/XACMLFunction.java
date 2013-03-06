@@ -24,12 +24,14 @@
  *
  */
 package org.forgerock.openam.xacml.v3.Functions;
+import com.sun.identity.entitlement.ResourceAttribute;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 /*
@@ -40,10 +42,15 @@ import java.util.List;
  */
 public abstract class XACMLFunction extends FunctionArgument {
     static java.util.Map<String,String> functions;
-    private List<FunctionArgument> arguments;
+    protected List<FunctionArgument> arguments;
+    protected String functionID;
 
     public XACMLFunction() {
         arguments = new ArrayList<FunctionArgument>();
+    }
+
+    public void setFunctionID(String functionID) {
+        this.functionID = functionID;
     }
 
     public XACMLFunction addArgument(FunctionArgument arg) {
@@ -68,6 +75,53 @@ public abstract class XACMLFunction extends FunctionArgument {
         return arguments.size();
     }
 
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject jo = super.toJSONObject();
+
+        jo.put("functionID",functionID);
+        for (FunctionArgument arg : arguments ) {
+            jo.append("arguments", arg.toJSONObject());
+        }
+
+        return jo;
+
+    }
+    protected void init(JSONObject jo) throws JSONException {
+        super.init(jo);
+        functionID = jo.optString("functionID");
+
+        JSONArray array = jo.getJSONArray("arguments");
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject json = (JSONObject)array.get(i);
+            arguments.add(FunctionArgument.getInstance(json));
+        }
+        return;
+    };
+
+
+    public String toXMLAllow(String type) {
+        String retVal = "";
+        /*
+             Handle Match AnyOf and AllOf specially
+        */
+
+        if (type.equals("Match")) {
+            retVal = "<Match MatchId=\"" + functionID + "\">" ;
+        } else if (type.equals("Allow")) {
+            retVal = "<Allow FunctionId=\"" + functionID + "\">" ;
+        }
+        for (FunctionArgument arg : arguments){
+            retVal = retVal + arg.toXML(type);
+        }
+        if (type.equals("Match")) {
+            retVal = "</Match\">" ;
+        } else if (type.equals("Allow")) {
+            retVal = "</Allow\">" ;
+        }
+        return retVal;
+    }
+
+
     public static XACMLFunction getInstance(String name)  {
         if (functions == null) {
             initFunctionTable();
@@ -81,6 +135,9 @@ public abstract class XACMLFunction extends FunctionArgument {
              retVal = (XACMLFunction) Class.forName(cName).newInstance();
             } catch (Exception ex) {
                retVal = null;
+        }
+        if (retVal != null) {
+            retVal.setFunctionID(name);
         }
         return retVal;
     }

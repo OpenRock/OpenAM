@@ -134,7 +134,7 @@ public class Evaluator {
         String realm,
         Subject subject,
         Set<String> resourceNames,
-        Map<String, Set<String>> environment
+        Object environment
     ) throws EntitlementException {
         if ((resourceNames == null) || resourceNames.isEmpty()) {
             throw new EntitlementException(424);
@@ -170,7 +170,8 @@ public class Evaluator {
         String realm,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment,
+        //Map<String, Set<String>> environment,
+        Object environment,
         boolean recursive
     ) throws EntitlementException {
         long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :

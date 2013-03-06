@@ -51,7 +51,7 @@ public class And extends XACMLFunction {
         int args = getArgCount();
 
         for (int i=0;i<args;i++) {
-            Boolean v = (Boolean)getArg(i).getValue(pip);
+            Boolean v = Boolean.getBoolean((String)getArg(i).getValue(pip));
             if (v.booleanValue() == false) {
                 return    FunctionArgument.falseObject;
             }
