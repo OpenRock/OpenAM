@@ -820,10 +820,8 @@ IS_AUTHENTICATED:
         if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized.
-            response.setCharacterEncoding("UTF-8");
-            response.setContentLength(0);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401.
-            renderResponse(requestContentType, null, response);
+            // This Starts the Authorization via Digest Flow...
+            this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
             return;
         }
 
@@ -909,13 +907,14 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
         // ***********************************************************************************************
         // Check the Request Path End-Point Information, provide the Home Document to the PEP Requester
         // by Rendering our Response.
-        if ((xacmlRequestInformation.getRequestURI() == null) ||
+        if ( ((xacmlRequestInformation.getRequestURI() == null) ||
                 (xacmlRequestInformation.getRequestURI().isEmpty()) ||
                 (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml")) ||
                 (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/home")) ||
-                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status")) ||
+                (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status")) ) ||
+             ((xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
                 (xacmlRequestInformation.getRequestURI().trim().
-                        toLowerCase().contains("/openam/xacml/pdp/".toLowerCase())) ) {
+                        toLowerCase().contains("/openam/xacml/pdp/".toLowerCase())) ) ) {
             try {
                 renderServerOKResponse(xacmlRequestInformation.getContentType(),
                         XacmlHomeResource.getHome(xacmlRequestInformation, request), response);

@@ -110,7 +110,7 @@ public class XmlToMapUtility {
                 String rawContent = new Scanner(inputStream).useDelimiter("\\A").next();
 
                 Map<String, Object> mapObjects = fromString(rawContent);
-                System.out.println("XML to JSON Value: " + mapObjects);
+                System.out.println("XML to Map Collection Value: " + mapObjects);
             }
         } finally {
             if (inputStream != null) {

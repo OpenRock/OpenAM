@@ -208,7 +208,12 @@ public class XacmlPEPRequestClient {
                 // WWW-Authenticate:Digest realm="OpenAM_XACML_PDP_Realm", qop="auth",
                 //   nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
                 Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                System.out.println("Received Authentication Header: " + authHeader);
+                if (authHeader == null) {
+                    // Process any Final Response.
+                    return getFinalResponseContent(response);
+                } else {
+                    System.out.println("Received Authentication Header: " + authHeader);
+                }
 
                 // Parse realm, nonce sent by server.
                 DigestScheme digestScheme = new DigestScheme();
@@ -271,7 +276,13 @@ public class XacmlPEPRequestClient {
                 // WWW-Authenticate:Digest realm="My Test Realm", qop="auth",
                 //   nonce="cdcf6cbe6ee17ae0790ed399935997e8", opaque="ae40d7c8ca6a35af15460d352be5e71c"
                 Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                System.out.println("Received Authentication Header: " + authHeader);
+                if (authHeader == null) {
+                    // Process any Final Response.
+                    return getFinalResponseContent(response);
+                } else {
+                    System.out.println("Received Authentication Header: " + authHeader);
+                }
+
 
                 // Parse realm, nonce sent by server.
                 DigestScheme digestScheme = new DigestScheme();

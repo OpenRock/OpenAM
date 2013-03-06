@@ -317,9 +317,6 @@ public class TestXacmlContentHandlerService {
 
     }
 
-    /**
-
-    @Ignore
     @Test
     public void testUseCase_JSON_NotAuthorized() {
 
@@ -344,7 +341,6 @@ public class TestXacmlContentHandlerService {
 
     }
 
-    @Ignore
     @Test
     public void testUseCase_XML_NotAuthorized() {
 
@@ -389,7 +385,6 @@ public class TestXacmlContentHandlerService {
 
     }
 
-    @Ignore
     @Test
     public void testUseCase_XML_Forbidden() {
 
@@ -423,7 +418,6 @@ public class TestXacmlContentHandlerService {
 
     }
 
-    @Ignore
     @Test
     public void testUseCase_XML_SOAP_ENVELOPE() {
 
@@ -456,7 +450,5 @@ public class TestXacmlContentHandlerService {
         }
 
     }
-
-    *** */
 
 }

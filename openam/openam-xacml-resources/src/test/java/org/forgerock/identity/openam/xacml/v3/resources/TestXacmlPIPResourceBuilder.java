@@ -87,6 +87,7 @@ public class TestXacmlPIPResourceBuilder {
         // Now perform Test Builder functions
         assertTrue(XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation));
         assertEquals(xacmlRequestInformation.getPipResourceResolver().size(), 19);
+        assertTrue(xacmlRequestInformation.isRequestNodePresent());
 
         System.out.println("\nXML Content Result:\n\n" + xacmlRequestInformation);
 
@@ -119,6 +120,7 @@ public class TestXacmlPIPResourceBuilder {
         // Now perform Test Builder functions
         assertTrue(XacmlPIPResourceBuilder.buildXacmlPIPResourceForRequests(xacmlRequestInformation));
         assertEquals(xacmlRequestInformation.getPipResourceResolver().size(), 19);
+        assertTrue(xacmlRequestInformation.isRequestNodePresent());
 
         System.out.println("\nJSON Content Result:\n\n" + xacmlRequestInformation);
 
