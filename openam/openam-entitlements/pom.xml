@@ -150,6 +150,14 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
