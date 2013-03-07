@@ -85,7 +85,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
             amIdentity = new AMIdentity(ssotok);
 
-            //build resource
+            // build resource
             result.put("id", amIdentity.getName());
             result.put("realm", com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm()));
             result.put("dn", amIdentity.getUniversalId());
@@ -111,7 +111,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         if (action.equalsIgnoreCase("idFromSession")) {
             idFromSession(context, request, handler);
-        } else { //for now this is the only case coming in, so fail if otherwise
+        } else { // for now this is the only case coming in, so fail if otherwise
             final ResourceException e =
                     new NotSupportedException("Actions are not supported for resource instances");
             handler.handleError(e);
@@ -137,7 +137,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
-        //anyone can create an account add
+        // anyone can create an account add
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
 

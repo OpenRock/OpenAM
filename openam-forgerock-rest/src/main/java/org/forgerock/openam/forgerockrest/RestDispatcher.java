@@ -20,6 +20,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -31,25 +32,21 @@ import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.DashboardResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 
-import javax.servlet.ServletException;
 import java.security.AccessController;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import javax.servlet.ServletException;
+import java.util.*;
 
 
 /**
@@ -136,7 +133,14 @@ public final class RestDispatcher {
         factory = Resources.newInternalConnectionFactory(new RequestHandler() {
             public void handleAction(ServerContext serverContext, ActionRequest actionRequest,
                                      ResultHandler<JsonValue> jsonValueResultHandler) {
-                jsonValueResultHandler.handleResult(new JsonValue(new HashMap<String, Object>()));
+                try {
+                    Map parsedDetails = getRequestDetails(actionRequest.getResourceName());
+                    final RequestHandler rootRealm = realm(parsedDetails, actionRequest.getResourceName());
+                    rootRealm.handleAction(serverContext, actionRequest, jsonValueResultHandler);
+                } catch (NotFoundException nfe) {
+                    // URL not valid request
+                    jsonValueResultHandler.handleError(nfe);
+                }
             }
 
             public void handleCreate(ServerContext serverContext, CreateRequest createRequest,

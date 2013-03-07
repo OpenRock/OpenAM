@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.realm.RealmUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -57,11 +56,9 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-
 import com.sun.identity.idsvcs.*;
 
 import java.util.Set;
-
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
 
@@ -164,14 +161,14 @@ public final class RealmResource implements CollectionResourceProvider {
                         + realm + ":" + smse);
                 handler.handleError(nf);
             } catch (ForbiddenException fe) {
-                // Usr does not have authorization
+                // User does not have authorization
                 RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 handler.handleError(fe);
             } catch (PermanentException pe) {
                 RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
-                //Cannot recover from this exception
+                // Cannot recover from this exception
                 handler.handleError(pe);
             } catch (ConflictException ce) {
                 RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
