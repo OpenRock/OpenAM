@@ -255,10 +255,10 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Content-Type", ContentType.JSON.applicationType());
 
         try {
-            // Check for a 200 on our Get.
+            // Check for a 401 on our Get.
             HttpTester response = new HttpTester();
             response.parse(servletTester.getResponses(request.generate()));
-            assertEquals(response.getStatus(),200);
+            assertEquals(response.getStatus(),401);
         } catch (IOException ioe) {
 
         } catch (Exception e) {

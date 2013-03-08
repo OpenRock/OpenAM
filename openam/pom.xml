@@ -1430,6 +1430,18 @@
                 <version>2.1.1</version>
             </dependency>
 
+            <!-- JoSQL -->
+            <dependency>
+                <groupId>org.JoSQL</groupId>
+                <artifactId>JoSQL</artifactId>
+                <version>2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.JoSQL</groupId>
+                <artifactId>gentlyWEB-utils</artifactId>
+                <version>1.1</version>
+            </dependency>
+
             <!-- Session HA Module Dependencies-->
             <dependency>
                 <groupId>commons-net</groupId>

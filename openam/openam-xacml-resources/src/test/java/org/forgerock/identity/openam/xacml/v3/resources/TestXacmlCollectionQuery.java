@@ -30,26 +30,20 @@ import org.forgerock.identity.openam.xacml.v3.commons.JsonToMapUtility;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.forgerock.identity.openam.xacml.v3.commons.XmlToMapUtility;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.Enumeration;
-
-import static org.testng.Assert.*;
-
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
- * XACML PIP Resource Builder Test Suite
+ * XACML Collection Query using JoSQL.
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
-@RunWith(PowerMockRunner.class)
-public class TestXacmlPIPResourceBuilder {
-
+public class TestXacmlCollectionQuery {
     private final static String testSOAPEnvelope_ResourceName = "test_data/request-curtiss.xml";
     private final static String testJSON_ResourceName = "test_data/request-curtiss.json";
 
@@ -62,7 +56,7 @@ public class TestXacmlPIPResourceBuilder {
     }
 
     @Test
-    public void testUseCase_Building_PIP_MAP_FROM_XML_CONTENT() {
+    public void testUseCase_Building_PIP_MAP_FROM_XML_CONTENT_AND_QUERY_COLLECTION() {
 
         String testData = XACML3Utils.getResourceContents(testSOAPEnvelope_ResourceName);
         assertNotNull(testData);
@@ -94,7 +88,7 @@ public class TestXacmlPIPResourceBuilder {
     }
 
     @Test
-    public void testUseCase_Building_PIP_MAP_FROM_JSON_CONTENT() {
+    public void testUseCase_Building_PIP_MAP_FROM_JSON_CONTENT_AND_QUERY_COLLECTION() {
 
         String testData = XACML3Utils.getResourceContents(testJSON_ResourceName);
         assertNotNull(testData);

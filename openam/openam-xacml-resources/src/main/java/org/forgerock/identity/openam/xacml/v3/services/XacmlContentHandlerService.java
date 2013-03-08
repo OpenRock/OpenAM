@@ -914,7 +914,7 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
                 (xacmlRequestInformation.getRequestURI().trim().equalsIgnoreCase("/openam/xacml/status")) ) ||
              ((xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("GET")) &&
                 (xacmlRequestInformation.getRequestURI().trim().
-                        toLowerCase().contains("/openam/xacml/pdp/".toLowerCase())) ) ) {
+                        toLowerCase().contains("/openam/xacml/pdp".toLowerCase())) ) ) {
             try {
                 renderServerOKResponse(xacmlRequestInformation.getContentType(),
                         XacmlHomeResource.getHome(xacmlRequestInformation, request), response);
