@@ -73,6 +73,7 @@ public interface XACML3Constants extends XACMLConstants {
 
     public static final String REQUEST_COMBINED_DECISION = "CombinedDecision";
     public static final String REQUEST_RETURN_POLICY_ID_LIST = "ReturnPolicyIdList";
+    public static final String REQUEST_MULTIREQUESTS =  "MultiRequests";
     public static final String REQUEST_XMLNS = "xmlns";
 
     public static final String REQUEST_ENVIRONMENT = "Environment";

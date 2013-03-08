@@ -167,9 +167,14 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                         ((Boolean) requestMap.get(requestAttributes)).booleanValue());
                             } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_XMLNS)) {
                                 xacmlRequestInformation.setRequest_NameSpace((String) requestMap.get(requestAttributes));
+                            } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_MULTIREQUESTS)) {
+                                // Process our Multiple Requests for this Request...
+                                xacmlRequestInformation.setRequestWithMultiRequestsPresent(true);
+                                // Currently we do not support Multiple Nested Requests, set indicator for Handler
+                                // to immediately send an Indeterminate Response.
                             } else if (removeNamespace(attributeName).equalsIgnoreCase(ATTRIBUTES)) {
-                                // Process our Attributes for this Request...
-                                processAttributes(xacmlRequestInformation, null, requestMap.get(attributeName));
+                                    // Process our Attributes for this Request...
+                                    processAttributes(xacmlRequestInformation, null, requestMap.get(attributeName));
                             } else if (
                                     (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) &&
                                             ((removeNamespace(attributeName).equalsIgnoreCase(REQUEST_ENVIRONMENT)) ||

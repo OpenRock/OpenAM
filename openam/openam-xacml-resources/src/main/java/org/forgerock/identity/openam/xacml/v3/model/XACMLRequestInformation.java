@@ -85,6 +85,10 @@ public class XACMLRequestInformation implements Serializable {
      */
     private boolean requestNodePresent;
     /**
+     * Request Node Present with MultiRequests Present.
+     */
+    private boolean requestWithMultiRequestsPresent;
+    /**
      * Content Type
      */
     private ContentType contentType;
@@ -406,6 +410,14 @@ public class XACMLRequestInformation implements Serializable {
         this.requestNodePresent = requestNodePresent;
     }
 
+    public boolean isRequestWithMultiRequestsPresent() {
+        return requestWithMultiRequestsPresent;
+    }
+
+    public void setRequestWithMultiRequestsPresent(boolean requestWithMultiRequestsPresent) {
+        this.requestWithMultiRequestsPresent = requestWithMultiRequestsPresent;
+    }
+
     public String getRequestMethod() {
         return requestMethod;
     }
@@ -613,6 +625,7 @@ public class XACMLRequestInformation implements Serializable {
         sb.append(", realm='").append(realm).append('\'');
         sb.append(", soapEnvelopeNodePresent=").append(soapEnvelopeNodePresent);
         sb.append(", requestNodePresent=").append(requestNodePresent);
+        sb.append(", requestWithMultiRequestsPresent=").append(requestWithMultiRequestsPresent);
 
         sb.append(", requestMethod='").append(requestMethod).append('\'');
         sb.append(", requestAuthenticationType='").append(requestAuthenticationType).append('\'');

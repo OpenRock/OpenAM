@@ -261,6 +261,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Ensure we are ok and have necessary assets to run.
         if (xacmlSchema != null) {
             debug.error("Initialization of XACML Content Resource Router, Server Information: " + servletCtx.getServerInfo());
+            debug.error("XACML v3 Schema Version: "+XACML3_NAMESPACE);
         }
         // ***************************************************
         // Initialize our Authentication Digest Thread.
@@ -291,7 +292,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
      */
     @Override
     public String getServletInfo() {
-        return "ForgeRock OpenAM XACML v3 Servlet/Restlet Implementation, Standards per OASIS, 2013.";
+        return "ForgeRock OpenAM XACML v3 PDP Content Handler Implementation, Standards per OASIS, 2013.";
     }
 
     /**
@@ -838,6 +839,19 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
                 (!xacmlRequestInformation.isRequestNodePresent()) ) {
             // No Request Node found within the document, bad request.
             this.renderBadRequest(requestContentType, response);
+            return;
+        }
+        // ******************************************************************
+        // Check for a Request with Multiple Requests,
+        // As of this time we do not support this capability.  So to
+        // conform to the OASIS specification, we must acknowledge this
+        // request and return a Indeterminate Response immediately!
+        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
+             (xacmlRequestInformation.isRequestWithMultiRequestsPresent()) ) {
+            // Multiple nested Requests Node within the document, not Supported.
+            // Render our Response, it will set a default Indeterminate Result Response.
+            String responseContent = xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType);
+            renderServerOKResponse(xacmlRequestInformation.getContentType(), responseContent, response);
             return;
         }
         // ******************************************************************
