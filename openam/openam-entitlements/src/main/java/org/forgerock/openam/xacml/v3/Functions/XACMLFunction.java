@@ -24,7 +24,7 @@
  *
  */
 package org.forgerock.openam.xacml.v3.Functions;
-import com.sun.identity.entitlement.ResourceAttribute;
+
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 import org.json.JSONArray;
@@ -41,6 +41,7 @@ import java.util.*;
     when the function is evaluated.
  */
 public abstract class XACMLFunction extends FunctionArgument {
+    // TODO : Q. Should functions be change to HashMap<String, Class<XACMLFunction>>(); ???
     static java.util.Map<String,String> functions;
     protected List<FunctionArgument> arguments;
     protected String functionID;
@@ -144,6 +145,8 @@ public abstract class XACMLFunction extends FunctionArgument {
 
     static void initFunctionTable() {
         functions = new HashMap<String,String>();
+
+        // TODO : Q. Should this be change to HashMap<String, Class<XACMLFunction>>(); ???
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-equal","org.forgerock.openam.xacml.v3.Functions.StringEqual");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:boolean-equal","org.forgerock.openam.xacml.v3.Functions.BooleanEqual");

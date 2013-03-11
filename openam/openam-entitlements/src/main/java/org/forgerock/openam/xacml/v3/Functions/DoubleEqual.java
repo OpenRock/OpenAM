@@ -36,6 +36,9 @@ It SHALL perform its evaluation on doubles according to IEEE 754 [IEEE754].
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:double-equal
+ */
 public class DoubleEqual extends XACMLFunction {
 
     public DoubleEqual()  {
@@ -47,8 +50,11 @@ public class DoubleEqual extends XACMLFunction {
             return retVal;
         }
         String s = (String)getArg(0).getValue(pip);
-        Double arg0 = Double.parseDouble(s);
         String s1 = (String)getArg(1).getValue(pip);
+        if ( (s==null) || (s1==null ) )  {
+            return retVal;
+        }
+        Double arg0 = Double.parseDouble(s);
         Double arg1 = Double.parseDouble(s1);
 
         if (arg0.equals(arg1)) {

@@ -35,6 +35,9 @@ Otherwise, it SHALL return “False”.*/
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:boolean-equal
+ */
 public class BooleanEqual extends XACMLFunction {
 
     public BooleanEqual()  {
@@ -49,7 +52,12 @@ public class BooleanEqual extends XACMLFunction {
         Object s = getArg(0).getValue(pip);
         Object ob = getArg(1).getValue(pip);
 
-        if ( s.toString().equalsIgnoreCase(ob.toString())) {
+        if ( (s == null) || (ob == null) ) {
+            return retVal;
+        }
+        boolean boolean1 = Boolean.parseBoolean((String)s);
+        boolean boolean2 = Boolean.parseBoolean((String)ob);
+        if ( boolean1 == boolean2) {
             retVal = FunctionArgument.trueObject;
         } else {
             retVal = FunctionArgument.falseObject;

@@ -39,6 +39,9 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:string-equal
+ */
 public class StringEqual extends XACMLFunction {
 
     public StringEqual()  {

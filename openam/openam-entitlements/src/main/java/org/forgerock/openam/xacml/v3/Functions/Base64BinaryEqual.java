@@ -40,6 +40,9 @@ urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal
+ */
 public class Base64BinaryEqual extends XACMLFunction {
 
     public Base64BinaryEqual()  {
@@ -48,6 +51,15 @@ public class Base64BinaryEqual extends XACMLFunction {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {
+            return retVal;
+        }
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+        if ( (getArg(0).getValue(pip)==null) || (getArg(1).getValue(pip)==null ) )  {
+            return retVal;
+        }
+        if ( (((String)getArg(0).getValue(pip)).length()) != (((String)getArg(0).getValue(pip)).length()) )  {
             return retVal;
         }
         String s = (String)getArg(0).getValue(pip);

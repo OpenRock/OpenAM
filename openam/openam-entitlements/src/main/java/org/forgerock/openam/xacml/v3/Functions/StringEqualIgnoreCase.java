@@ -38,6 +38,9 @@ urn:oasis:names:tc:xacml:1.0:function:string- normalize-to-lower-case.
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case
+ */
 public class StringEqualIgnoreCase extends XACMLFunction {
 
     public StringEqualIgnoreCase()  {

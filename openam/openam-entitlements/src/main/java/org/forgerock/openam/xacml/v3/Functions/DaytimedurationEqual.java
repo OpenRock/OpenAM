@@ -37,13 +37,36 @@ MUST be converted to a value expressed in fractional seconds [XF] Section 10.3.2
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+import java.util.Date;
+
+// TODO : Needs to be addressed per comparison @ fractional Seconds...
+
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-equal
+ */
 public class DaytimedurationEqual extends XACMLFunction {
 
     public DaytimedurationEqual()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip){
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+
+        String s1 = (String)getArg(0).getValue(pip);
+        String s2 = (String)getArg(1).getValue(pip);
+
+        // TODO : Convert to Fractional seconds...
+        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
+        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+
+        if( d1.equals(d2)) {
+            retVal = FunctionArgument.trueObject;
+        };
+        return retVal;
     }
 }

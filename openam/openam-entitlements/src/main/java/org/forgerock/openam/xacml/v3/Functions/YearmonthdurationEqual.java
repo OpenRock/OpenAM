@@ -36,13 +36,37 @@ This function SHALL take two arguments of data-type
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+import java.util.Date;
+
+// TODO : Needs to be addressed per comparison @ fractional Seconds...
+
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-equal
+ */
 public class YearmonthdurationEqual extends XACMLFunction {
 
     public YearmonthdurationEqual()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip){
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+
+        String s1 = (String)getArg(0).getValue(pip);
+        String s2 = (String)getArg(1).getValue(pip);
+        if ( (s1==null) || (s2==null ) )  {
+            return retVal;
+        }
+        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
+        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+
+        if( d1.equals(d2)) {
+            retVal = FunctionArgument.trueObject;
+        };
+        return retVal;
     }
 }

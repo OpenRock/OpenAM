@@ -38,6 +38,9 @@ import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 import java.util.Date;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:date-equal
+ */
 public class DateEqual extends XACMLFunction {
 
     public DateEqual()  {
@@ -50,6 +53,9 @@ public class DateEqual extends XACMLFunction {
 
         String s1 = (String)getArg(0).getValue(pip);
         String s2 = (String)getArg(1).getValue(pip);
+        if ( (s1==null) || (s2==null ) )  {
+            return retVal;
+        }
 
         Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
         Date d2 = XACML3PrivilegeUtils.stringToDate(s2);

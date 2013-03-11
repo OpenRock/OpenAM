@@ -35,6 +35,9 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-equal
+ */
 public class IntegerEqual extends XACMLFunction {
 
     public IntegerEqual()  {
@@ -46,8 +49,12 @@ public class IntegerEqual extends XACMLFunction {
             return retVal;
         }
         String s = (String)getArg(0).getValue(pip);
-        Integer arg0 = Integer.parseInt(s);
         String s1 = (String)getArg(1).getValue(pip);
+        if ( (s==null) || (s1==null ) )  {
+            return retVal;
+        }
+
+        Integer arg0 = Integer.parseInt(s);
         Integer arg1 = Integer.parseInt(s1);
 
         if (arg0.equals(arg1)) {

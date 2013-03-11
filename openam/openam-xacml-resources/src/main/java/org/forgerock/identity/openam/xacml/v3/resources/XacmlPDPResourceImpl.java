@@ -88,7 +88,7 @@ public class XacmlPDPResourceImpl implements XacmlPDPResource, XACML3Constants {
 
             }
 
-        // TODO : Finish Implemetation...
+        // TODO : Finish Implementation...
         } catch (Exception ex) {
 
         }

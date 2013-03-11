@@ -46,7 +46,8 @@ import java.util.*;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResourceResolver ,XACML3EvalContextInterface {
+public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResourceResolver,
+        XACML3EvalContextInterface {
 
     private Map<XacmlPIPResourceIdentifier, FunctionArgument> resourceResolutionMap;
     private  XACMLRequestInformation parent;

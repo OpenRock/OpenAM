@@ -100,7 +100,8 @@ public class XACMLRequestInformation implements Serializable {
      * Content, is Marshaled into a common Map Collection, which can be queried using JoSQL,
      * but currently not using JoSQL, until license review.
      */
-    private Map<String,Object> content;   // TODO This needs to be refactored to List<Map<String,Object>>
+    private Map<String,Object> content;
+    // TODO This needs to be refactored to List<Map<String,Object>>
     // TODO :: To Support multiple Requests.
     /**
      * Optional HTTP Digest Authorization Request

@@ -37,6 +37,9 @@ if and only if the values of the two arguments are equal on a codepoint-by-codep
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:anyURI-equal
+ */
 public class AnyuriEqual extends XACMLFunction {
 
     public AnyuriEqual()  {
@@ -46,6 +49,9 @@ public class AnyuriEqual extends XACMLFunction {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {
+            return retVal;
+        }
+        if ( (getArg(0).getValue(pip)==null) || (getArg(1).getValue(pip)==null ) )  {
             return retVal;
         }
         String s = (String)getArg(0).getValue(pip);

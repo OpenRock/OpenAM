@@ -32,20 +32,30 @@ This function SHALL take two arguments of
 and SHALL return an "http://www.w3.org/2001/XMLSchema#boolean".
 It SHALL return “True” if and only if each Relative Distinguished Name (RDN) in the two arguments matches.
 Otherwise, it SHALL return “False”.
+
 Two RDNs shall be said to match if and only if the result of the following operations is “True” .
+
 1. Normalize the two arguments according to IETF RFC 2253
 "Lightweight Directory Access Protocol (v3): UTF-8 String Representation of Distinguished Names".
+
 2. If any RDN contains multiple attributeTypeAndValue pairs,
 re-order the Attribute ValuePairs in that RDN in ascending order when compared as octet strings
 (described in ITU-T Rec. X.690 (1997 E) Section 11.6 "Set-of components").
+
 3. Compare RDNs using the rules in IETF RFC 3280
  "Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL)
  Profile", Section 4.1.2.4 "Issuer".
+
  */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+// TODO : Needs to be addressed per comparison to recognize all of the above Requirements...
+
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:x500Name-equal
+ */
 public class X500NameEqual extends XACMLFunction {
 
     public X500NameEqual()  {
@@ -57,12 +67,15 @@ public class X500NameEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
+        if ( (getArg(0).getValue(pip)==null) || (getArg(1).getValue(pip)==null ) )  {
+            return retVal;
+        }
         String s = (String)getArg(0).getValue(pip);
-        if ( s.equals((String)getArg(1).getValue(pip))) {
+        if ( s.equalsIgnoreCase((String)getArg(1).getValue(pip))) {
             retVal =   FunctionArgument.trueObject;
         } else {
             retVal =   FunctionArgument.falseObject;
-        };
+        }
         return retVal;
     }
 }
