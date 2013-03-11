@@ -91,7 +91,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code doesn't exist.");
-        } else if (Boolean.parseBoolean(code.getParameter(OAuth2Constants.CoreTokenParams.ISSUED))) {
+        } else if (code.isIssued()) {
             invalidateTokens(code_p);
             getTokenStore().deleteAuthorizationCode(code_p);
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code has been used");
@@ -105,8 +105,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             }
 
             //get code sessionClient
-            String clientID = code.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
-            String redirectURI = code.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+            String clientID = code.getClientID();
+            String redirectURI = code.getRedirectURI();
             SessionClient sc = new SessionClientImpl(clientID, redirectURI);
             if (!sc.equals(sessionClient)) {
                 // Throw redirect_uri mismatch
@@ -117,8 +117,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             CoreToken token = createAccessToken(code);
 
             //set access token issued
-            code.put(OAuth2Constants.CoreTokenParams.ISSUED, "true");
-            getTokenStore().updateAuthorizationCode(code_p, code);
+            // TODO code.put(OAuth2Constants.CoreTokenParams.ISSUED, "true");
+            //getTokenStore().updateAuthorizationCode(code_p, code);
             Map<String, Object> response = token.convertToMap();
 
             //execute post token creation pre return scope plugin for extra return data.
@@ -165,7 +165,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
     protected CoreToken createRefreshToken(CoreToken code){
         resourceOwner = getAuthenticatedResourceOwner();
-        return getTokenStore().createRefreshToken(OAuth2Utils.stringToSet(code.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)),
+        return getTokenStore().createRefreshToken(code.getScope(),
                                                     OAuth2Utils.getRealm(getRequest()),
                                                     code.getUserID(),
                                                     sessionClient.getClientId(),
@@ -186,12 +186,12 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
 
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    OAuth2Utils.stringToSet(code.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)), OAuth2Utils.getRealm(getRequest()), token.getUserID(),
-                    token.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID), token.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI), code.getTokenID(), token.getTokenID());
+                    code.getScope(), OAuth2Utils.getRealm(getRequest()), token.getUserID(),
+                    token.getClientID(), token.getRedirectURI(), code.getTokenID(), token.getTokenID());
         } else {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    OAuth2Utils.stringToSet(code.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)), OAuth2Utils.getRealm(getRequest()), code.getUserID(),
-                    code.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID), code.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI), code.getTokenID(), null);
+                    code.getScope(), OAuth2Utils.getRealm(getRequest()), code.getUserID(),
+                    code.getClientID(), code.getRedirectURI(), code.getTokenID(), null);
         }
     }
 

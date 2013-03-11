@@ -44,7 +44,7 @@ public interface ResponseType {
      * @param data The data needed to create the token
      * @return  the created token
      */
-    public CoreToken createToken(Map<String, String> data);
+    public CoreToken createToken(Map<String, Object> data);
 
     /**
      * Returns the location in the HTTP response the token should be returned

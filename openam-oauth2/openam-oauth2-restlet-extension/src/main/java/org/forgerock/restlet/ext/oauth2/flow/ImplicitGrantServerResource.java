@@ -40,14 +40,14 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
  */
 public class ImplicitGrantServerResource implements ResponseType {
 
-    public CoreToken createToken(Map<String, String> data){
+    public CoreToken createToken(Map<String, Object> data){
         DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
-        return store.createAccessToken(data.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE),
-                OAuth2Utils.stringToSet(data.get(OAuth2Constants.CoreTokenParams.SCOPE)),
-                data.get(OAuth2Constants.CoreTokenParams.REALM),
-                data.get(OAuth2Constants.CoreTokenParams.USERNAME),
-                data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
-                data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI),
+        return store.createAccessToken((String)data.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE),
+                (Set<String>)data.get(OAuth2Constants.CoreTokenParams.SCOPE),
+                (String)data.get(OAuth2Constants.CoreTokenParams.REALM),
+                (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
+                (String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
+                (String)data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI),
                 null,
                 null);
     }

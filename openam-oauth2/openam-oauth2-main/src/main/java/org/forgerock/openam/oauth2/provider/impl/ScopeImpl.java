@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,23 +22,21 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * "Portions Copyrighted 2012-2013 ForgeRock Inc"
- *
- */
-
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.restlet.Request;
 
-import java.security.AccessController;
+import java.security.*;
 import java.util.*;
 
 /**
@@ -50,10 +48,21 @@ import java.util.*;
  */
 public class ScopeImpl implements Scope {
 
+    // TODO remove this temporary keypair generation and use the client keypair
+    static KeyPair keyPair;
+    static{
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(1024);
+            keyPair = keyPairGenerator.genKeyPair();
+        } catch (NoSuchAlgorithmException e){
+
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
         if (requestedScope == null){
@@ -68,7 +77,6 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
         if (requestedScope == null){
@@ -83,7 +91,6 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScope,
                                                      Set<String> availableScopes,
                                                      Set<String> allScopes,
@@ -101,7 +108,6 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Map<String, Object> evaluateScope(CoreToken token){
         Map<String, Object> map = new HashMap<String, Object>();
         Set<String> scopes = OAuth2Utils.stringToSet(token.getParameter(OAuth2Constants.CoreTokenParams.SCOPE));
@@ -175,14 +181,54 @@ public class ScopeImpl implements Scope {
      */
     public Map<String, Object> extraDataToReturnForTokenEndpoint(Set<String> parameters, CoreToken token){
         Map<String, Object> map = new HashMap<String, Object>();
-        String scope = token.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
-        Set<String> scopeSet = OAuth2Utils.stringToSet(scope);
+        Set<String> scope = token.getScope();
 
+        //OpenID Connect
         // if an openid scope return the id_token
-        if (scopeSet.contains("openid")){
-            //TODO create a real id token
-            map.put("id_token", "XXXX");
+        if (scope.contains("openid")){
+            DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
+            String jwtToken = store.createSignedJWT(token.getRealm(),
+                    token.getUserID(),
+                    token.getClientID(),
+                    OAuth2Utils.getDeploymentURL(Request.getCurrent()),
+                    token.getClientID(),
+                    keyPair.getPrivate());
+            map.put("id_token", jwtToken);
         }
+        //END OpenID Connect
+        return map;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Set<String> parameters, Map<String, CoreToken> tokens){
+        Map<String, String> map = new HashMap<String, String>();
+
+        // OpenID Connect
+        boolean fragment = false;
+        if (tokens != null && !tokens.isEmpty()){
+            for(Map.Entry<String, CoreToken> token : tokens.entrySet() ){
+                Set<String> scope = token.getValue().getScope();
+                if (scope.contains("openid") && !token.getKey().equalsIgnoreCase(OAuth2Constants.AuthorizationEndpoint.CODE)){
+                    DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
+                    String jwtToken = store.createSignedJWT(token.getValue().getRealm(),
+                                                token.getValue().getUserID(),
+                                                token.getValue().getClientID(),
+                                                OAuth2Utils.getDeploymentURL(Request.getCurrent()),
+                                                token.getValue().getClientID(),
+                                                keyPair.getPrivate());
+                    map.put("id_token", jwtToken);
+                    fragment = true;
+                    break;
+                }
+            }
+        }
+        if (fragment){
+            map.put("returnType", "FRAGMENT");
+        }
+        //end OpenID Connect
+
         return map;
     }
 

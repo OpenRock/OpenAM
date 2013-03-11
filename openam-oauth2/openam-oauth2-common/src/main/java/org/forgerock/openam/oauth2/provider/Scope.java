@@ -79,10 +79,19 @@ public interface Scope {
     /**
      * This method is called before the access_token end point returns an access token. Whatever is returned by this
      * method will be added to the json object returned by the access_token endpoint.
-     * @param parameters set of data to pass into the method to use in the method
+     * @param parameters set of extra data to pass into the method
      * @param token the token created that will be returned with the extra data from this method
      * @return
      */
     public Map<String, Object> extraDataToReturnForTokenEndpoint(Set<String> parameters, CoreToken token);
+
+    /**
+     * This method is called before the access_token end point returns an access token. Whatever is returned by this
+     * method will be added to the json object returned by the access_token endpoint.
+     * @param parameters set of extra data to pass into the method
+     * @param tokens a map of token return names to the token. For example "code"=>tokenObject
+     * @return the return map should include the key value pair returnType=>Value where value is either FRAGMENT or QUERY
+     */
+    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Set<String> parameters, Map<String, CoreToken> tokens);
 
 }

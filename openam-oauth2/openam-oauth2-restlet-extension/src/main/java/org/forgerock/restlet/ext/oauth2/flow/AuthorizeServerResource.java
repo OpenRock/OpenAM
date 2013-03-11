@@ -1,3 +1,27 @@
+/*
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
 package org.forgerock.restlet.ext.oauth2.flow;
 
 
@@ -90,9 +114,9 @@ public class AuthorizeServerResource extends AbstractFlow {
 
             Set<String> requestedResponseTypes = OAuth2Utils.stringToSet(OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class));
             Map<String, CoreToken> listOfTokens = new HashMap<String, CoreToken>();
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, Object> data = new HashMap<String, Object>();
             data.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, client.getClient().getAccessTokenType());
-            data.put(OAuth2Constants.CoreTokenParams.SCOPE, checkedScope.toString());
+            data.put(OAuth2Constants.CoreTokenParams.SCOPE, checkedScope);
             data.put(OAuth2Constants.CoreTokenParams.REALM, OAuth2Utils.getRealm(getRequest()));
             data.put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwner.getIdentifier());
             data.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, sessionClient.getClientId());
@@ -107,6 +131,10 @@ public class AuthorizeServerResource extends AbstractFlow {
                 try {
                     for(String request: requestedResponseTypes){
                         String responseClass = responseTypes.get(request);
+                        if (responseClass == null || responseClass.isEmpty()){
+                            OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);
+                            continue;
+                        }
                         Class clazz = Class.forName(responseClass);
                         ResponseType classObj = (ResponseType) clazz.newInstance();
                         CoreToken token = classObj.createToken(data);
@@ -134,6 +162,21 @@ public class AuthorizeServerResource extends AbstractFlow {
             }
 
             Form tokenForm = tokensToForm(listOfTokens);
+
+            //execute post token creation pre return scope plugin for extra return data.
+            Set<String> extraData = new HashSet<String>();
+            Map<String, String> valuesToAdd = executeAuthorizationExtraDataScopePlugin(extraData, listOfTokens);
+            if (valuesToAdd != null && !valuesToAdd.isEmpty()){
+                String returnType = valuesToAdd.remove("returnType");
+                if(returnType != null && !returnType.isEmpty()){
+                    if (returnType.equalsIgnoreCase("FRAGMENT")){
+                        fragment = true;
+                    }
+                }
+            }
+            for(Map.Entry<String, String> entry : valuesToAdd.entrySet()){
+                    tokenForm.add(entry.getKey(), entry.getValue().toString());
+            }
 
             /*
              * scope OPTIONAL, if identical to the scope requested by the

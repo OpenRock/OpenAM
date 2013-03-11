@@ -27,6 +27,7 @@
  */
 package org.forgerock.openam.oauth2.provider;
 
+import java.security.PrivateKey;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
@@ -175,5 +176,17 @@ public interface OAuth2TokenStore {
     public void deleteRefreshToken(String id) throws OAuthProblemException;
 
     public JsonValue queryForToken(String id) throws OAuthProblemException;
+
+    /**
+     * Creates a signed JWT token
+     * @param realm realm of the token
+     * @param uuid  the subject of the token
+     * @param clientID the audience of the token
+     * @param deploymentURI the issuer of the token
+     * @param authorizationParty the client allowed to use the token as an access token
+     * @param pk the private key to sign the JWT with
+     * @return
+     */
+    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk);
 
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -18,14 +18,13 @@
  * "Portions copyright [year] [name of copyright owner]".
  *
  */
-/*
- * "Portions copyright 2012-2013 ForgeRock Inc".
- */
 package org.forgerock.openam.oauth2.model;
 
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+
 import java.util.*;
 
 public class CoreToken extends JsonValue implements Token {
@@ -78,31 +77,31 @@ public class CoreToken extends JsonValue implements Token {
 
     protected void setTokenID(String id){
         this.id = id;
-        this.put(OAuth2Constants.CoreTokenParams.ID, id);
+        this.put(OAuth2Constants.CoreTokenParams.ID, OAuth2Utils.stringToSet(id));
     }
 
     protected void setUserName(String userName) {
-        this.put(OAuth2Constants.CoreTokenParams.USERNAME, userName);
+        this.put(OAuth2Constants.CoreTokenParams.USERNAME, OAuth2Utils.stringToSet(userName));
     }
 
     protected void setRealm(String realm) {
         if (realm == null || realm.isEmpty()){
-            this.put(OAuth2Constants.CoreTokenParams.REALM, "/");
+            this.put(OAuth2Constants.CoreTokenParams.REALM, OAuth2Utils.stringToSet("/"));
         } else {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, realm);
+            this.put(OAuth2Constants.CoreTokenParams.REALM, OAuth2Utils.stringToSet(realm));
         }
     }
 
     protected void setExpireTime(long expireTime) {
-        this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, String.valueOf((expireTime * 1000) + System.currentTimeMillis()));
+        this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, OAuth2Utils.stringToSet(String.valueOf((expireTime * 1000) + System.currentTimeMillis())));
     }
 
     protected void setTokenType(String tokenType) {
-        this.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
+        this.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, OAuth2Utils.stringToSet(tokenType));
     }
 
     protected void setTokenName(String tokenName) {
-        this.put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
+        this.put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, OAuth2Utils.stringToSet(tokenName));
     }
 
     /**
@@ -129,7 +128,7 @@ public class CoreToken extends JsonValue implements Token {
      * @return the id of the parent token
      */
     public String getParent(){
-        return this.getParameter(OAuth2Constants.CoreTokenParams.PARENT);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.PARENT).iterator().next();
     }
 
     /**
@@ -138,7 +137,7 @@ public class CoreToken extends JsonValue implements Token {
      */
     public boolean isIssued(){
         if (this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED) != null){
-            return Boolean.parseBoolean(this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED));
+            return Boolean.parseBoolean(this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED).iterator().next());
         } else {
             return false;
         }
@@ -149,7 +148,7 @@ public class CoreToken extends JsonValue implements Token {
      * @return id of refresh token
      */
     public String getRefreshToken(){
-        return this.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN).iterator().next();
     }
 
     /**
@@ -159,7 +158,7 @@ public class CoreToken extends JsonValue implements Token {
      *          ID of user
      */
     public String getUserID() {
-        return this.getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.USERNAME).iterator().next();
     }
 
     /**
@@ -169,7 +168,7 @@ public class CoreToken extends JsonValue implements Token {
      *          the realm
      */
     public String getRealm() {
-        return this.getParameter(OAuth2Constants.CoreTokenParams.REALM);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.REALM).iterator().next();
     }
 
     /**
@@ -178,7 +177,7 @@ public class CoreToken extends JsonValue implements Token {
      * @return time of expiry expressed as milliseconds since the epoch.
      */
     public long getExpireTime() {
-        return Long.parseLong(this.getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME));
+        return Long.parseLong(this.getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME).iterator().next());
     }
 
     /**
@@ -199,11 +198,7 @@ public class CoreToken extends JsonValue implements Token {
      *          Set of strings that are the tokens scope
      */
     public Set<String> getScope(){
-        if (this.get(OAuth2Constants.CoreTokenParams.SCOPE) != null){
-            return (Set<String>) this.get(OAuth2Constants.CoreTokenParams.SCOPE).getObject();
-        } else {
-            return null;
-        }
+        return this.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
     }
 
     /**
@@ -223,7 +218,7 @@ public class CoreToken extends JsonValue implements Token {
      * @return The type of token. For example {@link BearerToken}
      */
     public String getTokenType(){
-        return this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).iterator().next();
     }
 
     /**
@@ -232,7 +227,7 @@ public class CoreToken extends JsonValue implements Token {
      * @return The name of token. Will be either access_token, code, refresh_token
      */
     public String getTokenName(){
-        return this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME).iterator().next();
     }
 
     /**
@@ -241,7 +236,7 @@ public class CoreToken extends JsonValue implements Token {
      * @return The client_id associated with token
      */
     public String getClientID(){
-        return this.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID).iterator().next();
     }
 
     /**
@@ -250,16 +245,16 @@ public class CoreToken extends JsonValue implements Token {
      * @return The  redirect_uri associated with token
      */
     public String getRedirectURI(){
-        return this.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        return this.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI).iterator().next();
     }
     /**
      * Gets any parameter stored in the token
      * @return
      */
-    public String getParameter(String paramName){
+    public Set<String> getParameter(String paramName){
         JsonValue param = get(paramName);
-        if (param != null && param.isString()){
-            return param.asString();
+        if (param != null){
+            return (Set<String>)param.getObject();
         }
         return null;
     }

@@ -29,16 +29,17 @@ import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 
 import java.util.Map;
+import java.util.Set;
 
 public class CodeServerResource implements ResponseType {
 
-    public CoreToken createToken(Map<String, String> data){
+    public CoreToken createToken(Map<String, Object> data){
         DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
-        return store.createAuthorizationCode(OAuth2Utils.stringToSet(data.get(OAuth2Constants.CoreTokenParams.SCOPE)),
-                data.get(OAuth2Constants.CoreTokenParams.REALM),
-                data.get(OAuth2Constants.CoreTokenParams.USERNAME),
-                new SessionClientImpl(data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
-                        data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI)));
+        return store.createAuthorizationCode((Set<String>)data.get(OAuth2Constants.CoreTokenParams.SCOPE),
+                (String)data.get(OAuth2Constants.CoreTokenParams.REALM),
+                (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
+                new SessionClientImpl((String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
+                        (String)data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI)));
 
     }
 

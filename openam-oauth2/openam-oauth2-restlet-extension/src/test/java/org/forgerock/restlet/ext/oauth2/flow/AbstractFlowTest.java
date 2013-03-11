@@ -177,7 +177,7 @@ public class AbstractFlowTest {
                         (String) invocation.getArguments()[1]);
                 when(authorizationCode.getClient()).thenReturn(
                         (SessionClient) invocation.getArguments()[3]);
-                when(authorizationCode.getToken()).thenReturn(code);
+                when(authorizationCode.getTokenID()).thenReturn(code);
 
                 authorizationCodeMap.put(code, authorizationCode);
 

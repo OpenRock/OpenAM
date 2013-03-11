@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,12 +19,14 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.ext.cts.repo;
 
 import java.security.AccessController;
+import java.security.PrivateKey;
+import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
@@ -42,10 +44,7 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.openam.oauth2.model.BearerToken;
-import org.forgerock.openam.oauth2.model.CoreToken;
-import org.forgerock.openam.oauth2.model.SessionClient;
-import org.forgerock.openam.oauth2.model.SessionClientImpl;
+import org.forgerock.openam.oauth2.model.*;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -83,7 +82,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
                     "Service unavailable", "Could not create underlying storage", null);
         }
     }
-    public void getSettings(String realm){
+    private void getSettings(String realm){
         if (realm == null){
             //default realm
             realm = "/";
@@ -455,6 +454,23 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk){
+        long timeInSeconds = System.currentTimeMillis()/1000;
+        getSettings(realm);
+        JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm);
+        String jwt = null;
+        try {
+            jwt = jwtToken.sign(pk).build();
+        } catch(SignatureException e){
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create JWT token", e);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
+        }
+        return jwt;
     }
 
 }
