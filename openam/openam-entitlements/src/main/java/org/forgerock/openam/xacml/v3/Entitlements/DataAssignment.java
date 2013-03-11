@@ -57,11 +57,11 @@ public class DataAssignment extends FunctionArgument {
         this.expression = XACML3PrivilegeUtils.getAssignmentFunction(att);
     }
 
-    public  FunctionArgument evaluate(XACMLEvalContext pip) {
-        return FunctionArgument.notApplicableObject;
+    public  FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        throw new NotApplicableException("Evaluate called for DataAssignment");
     };
-    public  Object getValue(XACMLEvalContext pip) {
-        return FunctionArgument.notApplicableObject;
+    public  Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
+        throw new NotApplicableException("Evaluate called for DataAssignment");
     };
 
     public JSONObject toJSONObject() throws JSONException {
@@ -85,7 +85,11 @@ public class DataAssignment extends FunctionArgument {
         ret.setCategory(category);
         ret.setAttributeId(attributeID);
         AttributeValue av = new AttributeValue();
+        try {
         av.getContent().add(expression.getValue(pip));
+        } catch (XACML3EntitlementException ex) {
+            av.getContent().add("null");
+        }
         ret.setExpression(objectFactory.createAttributeValue(av));
         return ret;
     }

@@ -27,12 +27,11 @@
 package org.forgerock.openam.xacml.v3.Entitlements;
 
 
-
 /*
-    This class Encapsulates a DataValue from the XACML policy.
-    In this case, we have the actual Data in the object
+   This class Encapsulates a DataValue from the XACML policy.
+   In this case, we have the actual Data in the object
 
- */
+*/
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,23 +41,27 @@ public class DataValue extends FunctionArgument {
 
     public DataValue() {
     }
+    /* When we create the value,  is HAS to be of the type */
+
     public DataValue(String type, Object value) {
         setType(type);
         data = value;
     }
 
-    public FunctionArgument evaluate(XACMLEvalContext pip) {
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         return this;
     };
 
-    public Object getValue(XACMLEvalContext pip) {
+    public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
         return data;
     }
+
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = super.toJSONObject();
-        jo.put("value",data);
+        jo.put("value", data);
         return jo;
     }
+
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
         this.data = jo.optString("value");
@@ -73,7 +76,6 @@ public class DataValue extends FunctionArgument {
 
         return retVal;
     }
-
 
 
 }

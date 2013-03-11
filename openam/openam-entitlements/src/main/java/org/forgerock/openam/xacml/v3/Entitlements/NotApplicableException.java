@@ -34,17 +34,14 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
  */
 
-public class NotApplicableValue extends FunctionArgument {
+public class NotApplicableException extends XACML3EntitlementException {
 
-    public NotApplicableValue() {
+    public NotApplicableException() {
+        super();
     }
 
-    public FunctionArgument evaluate(XACMLEvalContext pip) {
-        return this;
-    };
-
-    public Object getValue(XACMLEvalContext pip) {
-        return this;
+    public NotApplicableException(String message) {
+        super(message);
     }
 }
 

@@ -45,4 +45,60 @@ public class DataType {
     public static String XACMLDNSNAME = "urn:oasis:names:tc:xacml:2.0:data-type:dnsName";
     public static String XACMLXPATHEXPRESSION = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression";
 
+    public static enum Type {
+    XACMLSTRINGTYPE          (1,XACMLSTRING),
+    XACMLBOOLEANTYPE         (2,XACMLBOOLEAN),
+    XACMLINTEGERTYPE         (3,XACMLINTEGER),
+    XACMLDOUBLETYPE          (4,XACMLDOUBLE),
+    XACMLTIMETYPE            (5,XACMLTIME),
+    XACMLDATETYPE            (6,XACMLDATE),
+    XACMLDATETIMETYPE        (7,XACMLDATETIME),
+    XACMLANYURITYPE          (8,XACMLANYURI),
+    XACMLHEXBINARYTYPE       (9,XACMLHEXBINARY),
+    XACMLBASE64BINARYTYPE    (10,XACMLBASE64BINARY),
+    XACMLDAYTIMEDURATIONTYPE (11,XACMLDAYTIMEDURATION),
+    XACMLYEARMONTHDURATIONTYPE(12,XACMLYEARMONTHDURATION),
+    XACMLX500NAMETYPE        (13,XACMLX500NAME),
+    XACMLRFC822NAMETYPE      (14,XACMLRFC822NAME),
+    XACMLIPADDRESSTYPE       (15,XACMLIPADDRESS),
+    XACMLDNSNAMETYPE         (16,XACMLDNSNAME),
+    XACMLXPATHEXPRESSIONTYPE (17,XACMLXPATHEXPRESSION);
+
+        private int index;
+        private String typeName;
+
+        Type (int i,String t) {
+            index = i;
+            this.typeName = t;
+        }
+        int getIndex() {
+            return index;
+        }
+        String getTypeName() {
+            return typeName;
+        }
+    }
+    private int typeIndex;
+
+    public DataType(String name) {
+        for (Type s : Type.values()) {
+            if (name.equals(s.getTypeName())) {
+                typeIndex = s.getIndex();
+                break;
+            }
+        }
+    }
+    public String getTypeName() {
+        String retVal = null;
+        for (Type s : Type.values()) {
+            if (typeIndex == s.getIndex()) {
+                retVal =  s.getTypeName();
+                break;
+            }
+        }
+        return retVal;
+    }
+    public int getIndex() {
+        return typeIndex;
+    }
 }

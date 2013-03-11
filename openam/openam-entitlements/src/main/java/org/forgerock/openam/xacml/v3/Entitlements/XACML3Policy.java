@@ -64,9 +64,6 @@ public class XACML3Policy {
 
     public FunctionArgument getDefinedVariable(String variableID){
         FunctionArgument retVal = definedVars.get(variableID);
-        if (retVal == null) {
-            retVal = FunctionArgument.indeterminateObject;
-        }
         return retVal;
     }
 
@@ -89,10 +86,15 @@ public class XACML3Policy {
 
         Result result = new Result();
         boolean indeterminate = true;
+        FunctionArgument evalResult;
 
         pip.setPolicy(this);
-
-        FunctionArgument evalResult = target.evaluate(pip);
+        try {
+            evalResult = target.evaluate(pip);
+        } catch (XACML3EntitlementException ex) {
+            result.setDecision(DecisionType.fromValue("Indeterminate"));
+            return null;
+        }
 
         if (evalResult.isTrue())        {    // we  match,  so evaluate
             for (XACML3PolicyRule r : rules) {

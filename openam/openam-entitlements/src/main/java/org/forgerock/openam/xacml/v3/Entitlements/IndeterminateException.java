@@ -27,24 +27,19 @@
 package org.forgerock.openam.xacml.v3.Entitlements;
 
 
-
 /*
-    This class Encapsulates a DataValue from the XACML policy.
-    In this case, we have the actual Data in the object
+   This class can be thrown by the evaluation system for any errors
 
- */
+*/
 
-public class IndeterminateValue extends FunctionArgument {
+public class IndeterminateException extends XACML3EntitlementException {
 
-    public IndeterminateValue() {
+    public IndeterminateException() {
+        super();
     }
 
-    public FunctionArgument evaluate(XACMLEvalContext pip) {
-        return this;
-    };
-
-    public Object getValue(XACMLEvalContext pip) {
-        return this;
+    public IndeterminateException(String message) {
+        super(message);
     }
 }
 

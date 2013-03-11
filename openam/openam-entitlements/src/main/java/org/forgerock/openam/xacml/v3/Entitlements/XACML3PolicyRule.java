@@ -68,9 +68,11 @@ public class XACML3PolicyRule {
 
         XACML3Decision result = new XACML3Decision();
 
+        try {
         FunctionArgument evalResult = target.evaluate(pip);
 
         if (evalResult.isTrue())        {    // we Dont match,  so evaluate
+
             evalResult = condition.evaluate(pip);
             if (evalResult.isTrue() || evalResult.isFalse())        {    // we Match Target,  and Condition
 
@@ -97,11 +99,8 @@ public class XACML3PolicyRule {
                 return result;
             }
         }
-
-        if (evalResult.isIndeterminate()) {
+        } catch (XACML3EntitlementException ex) {
             result.setStatus("Indeterminate");
-        } else if (evalResult.isNotApplicable()) {
-            result.setStatus("NotApplicable");
         }
 
         return result;
