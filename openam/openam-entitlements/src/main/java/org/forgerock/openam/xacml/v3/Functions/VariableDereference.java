@@ -37,6 +37,7 @@ as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/c
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class VariableDereference extends XACMLFunction {
@@ -44,8 +45,12 @@ public class VariableDereference extends XACMLFunction {
     public VariableDereference()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip)  {
+        try {
         return pip.getDefinedVariable((String)getArg(0).getValue(pip));
+        } catch (XACML3EntitlementException ex) {
+                return null;
+        }
     }
 }
 

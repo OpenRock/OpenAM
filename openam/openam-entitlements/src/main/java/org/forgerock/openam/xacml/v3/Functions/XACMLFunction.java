@@ -26,6 +26,7 @@
 package org.forgerock.openam.xacml.v3.Functions;
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +63,7 @@ public abstract class XACMLFunction extends FunctionArgument {
         arguments.addAll(args);
         return this;
     };
-    public Object getValue(XACMLEvalContext pip) {
+    public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
         return evaluate(pip).getValue(pip);
     };
     abstract public FunctionArgument evaluate( XACMLEvalContext pip);
