@@ -57,7 +57,7 @@ public class IntegerEqual extends XACMLFunction {
         Integer arg0 = Integer.parseInt(s);
         Integer arg1 = Integer.parseInt(s1);
 
-        if (arg0.equals(arg1)) {
+        if (arg0.intValue() == arg1.intValue()) {
             retVal = FunctionArgument.trueObject;
         } else {
             retVal = FunctionArgument.falseObject;

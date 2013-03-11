@@ -57,7 +57,7 @@ public class DoubleEqual extends XACMLFunction {
         Double arg0 = Double.parseDouble(s);
         Double arg1 = Double.parseDouble(s1);
 
-        if (arg0.equals(arg1)) {
+        if (arg0.doubleValue() == arg1.doubleValue()) {
             retVal = FunctionArgument.trueObject;
         } else {
             retVal = FunctionArgument.falseObject;

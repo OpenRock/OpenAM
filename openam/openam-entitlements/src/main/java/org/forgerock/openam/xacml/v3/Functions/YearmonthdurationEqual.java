@@ -64,7 +64,7 @@ public class YearmonthdurationEqual extends XACMLFunction {
         Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
         Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
 
-        if( d1.equals(d2)) {
+        if( d1.getTime() == d2.getTime() ) {
             retVal = FunctionArgument.trueObject;
         };
         return retVal;

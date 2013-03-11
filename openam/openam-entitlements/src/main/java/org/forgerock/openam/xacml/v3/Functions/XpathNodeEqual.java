@@ -44,6 +44,15 @@ public class XpathNodeEqual extends XACMLFunction {
     public XpathNodeEqual()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip){
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+        String s = (String)getArg(0).getValue(pip);
+        if ( s.equals((String)getArg(1).getValue(pip))) {
+            retVal =   FunctionArgument.trueObject;
+        }
+        return retVal;
     }
 }

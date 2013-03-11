@@ -174,13 +174,14 @@ public class XACML3PrivilegeUtils {
         dateString = dateString.replace("T", ":");
         Date retVal = new Date();
         try {
-            retVal = sdf. parse(dateString);
+            retVal = sdf.parse(dateString);
         } catch (java.text.ParseException pe) {
             //TODO: log debug warning
         }
         return retVal;
 
     }
+
     public static String dateToString(Date date){
 
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -190,6 +191,20 @@ public class XACML3PrivilegeUtils {
 
         String retVal = sdf1.format (date) + "T" + sdf2.format(date);
         return retVal;
+    }
+
+    public static Date stringToTimeCalendar(String timeString) {
+        Date retVal = null;
+        SimpleDateFormat sdf = new SimpleDateFormat(
+                "HH:mm:ss.SSSS");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        try {
+            retVal = sdf.parse(timeString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
     }
 
 

@@ -65,7 +65,7 @@ public class DatetimeEqual extends XACMLFunction {
 
         if( d1.equals(d2)) {
             retVal = FunctionArgument.trueObject;
-        };
+        }
         return retVal;
     }
 }

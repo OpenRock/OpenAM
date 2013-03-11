@@ -37,6 +37,7 @@ import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+import java.util.Calendar;
 import java.util.Date;
 
 // TODO : Verify Time String Format.
@@ -62,9 +63,20 @@ public class TimeEqual extends XACMLFunction {
         Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
         Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
 
-        if( d1.equals(d2)) {
+
+        // Be Precise in Equality Check.
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(d1);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(d2);
+
+        if ( (cal1.get(Calendar.HOUR) == (cal2.get(Calendar.HOUR))) &&
+                (cal1.get(Calendar.MINUTE) == (cal2.get(Calendar.MINUTE))) &&
+                (cal1.get(Calendar.SECOND) == (cal2.get(Calendar.SECOND))) &&
+                (cal1.get(Calendar.MILLISECOND) == (cal2.get(Calendar.MILLISECOND))) ) {
             retVal = FunctionArgument.trueObject;
-        };
+        }
         return retVal;
     }
 }

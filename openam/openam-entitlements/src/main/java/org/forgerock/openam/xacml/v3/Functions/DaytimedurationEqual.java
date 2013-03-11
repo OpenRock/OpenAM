@@ -60,13 +60,12 @@ public class DaytimedurationEqual extends XACMLFunction {
         String s1 = (String)getArg(0).getValue(pip);
         String s2 = (String)getArg(1).getValue(pip);
 
-        // TODO : Convert to Fractional seconds...
         Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
         Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
 
-        if( d1.equals(d2)) {
+        if ( d1.getTime() == d2.getTime() ) {
             retVal = FunctionArgument.trueObject;
-        };
+        }
         return retVal;
     }
 }
