@@ -36,6 +36,9 @@ import javax.xml.bind.JAXBElement;
 
 import com.sun.identity.entitlement.xacml3.core.AllOf;
 import com.sun.identity.entitlement.xacml3.core.AnyOf;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.forgerock.openam.xacml.v3.Functions.*;
 
 /**
@@ -44,6 +47,16 @@ import org.forgerock.openam.xacml.v3.Functions.*;
  */
 public class XACML3PrivilegeUtils {
 
+    // Global Pattern Definitions
+    public static final String YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS =
+            new String( "yyyy-MM-dd:HH:mm:ss.SSSS");
+    public static final String YEAR_MONTH_DAY = new String("yyyy-MM-dd");
+    public static final String YEAR_MONTH = new String("yyyy-MM");
+    public static final String HOUR_MINUTE_SECOND_MILLISECONDS = new String("HH:mm:ss.SSS");
+    public static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT");
+
+
+    // Static Methods
 
     static FunctionArgument getTargetFunction(Target target, Set<String> rSelectors) {
         List<AnyOf> anyOfList = target.getAnyOf();
@@ -182,9 +195,8 @@ public class XACML3PrivilegeUtils {
 
     public static Date stringToDate(String dateString) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                "yyyy-MM-dd:HH:mm:ss.SSSS");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        sdf.setTimeZone(GMT_TIMEZONE);
         dateString = dateString.replace("T", ":");
         Date retVal = new Date();
         try {
@@ -198,28 +210,48 @@ public class XACML3PrivilegeUtils {
 
     public static String dateToString(Date date){
 
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss.SSS");
-        sdf1.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sdf2.setTimeZone(TimeZone.getTimeZone("GMT"));
+        SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
+        SimpleDateFormat sdf2 = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
+        sdf1.setTimeZone(GMT_TIMEZONE);
+        sdf2.setTimeZone(GMT_TIMEZONE);
 
         String retVal = sdf1.format (date) + "T" + sdf2.format(date);
         return retVal;
     }
 
-    public static Date stringToTimeCalendar(String timeString) {
-        Date retVal = null;
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                "HH:mm:ss.SSSS");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+    public static Calendar stringToCalendar(String timeString, final String pattern) {
+        Calendar retVal = Calendar.getInstance();
+        if ( (timeString == null) || (pattern == null) ) {
+            return null;
+        }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            simpleDateFormat.setTimeZone(GMT_TIMEZONE);
         try {
-            retVal = sdf.parse(timeString);
+            retVal.setTime(simpleDateFormat.parse(timeString));
         } catch (java.text.ParseException pe) {
             //TODO: log debug warning
         }
         return retVal;
-
     }
 
+    public static byte[] convertHexBinaryStringToByteArray(final String hexBinaryString) {
+        try {
+            if (hexBinaryString == null) {
+                return new byte[0];
+            }
+            return Hex.decodeHex(hexBinaryString.toCharArray());
+        } catch(DecoderException de) {
+            // TODO Handle
+            return new byte[0];
+        }
+    }
+
+    public static byte[] convertBase64StringToByteArray(final String base64String) {
+            if (base64String == null) {
+                return new byte[0];
+            }
+            Base64 base64 = new Base64();
+            return base64.decode(base64String);
+    }
 
 }

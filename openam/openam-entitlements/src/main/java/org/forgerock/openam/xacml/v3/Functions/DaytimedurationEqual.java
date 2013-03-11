@@ -40,6 +40,7 @@ import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+import java.util.Calendar;
 import java.util.Date;
 
 // TODO : Needs to be addressed per comparison @ fractional Seconds...
@@ -60,10 +61,12 @@ public class DaytimedurationEqual extends XACMLFunction {
         String s1 = (String)getArg(0).getValue(pip);
         String s2 = (String)getArg(1).getValue(pip);
 
-        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
-        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+        Calendar cal1  = XACML3PrivilegeUtils.stringToCalendar(s1,
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        Calendar cal2 = XACML3PrivilegeUtils.stringToCalendar(s2,
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
 
-        if ( d1.getTime() == d2.getTime() ) {
+        if (cal1.getTimeInMillis() == (cal2.getTimeInMillis())) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

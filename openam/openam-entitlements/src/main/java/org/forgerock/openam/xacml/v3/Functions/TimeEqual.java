@@ -60,21 +60,13 @@ public class TimeEqual extends XACMLFunction {
         if ( (s1==null) || (s2==null ) )  {
             return retVal;
         }
-        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
-        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
 
+        Calendar cal1 = XACML3PrivilegeUtils.stringToCalendar(s1,
+                XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS);
+        Calendar cal2 = XACML3PrivilegeUtils.stringToCalendar(s2,
+                XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS);
 
-        // Be Precise in Equality Check.
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTime(d1);
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTime(d2);
-
-        if ( (cal1.get(Calendar.HOUR) == (cal2.get(Calendar.HOUR))) &&
-                (cal1.get(Calendar.MINUTE) == (cal2.get(Calendar.MINUTE))) &&
-                (cal1.get(Calendar.SECOND) == (cal2.get(Calendar.SECOND))) &&
-                (cal1.get(Calendar.MILLISECOND) == (cal2.get(Calendar.MILLISECOND))) ) {
+        if (cal1.getTimeInMillis() == (cal2.getTimeInMillis())) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

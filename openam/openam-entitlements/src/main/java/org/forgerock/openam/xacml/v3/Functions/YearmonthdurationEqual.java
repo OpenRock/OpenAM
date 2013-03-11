@@ -39,9 +39,8 @@ import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
+import java.util.Calendar;
 import java.util.Date;
-
-// TODO : Needs to be addressed per comparison @ fractional Seconds...
 
 /**
  * urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-equal
@@ -61,12 +60,14 @@ public class YearmonthdurationEqual extends XACMLFunction {
         if ( (s1==null) || (s2==null ) )  {
             return retVal;
         }
-        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
-        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+        Calendar cal1 = XACML3PrivilegeUtils.stringToCalendar(s1,
+                XACML3PrivilegeUtils.YEAR_MONTH);
+        Calendar cal2 = XACML3PrivilegeUtils.stringToCalendar(s2,
+                XACML3PrivilegeUtils.YEAR_MONTH);
 
-        if( d1.getTime() == d2.getTime() ) {
+        if (cal1.getTimeInMillis() == (cal2.getTimeInMillis())) {
             retVal = FunctionArgument.trueObject;
-        };
+        }
         return retVal;
     }
 }

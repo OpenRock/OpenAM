@@ -38,7 +38,10 @@ urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+
+import java.util.Arrays;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal
@@ -53,17 +56,17 @@ public class Base64BinaryEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        if ( getArgCount() != 2) {
-            return retVal;
-        }
         if ( (getArg(0).getValue(pip)==null) || (getArg(1).getValue(pip)==null ) )  {
             return retVal;
         }
-        if ( (((String)getArg(0).getValue(pip)).length()) != (((String)getArg(0).getValue(pip)).length()) )  {
+        if ( (((String)getArg(0).getValue(pip)).length()) != (((String)getArg(1).getValue(pip)).length()) )  {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
-        if ( s.equalsIgnoreCase((String) getArg(1).getValue(pip))) {
+
+        byte[] byteArray1 = XACML3PrivilegeUtils.convertBase64StringToByteArray((String) getArg(0).getValue(pip));
+        byte[] byteArray2 = XACML3PrivilegeUtils.convertBase64StringToByteArray((String) getArg(1).getValue(pip));
+
+        if (Arrays.equals(byteArray1, byteArray2)) {
             retVal = FunctionArgument.trueObject;
         } else {
             retVal = FunctionArgument.falseObject;
