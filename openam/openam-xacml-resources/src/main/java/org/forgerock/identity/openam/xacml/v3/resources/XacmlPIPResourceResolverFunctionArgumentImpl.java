@@ -29,10 +29,7 @@ package org.forgerock.identity.openam.xacml.v3.resources;
 import com.sun.identity.entitlement.xacml3.core.Response;
 import com.sun.identity.entitlement.xacml3.core.Result;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
-import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EvalContextInterface;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import java.util.*;
 
@@ -80,7 +77,9 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         }
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(category, attributeId, includeInResult);
-
+        if (dataType == null) {
+            dataType = DataType.XACMLUNKNOWN;
+        }
         this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value));
         return true;
     }
