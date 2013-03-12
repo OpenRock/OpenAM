@@ -38,10 +38,13 @@ This function SHALL take two arguments of data-type
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 import java.util.Arrays;
+
+// TODO : Verify incoming content....
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:hexBinary-equal
@@ -50,7 +53,7 @@ public class HexbinaryEqual extends XACMLFunction {
 
     public HexbinaryEqual()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {
@@ -74,5 +77,4 @@ public class HexbinaryEqual extends XACMLFunction {
         }
         return retVal;
     }
-
 }

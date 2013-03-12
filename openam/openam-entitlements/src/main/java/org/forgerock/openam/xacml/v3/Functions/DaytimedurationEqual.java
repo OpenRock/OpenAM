@@ -37,6 +37,7 @@ MUST be converted to a value expressed in fractional seconds [XF] Section 10.3.2
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
@@ -52,7 +53,7 @@ public class DaytimedurationEqual extends XACMLFunction {
 
     public DaytimedurationEqual()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = FunctionArgument.falseObject;
         if ( getArgCount() != 2) {
             return retVal;

@@ -36,13 +36,14 @@ according to the specification of adding durations to date and time [XS] Appendi
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DatetimeAddDaytimeduration extends XACMLFunction {
 
     public DatetimeAddDaytimeduration()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         return FunctionArgument.falseObject;
     }
 }

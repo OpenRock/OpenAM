@@ -41,7 +41,7 @@ import org.json.JSONObject;
 public class DataDesignator extends FunctionArgument {
     private String category;
     private String attributeID;
-    private boolean presence;
+    private boolean mustExist;
 
     public DataDesignator() {
     }
@@ -49,23 +49,27 @@ public class DataDesignator extends FunctionArgument {
         setType(type);
         this.category = category;
         this.attributeID = attributeID;
-        this.presence = presence;
+        this.mustExist = presence;
     }
 
-    public FunctionArgument evaluate(XACMLEvalContext pip) {
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         return pip.resolve(category,attributeID);
     }
 
-    public Object getValue(XACMLEvalContext pip) {
+    public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument fArg = evaluate(pip);
         if (fArg == null) {
-            return "false";
+            if (mustExist) {
+                throw new IndeterminateException("Required attrib not found");
+            } else {
+                return null;
+            }
         }
         Object ob = fArg.getValue(pip);
         if (ob == null)  {
             return "false";
         }
-        return ob.toString();
+        return ob;
     }
 
     public JSONObject toJSONObject() throws JSONException {
@@ -89,7 +93,7 @@ public class DataDesignator extends FunctionArgument {
         String retVal = "<AttributeDesignator DataType=\"" + getType() + "\" "
                 + "AttributeId=\"" + attributeID + "\" "
                 + "Category=\"" + category + "\" "
-                + "MustBePresent=\"" + presence + "\" >" ;
+                + "MustBePresent=\"" + mustExist + "\" >" ;
 
         return retVal;
     }

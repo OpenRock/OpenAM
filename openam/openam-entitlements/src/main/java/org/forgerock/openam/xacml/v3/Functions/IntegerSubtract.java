@@ -38,13 +38,14 @@ Each function evaluation operating on doubles SHALL proceed as specified by thei
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class IntegerSubtract extends XACMLFunction {
 
     public IntegerSubtract()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         return FunctionArgument.falseObject;
     }
 }

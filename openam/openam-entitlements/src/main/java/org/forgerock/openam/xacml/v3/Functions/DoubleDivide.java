@@ -37,13 +37,14 @@ functions SHALL take two arguments of the specified data-type,
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DoubleDivide extends XACMLFunction {
 
     public DoubleDivide()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         return FunctionArgument.falseObject;
     }
 }

@@ -37,6 +37,8 @@ as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/c
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.IndeterminateException;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class BooleanOneAndOnly extends XACMLFunction {
@@ -44,10 +46,10 @@ public class BooleanOneAndOnly extends XACMLFunction {
     public BooleanOneAndOnly()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
 
         if ( getArgCount() != 1) {
-            return FunctionArgument.indeterminateObject;
+            throw new IndeterminateException("Count not one");
         }
         return getArg(0);
     }

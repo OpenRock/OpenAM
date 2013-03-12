@@ -36,6 +36,7 @@ This function SHALL take two arguments of data-type
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
@@ -49,7 +50,7 @@ public class YearmonthdurationEqual extends XACMLFunction {
 
     public YearmonthdurationEqual()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = FunctionArgument.falseObject;
         if ( getArgCount() != 2) {
             return retVal;

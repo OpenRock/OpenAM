@@ -32,13 +32,14 @@ For doubles they SHALL comply with the rules governed by IEEE 754 [IEEE754].
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DoubleGreaterThanOrEqual extends XACMLFunction {
 
     public DoubleGreaterThanOrEqual()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         return FunctionArgument.falseObject;
     }
 }

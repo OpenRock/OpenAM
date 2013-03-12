@@ -40,6 +40,7 @@ urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 
 import java.util.Arrays;
 
@@ -50,7 +51,7 @@ public class Base64BinaryEqual extends XACMLFunction {
 
     public Base64BinaryEqual()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {

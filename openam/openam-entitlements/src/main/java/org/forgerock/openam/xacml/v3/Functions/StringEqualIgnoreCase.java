@@ -36,6 +36,8 @@ urn:oasis:names:tc:xacml:1.0:function:string- normalize-to-lower-case.
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.IndeterminateException;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 /**
@@ -46,7 +48,7 @@ public class StringEqualIgnoreCase extends XACMLFunction {
     public StringEqualIgnoreCase()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {
@@ -56,7 +58,7 @@ public class StringEqualIgnoreCase extends XACMLFunction {
         String s2 = (String) getArg(1).getValue(pip);
 
         if ((s1 == null ) || (s2== null)) {
-             return FunctionArgument.indeterminateObject;
+            throw new IndeterminateException("Null Args");
         }
         if ( s1.equalsIgnoreCase(s2)) {
             retVal = FunctionArgument.trueObject;

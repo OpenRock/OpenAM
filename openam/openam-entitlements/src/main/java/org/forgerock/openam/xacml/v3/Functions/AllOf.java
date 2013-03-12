@@ -26,6 +26,7 @@
 package org.forgerock.openam.xacml.v3.Functions;
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 /*
@@ -37,7 +38,7 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
 
 public class AllOf extends XACMLFunction {
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = FunctionArgument.trueObject;
 
         for (int i = 0; i < getArgCount(); i++) {

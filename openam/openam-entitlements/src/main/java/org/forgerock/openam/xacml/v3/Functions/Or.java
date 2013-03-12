@@ -34,6 +34,8 @@ leaving the rest of the arguments unevaluated.
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.IndeterminateException;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class Or extends XACMLFunction {
@@ -41,7 +43,7 @@ public class Or extends XACMLFunction {
     public Or()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() == 0) {
@@ -52,7 +54,7 @@ public class Or extends XACMLFunction {
         for (int i=0;i<args;i++) {
             Object ob = getArg(i).getValue(pip);
             if (ob == null) {
-                return  FunctionArgument.indeterminateObject;
+                throw new IndeterminateException("Arg is null");
             }
             Boolean v = Boolean.getBoolean((String)ob);
             if (v.booleanValue() == true) {

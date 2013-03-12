@@ -49,6 +49,7 @@ re-order the Attribute ValuePairs in that RDN in ascending order when compared a
  */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 // TODO : Needs to be addressed per comparison to recognize all of the above Requirements...
@@ -61,7 +62,7 @@ public class X500NameEqual extends XACMLFunction {
     public X500NameEqual()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {

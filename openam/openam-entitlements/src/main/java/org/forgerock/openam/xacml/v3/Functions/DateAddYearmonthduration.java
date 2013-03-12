@@ -35,13 +35,14 @@ This function SHALL return the value by adding the second argument to the first 
 according to the specification of adding duration to date [XS] Appendix E.*/
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DateAddYearmonthduration extends XACMLFunction {
 
     public DateAddYearmonthduration()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         return FunctionArgument.falseObject;
     }
 }

@@ -33,6 +33,7 @@ The function SHALL return "True" if and only if the arguments are equal.
 Otherwise, it SHALL return “False”.*/
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 /**
@@ -43,7 +44,7 @@ public class BooleanEqual extends XACMLFunction {
     public BooleanEqual()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 2) {

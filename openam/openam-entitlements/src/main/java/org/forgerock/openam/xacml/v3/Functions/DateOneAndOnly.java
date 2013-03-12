@@ -37,6 +37,8 @@ as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/c
 */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.IndeterminateException;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 
 public class DateOneAndOnly extends XACMLFunction {
@@ -44,11 +46,11 @@ public class DateOneAndOnly extends XACMLFunction {
     public DateOneAndOnly()  {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip){
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() != 1) {
-            return FunctionArgument.indeterminateObject;
+            throw new IndeterminateException("More than one arg");
         }
         return getArg(0);
     }
