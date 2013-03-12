@@ -210,6 +210,8 @@
         <!-- OpenAM ForgeRock REST - CORE Module -->
         <module>openam-forgerock-rest</module>
 
+        <module>openam-network</module>
+
         <module>openam-plugins</module>
 
         <module>openam-console</module>
@@ -733,7 +735,11 @@
                 <artifactId>openam-installtools</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-network</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <!-- OpenAM schema projects -->
             <dependency>
                 <groupId>org.forgerock.openam</groupId>

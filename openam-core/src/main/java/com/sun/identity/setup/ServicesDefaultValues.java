@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.network.validateIPaddress;
 
 /**
  * This class holds the default values of service schema.
@@ -56,6 +57,7 @@ public class ServicesDefaultValues {
     private static Set preappendSlash = new HashSet();
     private static Set trimSlash = new HashSet();
     private Map defValues = new HashMap();
+    private static validateIPaddress ipValidator = new validateIPaddress();
     
     static {
         preappendSlash.add(SetupConstants.CONFIG_VAR_PRODUCT_NAME);
@@ -321,7 +323,7 @@ public class ServicesDefaultValues {
     ) {
         int idx = hostname.lastIndexOf(".");
         if ((idx == -1) || (idx == (hostname.length() -1)) ||
-            isIPAddress(hostname)
+            ipValidator.isValidIP(hostname)
         ) {
             cookieDomain = "";
         } else if ((cookieDomain == null) || (cookieDomain.length() == 0)) {
@@ -334,29 +336,6 @@ public class ServicesDefaultValues {
             }
         }
         return cookieDomain;
-    }
-
-    /**
-     * Validates if the hostname is IP address.
-     *
-     * @param hostname is the user specified hostname.
-     * @return <code>true</code> if hostname is an IP Address.
-     */
-    private static boolean isIPAddress(String hostname) {
-        StringTokenizer st = new StringTokenizer(hostname, ".");
-        boolean isIPAddr = (st.countTokens() == 4);
-        if (isIPAddr) {
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                try {
-                    int node = Integer.parseInt(token);
-                    isIPAddr = (node >= 0) && (node < 256);
-                } catch (NumberFormatException e) {
-                    isIPAddr = false;
-                }
-            }
-        }
-        return isIPAddr;
     }
 
     /**
