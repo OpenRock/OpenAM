@@ -49,7 +49,7 @@ import java.util.*;
  * @author jeff.schenk@forgerock.com
  * @see SAML2Utils
  */
-public class XACML3Utils implements XACML3Constants {
+public class XACML3Utils  {
     /**
      * Define our Static resource Bundle for our debugger.
      */
@@ -118,7 +118,7 @@ public class XACML3Utils implements XACML3Constants {
             return null;
         }
 
-        int index = uri.indexOf(NAME_META_ALIAS_IN_URI);
+        int index = uri.indexOf(XACML3Constants.NAME_META_ALIAS_IN_URI);
         if (index == -1 || index + 9 == uri.length()) {
             return null;
         }

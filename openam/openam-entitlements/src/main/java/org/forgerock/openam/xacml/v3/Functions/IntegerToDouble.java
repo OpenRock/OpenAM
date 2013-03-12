@@ -37,6 +37,7 @@ the result SHALL be Indeterminate, with the status code “urn:oasis:names:tc:xa
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 public class IntegerToDouble extends XACMLFunction {
 

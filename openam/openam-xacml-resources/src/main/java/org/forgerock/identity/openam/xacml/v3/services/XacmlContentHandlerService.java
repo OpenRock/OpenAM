@@ -124,7 +124,7 @@ import java.util.logging.Level;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlContentHandlerService extends HttpServlet implements XACML3Constants {
+public class XacmlContentHandlerService extends HttpServlet  {
     private static String LOG_PROVIDER = "amXACML";
     /**
      * Initialize our Resource Bundle.
@@ -243,8 +243,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                     SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             // Create Streams for every applicable schema.
             InputStream xmlCoreSchemaResourceContentStream = XACML3Utils.getResourceContentStream
-                    (xmlCoreSchemaResourceName);
-            InputStream resourceContentStream = XACML3Utils.getResourceContentStream(xacmlCoreSchemaResourceName);
+                    (XACML3Constants.xmlCoreSchemaResourceName);
+            InputStream resourceContentStream = XACML3Utils.getResourceContentStream(XACML3Constants.xacmlCoreSchemaResourceName);
             // Create the schema object from our Input Source Streams.
             if ((xmlCoreSchemaResourceContentStream != null) && (resourceContentStream != null)) {
                 xacmlSchema = constraintFactory.newSchema(new StreamSource[]{new StreamSource
@@ -261,7 +261,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Ensure we are ok and have necessary assets to run.
         if (xacmlSchema != null) {
             debug.error("Initialization of XACML Content Resource Router, Server Information: " + servletCtx.getServerInfo());
-            debug.error("XACML v3 Schema Version: "+XACML3_NAMESPACE);
+            debug.error("XACML v3 Schema Version: "+ XACML3Constants.XACML3_NAMESPACE);
         }
         // ***************************************************
         // Initialize our Authentication Digest Thread.
@@ -531,8 +531,8 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
     private String generateAuthenticateHeader(String realm) {
         StringBuilder header = new StringBuilder();
         header.append("Digest realm=\"").append(realm).append("\",");
-        if (!StringUtils.isBlank(AUTHENTICATION_METHOD)) {
-            header.append("qop=\"").append(AUTHENTICATION_METHOD).append("\",");
+        if (!StringUtils.isBlank(XACML3Constants.AUTHENTICATION_METHOD)) {
+            header.append("qop=\"").append(XACML3Constants.AUTHENTICATION_METHOD).append("\",");
         }
         header.append("algorithm=\"").append("md5").append("\",");
         header.append("nonce=\"").append(nonce).append("\",");
@@ -607,9 +607,9 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Obtain Each Value for Authentication
         // of the Digest.
         String method = request.getMethod();
-        String credential = headerValues.get(USERNAME);
+        String credential = headerValues.get(XACML3Constants.USERNAME);
         if ( (credential == null)||(credential.isEmpty()) ) {
-            debug.error(classMethod+"Unable to obtain the PEP's Credentials: No '"+USERNAME+"' Header Value " +
+            debug.error(classMethod+"Unable to obtain the PEP's Credentials: No '"+XACML3Constants.USERNAME+"' Header Value " +
                     "Supplied by Client.");
             return null;
         }
@@ -743,7 +743,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         XACMLRequestInformation xacmlRequestInformation = this.parseRequestInformation(requestContentType, request);
         if (xacmlRequestInformation == null) {
             // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
+            this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
             return;
         }
         // ******************************************************************
@@ -771,7 +771,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
         // Did we receive a valid WWW Authentication header using Digest?
         //
         if ((xacmlRequestInformation.getAuthenticationHeader() != null) &&
-            (xacmlRequestInformation.getAuthenticationHeader().startsWith(DIGEST))) {
+            (xacmlRequestInformation.getAuthenticationHeader().startsWith(XACML3Constants.DIGEST))) {
                 AuthenticationDigest authenticationDigestResponse =
                     authenticateUsingDigest(xacmlRequestInformation.getAuthenticationHeader(),
                             xacmlRequestInformation.getOriginalContent(), request, xacmlRequestInformation.getRealm());
@@ -780,7 +780,7 @@ public class XacmlContentHandlerService extends HttpServlet implements XACML3Con
                 if (authenticationDigestResponse == null) {
                     // Not Authenticated.
                     // This Starts the Authorization via Digest Flow...
-                    this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
+                    this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
                     return;
                 } else {
                     // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
@@ -822,7 +822,7 @@ IS_AUTHENTICATED:
             // ******************************************************************
             // Not Authenticated nor Authorized.
             // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(XACML3_PDP_DEFAULT_REALM, requestContentType, response);
+            this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
             return;
         }
 
@@ -961,7 +961,7 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
                 XACML3Utils.getMetaAliasByUri(requestURI);
         String realm = XACML3Utils.getRealmByMetaAlias(queryMetaAlias);
         if ( (realm == null) || (realm.isEmpty()) ) {
-            realm = XACML3_PDP_DEFAULT_REALM;
+            realm = XACML3Constants.XACML3_PDP_DEFAULT_REALM;
         }
 
         // Attempt to get the PDP Entity ID...
@@ -1101,7 +1101,7 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
      */
     private void renderUnAuthorized(final String realm, final ContentType requestContentType,
                                     HttpServletResponse response) {
-        response.addHeader(WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader(realm));
+        response.addHeader(XACML3Constants.WWW_AUTHENTICATE_HEADER, this.generateAuthenticateHeader(realm));
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401
         renderResponse(requestContentType, null, response);
     }

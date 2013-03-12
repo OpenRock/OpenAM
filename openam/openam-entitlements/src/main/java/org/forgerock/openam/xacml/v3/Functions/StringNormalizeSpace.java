@@ -35,6 +35,7 @@ The whitespace characters are defined in the metasymbol S (Production 3) of [XML
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 public class StringNormalizeSpace extends XACMLFunction {
 

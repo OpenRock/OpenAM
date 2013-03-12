@@ -28,9 +28,6 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.xacml3.core.*;
-import org.forgerock.openam.xacml.v3.Functions.XACMLFunction;
-import com.sun.identity.entitlement.xacml3.core.ObligationExpression;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -33,10 +33,7 @@ The evaluation SHALL stop with a result of "True" if any argument evaluates to "
 leaving the rest of the arguments unevaluated.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.IndeterminateException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 public class Or extends XACMLFunction {
 

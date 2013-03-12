@@ -36,13 +36,9 @@ Note that the lexical representation of each argument
 MUST be converted to a value expressed in fractional seconds [XF] Section 10.3.2.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import java.util.Calendar;
-import java.util.Date;
 
 // TODO : Needs to be addressed per comparison @ fractional Seconds...
 

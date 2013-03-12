@@ -51,6 +51,7 @@ re-order the Attribute ValuePairs in that RDN in ascending order when compared a
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 // TODO : Needs to be addressed per comparison to recognize all of the above Requirements...
 

@@ -46,7 +46,7 @@ import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPDPResource extends XACML3Constants {
+public interface XacmlPDPResource  {
 
     /**
      * Provide a PDP Evaluation Method to return a XACML 3 Response Object.

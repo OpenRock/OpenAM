@@ -46,7 +46,7 @@ import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
  * @author Jeff.Schenk@forgerock.com
  */
 
-public class POJOToXmlUtility implements XACML3Constants {
+public class POJOToXmlUtility  {
 
     /**
      * POJO to XML String Data Object.
@@ -63,7 +63,7 @@ public class POJOToXmlUtility implements XACML3Constants {
         // **********************************************
         // Transform/Marshal/Serialize Request Object to
         // XML Object.
-        stringBuilder.append(XML_HEADER);
+        stringBuilder.append(XACML3Constants.XML_HEADER);
         stringBuilder.append(response.toXML());
         // Return -- Marshaled Response Object to send over the wire.
         return stringBuilder.toString();

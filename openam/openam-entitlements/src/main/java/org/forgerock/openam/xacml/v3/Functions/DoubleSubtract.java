@@ -39,6 +39,7 @@ In the case of the divide functions, if the divisor is zero, then the function S
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 public class DoubleSubtract extends XACMLFunction {
 

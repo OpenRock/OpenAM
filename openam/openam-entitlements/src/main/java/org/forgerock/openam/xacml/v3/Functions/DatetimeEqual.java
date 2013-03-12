@@ -33,10 +33,7 @@ This function SHALL take two arguments of data-type
 It SHALL perform its evaluation according to the “op:dateTime-equal” function [XF] Section 10.4.6.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import java.util.Date;
 

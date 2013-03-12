@@ -47,7 +47,7 @@ import java.io.IOException;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPingResource implements XACML3Constants {
+public class XacmlPingResource  {
     /**
      * Define our Static resource Bundle for our debugger.
      */
@@ -92,7 +92,7 @@ public class XacmlPingResource implements XACML3Constants {
     public static String getXMLPingDocument(XACMLRequestInformation xacmlRequestInformation) {
         StringBuilder sb = new StringBuilder();
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
-        sb.append(XML_HEADER);
+        sb.append(XACML3Constants.XML_HEADER);
         // TODO...
         return sb.toString();
     }

@@ -34,6 +34,7 @@ For doubles they SHALL comply with the rules governed by IEEE 754 [IEEE754].
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 public class DoubleLessThanOrEqual extends XACMLFunction {
 

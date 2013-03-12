@@ -41,7 +41,7 @@ import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public interface XacmlPIPResource extends XACML3Constants {
+public interface XacmlPIPResource  {
 
 
 }

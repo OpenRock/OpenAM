@@ -39,7 +39,7 @@ import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPEPResource implements XACML3Constants {
+public class XacmlPEPResource  {
     /**
      * Define our Static resource Bundle for our debugger.
      */

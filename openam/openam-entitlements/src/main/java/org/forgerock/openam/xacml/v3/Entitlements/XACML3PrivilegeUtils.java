@@ -31,7 +31,6 @@ import com.sun.identity.entitlement.xacml3.core.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 
 import com.sun.identity.entitlement.xacml3.core.AllOf;
@@ -39,7 +38,6 @@ import com.sun.identity.entitlement.xacml3.core.AnyOf;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.forgerock.openam.xacml.v3.Functions.*;
 
 /**
  * Class with utility methods to map from

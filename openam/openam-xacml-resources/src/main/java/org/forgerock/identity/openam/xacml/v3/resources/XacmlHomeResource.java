@@ -46,7 +46,7 @@ import java.io.IOException;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlHomeResource implements XACML3Constants {
+public class XacmlHomeResource  {
     /**
      * Define our Static resource Bundle for our debugger.
      */
@@ -90,11 +90,11 @@ public class XacmlHomeResource implements XACML3Constants {
     public static String getXMLHomeDocument(XACMLRequestInformation xacmlRequestInformation) {
         StringBuilder sb = new StringBuilder();
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
-        sb.append(XML_HEADER);
+        sb.append(XACML3Constants.XML_HEADER);
         sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
         sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
         sb.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
-        sb.append("<atom:link href=\042"+PDP_AUTHORIZATION_ENDPOINT+"\042/>");
+        sb.append("<atom:link href=\042"+XACML3Constants.PDP_AUTHORIZATION_ENDPOINT+"\042/>");
         sb.append("</resource>");
         sb.append("</resources>");
         return sb.toString();
@@ -112,7 +112,7 @@ public class XacmlHomeResource implements XACML3Constants {
         JSONArray resourceArray = new JSONArray();
 
         JSONObject resource_1 = new JSONObject();
-        resource_1.append("href", PDP_AUTHORIZATION_ENDPOINT);
+        resource_1.append("href", XACML3Constants.PDP_AUTHORIZATION_ENDPOINT);
         JSONObject resource_1A = new JSONObject();
         resource_1A.append(xacmlRequestInformation.getXacmlHome(), resource_1);
 

@@ -37,10 +37,7 @@ This function SHALL take two arguments of data-type
 	sequence SHALL be as specified in [XS] Section 3.2.15.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import java.util.Arrays;
 

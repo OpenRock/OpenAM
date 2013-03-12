@@ -177,14 +177,8 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
             FunctionArgument functionArgument = this.resourceResolutionMap.get(key);
             sb.append("Category: "+key.getCategory()+", Attribute Id: "+key.getAttributeId()+", " +
                     "Included In Result: "+key.isIncludeInResult()+"\n");
-            sb.append("    Type: "+functionArgument.getType()+", Value: ");
-            try {
-                Object value = functionArgument.getValue(null);
-                sb.append(value.toString());
-            } catch(XACML3EntitlementException xee) {
-                sb.append("** "+xee.getMessage()+" **");
-            }
-                sb.append("\n");
+            sb.append("    Type: "+functionArgument.getType()+", Value: "+functionArgument.toString());
+            sb.append("\n");
         }
         // return String representation of our Internal Map Object.
         return sb.toString();

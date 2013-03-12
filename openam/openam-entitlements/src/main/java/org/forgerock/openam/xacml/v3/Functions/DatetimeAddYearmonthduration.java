@@ -38,6 +38,7 @@ according to the specification of adding durations to date and time [XS] Appendi
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 public class DatetimeAddYearmonthduration extends XACMLFunction {
 

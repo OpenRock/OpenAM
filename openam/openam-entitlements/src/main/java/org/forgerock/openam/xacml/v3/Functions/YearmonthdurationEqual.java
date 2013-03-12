@@ -35,13 +35,9 @@ This function SHALL take two arguments of data-type
  [XF] Section 10.3.2.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3PrivilegeUtils;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-equal

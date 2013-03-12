@@ -58,7 +58,7 @@ import java.util.Set;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPDPResourceImpl implements XacmlPDPResource, XACML3Constants {
+public class XacmlPDPResourceImpl implements XacmlPDPResource {
     /**
      * Define our Static resource Bundle for our debugger.
      */

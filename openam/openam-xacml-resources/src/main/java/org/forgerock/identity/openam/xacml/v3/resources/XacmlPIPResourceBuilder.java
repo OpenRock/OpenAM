@@ -46,7 +46,7 @@ import java.util.Map;
  *
  * @author Jeff.Schenk@forgerock.com
  */
-public class XacmlPIPResourceBuilder implements XACML3Constants {
+public class XacmlPIPResourceBuilder  {
 
     private static Debug debug = Debug.getInstance("amXACML");
     private static String className = XacmlPIPResourceBuilder.class.getSimpleName();
@@ -115,22 +115,22 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                 // TODO : When we go Java 7 or above use a String Switch here...
 
                 // Start Checking for SOAP Envelop, Body or XACMLAuthzDecisionQuery, Request.
-                if (key.toLowerCase().contains(SOAP_ENVELOPE.toLowerCase())) {
+                if (key.toLowerCase().contains(XACML3Constants.SOAP_ENVELOPE.toLowerCase())) {
                     xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
                     // Recursively access Inner or Embedded Contents...
                     buildXacmlPIPResourceForRequests(xacmlRequestInformation, contentMap.get(key), key);
-                } else if (key.toLowerCase().contains(SOAP_HEADER.toLowerCase())) {
+                } else if (key.toLowerCase().contains(XACML3Constants.SOAP_HEADER.toLowerCase())) {
                     // Nothing interesting in the SOAP Header, ignore...
                     xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
                     continue;
-                } else if (key.toLowerCase().contains(SOAP_BODY.toLowerCase())) {
+                } else if (key.toLowerCase().contains(XACML3Constants.SOAP_BODY.toLowerCase())) {
                     xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
                     // Recursively access Inner or Embedded Contents...
                     buildXacmlPIPResourceForRequests(xacmlRequestInformation, contentMap.get(key), key);
-                } else if (key.toLowerCase().contains(XACML_AUTHZ_QUERY.toLowerCase())) {
+                } else if (key.toLowerCase().contains(XACML3Constants.XACML_AUTHZ_QUERY.toLowerCase())) {
                     // Recursively access Inner or Embedded Contents...
                     buildXacmlPIPResourceForRequests(xacmlRequestInformation, contentMap.get(key), key);
-                } else if (key.toLowerCase().contains(REQUEST.toLowerCase())) {
+                } else if (key.toLowerCase().contains(XACML3Constants.REQUEST.toLowerCase())) {
                     // Get the Request Immediate Attributes.
                     if (!(contentMap.get(key) instanceof Map)) {
                         debug.error("Request does not contain a Map Object, improperly parsed Object, " +
@@ -159,34 +159,34 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                             // Cast our Object.
                             String attributeName = (String) requestAttributes;
                             // Determine our attribute name context.
-                            if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_COMBINED_DECISION)) {
+                            if (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_COMBINED_DECISION)) {
                                 xacmlRequestInformation.setRequest_CombinedDecision(
                                         ((Boolean) requestMap.get(requestAttributes)).booleanValue());
-                            } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_RETURN_POLICY_ID_LIST)) {
+                            } else if (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_RETURN_POLICY_ID_LIST)) {
                                 xacmlRequestInformation.setRequest_ReturnPolicyIdList(
                                         ((Boolean) requestMap.get(requestAttributes)).booleanValue());
-                            } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_XMLNS)) {
+                            } else if (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_XMLNS)) {
                                 xacmlRequestInformation.setRequest_NameSpace((String) requestMap.get(requestAttributes));
-                            } else if (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_MULTIREQUESTS)) {
+                            } else if (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_MULTIREQUESTS)) {
                                 // Process our Multiple Requests for this Request...
                                 xacmlRequestInformation.setRequestWithMultiRequestsPresent(true);
                                 // Currently we do not support Multiple Nested Requests, set indicator for Handler
                                 // to immediately send an Indeterminate Response.
-                            } else if (removeNamespace(attributeName).equalsIgnoreCase(ATTRIBUTES)) {
+                            } else if (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.ATTRIBUTES)) {
                                     // Process our Attributes for this Request...
                                     processAttributes(xacmlRequestInformation, null, requestMap.get(attributeName));
                             } else if (
                                     (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) &&
-                                            ((removeNamespace(attributeName).equalsIgnoreCase(REQUEST_ENVIRONMENT)) ||
-                                                    (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_RESOURCE)) ||
-                                                    (removeNamespace(attributeName).equalsIgnoreCase(REQUEST_SUBJECT)))) {
+                                            ((removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_ENVIRONMENT)) ||
+                                                    (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_RESOURCE)) ||
+                                                    (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_SUBJECT)))) {
                                 // Process these Attributes as Outer Objects.
                                 Map<String, Object> innerMap = (Map<String, Object>) requestMap.get(attributeName);
                                 String innerCategory = null;
                                 for (String innerKey : innerMap.keySet()) {
-                                    if (innerKey.equalsIgnoreCase(ATTRIBUTE_CATEGORY)) {
+                                    if (innerKey.equalsIgnoreCase(XACML3Constants.ATTRIBUTE_CATEGORY)) {
                                         innerCategory = (String) innerMap.get(innerKey);
-                                    } else if ((innerKey.equalsIgnoreCase(ATTRIBUTE)) &&
+                                    } else if ((innerKey.equalsIgnoreCase(XACML3Constants.ATTRIBUTE)) &&
                                             (innerMap.get(innerKey) instanceof List)) {
                                         processAttributes(xacmlRequestInformation,
                                                 innerCategory, innerMap.get(innerKey));
@@ -212,28 +212,28 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                 contentMap.get(key), key);
                     } else {
                         // XACMLAuthzDecisionQuery Node Attributes
-                        if (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(XACML_AUTHZ_QUERY)) {
-                            if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_ID)) {
+                        if (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(XACML3Constants.XACML_AUTHZ_QUERY)) {
+                            if (key.equalsIgnoreCase(XACML3Constants.XACML_AUTHZ_QUERY_ID)) {
                                 xacmlRequestInformation.getXacmlAuthzDecisionQuery().setId(
                                         (String) contentMap.get(key));
-                            } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_VERSION)) {
+                            } else if (key.equalsIgnoreCase(XACML3Constants.XACML_AUTHZ_QUERY_VERSION)) {
                                 xacmlRequestInformation.getXacmlAuthzDecisionQuery().setVersion(
                                         (Integer) contentMap.get(key));
-                            } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_ISSUE_INSTANT)) {
+                            } else if (key.equalsIgnoreCase(XACML3Constants.XACML_AUTHZ_QUERY_ISSUE_INSTANT)) {
                                 xacmlRequestInformation.getXacmlAuthzDecisionQuery().setIssueInstant(
                                         (String) contentMap.get(key));
-                            } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_DESTINATION_NAME)) {
+                            } else if (key.equalsIgnoreCase(XACML3Constants.XACML_AUTHZ_QUERY_DESTINATION_NAME)) {
                                 xacmlRequestInformation.getXacmlAuthzDecisionQuery().setDestination(
                                         (String) contentMap.get(key));
-                            } else if (key.equalsIgnoreCase(XACML_AUTHZ_QUERY_CONSTENT_NAME)) {
+                            } else if (key.equalsIgnoreCase(XACML3Constants.XACML_AUTHZ_QUERY_CONSTENT_NAME)) {
                                 xacmlRequestInformation.getXacmlAuthzDecisionQuery().setConsent(
                                         (String) contentMap.get(key));
                             }
 
                             // SOAP Node Attributes
-                        } else if ((removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_ENVELOPE)) ||
-                                (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_HEADER)) ||
-                                (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(SOAP_BODY))) {
+                        } else if ((removeNamespace(currentEmbeddedKey).equalsIgnoreCase(XACML3Constants.SOAP_ENVELOPE)) ||
+                                (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(XACML3Constants.SOAP_HEADER)) ||
+                                (removeNamespace(currentEmbeddedKey).equalsIgnoreCase(XACML3Constants.SOAP_BODY))) {
                             xacmlRequestInformation.setSoapEnvelopeNodePresent(true);
                             // Nothing else we need at this point!
                         } else {
@@ -290,22 +290,22 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                         }
 
                         // Check the Attribute Element Names...
-                        if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_CATEGORY)) {
+                        if (removeNamespace(attributeKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE_CATEGORY)) {
                             currentCategory = new String((String) attributeMap.get(attributeKey));
                             continue;
-                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_INCLUDE_IN_RESULT)) {
+                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE_INCLUDE_IN_RESULT)) {
                             includeInResult = ((Boolean) attributeMap.get(attributeKey)).booleanValue();
                             continue;
-                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_ID)) {
+                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE_ID)) {
                             attributeId = (String) attributeMap.get(attributeKey);
                             continue;
-                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE_VALUE)) {
+                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE_VALUE)) {
                             if (attributeMap.get(attributeKey) instanceof Map) {
                                 Map<String, Object> valueMap = (Map<String, Object>) attributeMap.get(attributeKey);
                                 for (String valueKey : valueMap.keySet()) {
-                                    if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE)) {
+                                    if (removeNamespace(valueKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE_VALUE_DATATYPE)) {
                                         dataType = (String) valueMap.get(valueKey);
-                                    } else if (removeNamespace(valueKey).equalsIgnoreCase(ATTRIBUTE_VALUE_CONTENT)) {
+                                    } else if (removeNamespace(valueKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE_VALUE_CONTENT)) {
                                         attributeValue = valueMap.get(valueKey);
                                     } else {
                                         // Show any stragglers, if applicable.
@@ -322,7 +322,7 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                         ", should be a Map Object, Ignoring.");
                                 continue;
                             }
-                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(ATTRIBUTE)) {
+                        } else if (removeNamespace(attributeKey).equalsIgnoreCase(XACML3Constants.ATTRIBUTE)) {
                             // Use Recursion to process our Attribute Object.
                             processAttributes(xacmlRequestInformation, currentCategory, attributeMap.get(attributeKey));
                             continue;
@@ -342,10 +342,10 @@ public class XacmlPIPResourceBuilder implements XACML3Constants {
                                 attributeValue = null;
                             }
                             // Determine the Inner Object for eventual Attribute Write to PIP.
-                            if (attributeKey.equalsIgnoreCase(ATTRIBUTE_VALUE_DATATYPE)) {
+                            if (attributeKey.equalsIgnoreCase(XACML3Constants.ATTRIBUTE_VALUE_DATATYPE)) {
                                 dataType = (String) attributeMap.get(attributeKey);
                                 continue;
-                            } else if (attributeKey.equalsIgnoreCase(ATTRIBUTE_VALUE_VALUE)) {
+                            } else if (attributeKey.equalsIgnoreCase(XACML3Constants.ATTRIBUTE_VALUE_VALUE)) {
                                 attributeValue = attributeMap.get(attributeKey);
                                 continue;
                             } else {

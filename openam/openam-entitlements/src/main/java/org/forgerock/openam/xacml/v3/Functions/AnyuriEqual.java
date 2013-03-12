@@ -37,6 +37,7 @@ if and only if the values of the two arguments are equal on a codepoint-by-codep
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:anyURI-equal
