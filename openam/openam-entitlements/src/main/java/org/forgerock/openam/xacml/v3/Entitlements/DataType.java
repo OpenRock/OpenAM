@@ -44,8 +44,10 @@ public class DataType {
     public static String XACMLIPADDRESS = "urn:oasis:names:tc:xacml:2.0:data-type:ipAddress";
     public static String XACMLDNSNAME = "urn:oasis:names:tc:xacml:2.0:data-type:dnsName";
     public static String XACMLXPATHEXPRESSION = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression";
+    public static String XACMLUNKNOWN = "urn:oasis:names:tc:xacml:3.0:data-type:Unknown";
 
     public static enum Type {
+    XACMLUNKNOWNTYPE         (0,XACMLUNKNOWN),
     XACMLSTRINGTYPE          (1,XACMLSTRING),
     XACMLBOOLEANTYPE         (2,XACMLBOOLEAN),
     XACMLINTEGERTYPE         (3,XACMLINTEGER),
@@ -81,6 +83,10 @@ public class DataType {
     private int typeIndex;
 
     public DataType(String name) {
+        typeIndex = 0; // Unknown XACML DataType.
+        if (name==null) {
+            return;
+        }
         for (Type s : Type.values()) {
             if (name.equals(s.getTypeName())) {
                 typeIndex = s.getIndex();

@@ -125,7 +125,7 @@ public abstract class FunctionArgument  {
     }
 
     private boolean isType(DataType.Type t)  {
-        return (dataType.getIndex() != t.getIndex());
+        return (dataType.getIndex() == t.getIndex());
     }
 
     public abstract FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException;
