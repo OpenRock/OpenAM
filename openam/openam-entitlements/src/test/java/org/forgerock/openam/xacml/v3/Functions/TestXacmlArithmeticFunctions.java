@@ -82,22 +82,6 @@ public class TestXacmlArithmeticFunctions {
     @Test
     public void testInteger_Subtract() {
 
-        booleanEqual = new BooleanEqual();
-        // Place Objects in Argument stack for comparison.
-        booleanEqual.addArgument(falseObject);
-        booleanEqual.addArgument(falseObject);
-        result = booleanEqual.evaluate(null);
-        assertNotNull(result);
-        assertTrue(result.isTrue());
-
-        booleanEqual = new BooleanEqual();
-        // Place Objects in Argument stack for comparison.
-        booleanEqual.addArgument(trueObject);
-        booleanEqual.addArgument(trueObject);
-        result = booleanEqual.evaluate(null);
-        assertNotNull(result);
-        assertTrue(result.isTrue());
-
     }
 
     /**

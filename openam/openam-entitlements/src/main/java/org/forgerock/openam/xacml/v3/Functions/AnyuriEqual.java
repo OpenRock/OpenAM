@@ -52,11 +52,11 @@ public class AnyuriEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        if ( (getArg(0).getValue(pip)==null) || (getArg(1).getValue(pip)==null ) )  {
+        if ( (getArg(0).asAnyURI(pip)==null) || (getArg(1).asAnyURI(pip)==null ) )  {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
-        if ( s.equalsIgnoreCase((String) getArg(1).getValue(pip))) {
+        String s = getArg(0).asAnyURI(pip);
+        if ( s.equals(getArg(1).asAnyURI(pip)) ) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

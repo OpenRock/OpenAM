@@ -32,7 +32,6 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.tools.tree.NewArrayExpression;
 
 import javax.print.attribute.standard.DateTimeAtCompleted;
 import java.util.Date;
@@ -96,7 +95,7 @@ public abstract class FunctionArgument  {
         this.dataType = new DataType(jo.optString("dataType"));
         this.issuer = jo.optString("issuer");
         return;
-    };
+    }
 
     public static FunctionArgument getInstance(JSONObject jo) {
         String className = jo.optString("className");
@@ -123,7 +122,7 @@ public abstract class FunctionArgument  {
     */
     public String toXML(String type) {
         return "";
-    };
+    }
 
     private boolean isType(DataType.Type t)  {
         return (dataType.getIndex() != t.getIndex());
@@ -137,19 +136,19 @@ public abstract class FunctionArgument  {
             throw new IndeterminateException("type conflict");
         }
         return (String) getValue(pip);
-    };
+    }
     public Boolean asBoolean(XACMLEvalContext pip) throws XACML3EntitlementException {
         if (!isType(DataType.Type.XACMLBOOLEANTYPE)) {
             throw new IndeterminateException("type conflict");
         }
         return (Boolean) getValue(pip);
-    };
+    }
     public Integer asInteger(XACMLEvalContext pip) throws XACML3EntitlementException {
         if (!isType(DataType.Type.XACMLINTEGERTYPE)) {
             throw new IndeterminateException("type conflict");
         }
         return (Integer) getValue(pip);
-    };
+    }
     public Double asDouble(XACMLEvalContext pip) throws XACML3EntitlementException {
         if (!isType(DataType.Type.XACMLDOUBLETYPE)) {
             throw new IndeterminateException("type conflict");
@@ -167,7 +166,7 @@ public abstract class FunctionArgument  {
             throw new IndeterminateException("type conflict");
         }
         return (Date) getValue(pip);
-    };
+    }
     public Date asDateTime(XACMLEvalContext pip) throws XACML3EntitlementException {
         if (!isType(DataType.Type.XACMLDATETIMETYPE)) {
             throw new IndeterminateException("type conflict");

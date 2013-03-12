@@ -29,10 +29,11 @@ import org.forgerock.openam.xacml.v3.Entitlements.DataType;
 import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import sun.tools.tree.NewArrayExpression;
 
 import static org.testng.Assert.*;
 
@@ -59,13 +60,13 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testAnyuriEqual() {
+    public void testAnyuriEqual() throws XACML3EntitlementException {
         FunctionArgument anyuri1 = new DataValue(DataType.XACMLANYURI, "/openam/xacml");
         FunctionArgument anyuri2 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
         FunctionArgument anyuri3 = new DataValue(DataType.XACMLANYURI, "/");
         FunctionArgument anyuri4 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
 
-        StringEqual anyuriEqual = new StringEqual();
+        AnyuriEqual anyuriEqual = new AnyuriEqual();
         // Place Objects in Argument stack for comparison.
         anyuriEqual.addArgument(anyuri1);
         anyuriEqual.addArgument(anyuri2);
@@ -73,7 +74,7 @@ public class TestXacmlEqualityPredicateFunctions {
         assertNotNull(result);
         assertTrue(result.isFalse());
 
-        anyuriEqual = new StringEqual();
+        anyuriEqual = new AnyuriEqual();
         // Place Objects in Argument stack for comparison.
         anyuriEqual.addArgument(anyuri1);
         anyuriEqual.addArgument(anyuri3);
@@ -81,7 +82,7 @@ public class TestXacmlEqualityPredicateFunctions {
         assertNotNull(result);
         assertTrue(result.isFalse());
 
-        anyuriEqual = new StringEqual();
+        anyuriEqual = new AnyuriEqual();
         // Place Objects in Argument stack for comparison.
         anyuriEqual.addArgument(anyuri2);
         anyuriEqual.addArgument(anyuri4);
@@ -92,7 +93,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testBase64BinaryEqual() {
+    public void testBase64BinaryEqual() throws XACML3EntitlementException {
 
         // base64data1 and base64data2 contained the Base 64 encoding of:
         // ForgeRock - OpenAM XACML says Hello!
@@ -135,7 +136,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testBooleanEqual() {
+    public void testBooleanEqual() throws XACML3EntitlementException {
         BooleanEqual booleanEqual = new BooleanEqual();
         // Place Objects in Argument stack for comparison.
         booleanEqual.addArgument(trueObject);
@@ -163,7 +164,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testDateEqual() {
+    public void testDateEqual() throws XACML3EntitlementException {
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATE, "2013-03-11:01:45:30.1267");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATE, "2013-03-11:01:45:30.126");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATE, "2013-03-11:01:45:30.1267");
@@ -196,7 +197,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testDatetimeEqual() {
+    public void testDatetimeEqual() throws XACML3EntitlementException {
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.127");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
@@ -229,7 +230,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testDaytimedurationEqual() {
+    public void testDaytimedurationEqual() throws XACML3EntitlementException {
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.124");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
@@ -262,7 +263,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testDoubleEqual() {
+    public void testDoubleEqual() throws XACML3EntitlementException {
         FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, "2111111111111111111290876");
         FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, "456789");
         FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, "2111111111111111111290876");
@@ -294,7 +295,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testHexbinaryEqual() {
+    public void testHexbinaryEqual() throws XACML3EntitlementException {
         FunctionArgument hexdata1 = new DataValue(DataType.XACMLHEXBINARY, "0123456789abcdef");
         FunctionArgument hexdata2 = new DataValue(DataType.XACMLHEXBINARY, "FF");
         FunctionArgument hexdata3 = new DataValue(DataType.XACMLHEXBINARY, "0123456789ABCDEF");
@@ -335,7 +336,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testIntegerEqual() {
+    public void testIntegerEqual() throws XACML3EntitlementException {
         FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, "22");
         FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, "456789");
         FunctionArgument integer3 = new DataValue(DataType.XACMLINTEGER, "22");
@@ -367,7 +368,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testRfc822NameEqual() {
+    public void testRfc822NameEqual() throws XACML3EntitlementException {
         FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLX500NAME,
                 "joe@example.org");
         FunctionArgument rfc822Name2 = new DataValue(DataType.XACMLX500NAME,
@@ -404,7 +405,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testStringEqual() {
+    public void testStringEqual() throws XACML3EntitlementException {
         FunctionArgument string1 = new DataValue(DataType.XACMLSTRING, "Hello World!");
         FunctionArgument string2 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
         FunctionArgument string3 = new DataValue(DataType.XACMLSTRING, "Hello");
@@ -437,7 +438,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testStringEqualIgnoreCase() {
+    public void testStringEqualIgnoreCase() throws XACML3EntitlementException {
         FunctionArgument string1 = new DataValue(DataType.XACMLSTRING, "Hello World!");
         FunctionArgument string2 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
         FunctionArgument string3 = new DataValue(DataType.XACMLSTRING, "Hello World");
@@ -470,7 +471,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testTimeEqual() {
+    public void testTimeEqual() throws XACML3EntitlementException {
         FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, "01:45:30.126");
         FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, "02:45:30.126");
         FunctionArgument timeObject3 = new DataValue(DataType.XACMLTIME, "01:45:30.126");
@@ -502,7 +503,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testX500NameEqual() {
+    public void testX500NameEqual() throws XACML3EntitlementException {
         FunctionArgument x500Name1 = new DataValue(DataType.XACMLX500NAME,
                 "/c=us/o=ForgeRock/ou=Components/cn=OpenAM");
         FunctionArgument x500Name2 = new DataValue(DataType.XACMLX500NAME,
@@ -539,7 +540,7 @@ public class TestXacmlEqualityPredicateFunctions {
     }
 
     @Test
-    public void testYearmonthdurationEqual() {
+    public void testYearmonthdurationEqual() throws XACML3EntitlementException {
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, "1984-03");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, "2016-03");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, "2013-03");

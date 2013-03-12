@@ -27,6 +27,7 @@ package org.forgerock.identity.openam.xacml.v3.resources;
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -50,7 +51,7 @@ public class TestXacmlPIPResourceResolverFunctionArgumentImpl {
     }
 
     @Test
-    public void testUseCase_ResolverManipulation() {
+    public void testUseCase_ResolverManipulation() throws XACML3EntitlementException {
 
         // Test Constructors.
         XacmlPIPResourceResolverFunctionArgumentImpl resolver =

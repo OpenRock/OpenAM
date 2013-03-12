@@ -31,6 +31,7 @@ import com.sun.identity.entitlement.xacml3.core.Result;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EvalContextInterface;
 
 import java.util.*;
@@ -176,8 +177,14 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
             FunctionArgument functionArgument = this.resourceResolutionMap.get(key);
             sb.append("Category: "+key.getCategory()+", Attribute Id: "+key.getAttributeId()+", " +
                     "Included In Result: "+key.isIncludeInResult()+"\n");
-            sb.append("    Type: "+functionArgument.getType()+", Value: "+functionArgument.getValue(null));
-            sb.append("\n");
+            sb.append("    Type: "+functionArgument.getType()+", Value: ");
+            try {
+                Object value = functionArgument.getValue(null);
+                sb.append(value.toString());
+            } catch(XACML3EntitlementException xee) {
+                sb.append("** "+xee.getMessage()+" **");
+            }
+                sb.append("\n");
         }
         // return String representation of our Internal Map Object.
         return sb.toString();
