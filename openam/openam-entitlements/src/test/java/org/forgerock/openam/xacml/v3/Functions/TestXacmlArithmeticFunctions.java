@@ -258,8 +258,46 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Divide() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 6);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
+        IntegerDivide integerDivide = new IntegerDivide();
+        // Place Objects in Argument stack for deduction.
+        integerDivide.addArgument(int1);
+        integerDivide.addArgument(int2);
+        FunctionArgument result = integerDivide.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 11);
+
+        integerDivide = new IntegerDivide();
+        // Place Objects in Argument stack for deduction.
+        integerDivide.addArgument(int3);
+        integerDivide.addArgument(int4);
+        result = integerDivide.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 3);
     }
+
+    /**
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-divide
+     * The result is the first argument divided by the second argument.
+     */
+    @Test(expectedExceptions = XACML3EntitlementException.class)
+    public void testInteger_Divide_Divisor_Zero() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 0);
+
+        IntegerDivide integerDivide = new IntegerDivide();
+        // Place Objects in Argument stack for deduction.
+        integerDivide.addArgument(int1);
+        integerDivide.addArgument(int2);
+        integerDivide.evaluate(null);
+        // Should never hit this code point...
+        assertTrue(false);
+    }
+
 
     /**
      *
@@ -268,7 +306,26 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Divide() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLDOUBLE, 66D);
+        FunctionArgument int2 = new DataValue(DataType.XACMLDOUBLE, 6D);
+        FunctionArgument int3 = new DataValue(DataType.XACMLDOUBLE, 6D);
+        FunctionArgument int4 = new DataValue(DataType.XACMLDOUBLE, 2D);
 
+        DoubleDivide integerDivide = new DoubleDivide();
+        // Place Objects in Argument stack for deduction.
+        integerDivide.addArgument(int1);
+        integerDivide.addArgument(int2);
+        FunctionArgument result = integerDivide.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), 11D);
+
+        integerDivide = new DoubleDivide();
+        // Place Objects in Argument stack for deduction.
+        integerDivide.addArgument(int3);
+        integerDivide.addArgument(int4);
+        result = integerDivide.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), 3D);
     }
 
     /**

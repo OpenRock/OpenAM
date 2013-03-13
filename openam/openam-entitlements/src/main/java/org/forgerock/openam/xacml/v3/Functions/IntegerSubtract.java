@@ -51,7 +51,7 @@ public class IntegerSubtract extends XACMLFunction {
         FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0);
         if ( getArgCount() != 2) {
             throw new XACML3EntitlementException("Function Requires 2 arguments, " +
-                    "only "+getArgCount()+" in stack.");
+                    "however "+getArgCount()+" in stack.");
         }
         Integer arg0 = getArg(0).asInteger(pip);
         Integer arg1 = getArg(1).asInteger(pip);
