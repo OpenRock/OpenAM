@@ -32,16 +32,22 @@ and SHALL normalize the value by stripping off all leading and trailing white sp
 The whitespace characters are defined in the metasymbol S (Production 3) of [XML].
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:string-normalize-space
+ */
 public class StringNormalizeSpace extends XACMLFunction {
 
     public StringNormalizeSpace()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if (getArgCount() != 1) {
+            throw new XACML3EntitlementException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        FunctionArgument retVal = new DataValue(DataType.XACMLSTRING,getArg(0).asString(pip).trim());
+        // return the Value.
+        return retVal;
     }
 }

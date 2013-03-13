@@ -33,16 +33,23 @@ Case mapping shall be done as specified for the fn:lower-case function in [XF]
 with no tailoring for particular languages or environments.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:string-normalize-to-lower-case
+ */
 public class StringNormalizeToLowerCase extends XACMLFunction {
 
     public StringNormalizeToLowerCase()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if (getArgCount() != 1) {
+            throw new XACML3EntitlementException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        FunctionArgument retVal = new DataValue(DataType.XACMLSTRING,getArg(0).asString(pip).toLowerCase());
+        // return the Value.
+        return retVal;
     }
 }

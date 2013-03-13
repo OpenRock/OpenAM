@@ -55,8 +55,7 @@ public class StringEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        String s = getArg(0).asString(pip);
-        if ( s.equals(getArg(1).asString(pip))) {
+        if ( getArg(0).asString(pip).equals(getArg(1).asString(pip))) {
             retVal =   FunctionArgument.trueObject;
         }
         return retVal;
