@@ -37,16 +37,26 @@ Each function evaluation operating on doubles SHALL proceed as specified by thei
  then the function SHALL evaluate to “Indeterminate”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-subtract
+ */
 public class IntegerSubtract extends XACMLFunction {
 
     public IntegerSubtract()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0);
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+        Integer arg0 = getArg(0).asInteger(pip);
+        Integer arg1 = getArg(1).asInteger(pip);
+
+        retVal = new DataValue(DataType.XACMLINTEGER, (arg0 - arg1));
+        // return the Deducted Value.
+        return retVal;
     }
 }

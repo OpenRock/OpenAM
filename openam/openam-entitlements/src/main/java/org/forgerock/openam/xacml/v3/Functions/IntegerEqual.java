@@ -50,14 +50,9 @@ public class IntegerEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
-        String s1 = (String)getArg(1).getValue(pip);
-        if ( (s==null) || (s1==null ) )  {
-            return retVal;
-        }
 
-        Integer arg0 = Integer.parseInt(s);
-        Integer arg1 = Integer.parseInt(s1);
+        Integer arg0 = getArg(0).asInteger(pip);
+        Integer arg1 = getArg(1).asInteger(pip);
 
         if (arg0.intValue() == arg1.intValue()) {
             retVal = FunctionArgument.trueObject;

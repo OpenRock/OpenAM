@@ -73,6 +73,9 @@ public abstract class XACMLFunction extends FunctionArgument {
     protected int getArgCount() {
         return arguments.size();
     }
+    protected final List<FunctionArgument> getArguments() {
+        return arguments;
+    }
 
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = super.toJSONObject();

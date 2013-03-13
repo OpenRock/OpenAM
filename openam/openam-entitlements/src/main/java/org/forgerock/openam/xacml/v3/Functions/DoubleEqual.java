@@ -51,13 +51,9 @@ public class DoubleEqual extends XACMLFunction {
         if ( getArgCount() != 2) {
             return retVal;
         }
-        String s = (String)getArg(0).getValue(pip);
-        String s1 = (String)getArg(1).getValue(pip);
-        if ( (s==null) || (s1==null ) )  {
-            return retVal;
-        }
-        Double arg0 = Double.parseDouble(s);
-        Double arg1 = Double.parseDouble(s1);
+
+        Double arg0 = getArg(0).asDouble(pip);
+        Double arg1 = getArg(1).asDouble(pip);
 
         if (arg0.doubleValue() == arg1.doubleValue()) {
             retVal = FunctionArgument.trueObject;

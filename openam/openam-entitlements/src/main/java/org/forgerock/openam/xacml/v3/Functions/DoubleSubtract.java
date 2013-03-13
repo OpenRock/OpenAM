@@ -36,16 +36,26 @@ if any argument is "Indeterminate", then the function SHALL evaluate to "Indeter
 In the case of the divide functions, if the divisor is zero, then the function SHALL evaluate to “Indeterminate”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:double-subtract
+ */
 public class DoubleSubtract extends XACMLFunction {
 
     public DoubleSubtract()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, 0D);
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+        Double arg0 = getArg(0).asDouble(pip);
+        Double arg1 = getArg(1).asDouble(pip);
+
+        retVal = new DataValue(DataType.XACMLDOUBLE, (arg0 - arg1));
+        // return the Deducted Value.
+        return retVal;
     }
 }

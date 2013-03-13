@@ -264,10 +264,10 @@ public class TestXacmlEqualityPredicateFunctions {
 
     @Test
     public void testDoubleEqual() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, "2111111111111111111290876");
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, "456789");
-        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, "2111111111111111111290876");
-        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, "2");
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 456789D);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D);
 
         DoubleEqual doubleEqual = new DoubleEqual();
         doubleEqual.addArgument(double1);
@@ -337,10 +337,10 @@ public class TestXacmlEqualityPredicateFunctions {
 
     @Test
     public void testIntegerEqual() throws XACML3EntitlementException {
-        FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, "22");
-        FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, "456789");
-        FunctionArgument integer3 = new DataValue(DataType.XACMLINTEGER, "22");
-        FunctionArgument integer4 = new DataValue(DataType.XACMLINTEGER, "0");
+        FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, 22);
+        FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, 456789);
+        FunctionArgument integer3 = new DataValue(DataType.XACMLINTEGER, 22);
+        FunctionArgument integer4 = new DataValue(DataType.XACMLINTEGER, 0);
 
         IntegerEqual integerEqual = new IntegerEqual();
         integerEqual.addArgument(integer1);

@@ -28,26 +28,24 @@ package org.forgerock.openam.xacml.v3.Functions;
 import org.forgerock.openam.xacml.v3.Entitlements.DataType;
 import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 
 /**
- * XACML Equality Predicate Functions
+ * XACML Arithmetic Functions
  *
  * Testing Functions as specified by OASIS XACML v3 Core specification.
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
 public class TestXacmlArithmeticFunctions {
-
-    static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
-    static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
-
 
     @BeforeClass
     public void before() throws Exception {
@@ -62,8 +60,48 @@ public class TestXacmlArithmeticFunctions {
      * This function MUST accept two or more arguments.
      */
     @Test
-    public void testInteger_Add() {
+    public void testInteger_Add() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 222);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 420);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
+        IntegerAdd integerAdd = new IntegerAdd();
+        // Place Objects in Argument stack for comparison.
+        integerAdd.addArgument(int1);
+        integerAdd.addArgument(int2);
+        FunctionArgument result = integerAdd.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 223);
+
+        integerAdd = new IntegerAdd();
+        // Place Objects in Argument stack for accumulation.
+        integerAdd.addArgument(int1);
+        integerAdd.addArgument(int2);
+        integerAdd.addArgument(int3);
+        integerAdd.addArgument(int4);
+        result = integerAdd.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 645);
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:integer-add
+     * This function MUST accept two or more arguments.
+     */
+    @Test(expectedExceptions = XACML3EntitlementException.class)
+    public void testInteger_Add_Exception() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1);
+        FunctionArgument bad2 = new DataValue(DataType.XACMLSTRING, "1");
+
+        IntegerAdd integerAdd = new IntegerAdd();
+        // Place Objects in Argument stack for comparison.
+        integerAdd.addArgument(int1);
+        integerAdd.addArgument(bad2);
+        FunctionArgument result = integerAdd.evaluate(null);
+        // We should never hit here....
+        assertTrue(false);
     }
 
     /**
@@ -71,8 +109,29 @@ public class TestXacmlArithmeticFunctions {
      * This function MUST accept two or more arguments.
      */
     @Test
-    public void testDouble_Add() {
+    public void testDouble_Add() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 10000000001D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000222D);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000420D);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 10000000002D);
 
+        DoubleAdd doubleAdd = new DoubleAdd();
+        // Place Objects in Argument stack for accumulation.
+        doubleAdd.addArgument(double1);
+        doubleAdd.addArgument(double2);
+        FunctionArgument result = doubleAdd.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null).doubleValue(), 20000000223D);
+
+        doubleAdd = new DoubleAdd();
+        // Place Objects in Argument stack for comparison.
+        doubleAdd.addArgument(double1);
+        doubleAdd.addArgument(double2);
+        doubleAdd.addArgument(double3);
+        doubleAdd.addArgument(double4);
+        result = doubleAdd.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null).doubleValue(), 40000000645D);
     }
 
     /**
@@ -80,8 +139,27 @@ public class TestXacmlArithmeticFunctions {
      * The result is the second argument subtracted from the first argument.
      */
     @Test
-    public void testInteger_Subtract() {
+    public void testInteger_Subtract() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 6);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 66);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
+        IntegerSubtract integerSubtract = new IntegerSubtract();
+        // Place Objects in Argument stack for deduction.
+        integerSubtract.addArgument(int1);
+        integerSubtract.addArgument(int2);
+        FunctionArgument result = integerSubtract.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), -60);
+
+        integerSubtract = new IntegerSubtract();
+        // Place Objects in Argument stack for deduction.
+        integerSubtract.addArgument(int3);
+        integerSubtract.addArgument(int4);
+        result = integerSubtract.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 4);
     }
 
     /**
@@ -89,8 +167,27 @@ public class TestXacmlArithmeticFunctions {
      * The result is the second argument subtracted from the first argument.
      */
     @Test
-    public void testDouble_Subtract() {
+    public void testDouble_Subtract() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 10000000066D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000006D);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000002D);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 10000000004D);
 
+        DoubleSubtract doubleSubtract = new DoubleSubtract();
+        // Place Objects in Argument stack for deduction.
+        doubleSubtract.addArgument(double1);
+        doubleSubtract.addArgument(double2);
+        FunctionArgument result = doubleSubtract.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.asDouble(null).doubleValue() == 60D);
+
+        doubleSubtract = new DoubleSubtract();
+        // Place Objects in Argument stack for deduction.
+        doubleSubtract.addArgument(double3);
+        doubleSubtract.addArgument(double4);
+        result = doubleSubtract.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.asDouble(null).doubleValue() == -2D);
     }
 
     /**
@@ -98,7 +195,7 @@ public class TestXacmlArithmeticFunctions {
      * This function MUST accept two or more arguments.
      */
     @Test
-    public void testInteger_Multiply() {
+    public void testInteger_Multiply() throws XACML3EntitlementException {
 
     }
 
@@ -108,7 +205,7 @@ public class TestXacmlArithmeticFunctions {
      * This function MUST accept two or more arguments.
      */
     @Test
-    public void testDouble_Multiply() {
+    public void testDouble_Multiply() throws XACML3EntitlementException {
 
     }
 
@@ -117,7 +214,7 @@ public class TestXacmlArithmeticFunctions {
      * The result is the first argument divided by the second argument.
      */
     @Test
-    public void testInteger_Divide() {
+    public void testInteger_Divide() throws XACML3EntitlementException {
 
     }
 
@@ -127,7 +224,7 @@ public class TestXacmlArithmeticFunctions {
      * The result is the first argument divided by the second argument.
      */
     @Test
-    public void testDouble_Divide() {
+    public void testDouble_Divide() throws XACML3EntitlementException {
 
     }
 
@@ -136,7 +233,7 @@ public class TestXacmlArithmeticFunctions {
      * The result is remainder of the first argument divided by the second argument.
      */
     @Test
-    public void testInteger_Mod() {
+    public void testInteger_Mod() throws XACML3EntitlementException {
 
     }
 
@@ -148,7 +245,7 @@ public class TestXacmlArithmeticFunctions {
      * urn:oasis:names:tc:xacml:1.0:function:integer-abs
      */
     @Test
-    public void testInteger_Abs() {
+    public void testInteger_Abs() throws XACML3EntitlementException {
 
     }
 
@@ -156,7 +253,7 @@ public class TestXacmlArithmeticFunctions {
      *  urn:oasis:names:tc:xacml:1.0:function:double-abs
      */
     @Test
-    public void testDouble_Abs() {
+    public void testDouble_Abs() throws XACML3EntitlementException {
 
     }
 
@@ -164,7 +261,7 @@ public class TestXacmlArithmeticFunctions {
      * urn:oasis:names:tc:xacml:1.0:function:round
      */
     @Test
-    public void testRound() {
+    public void testRound() throws XACML3EntitlementException {
 
     }
 
@@ -172,7 +269,7 @@ public class TestXacmlArithmeticFunctions {
      * urn:oasis:names:tc:xacml:1.0:function:floor
      */
     @Test
-    public void testFloor() {
+    public void testFloor() throws XACML3EntitlementException {
 
     }
 

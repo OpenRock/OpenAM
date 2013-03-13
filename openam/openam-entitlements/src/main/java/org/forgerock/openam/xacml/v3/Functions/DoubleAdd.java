@@ -38,16 +38,29 @@ In the case of the divide functions, if the divisor is zero, then the function S
 This function MUST accept two or more arguments.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:double-add
+ */
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 public class DoubleAdd extends XACMLFunction {
 
     public DoubleAdd()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, 0D);
+        for (FunctionArgument doubleArgument : getArguments()) {
+            if (doubleArgument == null) {
+                continue;
+            }
+            // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
+            Double argumentValue = doubleArgument.asDouble(pip);
+            retVal = new DataValue(DataType.XACMLDOUBLE, (retVal.asDouble(pip) + argumentValue));
+        }
+        // return the Accumulated Value.
+        return retVal;
     }
+
 }

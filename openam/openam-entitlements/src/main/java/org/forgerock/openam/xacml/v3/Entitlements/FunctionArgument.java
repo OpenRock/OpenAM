@@ -27,13 +27,11 @@
 package org.forgerock.openam.xacml.v3.Entitlements;
 
 
-import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.shared.JSONUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.print.attribute.standard.DateTimeAtCompleted;
 import java.util.Date;
 
 /*

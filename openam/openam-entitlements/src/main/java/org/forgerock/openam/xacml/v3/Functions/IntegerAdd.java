@@ -39,16 +39,27 @@ functions SHALL take two arguments of the specified data-type,
 This function MUST accept two or more arguments.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-add
+ */
 public class IntegerAdd extends XACMLFunction {
 
     public IntegerAdd()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0);
+        for (FunctionArgument integerArgument : getArguments()) {
+            if (integerArgument == null) {
+                continue;
+            }
+            // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
+            Integer argumentValue = integerArgument.asInteger(pip);
+            retVal = new DataValue(DataType.XACMLINTEGER, (retVal.asInteger(pip) + argumentValue));
+        }
+        // return the Accumulated Value.
+        return retVal;
     }
 }
