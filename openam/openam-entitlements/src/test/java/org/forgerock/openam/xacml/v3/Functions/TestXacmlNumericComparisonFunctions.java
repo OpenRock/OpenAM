@@ -28,10 +28,26 @@ package org.forgerock.openam.xacml.v3.Functions;
 import org.forgerock.openam.xacml.v3.Entitlements.DataType;
 import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+/**
+ * A.3.6 Numeric comparison functions
+ These functions form a minimal set for comparing two numbers, yielding a Boolean result.
+ For doubles they SHALL comply with the rules governed by IEEE 754 [IEEE754].
+
+ urn:oasis:names:tc:xacml:1.0:function:integer-greater-than
+ urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal
+ urn:oasis:names:tc:xacml:1.0:function:integer-less-than
+ urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal
+ urn:oasis:names:tc:xacml:1.0:function:double-greater-than
+ urn:oasis:names:tc:xacml:1.0:function:double-greater-than-or-equal
+ urn:oasis:names:tc:xacml:1.0:function:double-less-than
+ urn:oasis:names:tc:xacml:1.0:function:double-less-than-or-equal
+
+ */
 
 /**
  * XACML Numeric Comparison Functions
@@ -55,11 +71,68 @@ public class TestXacmlNumericComparisonFunctions {
     }
 
     /**
-     *
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-greater-than
      */
     @Test
-    public void testOne() {
+    public void testIntegerGreaterThan() throws XACML3EntitlementException {
 
     }
+
+    /**
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal
+     */
+    @Test
+    public void testIntegerGreaterThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-less-than
+     */
+    @Test
+    public void testIntegerLessThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal
+     */
+    @Test
+    public void testIntegerLessThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-greater-than
+     */
+    @Test
+    public void testDoublerGreaterThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal
+     */
+    @Test
+    public void testDoubleGreaterThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *  urn:oasis:names:tc:xacml:1.0:function:integer-less-than
+     */
+    @Test
+    public void testDoubleLessThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal
+     */
+    @Test
+    public void testDoubleLessThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
 
 }
