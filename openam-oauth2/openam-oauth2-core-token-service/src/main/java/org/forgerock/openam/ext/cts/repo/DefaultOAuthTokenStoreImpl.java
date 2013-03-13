@@ -152,8 +152,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
                 new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
 
         BearerToken code2 =
-                new BearerToken(id, code.getUserID(), new SessionClientImpl(code.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID), code.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI)),
-                        code.getRealm(), OAuth2Utils.stringToSet(code.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)), code.getExpireTime(), code.getParameter(OAuth2Constants.CoreTokenParams.ISSUED));
+                new BearerToken(id, code.getUserID(), new SessionClientImpl(code.getClientID(), code.getRedirectURI()),
+                        code.getRealm(), code.getScope(), code.getExpireTime(), code.getIssued());
         try {
             response = accessor.create(id, code2);
         } catch (JsonResourceException e) {
