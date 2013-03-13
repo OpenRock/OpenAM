@@ -38,16 +38,30 @@ In the case of the divide functions, if the divisor is zero, then the function S
 This function MUST accept two or more arguments.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:double-multiply
+ */
 public class DoubleMultiply extends XACMLFunction {
 
     public DoubleMultiply()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if ( getArgCount() < 2) {
+            throw new XACML3EntitlementException("Function Requires 2 or more arguments, " +
+                    "only "+getArgCount()+" in stack.");
+        }
+        // Consume are first and second arguments and iterate from their to multiply across all arguments.
+        // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, (getArg(0).asDouble(pip) * getArg(1).asDouble
+                (pip)));
+        for(int i=2; i<getArgCount(); i++) {
+            Double argumentValue = getArg(i).asDouble(pip);
+            retVal = new DataValue(DataType.XACMLDOUBLE, (retVal.asDouble(pip) * argumentValue));
+        }
+        // return the Accumulated Value.
+        return retVal;
     }
 }

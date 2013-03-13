@@ -38,16 +38,30 @@ This function MUST accept two or more arguments.
 
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-multiply
+ */
 public class IntegerMultiply extends XACMLFunction {
 
     public IntegerMultiply()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if ( getArgCount() < 2) {
+            throw new XACML3EntitlementException("Function Requires 2 or more arguments, " +
+                    "only "+getArgCount()+" in stack.");
+        }
+        // Consume are first and second arguments and iterate from their to multiply across all arguments.
+        // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, (getArg(0).asInteger(pip) * getArg(1)
+                .asInteger(pip)));
+        for(int i=2; i<getArgCount(); i++) {
+            Integer argumentValue = getArg(i).asInteger(pip);
+            retVal = new DataValue(DataType.XACMLINTEGER, (retVal.asInteger(pip) * argumentValue));
+        }
+        // return the Accumulated Value.
+        return retVal;
     }
 }

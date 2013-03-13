@@ -196,7 +196,28 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Multiply() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 222);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 420);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
+        IntegerMultiply integerMultiply = new IntegerMultiply();
+        // Place Objects in Argument stack for comparison.
+        integerMultiply.addArgument(int1);
+        integerMultiply.addArgument(int2);
+        FunctionArgument result = integerMultiply.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 222);
+
+        integerMultiply = new IntegerMultiply();
+        // Place Objects in Argument stack for accumulation.
+        integerMultiply.addArgument(int1);
+        integerMultiply.addArgument(int2);
+        integerMultiply.addArgument(int3);
+        integerMultiply.addArgument(int4);
+        result = integerMultiply.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 1*222*420*2);
     }
 
     /**
@@ -206,6 +227,28 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Multiply() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 1D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000222D);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000420D);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D);
+
+        DoubleMultiply doubleMultiply = new DoubleMultiply();
+        // Place Objects in Argument stack for accumulation.
+        doubleMultiply.addArgument(double1);
+        doubleMultiply.addArgument(double2);
+        FunctionArgument result = doubleMultiply.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null).doubleValue(), 10000000222D);
+
+        doubleMultiply = new DoubleMultiply();
+        // Place Objects in Argument stack for comparison.
+        doubleMultiply.addArgument(double1);
+        doubleMultiply.addArgument(double2);
+        doubleMultiply.addArgument(double3);
+        doubleMultiply.addArgument(double4);
+        result = doubleMultiply.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null).doubleValue(), (1D * 10000000222D * 10000000420D * 2D));
 
     }
 

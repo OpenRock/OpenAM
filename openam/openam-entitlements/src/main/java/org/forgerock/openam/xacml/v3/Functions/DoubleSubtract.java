@@ -49,7 +49,8 @@ public class DoubleSubtract extends XACMLFunction {
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, 0D);
         if ( getArgCount() != 2) {
-            return retVal;
+            throw new XACML3EntitlementException("Function Requires 2 arguments, " +
+                    "only "+getArgCount()+" in stack.");
         }
         Double arg0 = getArg(0).asDouble(pip);
         Double arg1 = getArg(1).asDouble(pip);

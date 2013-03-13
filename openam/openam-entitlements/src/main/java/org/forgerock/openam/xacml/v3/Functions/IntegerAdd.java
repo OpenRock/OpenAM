@@ -51,6 +51,10 @@ public class IntegerAdd extends XACMLFunction {
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0);
+        if ( getArgCount() < 2) {
+            throw new XACML3EntitlementException("Function Requires 2 or more arguments, " +
+                    "only "+getArgCount()+" in stack.");
+        }
         for (FunctionArgument integerArgument : getArguments()) {
             if (integerArgument == null) {
                 continue;
