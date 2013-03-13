@@ -33,16 +33,23 @@ The round and floor functions SHALL take a single argument of data-type
 “http://www.w3.org/2001/XMLSchema#double”..
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:floor
+ */
 public class Floor extends XACMLFunction {
 
     public Floor()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        if (getArgCount() != 1) {
+            throw new XACML3EntitlementException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, Math.floor(getArg(0).asDouble(pip)));
+        // return the Value.
+        return retVal;
     }
 }

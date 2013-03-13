@@ -355,9 +355,11 @@ public class TestXacmlArithmeticFunctions {
 
     /**
      * The following functions SHALL take a single argument of the specified data-type.
-     * The round and floor functions SHALL take a single argument of data-type “http://www.w3
-     * .org/2001/XMLSchema#double”
+     *
+     * The round and floor functions SHALL take a single argument of data-type
+     * “http://www.w3.org/2001/XMLSchema#double”
      * and return a value of the data-type “http://www.w3.org/2001/XMLSchema#double”.
+     *
      * urn:oasis:names:tc:xacml:1.0:function:integer-abs
      */
     @Test
@@ -408,7 +410,22 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testRound() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566.67D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9.9D);
 
+        Round round = new Round();
+        // Place Objects in Argument stack.
+        round.addArgument(double1);
+        FunctionArgument result = round.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), -7567D);
+
+        round = new Round();
+        // Place Objects in Argument stack.
+        round.addArgument(double2);
+        result = round.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), -10D);
     }
 
     /**
@@ -416,7 +433,22 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testFloor() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -100.675D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9.564D);
 
+        Floor floor = new Floor();
+        // Place Objects in Argument stack.
+        floor.addArgument(double1);
+        FunctionArgument result = floor.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), -101.0D);
+
+        floor = new Floor();
+        // Place Objects in Argument stack.
+        floor.addArgument(double2);
+        result = floor.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), -10D);
     }
 
 
