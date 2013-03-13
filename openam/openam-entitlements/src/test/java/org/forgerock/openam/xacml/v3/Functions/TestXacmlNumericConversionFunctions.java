@@ -28,9 +28,13 @@ package org.forgerock.openam.xacml.v3.Functions;
 import org.forgerock.openam.xacml.v3.Entitlements.DataType;
 import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 
 /**
@@ -55,11 +59,48 @@ public class TestXacmlNumericConversionFunctions {
     }
 
     /**
-     *
+     * urn:oasis:names:tc:xacml:1.0:function:double-to-integer
      */
     @Test
-    public void testOne() {
+    public void testDoubleToInteger() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9D);
 
+        DoubleToInteger doubleToInteger = new DoubleToInteger();
+        // Place Objects in Argument stack.
+        doubleToInteger.addArgument(double1);
+        FunctionArgument result = doubleToInteger.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), -7566);
+
+        doubleToInteger = new DoubleToInteger();
+        // Place Objects in Argument stack.
+        doubleToInteger.addArgument(double2);
+        result = doubleToInteger.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), -9);
     }
 
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:integer-to-double
+     */
+    @Test
+    public void testIntegerToDouble() throws XACML3EntitlementException {
+        FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, -7566);
+        FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, -9);
+
+        IntegerToDouble integerToDouble = new IntegerToDouble();
+        // Place Objects in Argument stack.
+        integerToDouble.addArgument(integer1);
+        FunctionArgument result = integerToDouble.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), -7566D);
+
+        integerToDouble = new IntegerToDouble();
+        // Place Objects in Argument stack.
+        integerToDouble.addArgument(integer2);
+        result = integerToDouble.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), -9D);
+    }
 }

@@ -33,16 +33,23 @@ SHALL truncate its numeric value to a whole number and return an element of data
 “http://www.w3.org/2001/XMLSchema#integer”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:double-to-integer
+ */
 public class DoubleToInteger extends XACMLFunction {
 
     public DoubleToInteger()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if (getArgCount() != 1) {
+            throw new XACML3EntitlementException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER,
+                Integer.valueOf(getArg(0).asDouble(pip).intValue()));
+        // return the Value.
+        return retVal;
     }
 }

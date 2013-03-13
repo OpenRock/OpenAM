@@ -34,16 +34,23 @@ If the integer argument is outside the range which can be represented by a doubl
 the result SHALL be Indeterminate, with the status code “urn:oasis:names:tc:xacml:1.0:status:processing-error”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-to-double
+ */
 public class IntegerToDouble extends XACMLFunction {
 
     public IntegerToDouble()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if (getArgCount() != 1) {
+            throw new XACML3EntitlementException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE,
+                Double.valueOf(getArg(0).asInteger(pip).doubleValue()));
+        // return the Value.
+        return retVal;
     }
 }
