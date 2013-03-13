@@ -25,10 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.DataType;
-import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -67,7 +64,7 @@ public class TestXacmlArithmeticFunctions {
         FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
         IntegerAdd integerAdd = new IntegerAdd();
-        // Place Objects in Argument stack for comparison.
+        // Place Objects in Argument stack for accumulation.
         integerAdd.addArgument(int1);
         integerAdd.addArgument(int2);
         FunctionArgument result = integerAdd.evaluate(null);
@@ -96,7 +93,7 @@ public class TestXacmlArithmeticFunctions {
         FunctionArgument bad2 = new DataValue(DataType.XACMLSTRING, "1");
 
         IntegerAdd integerAdd = new IntegerAdd();
-        // Place Objects in Argument stack for comparison.
+        // Place Objects in Argument stack for accumulation.
         integerAdd.addArgument(int1);
         integerAdd.addArgument(bad2);
         FunctionArgument result = integerAdd.evaluate(null);
@@ -124,7 +121,7 @@ public class TestXacmlArithmeticFunctions {
         assertEquals(result.asDouble(null).doubleValue(), 20000000223D);
 
         doubleAdd = new DoubleAdd();
-        // Place Objects in Argument stack for comparison.
+        // Place Objects in Argument stack for accumulation.
         doubleAdd.addArgument(double1);
         doubleAdd.addArgument(double2);
         doubleAdd.addArgument(double3);
@@ -202,7 +199,7 @@ public class TestXacmlArithmeticFunctions {
         FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
         IntegerMultiply integerMultiply = new IntegerMultiply();
-        // Place Objects in Argument stack for comparison.
+        // Place Objects in Argument stack for accumulation.
         integerMultiply.addArgument(int1);
         integerMultiply.addArgument(int2);
         FunctionArgument result = integerMultiply.evaluate(null);
@@ -241,7 +238,7 @@ public class TestXacmlArithmeticFunctions {
         assertEquals(result.asDouble(null).doubleValue(), 10000000222D);
 
         doubleMultiply = new DoubleMultiply();
-        // Place Objects in Argument stack for comparison.
+        // Place Objects in Argument stack for accumulation.
         doubleMultiply.addArgument(double1);
         doubleMultiply.addArgument(double2);
         doubleMultiply.addArgument(double3);
@@ -264,7 +261,7 @@ public class TestXacmlArithmeticFunctions {
         FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
 
         IntegerDivide integerDivide = new IntegerDivide();
-        // Place Objects in Argument stack for deduction.
+        // Place Objects in Argument stack.
         integerDivide.addArgument(int1);
         integerDivide.addArgument(int2);
         FunctionArgument result = integerDivide.evaluate(null);
@@ -272,7 +269,7 @@ public class TestXacmlArithmeticFunctions {
         assertEquals(result.asInteger(null).intValue(), 11);
 
         integerDivide = new IntegerDivide();
-        // Place Objects in Argument stack for deduction.
+        // Place Objects in Argument stack.
         integerDivide.addArgument(int3);
         integerDivide.addArgument(int4);
         result = integerDivide.evaluate(null);
@@ -284,13 +281,13 @@ public class TestXacmlArithmeticFunctions {
      *  urn:oasis:names:tc:xacml:1.0:function:integer-divide
      * The result is the first argument divided by the second argument.
      */
-    @Test(expectedExceptions = XACML3EntitlementException.class)
+    @Test(expectedExceptions = IndeterminateException.class)
     public void testInteger_Divide_Divisor_Zero() throws XACML3EntitlementException {
         FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
         FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 0);
 
         IntegerDivide integerDivide = new IntegerDivide();
-        // Place Objects in Argument stack for deduction.
+        // Place Objects in Argument stack.
         integerDivide.addArgument(int1);
         integerDivide.addArgument(int2);
         integerDivide.evaluate(null);
@@ -312,7 +309,7 @@ public class TestXacmlArithmeticFunctions {
         FunctionArgument int4 = new DataValue(DataType.XACMLDOUBLE, 2D);
 
         DoubleDivide integerDivide = new DoubleDivide();
-        // Place Objects in Argument stack for deduction.
+        // Place Objects in Argument stack.
         integerDivide.addArgument(int1);
         integerDivide.addArgument(int2);
         FunctionArgument result = integerDivide.evaluate(null);
@@ -320,7 +317,7 @@ public class TestXacmlArithmeticFunctions {
         assertEquals(result.asDouble(null), 11D);
 
         integerDivide = new DoubleDivide();
-        // Place Objects in Argument stack for deduction.
+        // Place Objects in Argument stack.
         integerDivide.addArgument(int3);
         integerDivide.addArgument(int4);
         result = integerDivide.evaluate(null);
@@ -334,7 +331,26 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Mod() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 9);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 5);
 
+        IntegerMod integerMod = new IntegerMod();
+        // Place Objects in Argument stack.
+        integerMod.addArgument(int1);
+        integerMod.addArgument(int2);
+        FunctionArgument result = integerMod.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 3);
+
+        integerMod = new IntegerMod();
+        // Place Objects in Argument stack.
+        integerMod.addArgument(int3);
+        integerMod.addArgument(int4);
+        result = integerMod.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 1);
     }
 
     /**
@@ -346,7 +362,22 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Abs() throws XACML3EntitlementException {
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, -7566);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, -9);
 
+        IntegerAbs integerAbs = new IntegerAbs();
+        // Place Objects in Argument stack.
+        integerAbs.addArgument(int1);
+        FunctionArgument result = integerAbs.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 7566);
+
+        integerAbs = new IntegerAbs();
+        // Place Objects in Argument stack.
+        integerAbs.addArgument(int2);
+        result = integerAbs.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null).intValue(), 9);
     }
 
     /**
@@ -354,7 +385,22 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Abs() throws XACML3EntitlementException {
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566D);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9D);
 
+        DoubleAbs doubleAbs = new DoubleAbs();
+        // Place Objects in Argument stack.
+        doubleAbs.addArgument(double1);
+        FunctionArgument result = doubleAbs.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), 7566D);
+
+        doubleAbs = new DoubleAbs();
+        // Place Objects in Argument stack.
+        doubleAbs.addArgument(double2);
+        result = doubleAbs.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), 9D);
     }
 
     /**

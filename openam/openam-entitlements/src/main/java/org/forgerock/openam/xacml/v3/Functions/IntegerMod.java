@@ -36,16 +36,28 @@ urn:oasis:names:tc:xacml:1.0:function:integer-mod
  In the case of the divide functions, if the divisor is zero, then the function SHALL evaluate to “Indeterminate”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-mod
+ */
 public class IntegerMod extends XACMLFunction {
 
     public IntegerMod()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        if (getArgCount() != 2) {
+            throw new XACML3EntitlementException("Function Requires 2 arguments, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        Integer dividend = getArg(0).asInteger(pip);
+        Integer divisor = getArg(1).asInteger(pip);
+        if (divisor == 0) {
+            throw new IndeterminateException("Divisor is zero, Indeterminate Result.");
+        }
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, (dividend % divisor));
+        // return the Value.
+        return retVal;
     }
 }
