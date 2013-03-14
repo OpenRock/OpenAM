@@ -114,7 +114,7 @@ public class TestXacmlDateAndTimeArithmetricFunctions {
      *
      */
     @Test
-    public void testOne() throws XACML3EntitlementException {
+    public void testOne() throws XACML3EntitlementException{
 
     }
 
