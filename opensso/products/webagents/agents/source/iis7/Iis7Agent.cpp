@@ -593,6 +593,24 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
         am_web_delete_agent_configuration(agent_config);
         return RQ_NOTIFICATION_FINISH_REQUEST;
     }
+    
+    if (status == AM_SUCCESS) {
+        int vs = am_web_validate_url(agent_config, requestURL.c_str());
+        if (vs != -1) {
+            if (vs == 1) {
+                am_web_log_debug("%s: Request URL validation succeeded", thisfunc);
+                status = AM_SUCCESS;
+            } else {
+                am_web_log_error("%s: Request URL validation failed. Returning Access Denied error (HTTP403)", thisfunc);
+                status = AM_FAILURE;
+                do_deny(pHttpContext);
+                OphResourcesFree(pOphResources);
+                am_web_delete_agent_configuration(agent_config);
+                return RQ_NOTIFICATION_FINISH_REQUEST;
+            }
+        }
+    }
+    
     // Get the request method
     if (status == AM_SUCCESS) {
         status = GetVariable(pHttpContext, "REQUEST_METHOD", &reqMethod, &requestMethodSize, TRUE);

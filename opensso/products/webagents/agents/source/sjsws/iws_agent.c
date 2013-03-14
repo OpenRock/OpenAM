@@ -1052,6 +1052,32 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
             return notifResult;
         }
     }
+    
+    if (status == AM_SUCCESS) {
+        int vs = am_web_validate_url(agent_config, request_url);
+        if (vs != -1) {
+            if (vs == 1) {
+                am_web_log_debug("%s: Request URL validation succeeded", thisfunc);
+                status = AM_SUCCESS;
+            } else {
+                am_web_log_error("%s: Request URL validation failed. Returning Access Denied error (HTTP403)", thisfunc);
+                status = AM_FAILURE;
+                if (query != NULL) {
+                    free(query);
+                    query = NULL;
+                }
+                if (method != NULL) {
+                    free(method);
+                    method = NULL;
+                }
+                am_web_free_memory(request_url);
+                am_web_free_memory(orig_request_url);
+                am_web_delete_agent_configuration(agent_config);
+                return do_deny(sn, rq, status);
+            }
+        }
+    }
+    
     // Check if the SSO token is in the cookie header
     if (status == AM_SUCCESS) {
         status_tmp = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),

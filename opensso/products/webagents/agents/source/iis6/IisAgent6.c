@@ -1856,9 +1856,34 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                  pathInfo = NULL;
              }
              send_ok(pECB);
+             am_web_delete_agent_configuration(agent_config);
              return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
           }
     }
+    
+    if (status == AM_SUCCESS) {
+        int vs = am_web_validate_url(agent_config, requestURL);
+        if (vs != -1) {
+            if (vs == 1) {
+                am_web_log_debug("%s: Request URL validation succeeded", thisfunc);
+                status = AM_SUCCESS;
+            } else {
+                am_web_log_error("%s: Request URL validation failed. Returning Access Denied error (HTTP403)", thisfunc);
+                status = AM_FAILURE;
+                OphResourcesFree(pOphResources);
+                am_web_free_memory(requestURL);
+                am_web_free_memory(origRequestURL);
+                if (pathInfo != NULL) {
+                    free(pathInfo);
+                    pathInfo = NULL;
+                }
+                do_deny(pECB);
+                am_web_delete_agent_configuration(agent_config);
+                return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
+            }
+        }
+    }
+    
     // Set the correct HTTP status. By default the status is always 200,
     // even if the file doesn't exist. Leave status to 200 for notification
     // and dummy urls as those cases are handled by the agent.

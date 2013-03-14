@@ -1132,6 +1132,19 @@ int dsame_check_access(request_rec *r) {
     // Get the request URL
     if (status == AM_SUCCESS) {
         status = get_request_url(r, &url);
+        if (status == AM_SUCCESS) {
+            int vs = am_web_validate_url(agent_config, url);
+            if (vs != -1) {
+                if (vs == 1) {
+                    am_web_log_debug("%s: Request URL validation succeeded", thisfunc);
+                    status = AM_SUCCESS;
+                } else {
+                    am_web_log_error("%s: Request URL validation failed. Returning Access Denied error (HTTP403)", thisfunc);
+                    status = AM_FAILURE;
+                    ret = do_deny(r, status);
+                }
+            }
+        }
     }
 
     // Get the request method
