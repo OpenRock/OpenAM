@@ -33,16 +33,31 @@ then the result of the expression SHALL be "False". If the argument evaluates to
 then the result of the expression SHALL be "True".
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:not
+ */
 public class Not extends XACMLFunction {
 
     public Not()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if ( getArgCount() != 1) {
+            return FunctionArgument.falseObject;
+        }
+        Object argument = getArg(0).getValue(pip);
+        if (argument == null) {
+            throw new IndeterminateException("Argument is null!");
+        }
+        if(argument instanceof Boolean) {
+            if (((Boolean)argument).booleanValue() == true) {
+                return  FunctionArgument.falseObject;
+            }
+        } else {
+            throw new IndeterminateException("Expecting Boolean, but received: "+argument.getClass().getName());
+        }
+        // Return Condition
+        return FunctionArgument.trueObject;
     }
 }

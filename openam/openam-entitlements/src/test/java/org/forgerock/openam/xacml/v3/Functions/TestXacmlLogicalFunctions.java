@@ -25,13 +25,13 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.DataType;
-import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * A.3.5 Logical functions
@@ -80,6 +80,10 @@ public class TestXacmlLogicalFunctions {
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
 
+    static final FunctionArgument string1 = new DataValue(DataType.XACMLSTRING, "Hello World!");
+    static final FunctionArgument string2 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+    static final FunctionArgument string3 = new DataValue(DataType.XACMLSTRING, "Hello");
+    static final FunctionArgument string4 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
 
     @BeforeClass
     public void before() throws Exception {
@@ -95,6 +99,37 @@ public class TestXacmlLogicalFunctions {
     @Test
     public void test_Logical_Or() throws XACML3EntitlementException {
 
+        Or _OR = new Or();
+            StringEqual stringEqual = new StringEqual();
+            // Place Objects in Argument stack for comparison.
+            stringEqual.addArgument(string1);
+            stringEqual.addArgument(string2);
+        _OR.addArgument(stringEqual);
+        FunctionArgument result = _OR.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        _OR = new Or();
+        stringEqual = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual.addArgument(string2);
+        stringEqual.addArgument(string3);
+        _OR.addArgument(stringEqual);
+        // Place Objects in Argument stack for comparison.
+        StringEqual stringEqual2 = new StringEqual();
+        stringEqual2.addArgument(string3);
+        stringEqual2.addArgument(string4);
+        _OR.addArgument(stringEqual2);
+        // Place Objects in Argument stack for comparison.
+        StringEqual stringEqual3 = new StringEqual();
+        stringEqual3.addArgument(string2);
+        stringEqual3.addArgument(string4);
+        _OR.addArgument(stringEqual3);
+
+        result = _OR.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
     }
 
     /**
@@ -102,6 +137,38 @@ public class TestXacmlLogicalFunctions {
      */
     @Test
     public void test_Logical_And() throws XACML3EntitlementException {
+        And _AND = new And();
+        StringEqual stringEqual = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual.addArgument(string1);
+        stringEqual.addArgument(string2);
+        _AND.addArgument(stringEqual);
+        FunctionArgument result = _AND.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        _AND = new And();
+        stringEqual = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual.addArgument(string2);
+        stringEqual.addArgument(string4);
+        _AND.addArgument(stringEqual);
+
+        StringEqual stringEqual2 = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual2.addArgument(string2);
+        stringEqual2.addArgument(string4);
+        _AND.addArgument(stringEqual2);
+
+        StringEqual stringEqual3 = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual3.addArgument(string2);
+        stringEqual3.addArgument(string4);
+        _AND.addArgument(stringEqual3);
+
+        result = _AND.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
     }
 
@@ -110,14 +177,96 @@ public class TestXacmlLogicalFunctions {
      */
     @Test
     public void test_Logical_Nof() throws XACML3EntitlementException {
+        NOf _NOf = new NOf();
+        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 1);
+        _NOf.addArgument(requiredToBeTrue);
+
+        StringEqual stringEqual = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual.addArgument(string2);
+        stringEqual.addArgument(string3);
+        _NOf.addArgument(stringEqual);
+
+        // Place Objects in Argument stack for comparison.
+        StringEqual stringEqual2 = new StringEqual();
+        stringEqual2.addArgument(string3);
+        stringEqual2.addArgument(string4);
+        _NOf.addArgument(stringEqual2);
+
+        // Place Objects in Argument stack for comparison.
+        StringEqual stringEqual3 = new StringEqual();
+        stringEqual3.addArgument(string2);
+        stringEqual3.addArgument(string4);
+        _NOf.addArgument(stringEqual3);
+
+        FunctionArgument result = _NOf.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
     }
+
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:n-of
+     */
+    @Test(expectedExceptions = IndeterminateException.class)
+    public void test_Logical_Nof_Failure() throws XACML3EntitlementException {
+        NOf _NOf = new NOf();
+        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 4);
+        _NOf.addArgument(requiredToBeTrue);
+
+        StringEqual stringEqual = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual.addArgument(string2);
+        stringEqual.addArgument(string3);
+        _NOf.addArgument(stringEqual);
+
+        // Place Objects in Argument stack for comparison.
+        StringEqual stringEqual2 = new StringEqual();
+        stringEqual2.addArgument(string3);
+        stringEqual2.addArgument(string4);
+        _NOf.addArgument(stringEqual2);
+
+        // Place Objects in Argument stack for comparison.
+        StringEqual stringEqual3 = new StringEqual();
+        stringEqual3.addArgument(string2);
+        stringEqual3.addArgument(string4);
+        _NOf.addArgument(stringEqual3);
+
+        _NOf.evaluate(null);
+        // Should never get here...
+        assertTrue(false);
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:n-of
+     */
+    @Test
+    public void test_Logical_Nof_Nothing() throws XACML3EntitlementException {
+        NOf _NOf = new NOf();
+        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 0);
+        _NOf.addArgument(requiredToBeTrue);
+        FunctionArgument result = _NOf.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+    }
+
+
 
     /**
      * urn:oasis:names:tc:xacml:1.0:function:not
      */
     @Test
     public void test_Logical_Not() throws XACML3EntitlementException {
+        Not _NOT = new Not();
+        StringEqual stringEqual = new StringEqual();
+        // Place Objects in Argument stack for comparison.
+        stringEqual.addArgument(string1);
+        stringEqual.addArgument(string2);
+        _NOT.addArgument(stringEqual);
+        FunctionArgument result = _NOT.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
     }
 

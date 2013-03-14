@@ -35,6 +35,9 @@ leaving the rest of the arguments unevaluated.
 
 import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:or
+ */
 public class Or extends XACMLFunction {
 
     public Or()  {
@@ -49,13 +52,16 @@ public class Or extends XACMLFunction {
         int args = getArgCount();
 
         for (int i=0;i<args;i++) {
-            Object ob = getArg(i).getValue(pip);
-            if (ob == null) {
-                throw new IndeterminateException("Arg is null");
+            Object argument = getArg(i).getValue(pip);
+            if (argument == null) {
+                throw new IndeterminateException("Argument is null!");
             }
-            Boolean v = Boolean.getBoolean((String)ob);
-            if (v.booleanValue() == true) {
-                return    FunctionArgument.trueObject;
+            if(argument instanceof Boolean) {
+                if (((Boolean)argument).booleanValue() == true) {
+                    return  FunctionArgument.trueObject;
+                }
+            } else {
+                throw new IndeterminateException("Expecting Boolean, but received: "+argument.getClass().getName());
             }
         }
         return retVal;

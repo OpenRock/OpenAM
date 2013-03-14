@@ -33,12 +33,11 @@ The evaluation SHALL stop with a result of "False" if any argument evaluates to 
 leaving the rest of the arguments unevaluated.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
-
+/**
+ *  urn:oasis:names:tc:xacml:1.0:function:and
+ */
 public class And extends XACMLFunction {
 
     public And()  {
@@ -53,11 +52,19 @@ public class And extends XACMLFunction {
         int args = getArgCount();
 
         for (int i=0;i<args;i++) {
-            Boolean v = Boolean.getBoolean((String)getArg(i).getValue(pip));
-            if (v.booleanValue() == false) {
-                return    FunctionArgument.falseObject;
+            Object argument = getArg(i).getValue(pip);
+            if (argument == null) {
+                throw new IndeterminateException("Argument is null!");
+            }
+            if(argument instanceof Boolean) {
+                if (((Boolean)argument).booleanValue() != true) {
+                    return  FunctionArgument.falseObject;
+                }
+            } else {
+                throw new IndeterminateException("Expecting Boolean, but received: "+argument.getClass().getName());
             }
         }
         return retVal;
     }
+
 }
