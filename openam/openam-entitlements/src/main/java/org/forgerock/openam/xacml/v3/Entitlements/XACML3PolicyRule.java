@@ -55,11 +55,19 @@ public class XACML3PolicyRule {
         obligations = new ArrayList<XACML3Obligation>();
         advices = new ArrayList<XACML3Advice>();
 
-        for(ObligationExpression o : rule.getObligationExpressions().getObligationExpression())  {
-             obligations.add(new XACML3Obligation(o));
+        try {
+            for(ObligationExpression o : rule.getObligationExpressions().getObligationExpression())  {
+                obligations.add(new XACML3Obligation(o));
+            }
+        } catch (Exception ex) {
+
         }
-        for (AdviceExpression a : rule.getAdviceExpressions().getAdviceExpression()) {
-            advices.add(new XACML3Advice(a));
+        try {
+            for (AdviceExpression a : rule.getAdviceExpressions().getAdviceExpression()) {
+                advices.add(new XACML3Advice(a));
+            }
+        } catch (Exception ex) {
+
         }
     }
 

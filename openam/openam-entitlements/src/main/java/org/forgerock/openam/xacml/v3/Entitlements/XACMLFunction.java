@@ -140,6 +140,7 @@ public abstract class XACMLFunction extends FunctionArgument {
         }
         if (retVal != null) {
             retVal.setFunctionID(name);
+            retVal.setType(DataType.XACMLUNDEFINED);  // TODO: Do Function need types?
         }
         return retVal;
     }
@@ -148,6 +149,8 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions = new HashMap<String,String>();
 
         // TODO : Q. Should this be change to HashMap<String, Class<XACMLFunction>>(); ???
+        //  NO!  We don't need to instantiate the classes until needed. Most Policies will only use 10-20
+        // no need to pre-allocate all objects
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-equal","org.forgerock.openam.xacml.v3.Functions.StringEqual");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:boolean-equal","org.forgerock.openam.xacml.v3.Functions.BooleanEqual");

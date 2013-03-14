@@ -365,7 +365,7 @@ public abstract class Privilege implements IPrivilege {
 
         Object obj = getContext();
         if (obj != null) {
-            jo.put("xacmlPolicy",((XACML3Policy)obj).toJSONObject());
+            jo.put("xmlPolicy",((XACML3Policy)obj).toJSONObject());
         }
         return jo;
     }

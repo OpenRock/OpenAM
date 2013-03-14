@@ -43,10 +43,16 @@ public class DataValue extends FunctionArgument {
     }
     /* When we create the value,  is HAS to be of the type */
 
-    public DataValue(String type, Object value) {
+    public DataValue(String type, Object value, boolean rawType) {
         setType(type);
         data = value;
     }
+
+    public DataValue(String type, String value) {
+        setType(type);
+        data = getType().typedValue(value);
+    }
+
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         return this;
@@ -64,7 +70,7 @@ public class DataValue extends FunctionArgument {
 
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
-        this.data = jo.optString("value");
+        this.data = getType().typedValue(jo.optString("value"));
         return;
     };
 

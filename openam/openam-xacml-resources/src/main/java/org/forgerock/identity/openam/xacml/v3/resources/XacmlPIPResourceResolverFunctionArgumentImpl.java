@@ -80,7 +80,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         if (dataType == null) {
             dataType = DataType.XACMLUNKNOWN;
         }
-        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value));
+        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value,true));
         return true;
     }
 

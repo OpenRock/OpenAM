@@ -84,7 +84,7 @@ public class XACMLOpenSSOPrivilege extends OpenSSOPrivilege {
 
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
-        JSONObject contx = jo.getJSONObject("xacmlPolicy");
+        JSONObject contx = jo.getJSONObject("xmlPolicy");
         if (contx != null) {
             setContext(XACML3Policy.getInstance(contx));
         }

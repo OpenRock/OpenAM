@@ -101,6 +101,7 @@ public class Policy implements Cloneable {
     private long lastModifiedDate;
     private boolean referralPolicy=false;
     private boolean active = true;
+    private boolean isXacml3 = false;
 
     private int priority;
     private Map rules = new HashMap();
@@ -1278,6 +1279,24 @@ public class Policy implements Cloneable {
     }
 
     /**
+     * Gets the isXacml3 of the policy.
+     *
+     * @return isXacml3 of the policy
+     */
+    public boolean isXacml3() {
+        return (isXacml3);
+    }
+
+    /**
+     * Sets a isXacml3 of the policy.
+     *
+     *
+     */
+    public void setIsXacml3() {
+        this.isXacml3 = true;
+    }
+
+    /**
      * Stores the policy object in a persistent data store
      * under the organization, sub-organization or a container
      * object, specified as a parameter. The organization,
@@ -1318,6 +1337,8 @@ public class Policy implements Cloneable {
         NoPermissionException, NameAlreadyExistsException,
         NameNotFoundException, PolicyException {
         PolicyManager pm = new PolicyManager(token, name);
+        if (isXacml3()) return;
+
         pm.addPolicy(this);
     }
 
@@ -1368,6 +1389,7 @@ public class Policy implements Cloneable {
         answer.policyName = policyName;
         answer.description = description;
         answer.active = active;
+        answer.isXacml3 = isXacml3;
 
         // Copy rules
         answer.rules = new HashMap();

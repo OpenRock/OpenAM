@@ -26,6 +26,8 @@
 
 package org.forgerock.openam.xacml.v3.Entitlements;
 
+import java.util.Date;
+
 public class DataType {
     public static String XACMLSTRING = "http://www.w3.org/2001/XMLSchema#string";
     public static String XACMLBOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
@@ -44,10 +46,10 @@ public class DataType {
     public static String XACMLIPADDRESS = "urn:oasis:names:tc:xacml:2.0:data-type:ipAddress";
     public static String XACMLDNSNAME = "urn:oasis:names:tc:xacml:2.0:data-type:dnsName";
     public static String XACMLXPATHEXPRESSION = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression";
-    public static String XACMLUNKNOWN = "urn:oasis:names:tc:xacml:3.0:data-type:Unknown";
+    public static String XACMLUNDEFINED = "";
 
     public static enum Type {
-    XACMLUNKNOWNTYPE         (0,XACMLUNKNOWN),
+    XACMLUNDEFINEDTYPE       (0,XACMLUNDEFINED),
     XACMLSTRINGTYPE          (1,XACMLSTRING),
     XACMLBOOLEANTYPE         (2,XACMLBOOLEAN),
     XACMLINTEGERTYPE         (3,XACMLINTEGER),
@@ -107,4 +109,66 @@ public class DataType {
     public int getIndex() {
         return typeIndex;
     }
+
+    public boolean isType(DataType.Type t)  {
+        return (typeIndex == t.getIndex());
+    }
+
+    public Object typedValue(String s) {
+
+        if (isType(DataType.Type.XACMLSTRINGTYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLBOOLEANTYPE)) {
+            return Boolean.valueOf(s);
+        }
+        if (isType(DataType.Type.XACMLINTEGERTYPE)) {
+            return Integer.valueOf(s);
+        }
+        if (isType(DataType.Type.XACMLDOUBLETYPE)) {
+            return Double.valueOf(s);
+        }
+        if (isType(DataType.Type.XACMLTIMETYPE)) {
+            return XACML3PrivilegeUtils.stringToTime(s);
+        }
+        if (isType(DataType.Type.XACMLDATETYPE)) {
+            return XACML3PrivilegeUtils.stringToDate(s);
+        }
+        if (isType(DataType.Type.XACMLDATETIMETYPE)) {
+            return XACML3PrivilegeUtils.stringToDateTime(s);
+        }
+        if (isType(DataType.Type.XACMLANYURITYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLHEXBINARYTYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLBASE64BINARYTYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLDAYTIMEDURATIONTYPE)) {
+            return Integer.valueOf(s);
+        }
+        if (isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
+            return Integer.valueOf(s);
+        }
+        if (isType(DataType.Type.XACMLX500NAMETYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLRFC822NAMETYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLIPADDRESSTYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLDNSNAMETYPE)) {
+            return s;
+        }
+        if (isType(DataType.Type.XACMLXPATHEXPRESSIONTYPE)) {
+            return s;
+        }
+        return s;
+    }
+
+
 }

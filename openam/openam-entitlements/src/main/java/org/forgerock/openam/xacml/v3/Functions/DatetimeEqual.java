@@ -52,14 +52,12 @@ public class DatetimeEqual extends XACMLFunction {
             return retVal;
         }
 
-        String s1 = (String)getArg(0).getValue(pip);
-        String s2 = (String)getArg(1).getValue(pip);
-        if ( (s1==null) || (s2==null ) )  {
+        Date d1 = getArg(0).asDate(pip);
+        Date d2 = getArg(1).asDate(pip);
+
+        if ( (d1==null) || (d2==null ) )  {
             return retVal;
         }
-
-        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
-        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
 
         if( d1.equals(d2)) {
             retVal = FunctionArgument.trueObject;

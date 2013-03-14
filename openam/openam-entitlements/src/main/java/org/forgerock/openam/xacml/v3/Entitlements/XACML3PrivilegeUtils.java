@@ -46,11 +46,10 @@ import org.apache.commons.codec.binary.Hex;
 public class XACML3PrivilegeUtils {
 
     // Global Pattern Definitions
-    public static final String YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS =
-            new String( "yyyy-MM-dd:HH:mm:ss.SSSS");
-    public static final String YEAR_MONTH_DAY = new String("yyyy-MM-dd");
-    public static final String YEAR_MONTH = new String("yyyy-MM");
-    public static final String HOUR_MINUTE_SECOND_MILLISECONDS = new String("HH:mm:ss.SSS");
+    public static final String YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "yyyy-MM-dd:HH:mm:ss.SSSS";
+    public static final String YEAR_MONTH_DAY =  "yyyy-MM-dd";
+    public static final String YEAR_MONTH = "yyyy-MM";
+    public static final String HOUR_MINUTE_SECOND_MILLISECONDS = "HH:mm:ss.SSS";
     public static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT");
 
 
@@ -69,7 +68,7 @@ public class XACML3PrivilegeUtils {
                 for (Match match : matchList) {
                     String mName = match.getMatchId();
                     AttributeValue attr = match.getAttributeValue();
-                    DataValue dv = new DataValue(attr.getDataType(),attr.getContent().get(0));
+                    DataValue dv = new DataValue(attr.getDataType(),(String)(attr.getContent().get(0)));
 
                     AttributeDesignator attrd = match.getAttributeDesignator();
                     if (attrd == null) { continue; };
@@ -149,7 +148,7 @@ public class XACML3PrivilegeUtils {
         } else if (clazz.equals(AttributeValue.class)) {
 
             AttributeValue attr = (AttributeValue)je.getValue();
-            DataValue dv = new DataValue(attr.getDataType(),attr.getContent().get(0));
+            DataValue dv = new DataValue(attr.getDataType(),(String)(attr.getContent().get(0)));
             retVal = dv;
 
         } else if (clazz.equals(AttributeDesignator.class)) {
@@ -168,7 +167,7 @@ public class XACML3PrivilegeUtils {
             if (it == null) {
                 throw new XACML3EntitlementException("Null Variable Reference");
             }
-            it.addArgument(new DataValue(DataType.XACMLSTRING,vr.getVariableId()));
+            it.addArgument(new DataValue(DataType.XACMLSTRING,(String)(vr.getVariableId())));
             retVal = it;
         }
          return retVal;
@@ -196,6 +195,32 @@ public class XACML3PrivilegeUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf.setTimeZone(GMT_TIMEZONE);
         dateString = dateString.replace("T", ":");
+        Date retVal = new Date();
+        try {
+            retVal = sdf.parse(dateString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+    public static Date stringToDateTime(String dateString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Date retVal = new Date();
+        try {
+            retVal = sdf.parse(dateString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+    public static Date stringToTime(String dateString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
+        sdf.setTimeZone(GMT_TIMEZONE);
         Date retVal = new Date();
         try {
             retVal = sdf.parse(dateString);

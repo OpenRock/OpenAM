@@ -52,7 +52,7 @@ public class StringEqualIgnoreCase extends XACMLFunction {
             return retVal;
         }
         String s1 = (String)getArg(0).getValue(pip);
-        String s2 = (String) getArg(1).getValue(pip);
+        String s2 = (String)getArg(1).getValue(pip);
 
         if ((s1 == null ) || (s2== null)) {
             throw new IndeterminateException("Null Args");

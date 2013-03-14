@@ -492,6 +492,7 @@ public final class PolicyManager {
             // Now create a policy object out of the XML blob
             Iterator it = res.iterator();
             String policyXml = (String) it.next();
+
             Document doc = null;
             try {
                 doc = XMLUtils.getXMLDocument(
@@ -516,8 +517,15 @@ public final class PolicyManager {
                     " for organization: " + org);
             }
 
+            // This is to recognize XACML3 policies in the console and display them as inactive
+            if (XMLUtils.getNodeAttributeValue(rootNode,"PolicyId") != null) {
+                answer = new Policy( policyName, "XACML", false, false);
+                answer.setIsXacml3();  // dont let this be saved
+            } else {
+                answer = new Policy(this, rootNode);
+            };
+
             // Return the policy object
-            answer = new Policy(this, rootNode);
             Map policyConfig = getPolicyConfig();
             if (policyConfig != null) {
                 answer.setSubjectsResultTtl(

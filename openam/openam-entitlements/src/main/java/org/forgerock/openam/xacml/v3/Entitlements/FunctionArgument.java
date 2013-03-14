@@ -27,11 +27,13 @@
 package org.forgerock.openam.xacml.v3.Entitlements;
 
 
+import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.PrivilegeManager;
-
+import com.sun.identity.shared.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.print.attribute.standard.DateTimeAtCompleted;
 import java.util.Date;
 
 /*
@@ -43,8 +45,8 @@ import java.util.Date;
 
 */
 public abstract class FunctionArgument  {
-    public static FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN,Boolean.TRUE);
-    public static FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN,Boolean.FALSE);
+    public static FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN,"true");
+    public static FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN,"false");
 
     private DataType dataType;
     private String issuer ;
@@ -64,7 +66,7 @@ public abstract class FunctionArgument  {
     public boolean isTrue() {
         try {
         if (this instanceof DataValue) {
-            if (isType(DataType.Type.XACMLBOOLEANTYPE)) {
+            if (dataType.isType(DataType.Type.XACMLBOOLEANTYPE)) {
                 return Boolean.valueOf(this.asBoolean(null));
             } else {
                 return false;
@@ -84,7 +86,11 @@ public abstract class FunctionArgument  {
         JSONObject jo = new JSONObject();
 
         jo.put("className", getClass().getName());
+        if (dataType != null) {
         jo.put("dataType",dataType.getTypeName());
+        } else {
+            jo.put("dataType","");
+        }
         jo.put("issuer",issuer);
         return jo;
     }
@@ -122,111 +128,166 @@ public abstract class FunctionArgument  {
         return "";
     }
 
-    private boolean isType(DataType.Type t)  {
-        return (dataType.getIndex() == t.getIndex());
-    }
 
     public abstract FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException;
     public abstract Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException ;
 
+    private FunctionArgument getDataContainer(XACMLEvalContext pip) throws XACML3EntitlementException {
+        if ((this instanceof DataDesignator) || (this instanceof DataValue)) {
+            return this;
+        } else {
+            return this.evaluate(pip);
+        }
+    }
     public String asString(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLSTRINGTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLSTRINGTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public Boolean asBoolean(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLBOOLEANTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLBOOLEANTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Boolean) getValue(pip);
+        return (Boolean) fArg.getValue(pip);
     }
     public Integer asInteger(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLINTEGERTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLINTEGERTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Integer) getValue(pip);
+        return (Integer) fArg.getValue(pip);
     }
     public Double asDouble(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLDOUBLETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLDOUBLETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Double) getValue(pip);
+        return (Double) fArg.getValue(pip);
     }
     public Date asTime(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLTIMETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLTIMETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Date) getValue(pip);
+        return (Date) fArg.getValue(pip);
     }
     public Date asDate(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLDATETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLDATETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Date) getValue(pip);
+        return (Date) fArg.getValue(pip);
     }
     public Date asDateTime(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLDATETIMETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLDATETIMETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Date) getValue(pip);
+        return (Date) fArg.getValue(pip);
     }
     public String asAnyURI(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLANYURITYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLANYURITYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public String asHexBinary(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLHEXBINARYTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLHEXBINARYTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public String asBase64Binary(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLBASE64BINARYTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLBASE64BINARYTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public Integer asDayTimeDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLDAYTIMEDURATIONTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLDAYTIMEDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Integer) getValue(pip);
+        return (Integer) fArg.getValue(pip);
     }
     public Integer asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Integer) getValue(pip);
+        return (Integer) fArg.getValue(pip);
     }
     public String asX500Name(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLX500NAMETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLX500NAMETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public String asRfc822Name(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLRFC822NAMETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLRFC822NAMETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public String asIpAddress(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLIPADDRESSTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLIPADDRESSTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public String asDnsName(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLDNSNAMETYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLDNSNAMETYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (String) getValue(pip);
+        return (String) fArg.getValue(pip);
     }
     public String asXpathExpression(XACMLEvalContext pip) throws XACML3EntitlementException {
-        if (!isType(DataType.Type.XACMLXPATHEXPRESSIONTYPE)) {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLXPATHEXPRESSIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
         throw new IndeterminateException("type conflict");

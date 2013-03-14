@@ -245,7 +245,15 @@ public class PolicyViewBean
                 Set resourceNames =
                     model.getProtectedResourceNames(realm, name);
                 boolean isActive = model.isPolicyActive(realm, name);
-                if (resourceNames.isEmpty()) {
+
+                String id = model.cachePolicy(realm, name);
+                CachedPolicy cachedPolicy = model.getCachedPolicy(id);
+                Policy policy = cachedPolicy.getPolicy();
+                if (policy.isXacml3()) {
+                    tblModel.setValue(TBL_DATA_RESOURCES,
+                            model.getLocalizedString(
+                                    "policy.resources.XACML3.message"));
+                } else if (resourceNames.isEmpty()) {
                     tblModel.setValue(TBL_DATA_RESOURCES,
                         model.getLocalizedString(
                         "policy.resources.empty.message"));
@@ -352,10 +360,15 @@ public class PolicyViewBean
             AMAdminConstants.CURRENT_REALM);
         try {
             String id = model.cachePolicy(curRealm, policyName);
-            setPageSessionAttribute(
-                PolicyOpViewBeanBase.PG_SESSION_POLICY_CACHE_ID, id);
             CachedPolicy cachedPolicy = model.getCachedPolicy(id);
             Policy policy = cachedPolicy.getPolicy();
+            if (policy.isXacml3()) {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
+                        "Cannot Edit XACML3 Policy");
+                forwardTo();
+            }
+            setPageSessionAttribute(
+                    PolicyOpViewBeanBase.PG_SESSION_POLICY_CACHE_ID, id);
             PolicyOpViewBeanBase vb = (policy.isReferralPolicy())
                 ? (PolicyOpViewBeanBase)getViewBean(
                     PolicyReferralEditViewBean.class)

@@ -52,16 +52,13 @@ public class Or extends XACMLFunction {
         int args = getArgCount();
 
         for (int i=0;i<args;i++) {
-            Object argument = getArg(i).getValue(pip);
-            if (argument == null) {
-                throw new IndeterminateException("Argument is null!");
+            try {
+            Boolean ob = getArg(i).asBoolean(pip);
+            if (ob.booleanValue() == true) {
+                return    FunctionArgument.trueObject;
             }
-            if(argument instanceof Boolean) {
-                if (((Boolean)argument).booleanValue() == true) {
-                    return  FunctionArgument.trueObject;
-                }
-            } else {
-                throw new IndeterminateException("Expecting Boolean, but received: "+argument.getClass().getName());
+            } catch (XACML3EntitlementException ex) {
+                // Ignore the error
             }
         }
         return retVal;

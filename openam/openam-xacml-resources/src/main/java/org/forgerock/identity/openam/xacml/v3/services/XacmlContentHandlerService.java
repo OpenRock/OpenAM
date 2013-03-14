@@ -818,13 +818,13 @@ public class XacmlContentHandlerService extends HttpServlet  {
         // **********************************************************************
         // Only Continue if we have authenticated or Trust the PEP.
 IS_AUTHENTICATED:
-        if (!xacmlRequestInformation.isAuthenticated()) {
+   //     if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized.
             // This Starts the Authorization via Digest Flow...
-            this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
-            return;
-        }
+    //        this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
+    //        return;
+    //    }
 
         // ******************************************************************************************************
         // PEP must be Authenticated and Authorized proceeding past this code point
