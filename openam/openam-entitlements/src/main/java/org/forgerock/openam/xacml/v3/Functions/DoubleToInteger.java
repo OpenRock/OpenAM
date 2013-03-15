@@ -48,7 +48,7 @@ public class DoubleToInteger extends XACMLFunction {
                     "however " + getArgCount() + " in stack.");
         }
         FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER,
-                Integer.valueOf(getArg(0).asDouble(pip).intValue()));
+                Integer.valueOf(getArg(0).asDouble(pip).intValue()), true);
         // return the Value.
         return retVal;
     }

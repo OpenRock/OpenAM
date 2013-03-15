@@ -56,10 +56,10 @@ public class IntegerMultiply extends XACMLFunction {
         // Consume are first and second arguments and iterate from their to multiply across all arguments.
         // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
         FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, (getArg(0).asInteger(pip) * getArg(1)
-                .asInteger(pip)));
+                .asInteger(pip)), true);
         for(int i=2; i<getArgCount(); i++) {
             Integer argumentValue = getArg(i).asInteger(pip);
-            retVal = new DataValue(DataType.XACMLINTEGER, (retVal.asInteger(pip) * argumentValue));
+            retVal = new DataValue(DataType.XACMLINTEGER, (retVal.asInteger(pip) * argumentValue), true);
         }
         // return the Accumulated Value.
         return retVal;

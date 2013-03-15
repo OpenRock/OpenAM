@@ -48,7 +48,6 @@ public class IntegerSubtract extends XACMLFunction {
     }
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0);
         if ( getArgCount() != 2) {
             throw new XACML3EntitlementException("Function Requires 2 arguments, " +
                     "however "+getArgCount()+" in stack.");
@@ -56,7 +55,7 @@ public class IntegerSubtract extends XACMLFunction {
         Integer arg0 = getArg(0).asInteger(pip);
         Integer arg1 = getArg(1).asInteger(pip);
 
-        retVal = new DataValue(DataType.XACMLINTEGER, (arg0 - arg1));
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, (arg0 - arg1), true);
         // return the Deducted Value.
         return retVal;
     }

@@ -147,10 +147,12 @@ public class DataType {
             return s;
         }
         if (isType(DataType.Type.XACMLDAYTIMEDURATIONTYPE)) {
-            return Integer.valueOf(s);
+            //return Integer.valueOf(s);
+            return s;
         }
         if (isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
-            return Integer.valueOf(s);
+            //return Integer.valueOf(s);
+            return s;
         }
         if (isType(DataType.Type.XACMLX500NAMETYPE)) {
             return s;

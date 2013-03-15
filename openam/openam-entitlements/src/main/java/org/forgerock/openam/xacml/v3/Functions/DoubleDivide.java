@@ -56,7 +56,7 @@ public class DoubleDivide extends XACMLFunction {
         if (divisor == 0) {
             throw new IndeterminateException("Divisor is zero, Indeterminate Result.");
         }
-        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, (dividend / divisor));
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, (dividend / divisor), true);
         // return the Value.
         return retVal;
     }

@@ -57,7 +57,7 @@ public class IntegerDivide extends XACMLFunction {
         if (divisor == 0) {
             throw new IndeterminateException("Divisor is zero, Indeterminate Result.");
         }
-        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, (dividend / divisor));
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, (dividend / divisor), true);
         // return the Value.
         return retVal;
     }

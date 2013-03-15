@@ -27,9 +27,11 @@
 package org.forgerock.openam.xacml.v3.Entitlements;
 
 
-/*
+/**
    This class Encapsulates a DataValue from the XACML policy.
    In this case, we have the actual Data in the object
+
+  @author Allan.Foster@forgerock.com
 
 */
 
@@ -37,43 +39,97 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DataValue extends FunctionArgument {
+    /**
+     * Data Value Object.
+     */
     private Object data;
 
+    /**
+     * Default Constructor
+     */
     public DataValue() {
     }
-    /* When we create the value,  is HAS to be of the type */
 
+    /**
+     * Constructor used to specify whether raw value was supplied or not.
+     * When we create the value, is HAS to be of the type.
+
+     * @param type
+     * @param value
+     * @param rawType
+     */
     public DataValue(String type, Object value, boolean rawType) {
         setType(type);
-        data = value;
+        if (!rawType) {
+            data = getType().typedValue((String)value);
+        } else {
+            data = value;
+        }
     }
 
+    /**
+     * Constructor used to specify the value represented by String Data.
+
+     * @param type
+     * @param value
+     */
     public DataValue(String type, String value) {
         setType(type);
         data = getType().typedValue(value);
     }
 
-
+    /**
+     * Evaluate the Function Argument Set.
+     *
+     * @param pip
+     * @return
+     * @throws XACML3EntitlementException
+     */
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         return this;
-    };
+    }
 
+    /**
+     * Get the current Data Value.
+     *
+     * @param pip
+     * @return
+     * @throws XACML3EntitlementException
+     */
     public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
         return data;
     }
 
+    /**
+     * Get the current value in JSON Form.
+     *
+     * @return
+     * @throws JSONException
+     */
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = super.toJSONObject();
         jo.put("value", data);
         return jo;
     }
 
+    /**
+     * Initialize Data Value from a JSON Object.
+     *
+     * @param jo
+     * @throws JSONException
+     */
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
         this.data = getType().typedValue(jo.optString("value"));
         return;
-    };
+    }
 
+    /**
+     * UnMarshal the exiting DataType to XML.
+     *
+     * @param type
+     * @return
+     */
     public String toXML(String type) {
         /*
              Handle Match AnyOf and AllOf specially

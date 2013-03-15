@@ -56,10 +56,10 @@ public class DoubleMultiply extends XACMLFunction {
         // Consume are first and second arguments and iterate from their to multiply across all arguments.
         // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
         FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, (getArg(0).asDouble(pip) * getArg(1).asDouble
-                (pip)));
+                (pip)), true);
         for(int i=2; i<getArgCount(); i++) {
             Double argumentValue = getArg(i).asDouble(pip);
-            retVal = new DataValue(DataType.XACMLDOUBLE, (retVal.asDouble(pip) * argumentValue));
+            retVal = new DataValue(DataType.XACMLDOUBLE, (retVal.asDouble(pip) * argumentValue), true);
         }
         // return the Accumulated Value.
         return retVal;

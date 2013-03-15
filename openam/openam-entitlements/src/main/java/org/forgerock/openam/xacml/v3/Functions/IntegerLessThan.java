@@ -36,11 +36,29 @@ import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:integer-less-than
+ */
 public class IntegerLessThan extends XACMLFunction {
 
-    public IntegerLessThan()  {
+    public IntegerLessThan() {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+
+        Integer arg0 = getArg(0).asInteger(pip);
+        Integer arg1 = getArg(1).asInteger(pip);
+
+        if (arg0.intValue() < arg1.intValue()) {
+            retVal = FunctionArgument.trueObject;
+        } else {
+            retVal = FunctionArgument.falseObject;
+        }
+        return retVal;
     }
 }

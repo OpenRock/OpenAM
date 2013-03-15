@@ -48,7 +48,7 @@ public class IntegerAbs extends XACMLFunction {
             throw new XACML3EntitlementException("Function Requires 1 argument, " +
                     "however " + getArgCount() + " in stack.");
         }
-        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, Math.abs(getArg(0).asInteger(pip)));
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, Math.abs(getArg(0).asInteger(pip)),true);
         // return the Value.
         return retVal;
     }

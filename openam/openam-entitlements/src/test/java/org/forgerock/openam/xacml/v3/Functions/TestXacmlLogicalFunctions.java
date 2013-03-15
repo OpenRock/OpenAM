@@ -178,7 +178,7 @@ public class TestXacmlLogicalFunctions {
     @Test
     public void test_Logical_Nof() throws XACML3EntitlementException {
         NOf _NOf = new NOf();
-        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 1);
+        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 1, true);
         _NOf.addArgument(requiredToBeTrue);
 
         StringEqual stringEqual = new StringEqual();
@@ -211,7 +211,7 @@ public class TestXacmlLogicalFunctions {
     @Test(expectedExceptions = IndeterminateException.class)
     public void test_Logical_Nof_Failure() throws XACML3EntitlementException {
         NOf _NOf = new NOf();
-        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 4);
+        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 4, true);
         _NOf.addArgument(requiredToBeTrue);
 
         StringEqual stringEqual = new StringEqual();
@@ -244,7 +244,7 @@ public class TestXacmlLogicalFunctions {
     @Test
     public void test_Logical_Nof_Nothing() throws XACML3EntitlementException {
         NOf _NOf = new NOf();
-        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 0);
+        FunctionArgument requiredToBeTrue = new DataValue(DataType.XACMLINTEGER, 0, true);
         _NOf.addArgument(requiredToBeTrue);
         FunctionArgument result = _NOf.evaluate(null);
         assertNotNull(result);

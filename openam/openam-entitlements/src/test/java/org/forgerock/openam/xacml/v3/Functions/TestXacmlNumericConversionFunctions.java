@@ -63,8 +63,8 @@ public class TestXacmlNumericConversionFunctions {
      */
     @Test
     public void testDoubleToInteger() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9D, true);
 
         DoubleToInteger doubleToInteger = new DoubleToInteger();
         // Place Objects in Argument stack.
@@ -86,8 +86,8 @@ public class TestXacmlNumericConversionFunctions {
      */
     @Test
     public void testIntegerToDouble() throws XACML3EntitlementException {
-        FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, -7566);
-        FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, -9);
+        FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, -7566, true);
+        FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, -9, true);
 
         IntegerToDouble integerToDouble = new IntegerToDouble();
         // Place Objects in Argument stack.

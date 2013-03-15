@@ -48,7 +48,7 @@ public class DoubleAbs extends XACMLFunction {
             throw new XACML3EntitlementException("Function Requires 1 argument, " +
                     "however " + getArgCount() + " in stack.");
         }
-        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, Math.abs(getArg(0).asDouble(pip)));
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, Math.abs(getArg(0).asDouble(pip)), true);
         // return the Value.
         return retVal;
     }

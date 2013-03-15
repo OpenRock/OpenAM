@@ -58,10 +58,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Add() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 222);
-        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 420);
-        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 222, true);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 420, true);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2, true);
 
         IntegerAdd integerAdd = new IntegerAdd();
         // Place Objects in Argument stack for accumulation.
@@ -89,7 +89,7 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test(expectedExceptions = XACML3EntitlementException.class)
     public void testInteger_Add_Exception() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1, true);
         FunctionArgument bad2 = new DataValue(DataType.XACMLSTRING, "1");
 
         IntegerAdd integerAdd = new IntegerAdd();
@@ -107,10 +107,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Add() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 10000000001D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000222D);
-        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000420D);
-        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 10000000002D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 10000000001D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000222D, true);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000420D, true);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 10000000002D, true);
 
         DoubleAdd doubleAdd = new DoubleAdd();
         // Place Objects in Argument stack for accumulation.
@@ -137,10 +137,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Subtract() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 6);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 66);
-        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6);
-        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 6, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 66, true);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6, true);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2, true);
 
         IntegerSubtract integerSubtract = new IntegerSubtract();
         // Place Objects in Argument stack for deduction.
@@ -165,10 +165,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Subtract() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 10000000066D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000006D);
-        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000002D);
-        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 10000000004D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 10000000066D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000006D, true);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000002D, true);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 10000000004D, true);
 
         DoubleSubtract doubleSubtract = new DoubleSubtract();
         // Place Objects in Argument stack for deduction.
@@ -193,10 +193,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Multiply() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 222);
-        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 420);
-        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 1, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 222, true);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 420, true);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2, true);
 
         IntegerMultiply integerMultiply = new IntegerMultiply();
         // Place Objects in Argument stack for accumulation.
@@ -224,10 +224,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Multiply() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 1D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000222D);
-        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000420D);
-        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 1D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 10000000222D, true);
+        FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 10000000420D, true);
+        FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D, true);
 
         DoubleMultiply doubleMultiply = new DoubleMultiply();
         // Place Objects in Argument stack for accumulation.
@@ -255,10 +255,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Divide() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 6);
-        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6);
-        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 6, true);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6, true);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 2, true);
 
         IntegerDivide integerDivide = new IntegerDivide();
         // Place Objects in Argument stack.
@@ -283,8 +283,8 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test(expectedExceptions = IndeterminateException.class)
     public void testInteger_Divide_Divisor_Zero() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 0);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 0, true);
 
         IntegerDivide integerDivide = new IntegerDivide();
         // Place Objects in Argument stack.
@@ -303,10 +303,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Divide() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLDOUBLE, 66D);
-        FunctionArgument int2 = new DataValue(DataType.XACMLDOUBLE, 6D);
-        FunctionArgument int3 = new DataValue(DataType.XACMLDOUBLE, 6D);
-        FunctionArgument int4 = new DataValue(DataType.XACMLDOUBLE, 2D);
+        FunctionArgument int1 = new DataValue(DataType.XACMLDOUBLE, 66D, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLDOUBLE, 6D, true);
+        FunctionArgument int3 = new DataValue(DataType.XACMLDOUBLE, 6D, true);
+        FunctionArgument int4 = new DataValue(DataType.XACMLDOUBLE, 2D, true);
 
         DoubleDivide integerDivide = new DoubleDivide();
         // Place Objects in Argument stack.
@@ -331,10 +331,10 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Mod() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 9);
-        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6);
-        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 5);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, 66, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, 9, true);
+        FunctionArgument int3 = new DataValue(DataType.XACMLINTEGER, 6, true);
+        FunctionArgument int4 = new DataValue(DataType.XACMLINTEGER, 5, true);
 
         IntegerMod integerMod = new IntegerMod();
         // Place Objects in Argument stack.
@@ -364,8 +364,8 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testInteger_Abs() throws XACML3EntitlementException {
-        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, -7566);
-        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, -9);
+        FunctionArgument int1 = new DataValue(DataType.XACMLINTEGER, -7566, true);
+        FunctionArgument int2 = new DataValue(DataType.XACMLINTEGER, -9, true);
 
         IntegerAbs integerAbs = new IntegerAbs();
         // Place Objects in Argument stack.
@@ -387,8 +387,8 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testDouble_Abs() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9D, true);
 
         DoubleAbs doubleAbs = new DoubleAbs();
         // Place Objects in Argument stack.
@@ -410,8 +410,8 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testRound() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566.67D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9.9D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -7566.67D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9.9D, true);
 
         Round round = new Round();
         // Place Objects in Argument stack.
@@ -433,8 +433,8 @@ public class TestXacmlArithmeticFunctions {
      */
     @Test
     public void testFloor() throws XACML3EntitlementException {
-        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -100.675D);
-        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9.564D);
+        FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, -100.675D, true);
+        FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, -9.564D, true);
 
         Floor floor = new Floor();
         // Place Objects in Argument stack.

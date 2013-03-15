@@ -49,7 +49,7 @@ public class Round extends XACMLFunction {
                     "however " + getArgCount() + " in stack.");
         }
         Long longValue = Math.round(getArg(0).asDouble(pip));
-        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, longValue.doubleValue());
+        FunctionArgument retVal = new DataValue(DataType.XACMLDOUBLE, longValue.doubleValue(), true);
         // return the Value.
         return retVal;
     }

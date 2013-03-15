@@ -50,7 +50,7 @@ public class IntegerAdd extends XACMLFunction {
     }
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0);
+        FunctionArgument retVal = new DataValue(DataType.XACMLINTEGER, 0, true);
         if ( getArgCount() < 2) {
             throw new XACML3EntitlementException("Function Requires 2 or more arguments, " +
                     "only "+getArgCount()+" in stack.");
@@ -61,7 +61,7 @@ public class IntegerAdd extends XACMLFunction {
             }
             // We have a Valid DataType, Accumulate Arguments, or else Entitlement Exception will be thrown.
             Integer argumentValue = integerArgument.asInteger(pip);
-            retVal = new DataValue(DataType.XACMLINTEGER, (retVal.asInteger(pip) + argumentValue));
+            retVal = new DataValue(DataType.XACMLINTEGER, (retVal.asInteger(pip) + argumentValue), true);
         }
         // return the Accumulated Value.
         return retVal;
