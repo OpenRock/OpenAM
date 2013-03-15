@@ -78,7 +78,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         XacmlPIPResourceIdentifier xacmlPIPResourceIdentifier =
                 new XacmlPIPResourceIdentifier(category, attributeId, includeInResult);
         if (dataType == null) {
-            dataType = DataType.XACMLUNKNOWN;
+            dataType = DataType.XACMLUNDEFINED;
         }
         this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value,true));
         return true;
