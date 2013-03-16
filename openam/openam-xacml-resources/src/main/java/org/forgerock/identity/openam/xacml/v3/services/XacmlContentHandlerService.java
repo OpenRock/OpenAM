@@ -815,16 +815,35 @@ public class XacmlContentHandlerService extends HttpServlet  {
                     xacmlRequestInformation.getXacmlStringResponseBasedOnContent(requestContentType), response);
         } // End of Check for XACMLAuthzDecisionQuery Object and possible request Resolution for a [SAML4XACML] request.
 
+        // ***********************************************************************
+        // Check for a existence of a special auto-trusted End-Point, for a POST.
+        // This allows any incoming request if using the end-point of
+        // /openam/xacml/pdp/pep-trusted, will automatically trust the incoming
+        // request.
+        // TODO ::
+        // This will be removed once PEP Trust and security Authentication and
+        // Authorization has been decided upon.
+        // Correct Request Content and if no Request Object in XML or JSON
+        // form we render a Bad POST Request.
+AUTO_TRUST_PEP:
+        if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
+             (xacmlRequestInformation.isRequestNodePresent()) &&
+             (xacmlRequestInformation.getRequestURI().trim().
+                        toLowerCase().contains("/openam/xacml/pdp/pep-trusted".toLowerCase())) ) {
+            // Auto-Trust the PEP for the incoming request.
+            xacmlRequestInformation.setAuthenticated(true);
+        }
+
         // **********************************************************************
         // Only Continue if we have authenticated or Trust the PEP.
 IS_AUTHENTICATED:
-   //     if (!xacmlRequestInformation.isAuthenticated()) {
+        if (!xacmlRequestInformation.isAuthenticated()) {
             // ******************************************************************
             // Not Authenticated nor Authorized.
             // This Starts the Authorization via Digest Flow...
-    //        this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
-    //        return;
-    //    }
+            this.renderUnAuthorized(XACML3Constants.XACML3_PDP_DEFAULT_REALM, requestContentType, response);
+            return;
+        }
 
         // ******************************************************************************************************
         // PEP must be Authenticated and Authorized proceeding past this code point
