@@ -757,15 +757,6 @@ public class XacmlContentHandlerService extends HttpServlet  {
             }
         } // End of outer if Check for GET and no authentication Information.
 
-        // **************************************************************************************
-        // Continue with Authentication and Authorization of the PEP.
-        // **************************************************************************************
-
-        // **************************************************************************************
-        // Other Authentication and Authorization algorithm's such as SAML, OpenID and ...
-        // TODO : Add code to pull in an AA Plugin or Connect to a Framework Component.
-        // **************************************************************************************
-
         // ******************************************************************
         // Check for Authentication Digest.
         // Did we receive a valid WWW Authentication header using Digest?
@@ -786,29 +777,30 @@ public class XacmlContentHandlerService extends HttpServlet  {
                     // Authentication is valid, set our POJO indicators, we had a valid digest and authenticated.
                     xacmlRequestInformation.setAuthenticated(true);
                 } // End of Inner Else.
-        // ******************************************************************
-        // Check for any XACMLAuthzDecisionQuery Request?
-        } else if (xacmlRequestInformation.getXacmlAuthzDecisionQuery().getId() != null) {
-
-            debug.error("Processing XACMLAuthzDecisionQuery Wrapper Value: "+
-                    xacmlRequestInformation.getXacmlAuthzDecisionQuery().toString() );
-
-
-            // TODO : AME-302 Address processing a XACMLAuthzDecisionQuery Wrapper to
-            // TODO : Authorize and Authenticate the PEP sending the request.
-
-
-
         }
+
+
+        // **************************************************************************************
+        // Continue with Authentication and Authorization of the PEP.
+        // **************************************************************************************
+
+        // **************************************************************************************
+        // Other Authentication and Authorization algorithm's such as SAML, OpenID and ...
+        // TODO : Add code to pull in an AA Plugin or Connect to a Framework Component.
+        // **************************************************************************************
+
+        // TODO : AME-xxx As a Developer I need to implement multiple AA algorithms to
+        // TODO : Authorize and Authenticate the PEP sending the request.
+        // TODO : Suggest using OAuth2, OpenID and SAML Assertion, without using
+        // TODO : XACMLAuthzDecisionQuery.
+        // **************************************************************************************
+
+
         // **************************************************
-        // Determine if the Authentication Wrapper provided
-        // a Request which was already satisfied.
+        // Determine if the AA algorithm was able to
+        // satisfy the request without an explicit
+        // call to Evaluate the request.
         if ((xacmlRequestInformation.isAuthenticated()) && (xacmlRequestInformation.isRequestProcessed())) {
-
-             // TODO : AME-302
-            // Check for other Authentication Patterns Here...
-
-
             // *****************************************************************
             // Render our Response
             renderResponse(requestContentType,
@@ -817,14 +809,16 @@ public class XacmlContentHandlerService extends HttpServlet  {
 
         // ***********************************************************************
         // Check for a existence of a special auto-trusted End-Point, for a POST.
-        // This allows any incoming request if using the end-point of
+        // This allows any incoming requests if using the end-point of
         // /openam/xacml/pdp/pep-trusted, will automatically trust the incoming
         // request.
+        //
         // TODO ::
         // This will be removed once PEP Trust and security Authentication and
         // Authorization has been decided upon.
         // Correct Request Content and if no Request Object in XML or JSON
         // form we render a Bad POST Request.
+        //
 AUTO_TRUST_PEP:
         if ( (xacmlRequestInformation.getRequestMethod().equalsIgnoreCase("POST")) &&
              (xacmlRequestInformation.isRequestNodePresent()) &&
