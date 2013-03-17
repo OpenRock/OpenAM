@@ -27,7 +27,7 @@
 -->
 
 <!--
-Portions Copyrighted 2010]-2012 ForgeRock Inc
+Portions Copyrighted 2010 - 2013 ForgeRock Inc
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -46,7 +46,7 @@ Portions Copyrighted 2010]-2012 ForgeRock Inc
     <property name="webagents.apache22.src.dir" 
               location="${webagents.basedir}/agents/source/apache22"/>
     <property name="webagents.apache24.src.dir" 
-                  location="${webagents.basedir}/agents/source/apache24"/>
+              location="${webagents.basedir}/agents/source/apache24"/>
     <property name="webagents.iis6.src.dir"
               location="${webagents.basedir}/agents/source/iis6"/>
     <property name="webagents.iis7.src.dir"
@@ -187,6 +187,22 @@ Portions Copyrighted 2010]-2012 ForgeRock Inc
     <target name="all" depends="preparebuild, scratch">
         <echo message="Dispatch to container specific directory"/>
         <ant antfile="${webagents.install.dir}/build.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="varnish" depends="preparebuild, scratch">
+        <zip file="${webagents.dist.dir}/${containername}_v303_${build.os}${build.type.suffix}_agent_${agentversion}.zip" whenempty="create">  
+            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/bin/" includes="agentadmin"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/extlib/${build.os.ext}/nss${build.type.suffix}/bin/" includes="certutil"/>
+            <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
+            <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/lib/" includes="**/*.so*"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/lib/" includes="**/*.chk"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.built.dir}/${build.os.ext}/lib/" includes="libamsdk.so.3"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.built.dir}/${build.os.ext}/lib/" includes="libvmod_am.so"/>
+            <zipfileset prefix="web_agents/varnish" dir="${webagents.basedir}/legal/" includes="license.txt"/>
+        </zip>
+        <checksum file="${webagents.dist.dir}/${containername}_v303_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
+                  algorithm="SHA" fileext=".sha" />  
     </target>
 
 </project>

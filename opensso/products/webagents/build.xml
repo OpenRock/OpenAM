@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2012 ForgeRock AS
+    Portions Copyrighted 2010 - 2013 ForgeRock Inc
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -61,6 +61,19 @@
     </condition>
 
     <condition property="build.os" value="SunOS_x86">
+        <and>
+            <os name="sunos"/>
+            <and>
+                <os arch="x86"/>
+            </and>
+        </and>
+    </condition>
+    
+    <condition property="build.os.ext" value="Linux">
+        <os name="linux"/>
+    </condition>
+    
+    <condition property="build.os.ext" value="SunOS_i86pc">
         <and>
             <os name="sunos"/>
             <and>
@@ -124,11 +137,12 @@
     <target name="all">
         <antcall target="apache22" />
         <antcall target="apache24" />
-        <antcall target="sjsws" />
+        <antcall target="sjsws" /> 
         <antcall target="apache" />
-        <antcall target="proxy40" />
+        <antcall target="proxy40" /> 
         <antcall target="iis6" />
-        <antcall target="domino" />
+        <antcall target="domino" /> 
+        <antcall target="varnish" />
     </target>
 
     <target name="apache" depends="preparebuild">
@@ -195,6 +209,29 @@
         <ant antfile="${webagents.basedir}/build_agent.xml" 
              target="all" inheritRefs="true"/>
     </target>
+    
+    <target name="check.build.varnish">
+        <condition property="build.varnish">
+            <and>
+                <equals arg1="${build.type}" arg2="64"/>
+                <or>
+                    <os name="linux"/>
+                    <os name="sunos"/>
+                </or>
+                <not>
+                    <os name="sunos" arch="sparc"/>
+                </not>
+            </and> 
+        </condition>
+    </target>
+    
+    <target name="varnish" depends="preparebuild,check.build.varnish" if="build.varnish">
+        <echo message="Dispatch to Varnish"/>
+        <property name="containername" value="varnish"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+             target="varnish" inheritRefs="true"/>
+    </target>
 
     <target name="iis6" depends="preparebuild" if="iis.build.ok">
         <echo message="Dispatch to iis6"/>
@@ -241,6 +278,8 @@
               tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
               tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/varnish/build_date.js.template"
+              tofile="${webagents.dist.dir}/varnish_v303_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <antcall target="all" inheritRefs="true"/>
 <!--
         <copy file="${webagents.docs.dir}/nightly.html" 
@@ -270,6 +309,7 @@
         <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
         <echo message=" iis6            : builds the Microsoft Internet Information Services 6 agent"/>
         <echo message=" iis7            : builds the Microsoft Internet Information Services 7 agent"/>
+        <echo message=" varnish         : builds the Varnish Cache Server 3.0.3 agent"/>
         <echo message=" usage           : displays this usage message"/>
         <echo message=" "/>
         <echo message=" To run a target, issue the following command:"/>

@@ -29,7 +29,7 @@
 #
 #
 
-# Portions Copyrighted 2010-2012 ForgeRock Inc
+# Portions Copyrighted 2010 - 2013 ForgeRock Inc
 
 USERX_ROOT := ../..
 
@@ -51,7 +51,7 @@ else
 ifeq ($(OS_ARCH), AIX)
 SUBDIRS += apache apache22 apache24
 else 
-BUILD_AGENT := apache sjsws apache22 apache24 proxy40
+BUILD_AGENT := apache sjsws apache22 apache24 proxy40 varnish
 endif
 endif
 ifeq ($(OS_ARCH), WINNT)
