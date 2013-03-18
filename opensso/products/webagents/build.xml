@@ -213,7 +213,6 @@
     <target name="check.build.varnish">
         <condition property="build.varnish">
             <and>
-                <equals arg1="${build.type}" arg2="64"/>
                 <or>
                     <os name="linux"/>
                     <os name="sunos"/>
