@@ -31,7 +31,7 @@ VARNISH_LIB := $(VARNISH_LIB_NAME)$(SO_EXT)
 ifeq ($(BUILD_TYPE), 32)
 VARNISH_INCLUDE_FLAGS := -I$(DEST_INC_DIR) -I../common -I../../../extlib/$(OSMC_ARCH)/varnish_32/include/
 VARNISH_LDFLAGS := -L../../../extlib/$(OSMC_ARCH)/varnish_32/lib/
-VARNISH_CFLAGS := -m32
+VARNISH_CFLAGS := -m32 -D_FILE_OFFSET_BITS=64
 else
 VARNISH_INCLUDE_FLAGS := -I$(DEST_INC_DIR) -I../common -I../../../extlib/$(OSMC_ARCH)/varnish_64/include/
 VARNISH_LDFLAGS := -L../../../extlib/$(OSMC_ARCH)/varnish_64/lib/
