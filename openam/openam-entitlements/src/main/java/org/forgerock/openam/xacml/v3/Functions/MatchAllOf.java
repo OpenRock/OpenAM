@@ -25,9 +25,10 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
-
-import java.util.List;
+import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
 /*
 urn:oasis:names:tc:xacml:1.0:function:integer-equal
@@ -36,38 +37,14 @@ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XM
  The function SHALL return “True” if and only if the two arguments represent the same number.
  */
 
-public class AllOf extends XACMLFunction {
+public class MatchAllOf extends XACMLFunction {
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = FunctionArgument.trueObject;
 
-        int args = getArgCount();
-        if (args < 3) {
-            throw new NotApplicableException("Not enough arguments");
-        }
-        XACMLFunction func = (XACMLFunction)getArg(0);
-        FunctionArgument bag = getArg(args-1).evaluate(pip);
-        if (bag instanceof DataValue) {
-            bag = new DataBag(bag.getType().getTypeName(),(DataValue)bag);
-        }
-        if (!(bag instanceof DataBag))  {
-            throw new NotApplicableException("AllOf applied to NON bag");
-        }
-
-        for (int i = 1; i < args -1; i++) {
-             FunctionArgument res = getArg(i).evaluate(pip);
-             List<DataValue> bagVals = (List<DataValue>)bag.getValue(pip);
-            boolean oneIsTrue = false;
-
-            for (DataValue dv :  bagVals)  {
-                func.clearArguments();
-                func.addArgument(res).addArgument(dv);
-                FunctionArgument result = func.evaluate(pip);
-                if (result.isTrue()) {
-                    oneIsTrue = true;
-                }
-            }
-            if (!oneIsTrue) {
+        for (int i = 0; i < getArgCount(); i++) {
+            FunctionArgument res = getArg(i).evaluate(pip);
+            if (!res.isTrue()) {
                 retVal = FunctionArgument.falseObject;
             }
         }
@@ -79,21 +56,12 @@ public class AllOf extends XACMLFunction {
              Handle Match AnyOf and AllOf specially
         */
 
-        if (type.equals("Match")) {
-            retVal = "<AllOf>" ;
-        } else if (type.equals("Allow")) {
-            retVal = "<Allow FunctionId=\"" + functionID + "\">" ;
-        }
+        retVal = "<AllOf>" ;
 
         for (FunctionArgument arg : arguments){
             retVal = retVal + arg.toXML(type);
         }
-        if (type.equals("Match")) {
-            retVal = retVal + "</AllOf>" ;
-        } else if (type.equals("Allow")) {
-            retVal = retVal + "</Allow>" ;
-        }
-
+        retVal = retVal + "</AllOf>" ;
         return retVal;
     }
 

@@ -58,11 +58,11 @@ public class XACML3PrivilegeUtils {
     static FunctionArgument getTargetFunction(Target target, Set<String> rSelectors) {
         List<AnyOf> anyOfList = target.getAnyOf();
 
-        XACMLFunction retVal = XACMLFunction.getInstance("urn:oasis:names:tc:xacml:1.0:function:any-of");
+        XACMLFunction retVal = XACMLFunction.getInstance("urn:forgerock:xacml:1.0:function:MatchAnyOf");
 
         for (AnyOf anyOf : anyOfList) {
             List<AllOf> allOfList = anyOf.getAllOf();
-            XACMLFunction parent = XACMLFunction.getInstance("urn:oasis:names:tc:xacml:1.0:function:all-of");
+            XACMLFunction parent = XACMLFunction.getInstance("urn:forgerock:xacml:1.0:function:MatchAllOf");
             for (AllOf allOf : allOfList) {
                 List<Match> matchList = allOf.getMatch();
                 for (Match match : matchList) {
@@ -76,8 +76,11 @@ public class XACML3PrivilegeUtils {
                     if (attrd.getCategory().contains(":resource")) {
                         rSelectors.add(attrd.getAttributeId());
                     }
-
-                    parent.addArgument(XACMLFunction.getInstance(mName).addArgument(dv).addArgument(dd));
+                    // XACMLFunction.getInstance("urn:oasis:names:tc:xacml:1.0:function:any-of").XACMLFunction.getInstance(mName),
+                    parent.addArgument(XACMLFunction.getInstance("urn:oasis:names:tc:xacml:3.0:function:any-of")
+                            .addArgument(XACMLFunction.getInstance(mName))
+                            .addArgument(dv)
+                            .addArgument(dd));
 
                 }
             }

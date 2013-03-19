@@ -52,6 +52,10 @@ public abstract class XACMLFunction extends FunctionArgument {
         this.functionID = functionID;
     }
 
+    public XACMLFunction clearArguments() {
+        arguments.clear();
+        return this;
+    }
     public XACMLFunction addArgument(FunctionArgument arg) {
         arguments.add(arg);
         return this;
@@ -277,8 +281,8 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag","org.forgerock.openam.xacml.v3.Functions.Rfc822nameBag");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:string-concatenate","org.forgerock.openam.xacml.v3.Functions.StringConcatenate");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:uri-string-concatenate","org.forgerock.openam.xacml.v3.Functions.UriStringConcatenate");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:any-of","org.forgerock.openam.xacml.v3.Functions.AnyOf");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:all-of","org.forgerock.openam.xacml.v3.Functions.AllOf");
+        functions.put("urn:oasis:names:tc:xacml:3.0:function:any-of","org.forgerock.openam.xacml.v3.Functions.AnyOf");
+        functions.put("urn:oasis:names:tc:xacml:3.0:function:all-of","org.forgerock.openam.xacml.v3.Functions.AllOf");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:any-of-any","org.forgerock.openam.xacml.v3.Functions.AnyOfAny");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:all-of-any","org.forgerock.openam.xacml.v3.Functions.AllOfAny");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:any-of-all","org.forgerock.openam.xacml.v3.Functions.AnyOfAll");
@@ -412,6 +416,8 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:3.0:function:access-permitted","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
 
         functions.put("urn:oasis:names:forgerock:xacml:1.0:function:VariableDereference","org.forgerock.openam.xacml.v3.Functions.VariableDereference");
+        functions.put("urn:forgerock:xacml:1.0:function:MatchAnyOf","org.forgerock.openam.xacml.v3.Functions.MatchAnyOf");
+        functions.put("urn:forgerock:xacml:1.0:function:MatchAllOf","org.forgerock.openam.xacml.v3.Functions.MatchAllOf");
 
     }
 }

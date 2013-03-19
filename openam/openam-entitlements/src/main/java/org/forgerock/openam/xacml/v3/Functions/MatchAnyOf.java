@@ -36,46 +36,22 @@ The comparison SHALL use Unicode codepoint collation,
 as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
-import java.util.List;
+public class MatchAnyOf extends XACMLFunction {
 
-public class AnyOf extends XACMLFunction {
-
-    public AnyOf()  {
-    }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument retVal = FunctionArgument.falseObject;
 
-        int args = getArgCount();
-        if (args < 3) {
-            throw new NotApplicableException("Not enough arguments");
-        }
-        XACMLFunction func = (XACMLFunction)getArg(0);
-        FunctionArgument bag = getArg(args-1).evaluate(pip);
-        if (bag instanceof DataValue) {
-            bag = new DataBag(bag.getType().getTypeName(),(DataValue)bag);
-        }
-        if (!(bag instanceof DataBag))  {
-            throw new NotApplicableException("AnyOf applied to NON bag");
-        }
-
-        for (int i = 1; i < args -1; i++) {
+        for (int i = 0; i < getArgCount(); i++) {
             FunctionArgument res = getArg(i).evaluate(pip);
-            List<DataValue> bagVals = (List<DataValue>)bag.getValue(pip);
-            boolean oneIsTrue = false;
-
-            for (DataValue dv :  bagVals)  {
-                func.clearArguments();
-                func.addArgument(res).addArgument(dv);
-                FunctionArgument result = func.evaluate(pip);
-                if (result.isTrue()) {
-                    oneIsTrue = true;
-                }
-            }
-            if (oneIsTrue) {
+            if (res.isTrue()) {
                 retVal = FunctionArgument.trueObject;
+                break;
             }
         }
         return retVal;
@@ -86,20 +62,13 @@ public class AnyOf extends XACMLFunction {
              Handle Match AnyOf and AllOf specially
         */
 
-        if (type.equals("Match")) {
-            retVal = "<AnyOf>" ;
-        } else if (type.equals("Allow")) {
-            retVal = "<Allow FunctionId=\"" + functionID + "\">" ;
-        }
+        retVal = "<AnyOf>" ;
 
         for (FunctionArgument arg : arguments){
             retVal = retVal + arg.toXML(type);
         }
-        if (type.equals("Match")) {
-            retVal = retVal + "</AnyOf>" ;
-        } else if (type.equals("Allow")) {
-            retVal = retVal + "</Allow>" ;
-        }
+
+        retVal = retVal + "</AnyOf>" ;
 
         return retVal;
     }
