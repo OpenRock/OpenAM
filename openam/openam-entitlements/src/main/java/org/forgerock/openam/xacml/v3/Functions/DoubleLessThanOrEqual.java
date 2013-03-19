@@ -36,11 +36,28 @@ import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:double-less-than-or-equal
+ */
 public class DoubleLessThanOrEqual extends XACMLFunction {
 
     public DoubleLessThanOrEqual()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+
+        if ( getArgCount() != 2) {
+            return retVal;
+        }
+
+        Double arg0 = getArg(0).asDouble(pip);
+        Double arg1 = getArg(1).asDouble(pip);
+
+        if (arg0.doubleValue() <= arg1.doubleValue()) {
+            retVal = FunctionArgument.trueObject;
+        } else {
+            retVal = FunctionArgument.falseObject;
+        }
+        return retVal;
     }
 }
