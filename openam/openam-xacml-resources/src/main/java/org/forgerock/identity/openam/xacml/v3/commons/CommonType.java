@@ -34,16 +34,9 @@ package org.forgerock.identity.openam.xacml.v3.commons;
  */
 public enum CommonType {
 
-    JSON(0), XML(1);
+    JSON(), XML();
 
-    private final int commonTypeId;
-
-    CommonType(int commonTypeId) {
-        this.commonTypeId = commonTypeId;
-    }
-
-    public int id() {
-        return commonTypeId;
+    CommonType() {
     }
 
 }

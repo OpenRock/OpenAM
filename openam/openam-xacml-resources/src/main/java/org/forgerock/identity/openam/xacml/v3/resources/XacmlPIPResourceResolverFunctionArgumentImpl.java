@@ -80,7 +80,37 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         if (dataType == null) {
             dataType = DataType.XACMLUNDEFINED;
         }
-        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value,true));
+        // ******************************************
+        // Depending upon certain Object Value Types,
+        // we may need to Normalize it's values.
+        //
+        // Process: XACMLDATE, XACMLDATETIME, XACMLTIME, XACMLDAYTIMEDURATION, XACMLYEARMONTHDURATION
+        //
+        if ( (dataType.equalsIgnoreCase(DataType.XACMLDATE)) ||
+             (dataType.equalsIgnoreCase(DataType.XACMLDATETIME)) ||
+             (dataType.equalsIgnoreCase(DataType.XACMLTIME)) ||
+             (dataType.equalsIgnoreCase(DataType.XACMLDAYTIMEDURATION)) ||
+             (dataType.equalsIgnoreCase(DataType.XACMLYEARMONTHDURATION)) )
+        {
+            // Determine Actual Value Type from the Parse.
+            Long normalizedValue = new Long(0);
+            if (value instanceof String) {
+
+
+
+            } else if (value instanceof Calendar) {
+                normalizedValue = ((Calendar) value).getTimeInMillis();
+            } else if (value instanceof Date) {
+                 normalizedValue = ((Date) value).getTime();
+            } else if (value instanceof Long) {
+                 normalizedValue = new Long( ((Long) value).longValue());
+            }
+            // Set the Normalized Override.
+            value = normalizedValue;
+        }
+        // ******************************************
+        // Add Entry to Resource Resolution Map.
+        this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value, true));
         return true;
     }
 
@@ -125,7 +155,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
     }
 
     /**
-     * Provide the Size of our
+     * Provide the Size of our Resource Map at Top Level.
      * @return
      */
     public int size() {

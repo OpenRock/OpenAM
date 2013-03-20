@@ -32,45 +32,92 @@ import org.json.JSONObject;
 import java.util.*;
 
 
-/*
-    This interface defines the XACML functions.
-    The Syntax,  is to create a function object with a
-    ResourceID, and a Value, which will be checked
-    when the function is evaluated.
+/**
+ This interface defines the XACML functions.
+
+ The Syntax,  is to create a function object with a ResourceID, and a Value,
+ which will be checked when the function is evaluated.
+
+ @author allan.foster@forgerock.com
+
  */
 public abstract class XACMLFunction extends FunctionArgument {
-    // TODO : Q. Should functions be change to HashMap<String, Class<XACMLFunction>>(); ???
+    /**
+     * Globals
+     */
     static java.util.Map<String,String> functions;
     protected List<FunctionArgument> arguments;
     protected String functionID;
 
+    /**
+     * Default Constructor
+     */
     public XACMLFunction() {
         arguments = new ArrayList<FunctionArgument>();
     }
 
+    /**
+     * Set Function ID
+     * @param functionID
+     */
     public void setFunctionID(String functionID) {
         this.functionID = functionID;
     }
 
+    /**
+     * Clear All Arguments
+     * @return
+     */
     public XACMLFunction clearArguments() {
         arguments.clear();
         return this;
     }
+
+    /**
+     * Add a single Argument.
+     *
+     * @param arg
+     * @return
+     */
     public XACMLFunction addArgument(FunctionArgument arg) {
         arguments.add(arg);
         return this;
-    };
+    }
+
+    /**
+     * Add a Collection of Function SArguments.
+     * @param args
+     * @return
+     */
     public XACMLFunction addArgument(List<FunctionArgument> args) {
         arguments.addAll(args);
         return this;
-    };
+    }
+
+    /**
+     * Obtain Argument Value.
+     *
+     * @param pip
+     * @return Object - representing argument value
+     * @throws XACML3EntitlementException
+     */
     public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
         return evaluate(pip).getValue(pip);
-    };
-    abstract public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException ;
+    }
 
-    /* Protected methods only for subclasses */
+    /**
+     * PEP Evaluate Method to obtain a evaluation result.
+     *
+     * @param pip
+     * @return
+     * @throws XACML3EntitlementException
+     */
+     public abstract FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException ;
 
+    /**
+     *  Protected methods only for subclasses to
+     *  manipulate the Arguments.
+     */
     protected FunctionArgument getArg(int index) {
         return arguments.get(index);
     }
@@ -81,6 +128,11 @@ public abstract class XACMLFunction extends FunctionArgument {
         return arguments;
     }
 
+    /**
+     * Obtain the JSONObject for this Function's Implementation.
+     * @return
+     * @throws JSONException
+     */
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = super.toJSONObject();
 
@@ -92,6 +144,13 @@ public abstract class XACMLFunction extends FunctionArgument {
         return jo;
 
     }
+
+    /**
+     * Initialize the JSON Object's Arguments Array.
+     *
+     * @param jo - JSONObject
+     * @throws JSONException
+     */
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
         functionID = jo.optString("functionID");
@@ -104,7 +163,11 @@ public abstract class XACMLFunction extends FunctionArgument {
         return;
     };
 
-
+    /**
+     * Perform a String to XML  Allow Matching Functions.
+     * @param type
+     * @return String - XML String Object.
+     */
     public String toXMLAllow(String type) {
         String retVal = "";
         /*
@@ -127,7 +190,12 @@ public abstract class XACMLFunction extends FunctionArgument {
         return retVal;
     }
 
-
+    /**
+     * Obtain the instance of the specific Function by URN.
+     *
+     * @param name - URN
+     * @return XACMLFunction
+     */
     public static XACMLFunction getInstance(String name)  {
         if (functions == null) {
             initFunctionTable();
@@ -149,12 +217,11 @@ public abstract class XACMLFunction extends FunctionArgument {
         return retVal;
     }
 
+    /**
+     * Initialize our URN to Java Function Mapping.
+     */
     static void initFunctionTable() {
         functions = new HashMap<String,String>();
-
-        // TODO : Q. Should this be change to HashMap<String, Class<XACMLFunction>>(); ???
-        //  NO!  We don't need to instantiate the classes until needed. Most Policies will only use 10-20
-        // no need to pre-allocate all objects
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-equal","org.forgerock.openam.xacml.v3.Functions.StringEqual");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:boolean-equal","org.forgerock.openam.xacml.v3.Functions.BooleanEqual");
@@ -370,6 +437,8 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-subset","org.forgerock.openam.xacml.v3.Functions.Rfc822nameSubset");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-set-equals","org.forgerock.openam.xacml.v3.Functions.Rfc822nameSetEquals");
 
+        // TODO: Fix Unimplemented.
+
         functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-is-in","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
@@ -378,6 +447,10 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-is-in","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-bag","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
+
+        /**
+         * A.3.9 String functions
+         */
         functions.put("urn:oasis:names:tc:xacml:2.0:function:string-concatenate","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:boolean-from-string","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:string-from-boolean","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
@@ -415,6 +488,9 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:3.0:function:anyURI-substring","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:access-permitted","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
 
+        /**
+         * ForgeRock Specific Functions
+         */
         functions.put("urn:oasis:names:forgerock:xacml:1.0:function:VariableDereference","org.forgerock.openam.xacml.v3.Functions.VariableDereference");
         functions.put("urn:forgerock:xacml:1.0:function:MatchAnyOf","org.forgerock.openam.xacml.v3.Functions.MatchAnyOf");
         functions.put("urn:forgerock:xacml:1.0:function:MatchAllOf","org.forgerock.openam.xacml.v3.Functions.MatchAllOf");

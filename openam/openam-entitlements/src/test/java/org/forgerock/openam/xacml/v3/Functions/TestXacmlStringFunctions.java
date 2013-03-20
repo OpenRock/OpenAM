@@ -168,7 +168,7 @@ public class TestXacmlStringFunctions {
     }
 
     /**
-     *  urn:oasis:names:tc:xacml:1.0:function:string-normalize-space
+     *
      */
     @Test
     public void testOne() throws XACML3EntitlementException {
@@ -176,6 +176,46 @@ public class TestXacmlStringFunctions {
 
     }
 
+    /**
+     *
+
+      urn:oasis:names:tc:xacml:2.0:function:string-concatenate
+      urn:oasis:names:tc:xacml:3.0:function:boolean-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-boolean
+      urn:oasis:names:tc:xacml:3.0:function:integer-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-integer
+      urn:oasis:names:tc:xacml:3.0:function:double-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-double
+      urn:oasis:names:tc:xacml:3.0:function:time-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-time
+      urn:oasis:names:tc:xacml:3.0:function:date-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-date
+      urn:oasis:names:tc:xacml:3.0:function:dateTime-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-dateTime
+      urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
+      urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-dayTimeDuration
+      urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-yearMonthDuration
+      urn:oasis:names:tc:xacml:3.0:function:x500Name-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-x500Name
+      urn:oasis:names:tc:xacml:3.0:function:rfc822Name-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-rfc822Name
+      urn:oasis:names:tc:xacml:3.0:function:ipAddress-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-ipAddress
+      urn:oasis:names:tc:xacml:3.0:function:dnsName-from-string
+      urn:oasis:names:tc:xacml:3.0:function:string-from-dnsName
+      urn:oasis:names:tc:xacml:3.0:function:string-starts-with
+      urn:oasis:names:tc:xacml:3.0:function:anyURI-starts-with
+      urn:oasis:names:tc:xacml:3.0:function:string-ends-with
+      urn:oasis:names:tc:xacml:3.0:function:anyURI-ends-with
+      urn:oasis:names:tc:xacml:3.0:function:string-contains
+      urn:oasis:names:tc:xacml:3.0:function:anyURI-contains
+      urn:oasis:names:tc:xacml:3.0:function:string-substring
+      urn:oasis:names:tc:xacml:3.0:function:anyURI-substring
+
+     */
 
 
 }

@@ -53,7 +53,7 @@ public class XACML3Utils  {
     /**
      * Define our Static resource Bundle for our debugger.
      */
-    private static Debug debug = Debug.getInstance("amXACML");
+    private static Debug DEBUG = Debug.getInstance("amXACML");
 
     //  XACML Resource bundle
     public static final String BUNDLE_NAME = "amXACML";

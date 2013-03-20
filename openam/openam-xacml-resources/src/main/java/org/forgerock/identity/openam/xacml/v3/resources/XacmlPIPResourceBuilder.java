@@ -48,7 +48,7 @@ import java.util.Map;
  */
 public class XacmlPIPResourceBuilder  {
 
-    private static Debug debug = Debug.getInstance("amXACML");
+    private static Debug DEBUG = Debug.getInstance("amXACML");
     private static String className = XacmlPIPResourceBuilder.class.getSimpleName();
 
     /**
@@ -133,7 +133,7 @@ public class XacmlPIPResourceBuilder  {
                 } else if (key.toLowerCase().contains(XACML3Constants.REQUEST.toLowerCase())) {
                     // Get the Request Immediate Attributes.
                     if (!(contentMap.get(key) instanceof Map)) {
-                        debug.error("Request does not contain a Map Object, improperly parsed Object, " +
+                        DEBUG.error("Request does not contain a Map Object, improperly parsed Object, " +
                                 "ignoring Request!");
                         return false;
                     }
@@ -191,14 +191,14 @@ public class XacmlPIPResourceBuilder  {
                                         processAttributes(xacmlRequestInformation,
                                                 innerCategory, innerMap.get(innerKey));
                                     } else {
-                                        debug.error("Unknown Request Attribute Found: " + attributeName + ", Type: " +
+                                        DEBUG.error("Unknown Request Attribute Found: " + attributeName + ", Type: " +
                                                 innerMap.get(innerKey).getClass().getName() +
                                                 ", Value: " + innerMap.get(innerKey));
                                     }
                                 } // End of Inner For Each Loop.
                             } else {
                                 // Show any stragglers, if applicable.
-                                debug.error("Unknown Request Attribute Found: " + attributeName + ", Type: " +
+                                DEBUG.error("Unknown Request Attribute Found: " + attributeName + ", Type: " +
                                         requestMap.get(attributeName).getClass().getName() +
                                         ", Value: " + requestMap.get(attributeName));
                             }
@@ -238,7 +238,7 @@ public class XacmlPIPResourceBuilder  {
                             // Nothing else we need at this point!
                         } else {
                             // Show any stragglers, if applicable.
-                            debug.error(className + " Logic Issue, Unknown Embedded Key: " + currentEmbeddedKey + ", " +
+                            DEBUG.error(className + " Logic Issue, Unknown Embedded Key: " + currentEmbeddedKey + ", " +
                                     "InnerKey: " + key + ", " +
                                     "Type: " + contentMap.get(key).getClass().getName() + " " + contentMap.get(key));
                         }
@@ -247,7 +247,7 @@ public class XacmlPIPResourceBuilder  {
             } // End of outer for each loop.
 
         } else {
-            debug.error(className + " Content not a Map Object: " + currentContent.getClass().getName() + ", " +
+            DEBUG.error(className + " Content not a Map Object: " + currentContent.getClass().getName() + ", " +
                     "" + currentContent);
             return false;
         }
@@ -309,7 +309,7 @@ public class XacmlPIPResourceBuilder  {
                                         attributeValue = valueMap.get(valueKey);
                                     } else {
                                         // Show any stragglers, if applicable.
-                                        debug.error(className + " Not handling Attribute Found: " + valueKey + ", " +
+                                        DEBUG.error(className + " Not handling Attribute Found: " + valueKey + ", " +
                                                 attributes.getClass().getName() +
                                                 ", should be a Map Object, Ignoring.");
                                     }
@@ -317,7 +317,7 @@ public class XacmlPIPResourceBuilder  {
                                 continue;
                             } else {
                                 // Show any stragglers, if applicable.
-                                debug.error(className + " No routine for handling Attribute Value Type Found: " +
+                                DEBUG.error(className + " No routine for handling Attribute Value Type Found: " +
                                         attributes.getClass().getName() +
                                         ", should be a Map Object, Ignoring.");
                                 continue;
@@ -350,13 +350,13 @@ public class XacmlPIPResourceBuilder  {
                                 continue;
                             } else {
                                 // Show any stragglers, if applicable.
-                                debug.error(className + " Unknown Attribute Key: " + attributeKey + ", Attribute Type Found: " +
+                                DEBUG.error(className + " Unknown Attribute Key: " + attributeKey + ", Attribute Type Found: " +
                                         attributeMap.get(attributeKey).getClass().getName() +
                                         ", for Category: " + currentCategory);
                             }
                         } else {
                             // Show any stragglers, if applicable.
-                            debug.error(className + " Unknown Attribute Key: " + attributeKey + ", Attribute Type Found: " +
+                            DEBUG.error(className + " Unknown Attribute Key: " + attributeKey + ", Attribute Type Found: " +
                                     attributeMap.get(attributeKey).getClass().getName() +
                                     ", should be a List Object, Ignoring.");
                         }
@@ -364,14 +364,14 @@ public class XacmlPIPResourceBuilder  {
                     } // End Of Inner Map For Each loop.
                 } else {
                     // Show any stragglers, if applicable.
-                    debug.error(className + " No routine for handling Attribute Type Found: " +
+                    DEBUG.error(className + " No routine for handling Attribute Type Found: " +
                             attributes.getClass().getName() +
                             ", should be a Map Object, Ignoring.");
                 }
             } // End of List For Each Loop.
         } else {
             // Show any stragglers, if applicable.
-            debug.error(className + " Unknown Attributes Type Found: " +
+            DEBUG.error(className + " Unknown Attributes Type Found: " +
                     attributes.getClass().getName() +
                     ", should be a List Object, Ignoring.");
         }

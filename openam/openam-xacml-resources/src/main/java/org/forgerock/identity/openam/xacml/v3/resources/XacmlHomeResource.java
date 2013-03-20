@@ -50,7 +50,7 @@ public class XacmlHomeResource  {
     /**
      * Define our Static resource Bundle for our debugger.
      */
-    private static Debug debug = Debug.getInstance("amXACML");
+    private static Debug DEBUG = Debug.getInstance("amXACML");
 
     /**
      * Do not allow instantiation, only static methods.
@@ -70,7 +70,7 @@ public class XacmlHomeResource  {
     public static String getHome(XACMLRequestInformation xacmlRequestInformation, HttpServletRequest request) throws ServletException,
             JSONException, IOException {
         String classMethod = "XacmlHomeResource:getHome";
-        debug.error(classMethod + " processing URI:[" + request.getRequestURI() + "], Content Type:[" + request.getContentType() + "]");
+        DEBUG.error(classMethod + " processing URI:[" + request.getRequestURI() + "], Content Type:[" + request.getContentType() + "]");
         StringBuilder sb = new StringBuilder();
         // ************************************************************
         // Determine how to respond based upon Content Type.
@@ -87,6 +87,12 @@ public class XacmlHomeResource  {
         return sb.toString();
     }
 
+    /**
+     * Home Document
+     * XML Home Document using ATOM RFC4287
+     * @param xacmlRequestInformation
+     * @return
+     */
     public static String getXMLHomeDocument(XACMLRequestInformation xacmlRequestInformation) {
         StringBuilder sb = new StringBuilder();
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
