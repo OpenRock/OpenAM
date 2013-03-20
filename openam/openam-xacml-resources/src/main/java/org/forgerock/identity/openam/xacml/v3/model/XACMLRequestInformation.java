@@ -594,11 +594,7 @@ public class XACMLRequestInformation implements Serializable {
     }
 
     public void setXacmlResponse(Response xacmlResponse) {
-        if (this.xacmlResponse == null) {
-            this.xacmlResponse =  new XACMLDefaultResponse();
-        } else {
             this.xacmlResponse = xacmlResponse;
-        }
     }
 
     public boolean isRequestProcessed() {

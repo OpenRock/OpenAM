@@ -67,7 +67,7 @@ public class DataBag extends FunctionArgument {
     }
 
     public DataBag add(DataValue value)  {
-        if (getType() != value.getType()) {
+        if (getType().getIndex() != value.getType().getIndex()) {
             return this;                             // Should this be an exception???
         }
         data.add(value);

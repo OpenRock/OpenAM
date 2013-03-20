@@ -190,9 +190,11 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
      *
      * @return
      */
-    public List<Result> getResult( ) {
+    public void addResult( Result res ) {
         Response resp = parent.getXacmlResponse();
-        return resp.getResult();
+        List<Result> resList = resp.getResult();
+        resList.add(res);
+        parent.setXacmlResponse(resp);
     }
 
     /**

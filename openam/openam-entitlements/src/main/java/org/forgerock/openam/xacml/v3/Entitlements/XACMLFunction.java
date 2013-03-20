@@ -155,10 +155,12 @@ public abstract class XACMLFunction extends FunctionArgument {
         super.init(jo);
         functionID = jo.optString("functionID");
 
-        JSONArray array = jo.getJSONArray("arguments");
+        JSONArray array = jo.optJSONArray("arguments");
+        if (array != null) {
         for (int i = 0; i < array.length(); i++) {
             JSONObject json = (JSONObject)array.get(i);
             arguments.add(FunctionArgument.getInstance(json));
+        }
         }
         return;
     };

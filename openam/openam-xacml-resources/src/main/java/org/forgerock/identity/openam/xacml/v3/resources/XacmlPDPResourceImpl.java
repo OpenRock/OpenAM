@@ -79,14 +79,13 @@ public class XacmlPDPResourceImpl implements XacmlPDPResource {
             XACML3EvalContextInterface pip = (XACML3EvalContextInterface)xacmlRequestInformation.getPipResourceResolver();
             XACMLEvalContext eContext =  new XACMLEvalContext();
             eContext.setPip(pip);
+            eContext.setReponse(response);
 
             Set<String>  rNames = pip.getResourceNames();
 
+
             List<Entitlement> ent = eval.evaluate("/", adminSubject,rNames,eContext);
 
-            if (ent != null) {
-
-            }
 
         // TODO : Finish Implementation...
         } catch (Exception ex) {

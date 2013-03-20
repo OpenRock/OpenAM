@@ -33,7 +33,7 @@ import java.util.Set;
 
 public interface XACML3EvalContextInterface  {
     public FunctionArgument resolve(String category, String AttributeID);
-    public List<Result> getResult( );
+    public void addResult( Result res);
         public Set<String> getResourceNames();
     }
 

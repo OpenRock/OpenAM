@@ -26,16 +26,14 @@
 
 package org.forgerock.openam.xacml.v3.Entitlements;
 
-import com.sun.identity.entitlement.xacml3.core.DecisionType;
-import com.sun.identity.entitlement.xacml3.core.Obligation;
-import com.sun.identity.entitlement.xacml3.core.Obligations;
-import com.sun.identity.entitlement.xacml3.core.Result;
+import com.sun.identity.entitlement.xacml3.core.*;
 
 import java.util.List;
 
 public class XACMLEvalContext  {
     private XACML3Policy policyRef;
     private XACML3EvalContextInterface pip;
+    private Response response;
 
     public XACMLEvalContext() {
         policyRef = null;
@@ -58,11 +56,17 @@ public class XACMLEvalContext  {
     public FunctionArgument resolve(String category, String AttributeID) {
         return pip.resolve(category, AttributeID);
     }
+    public void setReponse(Response response) {
+        this.response = response;
+    }
+    public Response getResponse() {
+        return response;
+    }
     public void setResult(XACML3Decision decision)  {
-        List<Result> results = pip.getResult();
         Result r = new Result();
         r.setStatus(decision.getStatus());
         r.setDecision(decision.getDecision());
+        response.getResult().add(r);
         /*
         Obligations obs = new Obligations();
         List<Obligation> ob = obs.getObligation();
