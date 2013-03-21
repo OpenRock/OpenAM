@@ -168,54 +168,284 @@ public class TestXacmlStringFunctions {
     }
 
     /**
-     *
+     * urn:oasis:names:tc:xacml:2.0:function:string-concatenate
      */
     @Test
-    public void testOne() throws XACML3EntitlementException {
-
+    public void testStringconcatenate() throws XACML3EntitlementException {
 
     }
 
     /**
-     *
-
-      urn:oasis:names:tc:xacml:2.0:function:string-concatenate
-      urn:oasis:names:tc:xacml:3.0:function:boolean-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-boolean
-      urn:oasis:names:tc:xacml:3.0:function:integer-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-integer
-      urn:oasis:names:tc:xacml:3.0:function:double-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-double
-      urn:oasis:names:tc:xacml:3.0:function:time-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-time
-      urn:oasis:names:tc:xacml:3.0:function:date-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-date
-      urn:oasis:names:tc:xacml:3.0:function:dateTime-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-dateTime
-      urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
-      urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-dayTimeDuration
-      urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-yearMonthDuration
-      urn:oasis:names:tc:xacml:3.0:function:x500Name-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-x500Name
-      urn:oasis:names:tc:xacml:3.0:function:rfc822Name-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-rfc822Name
-      urn:oasis:names:tc:xacml:3.0:function:ipAddress-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-ipAddress
-      urn:oasis:names:tc:xacml:3.0:function:dnsName-from-string
-      urn:oasis:names:tc:xacml:3.0:function:string-from-dnsName
-      urn:oasis:names:tc:xacml:3.0:function:string-starts-with
-      urn:oasis:names:tc:xacml:3.0:function:anyURI-starts-with
-      urn:oasis:names:tc:xacml:3.0:function:string-ends-with
-      urn:oasis:names:tc:xacml:3.0:function:anyURI-ends-with
-      urn:oasis:names:tc:xacml:3.0:function:string-contains
-      urn:oasis:names:tc:xacml:3.0:function:anyURI-contains
-      urn:oasis:names:tc:xacml:3.0:function:string-substring
-      urn:oasis:names:tc:xacml:3.0:function:anyURI-substring
-
+     * urn:oasis:names:tc:xacml:3.0:function:boolean-from-string
      */
+    @Test
+    public void testBooleanFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-boolean
+     */
+    @Test
+    public void testStringFromBoolean() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:integer-from-string
+     */
+    @Test
+    public void testIntegerFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-integer
+     */
+    @Test
+    public void testStringFromInteger() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:double-from-string
+     */
+    @Test
+    public void testDoubleFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-double
+     */
+    @Test
+    public void testStringFromDouble() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:time-from-string
+     */
+    @Test
+    public void testTimeFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-time
+     */
+    @Test
+    public void testStringFromTime() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:date-from-string
+     */
+    @Test
+    public void testDateFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-date
+     */
+    @Test
+    public void testStringFromDate() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:dateTime-from-string
+     */
+    @Test
+    public void testDateTimeFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-dateTime
+     */
+    @Test
+    public void testStringFromDateTime() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
+     */
+    @Test
+    public void testAnyURIFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
+     */
+    @Test
+    public void testStringFromAnyURI() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-from-string
+     */
+    @Test
+    public void testDayTimeDurationFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-dayTimeDuration
+     */
+    @Test
+    public void testStringfromdayTimeDuration() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-from-string
+     */
+    @Test
+    public void testYearMonthDurationFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-yearMonthDuration
+     */
+    @Test
+    public void testStringfromyearMonthDuration() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:x500Name-from-string
+     */
+    @Test
+    public void testX500NameFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-x500Name
+     */
+    @Test
+    public void testStringFromx500Name() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:rfc822Name-from-string
+     */
+    @Test
+    public void testRfc822NameFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-rfc822Name
+     */
+    @Test
+    public void testStringFromrfc822Name() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:ipAddress-from-string
+     */
+    @Test
+    public void testIpAddressFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-ipAddress
+     */
+    @Test
+    public void testStringFromipAddress() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:dnsName-from-string
+     */
+    @Test
+    public void testDnsNameFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-dnsName
+     */
+    @Test
+    public void testStringFromdnsName() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-starts-with
+     */
+    @Test
+    public void testStringStartsWith() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:anyURI-starts-with
+     */
+    @Test
+    public void testAnyURIStartsWith() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-ends-with
+     */
+    @Test
+    public void testStringendswith() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:anyURI-ends-with
+     */
+    @Test
+    public void testAnyURIendswith() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-contains
+     */
+    @Test
+    public void testStringcontains() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:anyURI-contains
+     */
+    @Test
+    public void testAnyURIcontains() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-substring
+     */
+    @Test
+    public void testStringsubstring() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:anyURI-substring
+     */
+    @Test
+    public void testAnyURIsubstring() throws XACML3EntitlementException {
+
+    }
 
 
 }

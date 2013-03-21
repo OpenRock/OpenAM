@@ -370,4 +370,68 @@ public class TestXacmlNonNumericComparisonFunctions {
 
     }
 
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than
+     */
+    @Test
+    public void testDateTimeGreaterThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than-or-equal
+     */
+    @Test
+    public void testDateTimeGreaterThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:dateTime-less-than
+     */
+    @Test
+    public void testDateTimeLessThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:dateTime-less-than-or-equal
+     */
+    @Test
+    public void testDateTimeLessThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:date-greater-than
+     */
+    @Test
+    public void testDateGreaterThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:date-greater-than-or-equal
+     */
+    @Test
+    public void testDateGreaterThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:date-less-than
+     */
+    @Test
+    public void testDateLessThan() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     *   urn:oasis:names:tc:xacml:1.0:function:date-less-than-or-equal
+     */
+    @Test
+    public void testDateLessThanOrEqual() throws XACML3EntitlementException {
+
+    }
+
 }

@@ -42,13 +42,13 @@ public class XACML3PolicyRule {
     private List<XACML3Obligation> obligations;
     private List<XACML3Advice> advices;
 
-    public     XACML3PolicyRule() {
+    public XACML3PolicyRule() {
 
     }
 
 
     public XACML3PolicyRule(Rule rule) {
-        target = XACML3PrivilegeUtils.getTargetFunction(rule.getTarget(),new HashSet<String>());
+        target = XACML3PrivilegeUtils.getTargetFunction(rule.getTarget(), new HashSet<String>());
         ruleName = rule.getRuleId();
         effect = rule.getEffect().value();
         condition = XACML3PrivilegeUtils.getConditionFunction(rule.getCondition());
@@ -56,7 +56,7 @@ public class XACML3PolicyRule {
         advices = new ArrayList<XACML3Advice>();
 
         try {
-            for(ObligationExpression o : rule.getObligationExpressions().getObligationExpression())  {
+            for (ObligationExpression o : rule.getObligationExpressions().getObligationExpression()) {
                 obligations.add(new XACML3Obligation(o));
             }
         } catch (Exception ex) {
@@ -77,42 +77,43 @@ public class XACML3PolicyRule {
         XACML3Decision result = new XACML3Decision();
 
         try {
-        FunctionArgument evalResult = target.evaluate(pip);
+            FunctionArgument evalResult = target.evaluate(pip);
 
-        if (evalResult.isTrue())        {    // we Dont match,  so evaluate
+            if (evalResult.isTrue()) {    // we Dont match,  so evaluate
 
-            evalResult = condition.evaluate(pip);
-            if (evalResult.isTrue() || evalResult.isFalse())        {    // we Match Target,  and Condition
+                evalResult = condition.evaluate(pip);
+                if (evalResult.isTrue() || evalResult.isFalse()) {    // we Match Target,  and Condition
 
-                result.setStatus(null);
-                result.setDecision(effect);
+                    result.setStatus(null);
+                    result.setDecision(effect);
 
-                if (obligations != null) {
-                    ObligationExpressions ob = new ObligationExpressions();
-                    List<ObligationExpression> obs = ob.getObligationExpression();
-                    for (XACML3Obligation o : obligations) {
-                        obs.add(o.getXACML(pip));
+                    if (obligations != null) {
+                        ObligationExpressions ob = new ObligationExpressions();
+                        List<ObligationExpression> obs = ob.getObligationExpression();
+                        for (XACML3Obligation o : obligations) {
+                            obs.add(o.getXACML(pip));
+                        }
+                        result.setObligations(ob);
                     }
-                    result.setObligations(ob);
-                }
 
-                if (advices != null) {
-                    AdviceExpressions ad =  new AdviceExpressions();
-                    List<AdviceExpression> adv = ad.getAdviceExpression();
-                    for (XACML3Advice o : advices) {
-                        adv.add(o.getXACML(pip));
+                    if (advices != null) {
+                        AdviceExpressions ad = new AdviceExpressions();
+                        List<AdviceExpression> adv = ad.getAdviceExpression();
+                        for (XACML3Advice o : advices) {
+                            adv.add(o.getXACML(pip));
+                        }
+                        result.setAdvices(ad);
                     }
-                    result.setAdvices(ad);
+                    return result;
                 }
-                return result;
             }
-        }
         } catch (XACML3EntitlementException ex) {
             result.setStatus("Indeterminate");
         }
 
         return result;
     }
+
     public void init(JSONObject jo) throws JSONException {
         ruleName = jo.optString("ruleName");
         effect = jo.optString("effect");
@@ -123,21 +124,21 @@ public class XACML3PolicyRule {
 
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
-        jo.put("classname",this.getClass().getName());
+        jo.put("classname", this.getClass().getName());
         jo.put("ruleName", ruleName);
-        jo.put("effect", effect );
-        jo.put("target",target.toJSONObject());
-        jo.put("condition",condition.toJSONObject());
+        jo.put("effect", effect);
+        jo.put("target", target.toJSONObject());
+        jo.put("condition", condition.toJSONObject());
 
         return jo;
     }
 
 
-    static public XACML3PolicyRule getInstance(JSONObject jo)  {
+    static public XACML3PolicyRule getInstance(JSONObject jo) {
         String className = jo.optString("classname");
         try {
             Class clazz = Class.forName(className);
-            XACML3PolicyRule farg = (XACML3PolicyRule)clazz.newInstance();
+            XACML3PolicyRule farg = (XACML3PolicyRule) clazz.newInstance();
             farg.init(jo);
 
             return farg;

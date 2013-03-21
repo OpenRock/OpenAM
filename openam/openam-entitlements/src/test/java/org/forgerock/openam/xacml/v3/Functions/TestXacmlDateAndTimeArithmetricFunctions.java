@@ -111,13 +111,52 @@ public class TestXacmlDateAndTimeArithmetricFunctions {
     }
 
     /**
-     *
+     * urn:oasis:names:tc:xacml:3.0:function:dateTime-add-dayTimeDuration
      */
     @Test
-    public void testOne() throws XACML3EntitlementException{
+    public void testDateTimeAddDayTimeDuration() throws XACML3EntitlementException{
 
     }
 
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:dateTime-add-yearMonthDuration
+     */
+    @Test
+    public void testDateTimeAddYearMonthDuration() throws XACML3EntitlementException{
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:dateTime-subtract-dayTimeDuration
+     */
+    @Test
+    public void testDateTimeSubtractDayTimeDuration() throws XACML3EntitlementException{
+
+    }
+
+    /**
+     *  urn:oasis:names:tc:xacml:3.0:function:dateTime-subtract-yearMonthDuration
+     */
+    @Test
+    public void testDateTimeSubtractYearMonthDuration() throws XACML3EntitlementException{
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:date-add-yearMonthDuration
+     */
+    @Test
+    public void testDateAddYearMonthDuration() throws XACML3EntitlementException{
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:date-subtract-yearMonthDuration
+     */
+    @Test
+    public void testDateSubtractYearMonthDurationDayTimeDuration() throws XACML3EntitlementException{
+
+    }
 
 
 }

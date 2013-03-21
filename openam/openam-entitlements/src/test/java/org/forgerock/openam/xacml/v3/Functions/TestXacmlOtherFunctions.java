@@ -87,10 +87,10 @@ public class TestXacmlOtherFunctions {
     }
 
     /**
-     *
+     * urn:oasis:names:tc:xacml:3.0:function:access-permitted
      */
     @Test
-    public void testOne() throws XACML3EntitlementException {
+    public void testPermitted() throws XACML3EntitlementException {
 
     }
 
