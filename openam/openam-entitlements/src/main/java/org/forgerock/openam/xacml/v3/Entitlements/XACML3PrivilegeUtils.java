@@ -207,6 +207,12 @@ public class XACML3PrivilegeUtils {
         return retVal;
 
     }
+
+    /**
+     * Perform a String to Date conversion.
+     * @param dateString
+     * @return Date
+     */
     public static Date stringToDateTime(String dateString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
@@ -220,6 +226,12 @@ public class XACML3PrivilegeUtils {
         return retVal;
 
     }
+
+    /**
+     * Perform a String to Time conversion.
+     * @param dateString
+     * @return Date
+     */
     public static Date stringToTime(String dateString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
@@ -234,6 +246,31 @@ public class XACML3PrivilegeUtils {
 
     }
 
+    /**
+     * Perform a String to Date using a specified Format Pattern for String Value.
+     * @param formatPattern
+     * @param dateString
+     * @return
+     */
+    public static Date stringToDateTime(final String formatPattern, final String dateString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Date retVal = new Date();
+        try {
+            retVal = sdf.parse(dateString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+
+    /**
+     * Perform a Date Object to Human Readable Date based upon the Default Pattern.
+     * @param date
+     * @return
+     */
     public static String dateToString(Date date){
 
         SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
@@ -242,21 +279,6 @@ public class XACML3PrivilegeUtils {
         sdf2.setTimeZone(GMT_TIMEZONE);
 
         String retVal = sdf1.format (date) + "T" + sdf2.format(date);
-        return retVal;
-    }
-
-    public static Calendar stringToCalendar(String timeString, final String pattern) {
-        Calendar retVal = Calendar.getInstance();
-        if ( (timeString == null) || (pattern == null) ) {
-            return null;
-        }
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-            simpleDateFormat.setTimeZone(GMT_TIMEZONE);
-        try {
-            retVal.setTime(simpleDateFormat.parse(timeString));
-        } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
-        }
         return retVal;
     }
 

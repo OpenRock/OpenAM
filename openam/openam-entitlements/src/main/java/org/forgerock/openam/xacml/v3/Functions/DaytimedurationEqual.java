@@ -38,10 +38,6 @@ MUST be converted to a value expressed in fractional seconds [XF] Section 10.3.2
 
 import org.forgerock.openam.xacml.v3.Entitlements.*;
 
-import java.util.Calendar;
-
-// TODO : Needs to be addressed per comparison @ fractional Seconds...
-
 /**
  * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-equal
  */
@@ -55,15 +51,10 @@ public class DaytimedurationEqual extends XACMLFunction {
             return retVal;
         }
 
-        String s1 = (String)getArg(0).getValue(pip);
-        String s2 = (String)getArg(1).getValue(pip);
+        Long duration1 = getArg(0).asDayTimeDuration(pip);
+        Long duration2 = getArg(1).asDayTimeDuration(pip);
 
-        Calendar cal1  = XACML3PrivilegeUtils.stringToCalendar(s1,
-                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
-        Calendar cal2 = XACML3PrivilegeUtils.stringToCalendar(s2,
-                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
-
-        if (cal1.getTimeInMillis() == (cal2.getTimeInMillis())) {
+        if (duration1 == duration2) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

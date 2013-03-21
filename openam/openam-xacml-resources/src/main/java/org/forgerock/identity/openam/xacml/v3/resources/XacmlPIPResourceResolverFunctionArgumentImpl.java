@@ -85,29 +85,27 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         // we may need to Normalize it's values.
         //
         // Process: XACMLDATE, XACMLDATETIME, XACMLTIME, XACMLDAYTIMEDURATION, XACMLYEARMONTHDURATION
+        // Normalize these type Values either to a Long Object or Date Object whichever is applicable.
         //
-        if ( (dataType.equalsIgnoreCase(DataType.XACMLDATE)) ||
-             (dataType.equalsIgnoreCase(DataType.XACMLDATETIME)) ||
-             (dataType.equalsIgnoreCase(DataType.XACMLTIME)) ||
-             (dataType.equalsIgnoreCase(DataType.XACMLDAYTIMEDURATION)) ||
-             (dataType.equalsIgnoreCase(DataType.XACMLYEARMONTHDURATION)) )
-        {
-            // Determine Actual Value Type from the Parse.
-            Long normalizedValue = new Long(0);
-            if (value instanceof String) {
+        if (dataType.equalsIgnoreCase(DataType.XACMLDATE)) {
+            value = this.normalizeDateTimeValuesToDate(XACML3PrivilegeUtils.YEAR_MONTH_DAY, value);
+        } else if (dataType.equalsIgnoreCase(DataType.XACMLDATETIME)) {
+            value = this.normalizeDateTimeValuesToDate(XACML3PrivilegeUtils
+                    .YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, value);
+        } else if (dataType.equalsIgnoreCase(DataType.XACMLTIME)) {
+            value = this.normalizeDateTimeValuesToDate(XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, value);
+        } else if (dataType.equalsIgnoreCase(DataType.XACMLDAYTIMEDURATION)) {
+            value = this.normalizeDateTimeValuesToLong(XACML3PrivilegeUtils
+                    .YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, value);
+        } else if (dataType.equalsIgnoreCase(DataType.XACMLYEARMONTHDURATION)) {
+            value = this.normalizeDateTimeValuesToLong(XACML3PrivilegeUtils.YEAR_MONTH, value);
+        } // End of Check for Date and Time related Data Values for Normalization.
 
+         // ***********************************************************************
+       //// Add any additional Normalization requirements here.
+       //// TODO :: This could be a plug-in, as to what is normalized and how.
+         // ***********************************************************************
 
-
-            } else if (value instanceof Calendar) {
-                normalizedValue = ((Calendar) value).getTimeInMillis();
-            } else if (value instanceof Date) {
-                 normalizedValue = ((Date) value).getTime();
-            } else if (value instanceof Long) {
-                 normalizedValue = new Long( ((Long) value).longValue());
-            }
-            // Set the Normalized Override.
-            value = normalizedValue;
-        }
         // ******************************************
         // Add Entry to Resource Resolution Map.
         this.resourceResolutionMap.put(xacmlPIPResourceIdentifier,  new DataValue(dataType, value, true));
@@ -213,6 +211,52 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         }
         // return String representation of our Internal Map Object.
         return sb.toString();
+    }
+
+    /**
+     * Normalize Date and Time Values for future usage, into a Date Object.
+     * @param formatPattern - Format Pattern in String Form, if the value is a String instance.
+     * @param value - Value of DataType, which will be normalized to a Long.
+     * @return Long - Normalization value.
+     */
+    private Date normalizeDateTimeValuesToDate(String formatPattern, Object value) {
+
+        // Determine Actual Value Type from the Parse.
+        if (value instanceof String) {
+            return XACML3PrivilegeUtils.stringToDateTime(formatPattern, (String)value);
+        } else if (value instanceof Calendar) {
+            return ((Calendar) value).getTime();
+        } else if (value instanceof Date) {
+            return (Date)value;
+        } else if (value instanceof Long) {
+            return new Date( ((Long) value).longValue() );
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Normalize all Data and Time Values for future usage.
+     * @param formatPattern - Format Pattern in String Form, if the value is a String instance.
+     * @param value - Value of DataType, which will be normalized to a Long.
+     * @return Long - Normalization value.
+     */
+    private Long normalizeDateTimeValuesToLong(String formatPattern, Object value) {
+
+        // Determine Actual Value Type from the Parse.
+        Long normalizedValue = null;
+        if (value instanceof String) {
+            Date dateValue = XACML3PrivilegeUtils.stringToDateTime(formatPattern, (String)value);
+            normalizedValue = new Long( dateValue.getTime() );
+        } else if (value instanceof Calendar) {
+            normalizedValue = new Long( ((Calendar) value).getTimeInMillis() );
+        } else if (value instanceof Date) {
+            normalizedValue = new Long( ((Date) value).getTime() );
+        } else if (value instanceof Long) {
+            normalizedValue = new Long( ((Long) value).longValue());
+        }
+        // Set the Normalized Override.
+        return normalizedValue;
     }
 
 }

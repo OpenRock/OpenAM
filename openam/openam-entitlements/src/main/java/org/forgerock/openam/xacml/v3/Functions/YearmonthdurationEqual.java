@@ -52,17 +52,13 @@ public class YearmonthdurationEqual extends XACMLFunction {
             return retVal;
         }
 
-        String s1 = (String)getArg(0).getValue(pip);
-        String s2 = (String)getArg(1).getValue(pip);
-        if ( (s1==null) || (s2==null ) )  {
+        Long duration1 = getArg(0).asYearMonthDuration(pip);
+        Long duration2 = getArg(1).asYearMonthDuration(pip);
+        if ( (duration1==null) || (duration2==null ) )  {
             return retVal;
         }
-        Calendar cal1 = XACML3PrivilegeUtils.stringToCalendar(s1,
-                XACML3PrivilegeUtils.YEAR_MONTH);
-        Calendar cal2 = XACML3PrivilegeUtils.stringToCalendar(s2,
-                XACML3PrivilegeUtils.YEAR_MONTH);
 
-        if (cal1.getTimeInMillis() == (cal2.getTimeInMillis())) {
+        if (duration1.longValue() == duration2.longValue()) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;
