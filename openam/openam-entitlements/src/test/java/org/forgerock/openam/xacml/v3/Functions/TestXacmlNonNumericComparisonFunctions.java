@@ -212,6 +212,10 @@ public class TestXacmlNonNumericComparisonFunctions {
             XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "01:45:30.127");
     static final FunctionArgument timeObject4 = new DataValue(DataType.XACMLTIME, time4, true);
 
+    static final Date time5 = XACML3PrivilegeUtils.stringToDateTime(
+            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "03:00:00.000");
+    static final FunctionArgument timeObject5 = new DataValue(DataType.XACMLTIME, time5, true);
+
 
     @BeforeClass
     public void before() throws Exception {
@@ -468,10 +472,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     }
 
     /**
-     *   urn:oasis:names:tc:xacml:2.0:function:time-in-range
+     * urn:oasis:names:tc:xacml:2.0:function:time-in-range
+     *
+     This function SHALL take three arguments of data-type “http://www.w3.org/2001/XMLSchema#time”
+     and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+
+     It SHALL return "True" if the first argument falls in the range defined inclusively by the second and third arguments.
+     Otherwise, it SHALL return “False”.  Regardless of its value, the third argument SHALL be interpreted
+     as a time that is equal to, or later than by less than twenty-four hours, the second argument.
+     If no time zone is provided for the first argument, it SHALL use the default time zone at the context handler.
+     If no time zone is provided for the second or third arguments, then they SHALL use the time zone from the first argument.
+
+     * @throws XACML3EntitlementException
      */
     @Test
     public void testTimeInRange() throws XACML3EntitlementException {
+        TimeInRange timeinRange = new TimeInRange();
+        timeinRange.addArgument(timeObject1);  // To be In Range.
+        timeinRange.addArgument(timeObject3);  // In Range Start.
+        timeinRange.addArgument(timeObject5);  // In Range End.
+
+        FunctionArgument result = timeinRange.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
     }
 
