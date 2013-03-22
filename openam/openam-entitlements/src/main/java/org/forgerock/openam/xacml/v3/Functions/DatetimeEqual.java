@@ -37,8 +37,6 @@ import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import java.util.Date;
 
-// TODO : Verify DateTime String Format...
-
 /**
  * urn:oasis:names:tc:xacml:1.0:function:dateTime-equal
  */
@@ -52,14 +50,14 @@ public class DatetimeEqual extends XACMLFunction {
             return retVal;
         }
 
-        Date d1 = getArg(0).asDate(pip);
-        Date d2 = getArg(1).asDate(pip);
+        Date date1 = getArg(0).asDateTime(pip);
+        Date date2 = getArg(1).asDateTime(pip);
 
-        if ( (d1==null) || (d2==null ) )  {
+        if ( (date1==null) || (date2==null ) )  {
             return retVal;
         }
 
-        if( d1.equals(d2)) {
+        if (date1.compareTo(date2) == 0) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

@@ -267,6 +267,26 @@ public class XACML3PrivilegeUtils {
     }
 
     /**
+     * Perform a String to a Time Duration using a specified Format Pattern for String Value.
+     * @param formatPattern
+     * @param durationString
+     * @return
+     */
+    public static Long stringToLongDuration(final String formatPattern, final String durationString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Date retVal = new Date();
+        try {
+            retVal = sdf.parse(durationString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal.getTime();
+
+    }
+
+    /**
      * Perform a Date Object to Human Readable Date based upon the Default Pattern.
      * @param date
      * @return

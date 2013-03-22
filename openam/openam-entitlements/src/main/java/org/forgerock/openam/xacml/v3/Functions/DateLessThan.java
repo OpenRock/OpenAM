@@ -25,40 +25,57 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:date-less-than
+ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#date”
+ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+ It SHALL return "True" if and only if the first argument is less than the second argument
+ according to the order relation specified for “http://www.w3.org/2001/XMLSchema#date” by [XS] part 2, section 3.2.9.
+ Otherwise, it SHALL return “False”.  Note: if a date value does not include a time-zone value,
+ then an implicit time-zone value SHALL be assigned, as described in [XS].
+ */
 
 import org.forgerock.openam.xacml.v3.Entitlements.*;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:date-less-than
+ */
 public class DateLessThan extends XACMLFunction {
 
     public DateLessThan()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = FunctionArgument.falseObject;
-        if ( getArgCount() != 2) {
+        if (getArgCount() != 2) {
             return retVal;
         }
 
-        String s1 = (String)getArg(0).getValue(pip);
-        String s2 = (String)getArg(1).getValue(pip);
+        Date date1 = getArg(0).asTime(pip);
+        Date date2 = getArg(1).asTime(pip);
+        if ((date1 == null) || (date2 == null)) {
+            return retVal;
+        }
 
-        Date d1 = XACML3PrivilegeUtils.stringToDate(s1);
-        Date d2 = XACML3PrivilegeUtils.stringToDate(s2);
+        // Ensure TimeZone's are in Sync between the two arguments.
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        if (cal1.getTimeZone() == null) {
+            cal1.setTimeZone(TimeZone.getDefault());
+        }
+        if (cal2.getTimeZone() == null) {
+            cal1.setTimeZone(TimeZone.getDefault());
+        }
 
-        if( d1.before(d2) || d1.equals(d2)) {
+        // Compare...
+        if (cal1.compareTo(cal2) < 0) {
             retVal = FunctionArgument.trueObject;
-        };
+        }
         return retVal;
     }
 }

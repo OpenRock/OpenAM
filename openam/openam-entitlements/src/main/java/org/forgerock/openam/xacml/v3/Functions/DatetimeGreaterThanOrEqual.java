@@ -25,27 +25,60 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than-or-equal
+ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#dateTime”
+ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+ It SHALL return "True" if and only if the first argument is greater than or equal to the second argument
+ according to the order relation specified for “http://www.w3.org/2001/XMLSchema#dateTime” by [XS] part 2, section 3.2.7.
+ Otherwise, it SHALL return “False”.  Note: if a dateTime value does not include a time-zone value,
+ then an implicit time-zone value SHALL be assigned, as described in [XS].
+ */
 
 import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
 import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than-or-equal
+ */
 public class DatetimeGreaterThanOrEqual extends XACMLFunction {
 
-    public DatetimeGreaterThanOrEqual()  {
+    public DatetimeGreaterThanOrEqual() {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        if (getArgCount() != 2) {
+            return retVal;
+        }
+
+        Date date1 = getArg(0).asTime(pip);
+        Date date2 = getArg(1).asTime(pip);
+        if ((date1 == null) || (date2 == null)) {
+            return retVal;
+        }
+
+        // Ensure TimeZone's are in Sync between the two arguments.
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        if (cal1.getTimeZone() == null) {
+            cal1.setTimeZone(TimeZone.getDefault());
+        }
+        if (cal2.getTimeZone() == null) {
+            cal1.setTimeZone(TimeZone.getDefault());
+        }
+        // Compare...
+        if (cal1.compareTo(cal2) >= 0) {
+            retVal = FunctionArgument.trueObject;
+        }
+        return retVal;
     }
 }

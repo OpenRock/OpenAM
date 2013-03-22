@@ -54,7 +54,7 @@ public class DaytimedurationEqual extends XACMLFunction {
         Long duration1 = getArg(0).asDayTimeDuration(pip);
         Long duration2 = getArg(1).asDayTimeDuration(pip);
 
-        if (duration1 == duration2) {
+        if (duration1.longValue() == duration2.longValue()) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

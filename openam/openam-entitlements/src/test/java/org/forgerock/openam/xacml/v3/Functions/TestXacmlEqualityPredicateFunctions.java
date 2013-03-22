@@ -25,15 +25,13 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.DataType;
-import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.Date;
 
 import static org.testng.Assert.*;
 
@@ -196,13 +194,23 @@ public class TestXacmlEqualityPredicateFunctions {
 
     }
 
-    // TODO :: Fix to enable Test...
-    @Test(enabled=false)
+    @Test
     public void testDatetimeEqual() throws XACML3EntitlementException {
-        FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
-        FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.127");
-        FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
-        FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, "2014-03-11:01:45:30.126");
+        Date date1 = XACML3PrivilegeUtils.stringToDateTime(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2013-03-11:01:45:30.126");
+        FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, date1, true);
+
+        Date date2 = XACML3PrivilegeUtils.stringToDateTime(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2013-03-11:01:45:30.124");
+        FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, date2, true);
+
+        Date date3 = XACML3PrivilegeUtils.stringToDateTime(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2013-03-11:01:45:30.126");
+        FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, date3, true);
+
+        Date date4 = XACML3PrivilegeUtils.stringToDateTime(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2014-03-11:01:45:30.126");
+        FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
 
         DatetimeEqual dateTimeEqual = new DatetimeEqual();
         dateTimeEqual.addArgument(dateObject1);
@@ -230,13 +238,25 @@ public class TestXacmlEqualityPredicateFunctions {
 
     }
 
-    // TODO :: Fix to enable Test...
-    @Test(enabled=false)
+    @Test
     public void testDaytimedurationEqual() throws XACML3EntitlementException {
-        FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
-        FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.124");
-        FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, "2013-03-11:01:45:30.126");
-        FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, "2014-03-11:01:45:30.126");
+
+        Long duration1 = XACML3PrivilegeUtils.stringToLongDuration(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2013-03-11:01:45:30.126");
+        FunctionArgument dateObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
+
+        Long duration2 = XACML3PrivilegeUtils.stringToLongDuration(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2013-03-11:01:45:30.124");
+        FunctionArgument dateObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
+
+        Long duration3 = XACML3PrivilegeUtils.stringToLongDuration(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2013-03-11:01:45:30.126");
+        FunctionArgument dateObject3 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration3, true);
+
+        Long duration4 = XACML3PrivilegeUtils.stringToLongDuration(
+                XACML3PrivilegeUtils.YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS, "2014-03-11:01:45:30.126");
+        FunctionArgument dateObject4 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration4, true);
+
 
         DaytimedurationEqual dateTimeDurationEqual = new DaytimedurationEqual();
         dateTimeDurationEqual.addArgument(dateObject1);
@@ -472,8 +492,7 @@ public class TestXacmlEqualityPredicateFunctions {
 
     }
 
-    // TODO :: Fix to enable Test...
-    @Test(enabled=false)
+    @Test
     public void testTimeEqual() throws XACML3EntitlementException {
         FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, "01:45:30.126");
         FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, "02:45:30.126");
@@ -542,13 +561,19 @@ public class TestXacmlEqualityPredicateFunctions {
 
     }
 
-    // TODO :: Fix to enable Test...
-    @Test(enabled=false)
+    @Test
     public void testYearmonthdurationEqual() throws XACML3EntitlementException {
-        FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, "1984-03");
-        FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, "2016-03");
-        FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, "2013-03");
-        FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, "1984-03");
+        Long duration1 = XACML3PrivilegeUtils.stringToLongDuration(XACML3PrivilegeUtils.YEAR_MONTH, "1984-03");
+        FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration1, true);
+
+        Long duration2 = XACML3PrivilegeUtils.stringToLongDuration(XACML3PrivilegeUtils.YEAR_MONTH, "2016-03");
+        FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration2, true);
+
+        Long duration3 = XACML3PrivilegeUtils.stringToLongDuration(XACML3PrivilegeUtils.YEAR_MONTH, "2013-03");
+        FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
+
+        Long duration4 = XACML3PrivilegeUtils.stringToLongDuration(XACML3PrivilegeUtils.YEAR_MONTH, "1984-03");
+        FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
         YearmonthdurationEqual yearmonthdurationEqual = new YearmonthdurationEqual();
         yearmonthdurationEqual.addArgument(dateObject1);

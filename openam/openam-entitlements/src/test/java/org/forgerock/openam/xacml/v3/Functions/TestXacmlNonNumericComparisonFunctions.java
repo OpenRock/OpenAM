@@ -25,13 +25,12 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.DataType;
-import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.Entitlements.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.Date;
 
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -197,6 +196,21 @@ public class TestXacmlNonNumericComparisonFunctions {
     static final FunctionArgument stringAlphaUpper = new DataValue(DataType.XACMLSTRING, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     static final FunctionArgument stringAlphaLower = new DataValue(DataType.XACMLSTRING, "abcdefghijklmnopqrstuvwxyz");
 
+    static final Date time1 = XACML3PrivilegeUtils.stringToDateTime(
+            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS,  "01:45:30.126");
+    static final FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, time1, true);
+
+    static final Date time2 = XACML3PrivilegeUtils.stringToDateTime(
+            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "02:45:30.126");
+    static final FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, time2, true);
+
+    static final Date time3 = XACML3PrivilegeUtils.stringToDateTime(
+            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "01:45:30.126");
+    static final FunctionArgument timeObject3 = new DataValue(DataType.XACMLTIME, time3, true);
+
+    static final Date time4 = XACML3PrivilegeUtils.stringToDateTime(
+            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "01:45:30.127");
+    static final FunctionArgument timeObject4 = new DataValue(DataType.XACMLTIME, time4, true);
 
 
     @BeforeClass
@@ -336,6 +350,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testTimeGreaterThan() throws XACML3EntitlementException {
 
+        TimeGreaterThan timeGreaterThan = new TimeGreaterThan();
+        timeGreaterThan.addArgument(timeObject1);
+        timeGreaterThan.addArgument(timeObject2);
+
+        FunctionArgument result = timeGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        timeGreaterThan = new TimeGreaterThan();
+        timeGreaterThan.addArgument(timeObject2);
+        timeGreaterThan.addArgument(timeObject3);
+
+        result = timeGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        timeGreaterThan = new TimeGreaterThan();
+        timeGreaterThan.addArgument(timeObject4);
+        timeGreaterThan.addArgument(timeObject3);
+
+        result = timeGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -344,6 +381,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testTimeGreaterThanOrEqual() throws XACML3EntitlementException {
 
+        TimeGreaterThanOrEqual timeGreaterThanOrEqual = new TimeGreaterThanOrEqual();
+        timeGreaterThanOrEqual.addArgument(timeObject1);
+        timeGreaterThanOrEqual.addArgument(timeObject2);
+
+        FunctionArgument result = timeGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        timeGreaterThanOrEqual = new TimeGreaterThanOrEqual();
+        timeGreaterThanOrEqual.addArgument(timeObject2);
+        timeGreaterThanOrEqual.addArgument(timeObject3);
+
+        result = timeGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        timeGreaterThanOrEqual = new TimeGreaterThanOrEqual();
+        timeGreaterThanOrEqual.addArgument(timeObject4);
+        timeGreaterThanOrEqual.addArgument(timeObject3);
+
+        result = timeGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -352,6 +412,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testTimeLessThan() throws XACML3EntitlementException {
 
+        TimeLessThan timeLessThan = new TimeLessThan();
+        timeLessThan.addArgument(timeObject1);
+        timeLessThan.addArgument(timeObject2);
+
+        FunctionArgument result = timeLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        timeLessThan = new TimeLessThan();
+        timeLessThan.addArgument(timeObject2);
+        timeLessThan.addArgument(timeObject3);
+
+        result = timeLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        timeLessThan = new TimeLessThan();
+        timeLessThan.addArgument(timeObject3);
+        timeLessThan.addArgument(timeObject4);
+
+        result = timeLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -359,7 +442,29 @@ public class TestXacmlNonNumericComparisonFunctions {
      */
     @Test
     public void testTimeLessThanOrEqual() throws XACML3EntitlementException {
+        TimeLessThanOrEqual timeLessThanOrEqual = new TimeLessThanOrEqual();
+        timeLessThanOrEqual.addArgument(timeObject1);
+        timeLessThanOrEqual.addArgument(timeObject2);
 
+        FunctionArgument result = timeLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        timeLessThanOrEqual = new TimeLessThanOrEqual();
+        timeLessThanOrEqual.addArgument(timeObject2);
+        timeLessThanOrEqual.addArgument(timeObject3);
+
+        result = timeLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        timeLessThanOrEqual = new TimeLessThanOrEqual();
+        timeLessThanOrEqual.addArgument(timeObject3);
+        timeLessThanOrEqual.addArgument(timeObject4);
+
+        result = timeLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -374,7 +479,7 @@ public class TestXacmlNonNumericComparisonFunctions {
      *   urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than
      */
     @Test
-    public void testDateTimeGreaterThan() throws XACML3EntitlementException {
+    public void testDateTimeGreaterThanOrEqual() throws XACML3EntitlementException {
 
     }
 
@@ -382,7 +487,7 @@ public class TestXacmlNonNumericComparisonFunctions {
      *   urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than-or-equal
      */
     @Test
-    public void testDateTimeGreaterThanOrEqual() throws XACML3EntitlementException {
+    public void testDateTimeGreaterThanOrEqualOrEqual() throws XACML3EntitlementException {
 
     }
 
