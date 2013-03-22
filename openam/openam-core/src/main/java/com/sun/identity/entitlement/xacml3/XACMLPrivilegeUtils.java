@@ -48,7 +48,7 @@ import com.sun.identity.entitlement.xacml3.core.Target;
 import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
 import com.sun.identity.entitlement.xacml3.core.Version;
 
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
+import org.forgerock.openam.xacml.v3.model.XACML3Policy;
 
 import com.sun.identity.shared.JSONUtils;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -70,7 +70,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3Interface;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xml.sax.InputSource;

@@ -24,16 +24,13 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 
-import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.shared.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.print.attribute.standard.DateTimeAtCompleted;
 import java.util.Date;
 
 /*
@@ -53,6 +50,9 @@ public abstract class FunctionArgument  {
 
     public void setType(String type) {
         this.dataType = new DataType(type);
+    }
+    public void setType(DataType type) {
+        this.dataType = type;
     }
     public DataType getType() {
         return dataType;
@@ -175,7 +175,6 @@ public abstract class FunctionArgument  {
         }
         return (Double) fArg.getValue(pip);
     }
-
     public Date asTime(XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument fArg = getDataContainer(pip);
@@ -230,23 +229,23 @@ public abstract class FunctionArgument  {
         }
         return (String) fArg.getValue(pip);
     }
-    public Long asDayTimeDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
+    public Integer asDayTimeDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLDAYTIMEDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Long) fArg.getValue(pip);
+        return (Integer) fArg.getValue(pip);
     }
-    public Long asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
+    public Integer asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Long) fArg.getValue(pip);
+        return (Integer) fArg.getValue(pip);
     }
     public String asX500Name(XACMLEvalContext pip) throws XACML3EntitlementException {
 

@@ -25,15 +25,13 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.DataType;
-import org.forgerock.openam.xacml.v3.Entitlements.DataValue;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.DataType;
+import org.forgerock.openam.xacml.v3.model.DataValue;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
 
 /**
  * A.3.9 String functions

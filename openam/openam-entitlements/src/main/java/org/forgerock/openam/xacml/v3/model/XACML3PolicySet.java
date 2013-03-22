@@ -23,13 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.xacml3.core.Policy;
-
-public interface XACML3Interface {
-
-    Privilege XACML3NewPolicy(Policy pol);
-
+public class XACML3PolicySet {
 }

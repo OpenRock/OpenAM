@@ -40,10 +40,10 @@ SHALL be as if the function
 had been applied to the corresponding positive duration.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
 public class DatetimeSubtractyearmonthduration extends XACMLFunction {
 

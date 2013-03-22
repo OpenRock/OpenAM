@@ -24,24 +24,15 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
+import com.sun.identity.entitlement.xacml3.core.Result;
 
+import java.util.Set;
 
-/*
-    This class Encapsulates a DataValue from the XACML policy.
-    In this case, we have the actual Data in the object
-
- */
-
-public class NotApplicableException extends XACML3EntitlementException {
-
-    public NotApplicableException() {
-        super();
+public interface XACML3EvalContextInterface  {
+    public FunctionArgument resolve(String category, String AttributeID);
+    public void addResult( Result res);
+    public Set<String> getResourceNames();
     }
-
-    public NotApplicableException(String message) {
-        super(message);
-    }
-}
 

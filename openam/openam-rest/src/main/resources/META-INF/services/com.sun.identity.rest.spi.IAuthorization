@@ -1,1 +1,2 @@
 com.sun.identity.rest.spi.SSOTokenAuthZ
+com.sun.identity.rest.xacml.XACML3AuthZFilter

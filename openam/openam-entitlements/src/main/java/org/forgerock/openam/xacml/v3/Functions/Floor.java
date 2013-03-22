@@ -33,7 +33,7 @@ The round and floor functions SHALL take a single argument of data-type
 “http://www.w3.org/2001/XMLSchema#double”..
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:floor

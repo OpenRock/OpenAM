@@ -23,14 +23,9 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.*;
-
-import javax.xml.bind.annotation.XmlElement;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /* A decision encapsulates a
     Decision String,

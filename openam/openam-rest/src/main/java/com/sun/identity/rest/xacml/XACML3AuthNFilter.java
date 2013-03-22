@@ -23,23 +23,34 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+package com.sun.identity.rest.xacml;
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+import com.sun.identity.rest.spi.IAuthentication;import javax.servlet.*;
+import java.io.IOException;
 
+public class XACML3AuthNFilter implements IAuthentication {
 
-/*
-   This class can be thrown by the evaluation system for any errors
+    static String XACML3_AUTHN_SCHEME = "XACML3";
 
-*/
-
-public class IndeterminateException extends XACML3EntitlementException {
-
-    public IndeterminateException() {
-        super();
+    public String[] accept() {
+        String[] method = { XACML3_AUTHN_SCHEME };
+        return method;
     }
 
-    public IndeterminateException(String message) {
-        super(message);
+    public void init(FilterConfig arg0) throws ServletException {
+
     }
+
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain
+    ) throws IOException, ServletException {
+        chain.doFilter(request, response);
+
+    }
+
+    public void destroy() {
+    }
+
 }
-

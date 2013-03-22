@@ -25,7 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

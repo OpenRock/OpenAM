@@ -34,7 +34,7 @@ If the integer argument is outside the range which can be represented by a doubl
 the result SHALL be Indeterminate, with the status code “urn:oasis:names:tc:xacml:1.0:status:processing-error”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:integer-to-double

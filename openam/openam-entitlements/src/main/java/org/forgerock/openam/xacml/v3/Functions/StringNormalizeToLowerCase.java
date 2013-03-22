@@ -33,7 +33,7 @@ Case mapping shall be done as specified for the fn:lower-case function in [XF]
 with no tailoring for particular languages or environments.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:string-normalize-to-lower-case

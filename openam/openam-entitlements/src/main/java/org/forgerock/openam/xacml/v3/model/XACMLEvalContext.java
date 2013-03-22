@@ -24,16 +24,23 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.xacml3.core.*;
+import org.forgerock.openam.xacml.v3.profiles.XACML3AttributeHandler;
+import org.forgerock.openam.xacml.v3.profiles.XACML3ProfileManager;
 
+import javax.security.auth.Subject;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class XACMLEvalContext  {
     private XACML3Policy policyRef;
-    private XACML3EvalContextInterface pip;
     private Response response;
+    private XACML3Request requestContext;
 
     public XACMLEvalContext() {
         policyRef = null;
@@ -41,11 +48,6 @@ public class XACMLEvalContext  {
     public XACMLEvalContext(XACML3Policy pRef) {
         policyRef = pRef;
     }
-
-    public void setPip(XACML3EvalContextInterface pip) {
-        this.pip = pip;
-    };
-
     public void setPolicy(XACML3Policy pol) {
         this.policyRef = pol;
     };
@@ -53,15 +55,22 @@ public class XACMLEvalContext  {
     public FunctionArgument getDefinedVariable(String variableID){
          return policyRef.getDefinedVariable(variableID);
     }
-    public FunctionArgument resolve(String category, String AttributeID) {
-        return pip.resolve(category, AttributeID);
-    }
     public void setReponse(Response response) {
         this.response = response;
     }
     public Response getResponse() {
         return response;
     }
+    public void setRequest(XACML3Request request) {
+        this.requestContext = request;
+    }
+    public XACML3Request getRequest() {
+        return requestContext;
+    }
+    public FunctionArgument resolve(DataDesignator designator) throws XACML3EntitlementException {
+        return XACML3ProfileManager.getInstance().resolve(designator,requestContext);
+    }
+
     public void setResult(XACML3Decision decision)  {
         Result r = new Result();
         r.setStatus(decision.getStatus());
@@ -79,4 +88,22 @@ public class XACMLEvalContext  {
           */
 
     }
+    public static Response XACMLEvaluate(Request request, Subject adminSubject) {
+        XACML3Request xReq = new  XACML3Request(request);
+        Response response = new Response();
+        XACMLEvalContext eContext =  new XACMLEvalContext();
+        eContext.setReponse(response);
+        eContext.setRequest(xReq);
+
+        try {
+            Evaluator eval = new Evaluator(adminSubject,"xacml3");
+            Set<String> rNames = xReq.getResources();
+            List<Entitlement> ent = eval.evaluate("/", adminSubject,rNames,eContext);
+
+        } catch (Exception ex) {
+
+        }
+        return response;
+    }
+
 }

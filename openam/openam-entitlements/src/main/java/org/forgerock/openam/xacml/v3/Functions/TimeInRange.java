@@ -27,28 +27,12 @@ package org.forgerock.openam.xacml.v3.Functions;
 
 /**
  * urn:oasis:names:tc:xacml:2.0:function:time-in-range
-
- This function SHALL take three arguments of data-type “http://www.w3.org/2001/XMLSchema#time”
- and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-
- It SHALL return "True" if the first argument falls in the range defined inclusively by
- the second and third arguments.  Otherwise, it SHALL return “False”.
-
- Regardless of its value, the third argument SHALL be interpreted
- as a time that is equal to, or later than by less than twenty-four hours, the second argument.
-
- If no time zone is provided for the first argument,
- it SHALL use the default time zone at the context handler.
-
- If no time zone is provided for the second or third arguments,
- then they SHALL use the time zone from the first argument.
-
  */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
 import java.util.Calendar;
 import java.util.Date;

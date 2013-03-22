@@ -33,10 +33,10 @@ The round and floor functions SHALL take a single argument of data-type
 “http://www.w3.org/2001/XMLSchema#double”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
 public class Unimplemented extends XACMLFunction {
 

@@ -25,7 +25,11 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.DataType;
+import org.forgerock.openam.xacml.v3.model.DataValue;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACML3PrivilegeUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

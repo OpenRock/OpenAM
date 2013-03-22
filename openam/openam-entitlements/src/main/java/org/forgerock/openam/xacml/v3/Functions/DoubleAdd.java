@@ -42,7 +42,7 @@ This function MUST accept two or more arguments.
 /**
  * urn:oasis:names:tc:xacml:1.0:function:double-add
  */
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 public class DoubleAdd extends XACMLFunction {
 

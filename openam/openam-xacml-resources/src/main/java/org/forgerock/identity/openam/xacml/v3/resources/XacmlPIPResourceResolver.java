@@ -26,7 +26,7 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 
 import java.util.Set;
 

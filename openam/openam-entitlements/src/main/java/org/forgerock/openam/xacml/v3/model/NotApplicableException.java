@@ -23,25 +23,25 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.xacml.v3.Entitlements;
+
+package org.forgerock.openam.xacml.v3.model;
 
 
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.xacml3.core.Policy;
 
 /*
-*  This class is here to we can instantiate it from OpenAM without messing with Linking issues
-*
-*  It should return a new privilege object,  populated with the XACML3 policy
-*/
-public class XACML3Extension implements XACML3Interface {
+    This class Encapsulates a DataValue from the XACML policy.
+    In this case, we have the actual Data in the object
 
-    public Privilege XACML3NewPolicy(Policy pol) {
+ */
 
-        XACML3Policy xPol = new XACML3Policy(pol);
-         return null;
+public class NotApplicableException extends XACML3EntitlementException {
 
-    };
+    public NotApplicableException() {
+        super();
+    }
 
-
+    public NotApplicableException(String message) {
+        super(message);
+    }
 }
+

@@ -29,7 +29,7 @@ package org.forgerock.identity.openam.xacml.v3.resources;
 import com.sun.identity.entitlement.xacml3.core.Response;
 import com.sun.identity.entitlement.xacml3.core.Result;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.*;
 

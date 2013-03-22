@@ -25,9 +25,6 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-
 /**
  * XACML PIP Resource Interface.
  * <p/>

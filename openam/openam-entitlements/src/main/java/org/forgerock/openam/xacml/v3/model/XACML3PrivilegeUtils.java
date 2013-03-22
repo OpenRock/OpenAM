@@ -24,7 +24,7 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 
@@ -38,6 +38,8 @@ import com.sun.identity.entitlement.xacml3.core.AnyOf;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Class with utility methods to map from
@@ -207,12 +209,6 @@ public class XACML3PrivilegeUtils {
         return retVal;
 
     }
-
-    /**
-     * Perform a String to Date conversion.
-     * @param dateString
-     * @return Date
-     */
     public static Date stringToDateTime(String dateString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
@@ -226,12 +222,6 @@ public class XACML3PrivilegeUtils {
         return retVal;
 
     }
-
-    /**
-     * Perform a String to Time conversion.
-     * @param dateString
-     * @return Date
-     */
     public static Date stringToTime(String dateString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
@@ -246,51 +236,6 @@ public class XACML3PrivilegeUtils {
 
     }
 
-    /**
-     * Perform a String to Date using a specified Format Pattern for String Value.
-     * @param formatPattern
-     * @param dateString
-     * @return
-     */
-    public static Date stringToDateTime(final String formatPattern, final String dateString) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
-        sdf.setTimeZone(GMT_TIMEZONE);
-        Date retVal = new Date();
-        try {
-            retVal = sdf.parse(dateString);
-        } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
-        }
-        return retVal;
-
-    }
-
-    /**
-     * Perform a String to a Time Duration using a specified Format Pattern for String Value.
-     * @param formatPattern
-     * @param durationString
-     * @return
-     */
-    public static Long stringToLongDuration(final String formatPattern, final String durationString) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
-        sdf.setTimeZone(GMT_TIMEZONE);
-        Date retVal = new Date();
-        try {
-            retVal = sdf.parse(durationString);
-        } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
-        }
-        return retVal.getTime();
-
-    }
-
-    /**
-     * Perform a Date Object to Human Readable Date based upon the Default Pattern.
-     * @param date
-     * @return
-     */
     public static String dateToString(Date date){
 
         SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
@@ -299,6 +244,21 @@ public class XACML3PrivilegeUtils {
         sdf2.setTimeZone(GMT_TIMEZONE);
 
         String retVal = sdf1.format (date) + "T" + sdf2.format(date);
+        return retVal;
+    }
+
+    public static Calendar stringToCalendar(String timeString, final String pattern) {
+        Calendar retVal = Calendar.getInstance();
+        if ( (timeString == null) || (pattern == null) ) {
+            return null;
+        }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            simpleDateFormat.setTimeZone(GMT_TIMEZONE);
+        try {
+            retVal.setTime(simpleDateFormat.parse(timeString));
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
         return retVal;
     }
 
@@ -320,6 +280,48 @@ public class XACML3PrivilegeUtils {
             }
             Base64 base64 = new Base64();
             return base64.decode(base64String);
+    }
+
+    public static Request parseJSON(String req) {
+        Request request = new Request();
+        try {
+            JSONObject jo = new JSONObject(req);
+
+            request.setReturnPolicyIdList(jo.optBoolean("ReturnPolicyIdList"));
+            request.setCombinedDecision(jo.optBoolean("CombinedDecision"));
+            // request.setMultiRequests(jo.opt("MultiRequests"));
+            // request.setRequestDefaults(jo.opt("RequestDefaults"));
+
+            List<Attributes> attributes = request.getAttributes();
+
+            JSONArray array = jo.optJSONArray("Attributes");
+            if (array != null) {
+                for (int i = 0; i < array.length(); i++) {
+                    Attributes as = new Attributes();
+                    JSONObject entry = (JSONObject)array.get(i);
+                    as.setCategory(entry.getString("Category"));
+                    JSONArray json = (JSONArray)entry.getJSONArray("Attribute");
+                    if (json != null) {
+                        for (int j = 0;j < json.length(); j++) {
+                            JSONObject att = (JSONObject)array.get(j);
+                            Attribute a = new Attribute();
+                            a.setAttributeId(att.optString("AttributeId"));
+                            a.setIncludeInResult(att.optBoolean("IncludeInResult"));
+                            a.setIssuer(att.optString("Issuer"));
+                            List<AttributeValue> av = a.getAttributeValue();
+                            AttributeValue aValue = new AttributeValue();
+                            List<Object> content = aValue.getContent();
+                            content.add(att.opt("Value"));
+                            as.getAttribute().add(a);
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception ex ) {
+
+        }
+        return request;
     }
 
 }

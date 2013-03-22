@@ -36,7 +36,9 @@ The comparison SHALL use Unicode codepoint collation,
 as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.List;
 
 public class BooleanOneAndOnly extends XACMLFunction {
 
@@ -46,8 +48,20 @@ public class BooleanOneAndOnly extends XACMLFunction {
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
 
         if ( getArgCount() != 1) {
-            throw new IndeterminateException("Count not one");
+            throw new IndeterminateException("Should only be one");
         }
-        return getArg(0);
+        FunctionArgument fArg = getArg(0).evaluate(pip);
+        if (!(fArg instanceof DataBag)) {
+            throw new IndeterminateException("Not a DataBag");
+        }
+        List<DataValue> vals = (List<DataValue>)fArg.getValue(pip);
+        if (vals.size() > 1) {
+            throw new IndeterminateException("Multiple Values in Bag");
+        }
+        DataValue dv =  vals.get(0);
+        if (!dv.getType().isType(DataType.Type.XACMLBOOLEANTYPE)) {
+            throw new IndeterminateException("Wrong Type");
+        }
+        return dv;
     }
 }

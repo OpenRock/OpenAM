@@ -444,11 +444,11 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="searchIndexImpl" />
-                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3NameSplitter</Value>
+                            <Value>org.forgerock.openam.xacml.v3.model.XACML3NameSplitter</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="saveIndexImpl" />
-                            <Value>org.forgerock.openam.xacml.v3.Entitlements.XACML3NameIndexGenerator</Value>
+                            <Value>org.forgerock.openam.xacml.v3.model.XACML3NameIndexGenerator</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="resourceComparator" />

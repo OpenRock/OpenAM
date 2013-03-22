@@ -26,20 +26,16 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.core.Response;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EvalContextInterface;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACML3EvalContextInterface;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 
 import javax.security.auth.Subject;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -78,7 +74,7 @@ public class XacmlPDPResourceImpl implements XacmlPDPResource {
             Evaluator eval = new Evaluator(adminSubject,"xacml3");
             XACML3EvalContextInterface pip = (XACML3EvalContextInterface)xacmlRequestInformation.getPipResourceResolver();
             XACMLEvalContext eContext =  new XACMLEvalContext();
-            eContext.setPip(pip);
+//            eContext.setPip(pip);
             eContext.setReponse(response);
 
             Set<String>  rNames = pip.getResourceNames();

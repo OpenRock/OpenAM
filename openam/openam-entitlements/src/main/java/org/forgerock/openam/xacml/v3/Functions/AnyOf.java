@@ -36,7 +36,7 @@ The comparison SHALL use Unicode codepoint collation,
 as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.List;
 
@@ -55,7 +55,7 @@ public class AnyOf extends XACMLFunction {
         XACMLFunction func = (XACMLFunction)getArg(0);
         FunctionArgument bag = getArg(args-1).evaluate(pip);
         if (bag instanceof DataValue) {
-            bag = new DataBag(bag.getType().getTypeName(),(DataValue)bag);
+            bag = new DataBag((DataValue)bag);
         }
         if (!(bag instanceof DataBag))  {
             throw new NotApplicableException("AnyOf applied to NON bag");

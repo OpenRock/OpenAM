@@ -23,7 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,0 +1,3 @@
+org.forgerock.openam.xacml.v3.profiles.XACML3CoreProfile
+org.forgerock.openam.xacml.v3.profiles.XACML3IPCProfile
+org.forgerock.openam.xacml.v3.profiles.XACML3ECProfile

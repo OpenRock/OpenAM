@@ -35,10 +35,10 @@ This function SHALL return the value by adding the second argument to the first 
 according to the specification of adding durations to date and time [XS] Appendix E.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
 public class DatetimeAddDaytimeduration extends XACMLFunction {
 

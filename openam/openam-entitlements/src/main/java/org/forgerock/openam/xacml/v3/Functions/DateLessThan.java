@@ -35,7 +35,7 @@ package org.forgerock.openam.xacml.v3.Functions;
  then an implicit time-zone value SHALL be assigned, as described in [XS].
  */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.Calendar;
 import java.util.Date;

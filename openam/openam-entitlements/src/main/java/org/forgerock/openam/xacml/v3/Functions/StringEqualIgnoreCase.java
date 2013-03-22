@@ -35,7 +35,7 @@ they have both been converted to lower case with
 urn:oasis:names:tc:xacml:1.0:function:string- normalize-to-lower-case.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case

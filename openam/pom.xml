@@ -998,6 +998,7 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
+                <!-- version>2.1.9</version -->
                 <version>1.0.6</version>
                 <!-- Originally ? -->
             </dependency>
@@ -1006,12 +1007,16 @@
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-libs</artifactId>
                 <version>1.0.6</version>
+
+                <!-- version>1.0.6</version -->
                 <!-- Originally ? -->
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-xjc</artifactId>
+                <!-- version>2.1.9</version -->
+
                 <version>1.0.6</version>
                 <!-- Originally ? -->
             </dependency>
@@ -1054,7 +1059,8 @@
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-bundle</artifactId>
-                <version>1.1.1-ea</version>
+                <version>1.17.1</version>
+                <!-- version>1.1.1-ea</version -->
                 <!-- Originally 1.1.1-ea-SNAPSHOT -->
             </dependency>
 

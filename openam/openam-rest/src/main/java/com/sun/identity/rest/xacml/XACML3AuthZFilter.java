@@ -23,17 +23,42 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+package com.sun.identity.rest.xacml;
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+import com.sun.identity.rest.spi.IAuthentication;
+import com.sun.identity.rest.spi.IAuthorization;
 
-import com.sun.identity.entitlement.xacml3.core.Result;
+import javax.security.auth.Subject;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
-import java.util.List;
-import java.util.Set;
+public class XACML3AuthZFilter implements IAuthorization {
 
-public interface XACML3EvalContextInterface  {
-    public FunctionArgument resolve(String category, String AttributeID);
-    public void addResult( Result res);
-        public Set<String> getResourceNames();
+    static String XACML3_AUTHN_SCHEME = "XACML3";
+
+    public String[] accept() {
+        String[] method = { XACML3_AUTHN_SCHEME };
+        return method;
     }
 
+    public void init(FilterConfig arg0) throws ServletException {
+
+    }
+
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain
+    ) throws IOException, ServletException {
+        chain.doFilter(request, response);
+
+    }
+    public Subject getAuthZSubject(HttpServletRequest req) {
+        return null;
+    }
+
+    public void destroy() {
+    }
+
+}

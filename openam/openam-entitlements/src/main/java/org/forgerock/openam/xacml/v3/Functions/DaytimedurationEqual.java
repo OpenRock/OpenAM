@@ -36,7 +36,7 @@ Note that the lexical representation of each argument
 MUST be converted to a value expressed in fractional seconds [XF] Section 10.3.2.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-equal

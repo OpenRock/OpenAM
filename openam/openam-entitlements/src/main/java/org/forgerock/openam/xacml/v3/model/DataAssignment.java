@@ -24,7 +24,7 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 
 
@@ -38,10 +38,6 @@ package org.forgerock.openam.xacml.v3.Entitlements;
 import com.sun.identity.entitlement.xacml3.core.*;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 
 public class DataAssignment extends FunctionArgument {
     private String category;

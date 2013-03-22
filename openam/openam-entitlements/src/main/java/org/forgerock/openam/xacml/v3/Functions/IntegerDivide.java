@@ -37,7 +37,7 @@ Each function evaluation operating on doubles SHALL proceed
  In the case of the divide functions, if the divisor is zero, then the function SHALL evaluate to “Indeterminate”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:integer-divide

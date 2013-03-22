@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
+import org.forgerock.openam.xacml.v3.model.XACML3Policy;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

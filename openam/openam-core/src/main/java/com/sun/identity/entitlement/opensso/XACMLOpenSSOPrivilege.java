@@ -30,16 +30,13 @@ package com.sun.identity.entitlement.opensso;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeType;
-import com.sun.identity.session.util.RestrictedTokenAction;
-import com.sun.identity.session.util.RestrictedTokenContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3Policy;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACML3Policy;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.security.auth.Subject;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**

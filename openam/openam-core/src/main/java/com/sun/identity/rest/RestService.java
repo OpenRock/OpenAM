@@ -27,6 +27,8 @@
 
 package com.sun.identity.rest;
 
+import org.forgerock.openam.xacml.v3.rest.XACML3ContextResolver;
+
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
@@ -43,6 +45,10 @@ public class RestService extends Application {
         s.add(PrivilegeResource.class);
         s.add(ListenerResource.class);
         s.add(CoreTokenResource.class);
+
+        s.add(XACML3RequestHandler.class);
+        s.add(XACML3ContextResolver.class);
         return s;
     }
+
 }

@@ -33,7 +33,7 @@ SHALL truncate its numeric value to a whole number and return an element of data
 “http://www.w3.org/2001/XMLSchema#integer”.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:double-to-integer

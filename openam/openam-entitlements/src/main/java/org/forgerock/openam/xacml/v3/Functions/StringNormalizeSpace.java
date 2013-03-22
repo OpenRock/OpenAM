@@ -32,7 +32,7 @@ and SHALL normalize the value by stripping off all leading and trailing white sp
 The whitespace characters are defined in the metasymbol S (Production 3) of [XML].
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:string-normalize-space

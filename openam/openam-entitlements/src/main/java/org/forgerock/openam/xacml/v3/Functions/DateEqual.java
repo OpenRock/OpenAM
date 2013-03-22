@@ -32,8 +32,8 @@ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
 It SHALL perform its evaluation according to the “op:date-equal” function [XF] Section 10.4.9.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 
 import java.util.Date;
 

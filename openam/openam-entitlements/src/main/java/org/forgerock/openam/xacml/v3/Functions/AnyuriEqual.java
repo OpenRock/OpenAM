@@ -34,10 +34,10 @@ The function SHALL return “True”
 if and only if the values of the two arguments are equal on a codepoint-by-codepoint basis.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:anyURI-equal

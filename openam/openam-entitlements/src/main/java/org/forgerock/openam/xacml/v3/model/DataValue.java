@@ -24,36 +24,49 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 
 /**
- This class Encapsulates a DataValue from the XACML policy.
- In this case, we have the actual Data in the object
+   This class Encapsulates a DataValue from the XACML policy.
+   In this case, we have the actual Data in the object
 
- @author Allan.Foster@forgerock.com
+  @author Allan.Foster@forgerock.com
 
- */
+*/
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class DataBag extends FunctionArgument {
+public class DataValue extends FunctionArgument {
     /**
      * Data Value Object.
      */
-    private List<DataValue> data = new ArrayList<DataValue>();
+    private Object data;
+    private boolean includeInResult = false;  // Used only for Request Objects
 
     /**
      * Default Constructor
      */
-    public DataBag() {
+    public DataValue() {
     }
 
+    /**
+     * Constructor used to specify whether raw value was supplied or not.
+     * When we create the value, is HAS to be of the type.
+
+     * @param type
+     * @param value
+     * @param rawType
+     */
+    public DataValue(String type, Object value, boolean rawType) {
+        setType(type);
+        if (!rawType) {
+            data = getType().typedValue((String)value);
+        } else {
+            data = value;
+        }
+    }
 
     /**
      * Constructor used to specify the value represented by String Data.
@@ -61,17 +74,16 @@ public class DataBag extends FunctionArgument {
      * @param type
      * @param value
      */
-    public DataBag(String type, DataValue value) {
+    public DataValue(String type, String value) {
         setType(type);
-        this.add(value);
+        data = getType().typedValue(value);
     }
 
-    public DataBag add(DataValue value)  {
-        if (getType().getIndex() != value.getType().getIndex()) {
-            return this;                             // Should this be an exception???
-        }
-        data.add(value);
-        return this;
+    public void setIncludeInResult(boolean val) {
+        includeInResult = val;
+    }
+    public boolean getIncludeInResult() {
+        return includeInResult;
     }
 
     /**
@@ -104,9 +116,7 @@ public class DataBag extends FunctionArgument {
      */
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = super.toJSONObject();
-        for (DataValue arg : data ) {
-            jo.append("data", arg.toJSONObject());
-        }
+        jo.put("value", data);
         return jo;
     }
 
@@ -118,11 +128,7 @@ public class DataBag extends FunctionArgument {
      */
     protected void init(JSONObject jo) throws JSONException {
         super.init(jo);
-        JSONArray array = jo.getJSONArray("data");
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject json = (JSONObject)array.get(i);
-            data.add((DataValue)FunctionArgument.getInstance(json));
-        }
+        this.data = getType().typedValue(jo.optString("value"));
         return;
     }
 

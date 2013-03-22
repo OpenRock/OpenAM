@@ -24,10 +24,11 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.xacml3.core.*;
+import com.sun.identity.entitlement.xacml3.core.ObligationExpression;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,23 +36,23 @@ import org.json.JSONObject;
 
 import java.util.*;
 
-public class XACML3Advice {
+public class XACML3Obligation {
 
-    private String adviceID;
-    private String appliesTo;
-    private List<DataAssignment> advices;
+    private String obligationID;
+    private String fullFillOn;
+    private List<DataAssignment> assignments;
 
-    public XACML3Advice(AdviceExpression adv) {
-        adviceID = adv.getAdviceId();
-        appliesTo = adv.getAppliesTo().toString();
-        advices = new ArrayList<DataAssignment>();
+    public XACML3Obligation(ObligationExpression obligation) {
+        obligationID = obligation.getObligationId();
+        fullFillOn = obligation.getFulfillOn().value();
+        assignments = new ArrayList<DataAssignment>();
 
-        for (AttributeAssignmentExpression ex : adv.getAttributeAssignmentExpression()) {
-            advices.add(new DataAssignment(ex));
+        for (AttributeAssignmentExpression ex : obligation.getAttributeAssignmentExpression()) {
+            assignments.add(new DataAssignment(ex));
         }
     }
 
-    public XACML3Advice() {
+    public XACML3Obligation() {
     }
 
 
@@ -62,14 +63,13 @@ public class XACML3Advice {
 
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
-
         jo.put("classname",this.getClass().getName());
-        jo.put("adviceID", adviceID);
-        jo.put("appliesTo", appliesTo);
+        jo.put("obligationID", obligationID);
+        jo.put("fullFillOn", fullFillOn);
 
         JSONObject dassigns = new JSONObject();
-        for (DataAssignment da : advices) {
-            jo.append("advices",da.toJSONObject());
+        for (DataAssignment da : assignments) {
+            jo.append("assignments", da.toJSONObject());
         }
         return jo;
     }
@@ -78,27 +78,27 @@ public class XACML3Advice {
 
 
         JSONObject dassigns = new JSONObject();
-        for (DataAssignment da : advices) {
-            jo.append("advices",da.toJSONObject());
+        for (DataAssignment da : assignments) {
+            jo.append("assignments",da.toJSONObject());
         }
 
-        adviceID = jo.optString("adviceID");
-        appliesTo = jo.optString("appliesTo");
+        obligationID = jo.optString("obligationID");
+        fullFillOn = jo.optString("fullFillOn");
 
-        advices = new ArrayList<DataAssignment>() ;
+        assignments = new ArrayList<DataAssignment>() ;
 
-        JSONArray array = jo.getJSONArray("advices");
+        JSONArray array = jo.getJSONArray("assignments");
         for (int i = 0; i < array.length(); i++) {
             JSONObject json = (JSONObject)array.get(i);
-            advices.add((DataAssignment)FunctionArgument.getInstance(json));
+            assignments.add((DataAssignment)FunctionArgument.getInstance(json));
         }
     }
 
-    static public XACML3Advice getInstance(JSONObject jo)  {
+    static public XACML3Obligation getInstance(JSONObject jo)  {
         String className = jo.optString("classname");
         try {
             Class clazz = Class.forName(className);
-            XACML3Advice farg = (XACML3Advice)clazz.newInstance();
+            XACML3Obligation farg = (XACML3Obligation)clazz.newInstance();
             farg.init(jo);
 
             return farg;
@@ -113,16 +113,16 @@ public class XACML3Advice {
         }
         return null;
     }
-    public AdviceExpression getXACML(XACMLEvalContext pip) {
-        AdviceExpression ret = new AdviceExpression();
-        ret.setAdviceId(adviceID);
-        ret.setAppliesTo(EffectType.fromValue(appliesTo));
+
+    public ObligationExpression getXACML(XACMLEvalContext pip) {
+        ObligationExpression ret = new ObligationExpression();
+        ret.setFulfillOn(EffectType.fromValue(fullFillOn));
+        ret.setObligationId(obligationID);
         List<AttributeAssignmentExpression> exp = ret.getAttributeAssignmentExpression();
 
-        for( DataAssignment d : advices) {
+        for( DataAssignment d : assignments) {
             exp.add(d.getXACML(pip));
         }
         return ret;
     }
-
 }

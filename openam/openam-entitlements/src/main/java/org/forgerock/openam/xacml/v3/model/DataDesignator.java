@@ -24,7 +24,7 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 
 
@@ -51,9 +51,19 @@ public class DataDesignator extends FunctionArgument {
         this.attributeID = attributeID;
         this.mustExist = presence;
     }
+    public String getCategory() {
+        return category;
+    }
+    public String getAttributeID() {
+        return attributeID;
+    }
+    public boolean mustExist() {
+        return mustExist;
+    }
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
-        return pip.resolve(category,attributeID);
+        //return pip.resolve(category,attributeID);
+        return pip.resolve(this);
     }
 
     public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {

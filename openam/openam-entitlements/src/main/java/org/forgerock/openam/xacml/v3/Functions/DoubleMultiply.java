@@ -38,7 +38,7 @@ In the case of the divide functions, if the divisor is zero, then the function S
 This function MUST accept two or more arguments.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:double-multiply

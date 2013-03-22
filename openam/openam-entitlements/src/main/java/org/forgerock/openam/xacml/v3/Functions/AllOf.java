@@ -25,7 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class AllOf extends XACMLFunction {
         XACMLFunction func = (XACMLFunction)getArg(0);
         FunctionArgument bag = getArg(args-1).evaluate(pip);
         if (bag instanceof DataValue) {
-            bag = new DataBag(bag.getType().getTypeName(),(DataValue)bag);
+            bag = new DataBag((DataValue)bag);
         }
         if (!(bag instanceof DataBag))  {
             throw new NotApplicableException("AllOf applied to NON bag");

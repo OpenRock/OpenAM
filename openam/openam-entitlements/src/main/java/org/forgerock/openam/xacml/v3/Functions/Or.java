@@ -33,7 +33,7 @@ The evaluation SHALL stop with a result of "True" if any argument evaluates to "
 leaving the rest of the arguments unevaluated.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:or

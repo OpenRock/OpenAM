@@ -35,7 +35,7 @@ This function SHALL take two arguments of data-type
  [XF] Section 10.3.2.
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.*;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.Calendar;
 

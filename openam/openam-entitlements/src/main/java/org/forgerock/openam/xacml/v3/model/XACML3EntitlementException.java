@@ -1,4 +1,4 @@
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
 /**
  * Created with IntelliJ IDEA.

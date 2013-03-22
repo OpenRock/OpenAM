@@ -24,9 +24,7 @@
  *
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
-
-import java.util.Date;
+package org.forgerock.openam.xacml.v3.model;
 
 public class DataType {
     public static String XACMLSTRING = "http://www.w3.org/2001/XMLSchema#string";

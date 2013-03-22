@@ -36,16 +36,32 @@ The comparison SHALL use Unicode codepoint collation,
 as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
 */
 
-import org.forgerock.openam.xacml.v3.Entitlements.FunctionArgument;
-import org.forgerock.openam.xacml.v3.Entitlements.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.Entitlements.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.List;
 
 public class Base64BinaryOneAndOnly extends XACMLFunction {
 
     public Base64BinaryOneAndOnly()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+        if ( getArgCount() != 1) {
+            throw new IndeterminateException("Should only be one");
+        }
+        FunctionArgument fArg = getArg(0).evaluate(pip);
+        if (!(fArg instanceof DataBag)) {
+            throw new IndeterminateException("Not a DataBag");
+        }
+        List<DataValue> vals = (List<DataValue>)fArg.getValue(pip);
+        if (vals.size() > 1) {
+            throw new IndeterminateException("Multiple Values in Bag");
+        }
+        DataValue dv =  vals.get(0);
+        if (!dv.getType().isType(DataType.Type.XACMLBASE64BINARYTYPE)) {
+            throw new IndeterminateException("Wrong Type");
+        }
+        return dv;
     }
+
 }

@@ -29,20 +29,13 @@
  * Portions Copyrighted 2011 ForgeRock AS
  */
 
-package org.forgerock.openam.xacml.v3.Entitlements;
+package org.forgerock.openam.xacml.v3.model;
 
-import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /*
  * This class splits resource name (URL) to different parts so that they
