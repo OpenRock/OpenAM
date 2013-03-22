@@ -2295,6 +2295,13 @@ am_web_is_notification(const char *request_url,
     if (am_policy_is_notification_enabled(boot_info.policy_handle) ||
         (*agentConfigPtr)->configChangeNotificationEnable) {
 	try {
+            
+            if ((*agentConfigPtr)->notification_url == NULL || request_url == NULL) {
+                am_web_log_error("%s: error checking checking request url: %s (notification url: %s)",
+                        thisfunc, request_url == NULL ? "NULL" : request_url,
+                        (*agentConfigPtr)->notification_url == NULL ? "NULL" : (*agentConfigPtr)->notification_url);
+                return B_FALSE;
+            }
 	    // check override proto/host/port for notification url.
 	    // this would be true if notifications url is coming from
 	    // outside a firewall.

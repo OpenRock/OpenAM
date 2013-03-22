@@ -66,7 +66,6 @@ typedef enum {
     DONE = 1,
 } ret_status;
 
-#define	LOG(...)                fprintf(stderr, __VA_ARGS__);
 #define POOL_KEY                "AM_VARNISH_PA_PK"
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
@@ -617,13 +616,13 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     memset((void *) & req_func, 0, sizeof (req_func));
 
     if ((r = on_request_init(s)) == NULL) {
-        LOG("vmod_authenticate() on_request_init failed\n");
+        fprintf(stderr, "vmod_authenticate() on_request_init failed\n");
         send_deny(r);
         return 0;
     }
 
     if (agentBootInitialized != B_TRUE) {
-        LOG("vmod_authenticate() am_web_init failed\n");
+        fprintf(stderr, "vmod_authenticate() am_web_init failed\n");
         send_deny(r);
         return 0;
     }
@@ -667,6 +666,13 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
         status = AM_SUCCESS;
     }
 
+    if (url == NULL) {
+        am_web_log_error("%s: request memory pool error (%d)", thisfunc, errno);
+        status = AM_FAILURE;
+    } else {
+        am_web_log_debug("%s: request url: %s", thisfunc, url);
+    }
+
     if (status == AM_SUCCESS) {
         if (B_TRUE == am_web_is_notification(url, agent_config)) {
             char* data = NULL;
@@ -682,7 +688,7 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
             }
         }
     }
-    
+
     if (status == AM_SUCCESS) {
         int vs = am_web_validate_url(agent_config, url);
         if (vs != -1) {
