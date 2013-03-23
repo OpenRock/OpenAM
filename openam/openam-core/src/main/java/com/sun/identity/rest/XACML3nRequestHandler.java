@@ -38,7 +38,7 @@ import javax.ws.rs.*;
 import javax.xml.bind.JAXBElement;
 
 
-@Path("/xacml")
+@Path("/xacmln")
 public class XACML3nRequestHandler {
 
     @GET
