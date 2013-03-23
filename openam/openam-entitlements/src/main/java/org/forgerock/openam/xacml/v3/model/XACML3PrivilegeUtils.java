@@ -294,15 +294,15 @@ public class XACML3PrivilegeUtils {
         return retVal;
     }
 
-    public static Calendar stringToCalendar(String timeString, final String pattern) {
-        Calendar retVal = Calendar.getInstance();
-        if ( (timeString == null) || (pattern == null) ) {
+    public static Date stringToDate(String dateString, final String pattern) {
+        Date retVal = new Date();
+        if ( (dateString == null) || (pattern == null) ) {
             return null;
         }
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-            simpleDateFormat.setTimeZone(GMT_TIMEZONE);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        simpleDateFormat.setTimeZone(GMT_TIMEZONE);
         try {
-            retVal.setTime(simpleDateFormat.parse(timeString));
+            retVal = simpleDateFormat.parse(dateString);
         } catch (java.text.ParseException pe) {
             //TODO: log debug warning
         }

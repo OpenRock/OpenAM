@@ -223,7 +223,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
 
         // Determine Actual Value Type from the Parse.
         if (value instanceof String) {
-            return XACML3PrivilegeUtils.stringToDateTime(formatPattern, (String)value);
+            return XACML3PrivilegeUtils.stringToDate((String)value, formatPattern);
         } else if (value instanceof Calendar) {
             return ((Calendar) value).getTime();
         } else if (value instanceof Date) {
@@ -246,7 +246,7 @@ public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPRes
         // Determine Actual Value Type from the Parse.
         Long normalizedValue = null;
         if (value instanceof String) {
-            Date dateValue = XACML3PrivilegeUtils.stringToDateTime(formatPattern, (String)value);
+            Date dateValue = XACML3PrivilegeUtils.stringToDate((String)value, formatPattern);
             normalizedValue = new Long( dateValue.getTime() );
         } else if (value instanceof Calendar) {
             normalizedValue = new Long( ((Calendar) value).getTimeInMillis() );
