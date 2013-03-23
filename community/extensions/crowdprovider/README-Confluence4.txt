@@ -2,6 +2,8 @@ To allow for SSO in Confluence 4.x using OpenAM follow the following steps:
 
 Copy the OpenAM client sdk to $ATLASSIAN_CONFLUENCE_APPLICATION_DIR/confluence/WEB-INF/lib/
 Create an AMConfig.properties to $ATLASSIAN_CONFLUENCE_APPLICATION_DIR/confluence/WEB-INF/classes/ (or somewhere in the classpath) NOTE: you can find a template on: https://svn.forgerock.org/openam/trunk/opensso/products/amserver/clientsdk/resources/AMClient.properties but be aware that you have to rename the file to AMConfig.properties.
+Create an Agent 2.2 profile in the OpenAM Console in the top level realm, the agent profile name and password should matc
+h those in the AMConfig.properties file.
 Copy this projects jar to $ATLASSIAN_CONFLUENCE_APPLICATION_DIR/confluence/WEB-INF/lib/
 
 Edit $ATLASSIAN_CONFLUENCE_APPLICATION_DIR/confluence/WEB-INF/classes/seraph-config.xml:
