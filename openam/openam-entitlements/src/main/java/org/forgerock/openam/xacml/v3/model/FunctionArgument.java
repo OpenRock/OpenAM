@@ -229,23 +229,23 @@ public abstract class FunctionArgument  {
         }
         return (String) fArg.getValue(pip);
     }
-    public Integer asDayTimeDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
+    public Long asDayTimeDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLDAYTIMEDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Integer) fArg.getValue(pip);
+        return (Long) fArg.getValue(pip);
     }
-    public Integer asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
+    public Long asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Integer) fArg.getValue(pip);
+        return (Long) fArg.getValue(pip);
     }
     public String asX500Name(XACMLEvalContext pip) throws XACML3EntitlementException {
 

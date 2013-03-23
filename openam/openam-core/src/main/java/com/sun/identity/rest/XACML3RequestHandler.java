@@ -67,7 +67,7 @@ public class XACML3RequestHandler {
     @Consumes("application/json")
     @Produces("application/json")
     @Path("/pdp")
-    public JSONObject getJSONDecision( String req   ) {
+    public Response getJSONDecision( String req   ) {
 
 
         Response response = null;
@@ -75,9 +75,11 @@ public class XACML3RequestHandler {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
 
         response = XACMLEvalContext.XACMLEvaluate( request,adminSubject);
-        ObjectFactory objectFactory = new ObjectFactory();
-        JSONObject jo = new JSONObject(response);
-        return jo;
+        return response;
+
+        //ObjectFactory objectFactory = new ObjectFactory();
+        //JSONObject jo = new JSONObject(response);
+        //return jo;
     }
 
     @POST

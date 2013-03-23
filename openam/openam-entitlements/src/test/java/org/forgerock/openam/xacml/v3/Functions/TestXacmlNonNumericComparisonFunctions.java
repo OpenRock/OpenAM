@@ -188,6 +188,8 @@ import static org.testng.Assert.assertTrue;
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
+
+
 public class TestXacmlNonNumericComparisonFunctions {
 
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
@@ -199,7 +201,7 @@ public class TestXacmlNonNumericComparisonFunctions {
     static final FunctionArgument string4 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
     static final FunctionArgument stringAlphaUpper = new DataValue(DataType.XACMLSTRING, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     static final FunctionArgument stringAlphaLower = new DataValue(DataType.XACMLSTRING, "abcdefghijklmnopqrstuvwxyz");
-
+/*
     static final Date time1 = XACML3PrivilegeUtils.stringToDateTime(
             XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS,  "01:45:30.126");
     static final FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, time1, true);
@@ -219,7 +221,7 @@ public class TestXacmlNonNumericComparisonFunctions {
     static final Date time5 = XACML3PrivilegeUtils.stringToDateTime(
             XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "03:00:00.000");
     static final FunctionArgument timeObject5 = new DataValue(DataType.XACMLTIME, time5, true);
-
+ */
 
     @BeforeClass
     public void before() throws Exception {
@@ -355,6 +357,8 @@ public class TestXacmlNonNumericComparisonFunctions {
     /**
      * urn:oasis:names:tc:xacml:1.0:function:time-greater-than
      */
+
+    /*
     @Test
     public void testTimeGreaterThan() throws XACML3EntitlementException {
 
@@ -382,10 +386,10 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
     }
-
+                             */
     /**
      * urn:oasis:names:tc:xacml:1.0:function:time-greater-than-or-equal
-     */
+     */                    /*
     @Test
     public void testTimeGreaterThanOrEqual() throws XACML3EntitlementException {
 
@@ -413,10 +417,11 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
     }
-
+                                     */
     /**
      *  urn:oasis:names:tc:xacml:1.0:function:time-less-than
      */
+    /*
     @Test
     public void testTimeLessThan() throws XACML3EntitlementException {
 
@@ -444,10 +449,11 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
     }
-
+                                         */
     /**
      *  urn:oasis:names:tc:xacml:1.0:function:time-less-than-or-equal
      */
+    /*
     @Test
     public void testTimeLessThanOrEqual() throws XACML3EntitlementException {
         TimeLessThanOrEqual timeLessThanOrEqual = new TimeLessThanOrEqual();
@@ -489,6 +495,7 @@ public class TestXacmlNonNumericComparisonFunctions {
 
      * @throws XACML3EntitlementException
      */
+    /*
     @Test
     public void testTimeInRange() throws XACML3EntitlementException {
         TimeInRange timeinRange = new TimeInRange();

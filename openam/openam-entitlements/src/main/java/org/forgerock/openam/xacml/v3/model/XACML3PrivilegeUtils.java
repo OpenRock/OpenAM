@@ -303,7 +303,7 @@ public class XACML3PrivilegeUtils {
                     JSONArray json = (JSONArray)entry.getJSONArray("Attribute");
                     if (json != null) {
                         for (int j = 0;j < json.length(); j++) {
-                            JSONObject att = (JSONObject)array.get(j);
+                            JSONObject att = (JSONObject)json.get(j);
                             Attribute a = new Attribute();
                             a.setAttributeId(att.optString("AttributeId"));
                             a.setIncludeInResult(att.optBoolean("IncludeInResult"));
@@ -311,11 +311,13 @@ public class XACML3PrivilegeUtils {
                             List<AttributeValue> av = a.getAttributeValue();
                             AttributeValue aValue = new AttributeValue();
                             List<Object> content = aValue.getContent();
-                            content.add(att.opt("Value"));
+                            JSONObject val = att.optJSONObject("AttributeValue");
+                            content.add(val.opt("$"));
+                            av.add(aValue);
                             as.getAttribute().add(a);
                         }
                     }
-
+                 attributes.add(as);
                 }
             }
         } catch (Exception ex ) {
