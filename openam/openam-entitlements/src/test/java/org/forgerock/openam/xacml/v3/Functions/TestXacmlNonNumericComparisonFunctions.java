@@ -201,27 +201,22 @@ public class TestXacmlNonNumericComparisonFunctions {
     static final FunctionArgument string4 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
     static final FunctionArgument stringAlphaUpper = new DataValue(DataType.XACMLSTRING, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     static final FunctionArgument stringAlphaLower = new DataValue(DataType.XACMLSTRING, "abcdefghijklmnopqrstuvwxyz");
-/*
-    static final Date time1 = XACML3PrivilegeUtils.stringToDateTime(
-            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS,  "01:45:30.126");
+
+    static final Date time1 = XACML3PrivilegeUtils.stringToTime("01:45:30.126");
     static final FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, time1, true);
 
-    static final Date time2 = XACML3PrivilegeUtils.stringToDateTime(
-            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "02:45:30.126");
+    static final Date time2 = XACML3PrivilegeUtils.stringToTime("02:45:30.126");
     static final FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, time2, true);
 
-    static final Date time3 = XACML3PrivilegeUtils.stringToDateTime(
-            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "01:45:30.126");
+    static final Date time3 = XACML3PrivilegeUtils.stringToTime("01:45:30.126");
     static final FunctionArgument timeObject3 = new DataValue(DataType.XACMLTIME, time3, true);
 
-    static final Date time4 = XACML3PrivilegeUtils.stringToDateTime(
-            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "01:45:30.127");
+    static final Date time4 = XACML3PrivilegeUtils.stringToTime("01:45:30.127");
     static final FunctionArgument timeObject4 = new DataValue(DataType.XACMLTIME, time4, true);
 
-    static final Date time5 = XACML3PrivilegeUtils.stringToDateTime(
-            XACML3PrivilegeUtils.HOUR_MINUTE_SECOND_MILLISECONDS, "03:00:00.000");
+    static final Date time5 = XACML3PrivilegeUtils.stringToTime("03:00:00.000");
     static final FunctionArgument timeObject5 = new DataValue(DataType.XACMLTIME, time5, true);
- */
+
 
     @BeforeClass
     public void before() throws Exception {
@@ -357,8 +352,6 @@ public class TestXacmlNonNumericComparisonFunctions {
     /**
      * urn:oasis:names:tc:xacml:1.0:function:time-greater-than
      */
-
-    /*
     @Test
     public void testTimeGreaterThan() throws XACML3EntitlementException {
 
@@ -386,10 +379,10 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
     }
-                             */
+
     /**
      * urn:oasis:names:tc:xacml:1.0:function:time-greater-than-or-equal
-     */                    /*
+     */
     @Test
     public void testTimeGreaterThanOrEqual() throws XACML3EntitlementException {
 
@@ -417,11 +410,10 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
     }
-                                     */
+
     /**
      *  urn:oasis:names:tc:xacml:1.0:function:time-less-than
      */
-    /*
     @Test
     public void testTimeLessThan() throws XACML3EntitlementException {
 
@@ -449,11 +441,10 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
     }
-                                         */
+
     /**
      *  urn:oasis:names:tc:xacml:1.0:function:time-less-than-or-equal
      */
-    /*
     @Test
     public void testTimeLessThanOrEqual() throws XACML3EntitlementException {
         TimeLessThanOrEqual timeLessThanOrEqual = new TimeLessThanOrEqual();
@@ -495,7 +486,6 @@ public class TestXacmlNonNumericComparisonFunctions {
 
      * @throws XACML3EntitlementException
      */
-    /*
     @Test
     public void testTimeInRange() throws XACML3EntitlementException {
         TimeInRange timeinRange = new TimeInRange();

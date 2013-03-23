@@ -28,7 +28,16 @@ package org.forgerock.openam.xacml.v3.Functions;
 /**
  *
  * urn:oasis:names:tc:xacml:1.0:function:time-greater-than
-   */
+
+ This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#time”
+ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+ It SHALL return "True" if and only if the first argument is greater than the second argument according to
+ the order relation specified for “http://www.w3.org/2001/XMLSchema#time” [XS] Section 3.2.8.
+ Otherwise, it SHALL return “False”.
+ Note: it is illegal to compare a time that includes a time-zone value with one that does not.
+ In such cases, the time-in-range function should be used.
+
+*/
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;

@@ -197,7 +197,7 @@ public class XACML3PrivilegeUtils {
 
     public static Date stringToDate(String dateString) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
         sdf.setTimeZone(GMT_TIMEZONE);
         dateString = dateString.replace("T", ":");
         Date retVal = new Date();
@@ -209,19 +209,66 @@ public class XACML3PrivilegeUtils {
         return retVal;
 
     }
-    public static Date stringToDateTime(String dateString) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
+    public static Date stringToDateTime(String dateTimeString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf.setTimeZone(GMT_TIMEZONE);
         Date retVal = new Date();
         try {
-            retVal = sdf.parse(dateString);
+            retVal = sdf.parse(dateTimeString);
         } catch (java.text.ParseException pe) {
             //TODO: log debug warning
         }
         return retVal;
 
     }
+
+    public static Long  stringDayTimedurationToLongDuration(String dateTimeString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Long retVal = new Long(0);
+        try {
+            Date date = sdf.parse(dateTimeString);
+            retVal = date.getTime();
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+
+    public static Long  stringYearMonthdurationToLongDuration(String yearMonthString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Long retVal = new Long(0);
+        try {
+            Date date = sdf.parse(yearMonthString);
+            retVal = date.getTime();
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+
+    public static Long  stringDaydurationToLongDuration(String dateString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Long retVal = new Long(0);
+        try {
+            Date date = sdf.parse(dateString);
+            retVal = date.getTime();
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+
     public static Date stringToTime(String dateString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);

@@ -27,6 +27,21 @@ package org.forgerock.openam.xacml.v3.Functions;
 
 /**
  * urn:oasis:names:tc:xacml:2.0:function:time-in-range
+ This function SHALL take three arguments of data-type “http://www.w3.org/2001/XMLSchema#time”
+ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+
+ It SHALL return "True" if the first argument falls in the range defined inclusively by
+ the second and third arguments.
+ Otherwise, it SHALL return “False”.
+ Regardless of its value, the third argument SHALL be interpreted
+ as a time that is equal to, or later than by less than twenty-four hours, the second argument.
+
+ If no time zone is provided for the first argument,
+ it SHALL use the default time zone at the context handler.
+
+ If no time zone is provided for the second or third arguments,
+ then they SHALL use the time zone from the first argument.
+
  */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
@@ -45,6 +60,7 @@ public class TimeInRange extends XACMLFunction {
 
     public TimeInRange()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal = FunctionArgument.falseObject;
         if ( getArgCount() != 3) {
@@ -54,7 +70,7 @@ public class TimeInRange extends XACMLFunction {
         Date date1 = getArg(0).asTime(pip);
         Date date2 = getArg(1).asTime(pip);
         Date date3 = getArg(2).asTime(pip);
-        if ( (date1==null) || (date2==null ) || (date3==null ) )  {
+        if ( (date1==null) || (date2==null) || (date3==null) )  {
             return retVal;
         }
 
@@ -71,15 +87,15 @@ public class TimeInRange extends XACMLFunction {
             cal1.setTimeZone(TimeZone.getDefault());
         }
         if (cal2.getTimeZone() == null) {
-            cal2.setTimeZone(cal1.getTimeZone());
+            cal2.setTimeZone(cal2.getTimeZone());
         }
         if (cal3.getTimeZone() == null) {
             cal3.setTimeZone(cal3.getTimeZone());
         }
 
         // Now Check if the First Time Object is in Range?
-        if  ( ( cal1.equals(cal2) ) || ( cal1.equals(cal2) ) ||
-              ( (cal1.after(cal2) && cal1.before(cal3)) ) ) {
+        if  ( (cal1.equals(cal2)) ||
+              (cal1.after(cal2) && cal1.before(cal3)) ) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

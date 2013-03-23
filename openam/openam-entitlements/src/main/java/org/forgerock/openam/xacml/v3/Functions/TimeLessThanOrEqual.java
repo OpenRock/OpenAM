@@ -69,7 +69,7 @@ public class TimeLessThanOrEqual extends XACMLFunction {
         cal2.setTime(date2);
         if ( ( (cal1.getTimeZone() == null) && (cal2.getTimeZone() == null) ) ||
                 ( (cal1.getTimeZone() != null) && (cal2.getTimeZone() != null) &&
-                        (cal1.getTimeZone().getRawOffset() == cal2.getTimeZone().getRawOffset()) ) )
+                  (cal1.getTimeZone().getRawOffset() == cal2.getTimeZone().getRawOffset()) ) )
         {
             // Compare...
             if ( (cal1.before(cal2)) || (cal1.equals(cal2)) ) {
