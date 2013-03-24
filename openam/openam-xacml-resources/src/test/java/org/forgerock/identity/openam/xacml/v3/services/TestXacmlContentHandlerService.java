@@ -27,7 +27,7 @@ package org.forgerock.identity.openam.xacml.v3.services;
 
 import static org.testng.Assert.*;
 
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.junit.runner.RunWith;

@@ -23,16 +23,13 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.v3.commons;
+package org.forgerock.openam.xacml.v3.commons;
 
-import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
-
-import java.util.regex.Pattern;
 
 /**
  * Very simple test to check parsing and validation of URNs.
@@ -41,12 +38,39 @@ import java.util.regex.Pattern;
  */
 public class TestURNValidation {
 
-    public final static String[] testURNs = {XACML3Constants.URN_HTTP,
-            XACML3Constants.URN_HOME,
-            XACML3Constants.URN_PDP,
-            XACML3Constants.URN_HOME_BODY,
-            XACML3Constants.URN_HOME_STATUS,
-            XACML3Constants.URN_ENTRY_POINT
+    /**
+     * RESTful XACML 3.0 Name Space Definitions.
+     */
+    static final String URN_HTTP = "urn:oasis:names:tc:xacml:3.0:profile:rest:http";
+    static final String URN_HOME = "urn:oasis:names:tc:xacml:3.0:profile:rest:home";
+    static final String URN_PDP = "urn:oasis:names:tc:xacml:3.0:profile:rest:pdp";
+
+    /**
+     * Normative Source: GET on the home location MUST return status code 200
+     *
+     * Target: Response to GET request on the home location
+     *
+     * Predicate: The HTTP status code in the [response] is 200
+     *
+     * Prescription Level: mandatory
+     */
+    static final String URN_HOME_STATUS = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status";
+    static final String URN_HOME_BODY = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body";
+
+
+    /**
+     * A RESTful XACML system MUST have a single entry point at a known location
+     * Each implementation of this profile MUST document the location of the entry point
+     */
+    static final String URN_ENTRY_POINT = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:documentation";
+
+
+    public final static String[] testURNs = {URN_HTTP,
+            URN_HOME,
+            URN_PDP,
+            URN_HOME_BODY,
+            URN_HOME_STATUS,
+            URN_ENTRY_POINT
     };
 
     @BeforeClass

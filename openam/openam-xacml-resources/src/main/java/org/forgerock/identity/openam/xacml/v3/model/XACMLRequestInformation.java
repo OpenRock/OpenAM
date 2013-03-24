@@ -27,17 +27,17 @@ package org.forgerock.identity.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.identity.openam.xacml.v3.commons.*;
+import org.forgerock.identity.openam.xacml.v3.commons.POJOToJsonUtility;
+import org.forgerock.identity.openam.xacml.v3.commons.POJOToXmlUtility;
+import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
+import org.forgerock.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolver;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolverFunctionArgumentImpl;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
+
 import java.io.Serializable;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 /**
  * XACMLRequestInformation

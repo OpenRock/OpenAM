@@ -40,7 +40,7 @@ public class XacmlPAPResource  {
     /**
      * Define our Static resource Bundle for our debugger.
      */
-    private static Debug debug = Debug.getInstance("amXACML");
+    private static Debug DEBUG = Debug.getInstance("amXACML");
 
 
 }

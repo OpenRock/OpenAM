@@ -107,38 +107,4 @@ public interface XACML3Constants extends XACMLConstants {
 
     public static final String PDP_AUTHORIZATION_ENDPOINT = "/xacml/pdp/"+AUTHORIZATION;
 
-    /**
-     * RESTful XACML 3.0 Name Space Definitions.
-     */
-    public static final String URN_HTTP = "urn:oasis:names:tc:xacml:3.0:profile:rest:http";
-    public static final String URN_HOME = "urn:oasis:names:tc:xacml:3.0:profile:rest:home";
-    public static final String URN_PDP = "urn:oasis:names:tc:xacml:3.0:profile:rest:pdp";
-
-    /**
-     * Network Transport
-     * Client and Server MUST use HTTP as the underlying Network Transport between each other.
-     * Also, SSL/TLS is encouraged to be used as well to protect Data over Transport.
-     */
-    public static final String URN_CLIENT = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:http:client";
-    public static final String URN_SERVER = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:http:server";
-
-    /**
-     * A RESTful XACML system MUST have a single entry point at a known location
-     * Each implementation of this profile MUST document the location of the entry point
-     */
-    public static final String URN_ENTRY_POINT = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:documentation";
-
-    /**
-     * ￼
-     * Normative Source: GET on the home location MUST return status code 200
-     * ￼
-     * Target: Response to GET request on the home location
-     * ￼
-     * Predicate: The HTTP status code in the [response] is 200
-     * ￼
-     * Prescription Level: mandatory
-     */
-    public static final String URN_HOME_STATUS = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status";
-    public static final String URN_HOME_BODY = "urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body";
-
 }

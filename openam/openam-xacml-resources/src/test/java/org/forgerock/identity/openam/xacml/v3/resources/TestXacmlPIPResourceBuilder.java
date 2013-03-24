@@ -25,7 +25,7 @@
  */
 package org.forgerock.identity.openam.xacml.v3.resources;
 
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.JsonToMapUtility;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.forgerock.identity.openam.xacml.v3.commons.XmlToMapUtility;
@@ -36,8 +36,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.Enumeration;
 
 import static org.testng.Assert.*;
 

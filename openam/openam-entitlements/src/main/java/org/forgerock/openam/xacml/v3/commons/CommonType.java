@@ -23,14 +23,14 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.identity.openam.xacml.v3.commons;
+package org.forgerock.openam.xacml.v3.commons;
 
 /**
- * Normalized Content Types which are dealt with using XACML 3 via HTTP/REST.
+ * Normalized Content Types from Specific Types.
  * <p/>
  *
  * @author jeff.schenk@forgerock.com
- * @see org.forgerock.identity.openam.xacml.v3.commons.ContentType
+ * @see ContentType
  *
  */
 public enum CommonType {

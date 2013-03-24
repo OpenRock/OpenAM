@@ -44,6 +44,8 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
+import org.forgerock.openam.xacml.v3.commons.*;
+
 import org.forgerock.identity.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.model.AuthenticationDigest;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;

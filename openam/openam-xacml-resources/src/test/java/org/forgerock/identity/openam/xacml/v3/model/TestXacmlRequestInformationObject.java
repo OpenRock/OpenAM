@@ -25,29 +25,14 @@
  */
 package org.forgerock.identity.openam.xacml.v3.model;
 
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
-import org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService;
-import org.junit.runner.RunWith;
+import org.forgerock.openam.xacml.v3.commons.ContentType;
 import org.mockito.Mockito;
-import org.mortbay.jetty.testing.HttpTester;
-import org.mortbay.jetty.testing.ServletTester;
-import org.powermock.modules.junit4.PowerMockRunner;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
 
 import static org.testng.Assert.*;
 

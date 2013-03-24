@@ -26,8 +26,8 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.identity.openam.xacml.v3.commons.CommonType;
-import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
+import org.forgerock.openam.xacml.v3.commons.CommonType;
+import org.forgerock.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.json.JSONArray;
