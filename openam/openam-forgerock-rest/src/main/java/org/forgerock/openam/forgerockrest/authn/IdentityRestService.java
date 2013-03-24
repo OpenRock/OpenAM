@@ -16,7 +16,10 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.sun.identity.authentication.client.AuthClientUtils;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,7 +28,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * JAX-RS endpoint for version 1 RESTful authentication requests.
@@ -56,32 +61,41 @@ public class IdentityRestService {
     }
 
     /**
-     * Handles the initial RESTful call from clients to authenticate. Using the query parameters from the URL the
+     * Handles the initial GET RESTful call from clients to authenticate. Using the query parameters from the URL the
      * method starts the login process and either returns an SSOToken on successful authentication or a number of
      * Callbacks needing to be completed before authentication can proceed or an exception if any problems occurred
      * whilst trying to authenticate.
      *
+     * Is to be used to initiate the authentication process but NOT for zero-page login. For providing all the
+     * required information for a zero-page login see the authenticate method for POST http requests.
+     *
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
+     * @param response The HttpServletResponse of the RESTful call.
      * @param authIndexType The authentication index type from the url parameters.
      * @param authIndexValue The authentication index value from the url parameters.
-     * @param realm The realm to authenticate in from the url parameters.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
      */
     @GET
     @Path("authenticate")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            @QueryParam("authIndexType") String authIndexType, @QueryParam("authIndex") String authIndexValue,
-            @QueryParam("realm") String realm) {
+            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+            @QueryParam("authIndex") String authIndexValue/*, @QueryParam("realm") String realm*/) {
+        //initiate
+        String realm = getRealm(request);
 
-        return restAuthenticationHandler.authenticate(headers, request, realm, authIndexType, authIndexValue);
+        return restAuthenticationHandler.authenticate(headers, request, response, realm, authIndexType,
+                authIndexValue, HttpMethod.GET);
     }
 
     /**
-     * Handles subsequent RESTful calls from clients submitting Callbacks for the authentication process to continue.
+     * Handles both initial and subsequent RESTful calls from clients submitting Callbacks for the authentication
+     * process to continue. This is determined by checking if the POST body is empty or not. If it is empty then this
+     * is initiating the authentication process otherwise it is a subsequent call submitting Callbacks.
+     *
      * Using the body of the POST request the method continues the login process, submitting the given Callbacks and
      * then either returns an SSOToken on successful authentication or a number of additional Callbacks needing to be
      * completed before authentication can proceed or an exception if any problems occurred whilst trying to
@@ -89,17 +103,42 @@ public class IdentityRestService {
      *
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
-     * @param msgBody The POST body of the RESTful call.
+     * @param response The HttpServletResponse of the RESTfull call.
+     * @param authIndexType The authentication index type from the url parameters.
+     * @param authIndexValue The authentication index value from the url parameters.
+     * @param postBody The body of the POST request.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
      */
     @POST
-    @Path("authenticate/submitReqs")
-    @Consumes("application/json")
-    @Produces("application/json")
-    public Response submitAuthRequirements(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            String msgBody) {
-        return restAuthenticationHandler.processAuthenticationRequirements(headers, request, msgBody);
+    @Path("authenticate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
+            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+            @QueryParam("authIndexValue") String authIndexValue, /*@QueryParam("realm") String realm, */String postBody) {
+
+        if (postBody != null && !"".equals(postBody)) {
+            //submitReqs
+            return restAuthenticationHandler.processAuthenticationRequirements(headers, request, response, postBody,
+                    HttpMethod.POST);
+        } else {
+            //initiate
+            String realm = getRealm(request);
+
+            return restAuthenticationHandler.authenticate(headers, request, response, realm, authIndexType,
+                    authIndexValue, HttpMethod.POST);
+        }
+    }
+
+    /**
+     * Gets the realm from the request.
+     *
+     * @param request The HttpServletRequest.
+     * @return The realm.
+     */
+    String getRealm(HttpServletRequest request) {
+        return AuthClientUtils.getDomainNameByRequest(request, AuthClientUtils.parseRequestParameters(request));
     }
 }

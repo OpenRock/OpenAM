@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.entitlement;
@@ -467,7 +467,7 @@ public abstract class Privilege implements IPrivilege {
         if (!jo.has("eCondition")) {
             return null;
         }
-        
+
         JSONObject sbj = jo.getJSONObject("eCondition");
         try {
             Class clazz = Class.forName(sbj.getString("className"));
