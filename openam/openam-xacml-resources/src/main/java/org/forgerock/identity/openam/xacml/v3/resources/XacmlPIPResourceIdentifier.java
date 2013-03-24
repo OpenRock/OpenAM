@@ -37,6 +37,7 @@ import java.io.Serializable;
  *
  * @author Jeff.Schenk@forgerock.com
  */
+@Deprecated
 public class XacmlPIPResourceIdentifier implements Serializable {
     /**
      * XACML Category URN

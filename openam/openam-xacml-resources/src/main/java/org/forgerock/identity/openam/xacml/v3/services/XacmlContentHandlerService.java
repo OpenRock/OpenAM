@@ -124,6 +124,7 @@ import java.util.logging.Level;
  *
  * @author Jeff.Schenk@forgerock.com
  */
+@Deprecated
 public class XacmlContentHandlerService extends HttpServlet  {
     private static String LOG_PROVIDER = "amXACML";
     /**
@@ -311,62 +312,6 @@ public class XacmlContentHandlerService extends HttpServlet  {
         processRequest(request, response);
 
         // GET operations to PDP.
-
-        /**
-         * Id: urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:status
-         ￼
-         Normative Source
-         ￼GET on the home location MUST return status code 200
-         ￼
-         Target
-         Response to GET request on the home location
-         ￼
-         Predicate
-         ￼ The HTTP status code in the [response] is 200
-         ￼
-         Prescription Level
-         ￼mandatory
-         */
-
-
-        /**
-         * Id ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:body
-
-         Normative Source￼
-         GET on the home location MUST return a home document
-         ￼
-         Target￼
-         Response to GET request on the home location
-         ￼
-         Predicate
-         The HTTP body in the [response] follows the home document schema
-         [HomeDocument]
-         ￼
-         Prescription Level
-         mandatory
-         */
-
-
-        /**
-         * Id
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:home:pdp
-         ￼
-         Normative Source
-         The XACML entry point representation SHOULD contain a link to the PDP
-         ￼
-         Target
-         Response to GET request on the home location
-         ￼
-         Predicate
-         The home document in the [response] body contains a resource with link relation
-         http://docs.oasis-open.org/ns/xacml/relation/pdp and a valid URL
-         ￼
-         Prescription Level
-         mandatory
-         */
-
-
     }
 
     /**
@@ -389,122 +334,6 @@ public class XacmlContentHandlerService extends HttpServlet  {
         processRequest(request, response);
 
         // POST operations to PDP.
-
-        /**
-         * ￼
-         Id   ￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:status
-         ￼
-         Normative Source     ￼
-         POST on the PDP with a valid XACML request MUST return status code 200
-         ￼
-         Target
-         Response to POST request on the PDP location with valid XACML request in the body
-         ￼
-         Predicate
-         The HTTP status code in the [response] is 200
-         ￼
-         Prescription Level
-         mandatory
-         */
-
-
-        /**
-         * Id￼
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:body
-         ￼
-         Normative Source
-         POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
-         ￼
-         Target
-         Response to POST request on the PDP location with valid XACML request in the body
-         ￼
-         Predicate
-         The HTTP body in the [response] is a valid XACML response
-         ￼
-         Prescription Level
-         mandatory
-         */
-
-
-        /**
-         * ￼
-         Id
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:xacml:invalid
-         ￼
-         Normative Source
-         POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
-         ￼
-         Target
-         Response to POST request on the PDP location with invalid XACML request in the body
-         ￼
-         Predicate
-         The HTTP status code in the [response] is 400
-         ￼
-         Prescription Level
-         mandatory
-         */
-
-
-        /**
-         * Id
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:status
-         ￼
-         Normative Source
-         POST on the PDP with a valid XACML request MUST return status code 200
-         ￼
-         Target
-         Response to POST request on the PDP location with valid XACML request wrapped in a
-         xacml-samlp:XACMLAuthzDecisionQuery in the body
-         ￼
-         Predicate
-         The HTTP status code in the [response] is 200
-         ￼
-         Prescription Level
-         optional
-         */
-
-
-        /**
-         * Id
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:body
-         ￼
-         Normative Source
-         POST on the PDP with a valid XACML request MUST return a valid XACML response in the body
-         ￼
-         Target
-         Response to POST request on the PDP location with valid XACML request wrapped in a
-         xacml-samlp:XACMLAuthzDecisionQuery in the body
-         ￼
-         Predicate
-         The HTTP body in the [response] is a valid XACML response wrapped in a
-         samlp:Response
-         ￼
-         Prescription Level
-         optional
-         */
-
-
-        /**
-         * ￼
-         Id
-         urn:oasis:names:tc:xacml:3.0:profile:rest:assertion:pdp:saml:invalid
-         ￼
-         Normative Source
-         POST on the PDP with an invalid XACML request MUST return status code 400 (Bad Request)
-         ￼
-         Target
-         Response to POST request on the PDP location with invalid XACML request
-         wrapped in a xacml-samlp:XACMLAuthzDecisionQuery in the body
-         ￼
-         Predicate
-         The HTTP status code in the [response] is 400
-         ￼
-         Prescription Level
-         optional
-         */
-
-
     }
 
     @Override

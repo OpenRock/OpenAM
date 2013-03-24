@@ -38,6 +38,7 @@ package org.forgerock.identity.openam.xacml.v3.resources;
  *
  * @author Jeff.Schenk@forgerock.com
  */
+@Deprecated
 public interface XacmlPIPResource  {
 
 

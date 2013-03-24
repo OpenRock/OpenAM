@@ -41,6 +41,7 @@ import java.util.Set;
  *
  * @author Jeff.Schenk@forgerock.com
  */
+@Deprecated
 public interface XacmlPIPResourceResolver extends XacmlPIPResource {
 
     /**

@@ -46,6 +46,7 @@ import java.util.Map;
  *
  * @author Jeff.Schenk@forgerock.com
  */
+@Deprecated
 public class XacmlPIPResourceBuilder  {
 
     private static Debug DEBUG = Debug.getInstance("amXACML");
@@ -176,7 +177,7 @@ public class XacmlPIPResourceBuilder  {
                                     // Process our Attributes for this Request...
                                     processAttributes(xacmlRequestInformation, null, requestMap.get(attributeName));
                             } else if (
-                                    (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) &&
+                                    (xacmlRequestInformation.getContentType().getCommonType().equals(CommonType.JSON)) &&
                                             ((removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_ENVIRONMENT)) ||
                                                     (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_RESOURCE)) ||
                                                     (removeNamespace(attributeName).equalsIgnoreCase(XACML3Constants.REQUEST_SUBJECT)))) {
@@ -333,7 +334,7 @@ public class XacmlPIPResourceBuilder  {
                             // Use Recursion to process our Inner attribute List.
                             processAttributes(xacmlRequestInformation, currentCategory,
                                     attributeMap.get(attributeKey));
-                        } else if (xacmlRequestInformation.getContentType().commonType().equals(CommonType.JSON)) {
+                        } else if (xacmlRequestInformation.getContentType().getCommonType().equals(CommonType.JSON)) {
                             // Do we have a pending Attribute to write?
                             if ((attributeId != null) && (attributeValue != null)) {
                                 xacmlRequestInformation.getPipResourceResolver().

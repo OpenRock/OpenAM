@@ -565,7 +565,7 @@ public class XACMLRequestInformation implements Serializable {
      * @return
      */
     public String getXacmlStringResponseBasedOnContent(ContentType requestContentType) {
-        if (requestContentType.commonType().equals(CommonType.XML)) {
+        if (requestContentType.getCommonType().equals(CommonType.XML)) {
             try {
                 return POJOToXmlUtility.toXML(this.getXacmlResponse());
             } catch(Exception exception) {

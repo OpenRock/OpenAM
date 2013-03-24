@@ -44,6 +44,7 @@ import java.util.*;
  *
  * @author Jeff.Schenk@forgerock.com
  */
+@Deprecated
 public class XacmlPIPResourceResolverFunctionArgumentImpl implements XacmlPIPResourceResolver,
         XACML3EvalContextInterface {
 
