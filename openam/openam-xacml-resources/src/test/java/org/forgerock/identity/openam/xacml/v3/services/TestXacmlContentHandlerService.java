@@ -30,7 +30,6 @@ import static org.testng.Assert.*;
 import org.forgerock.identity.openam.xacml.v3.commons.ContentType;
 import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
@@ -92,7 +91,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
 
         try {
             // Check for a 200 on our Get.
@@ -115,7 +114,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml/home");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
 
         try {
             // Check for a 200 on our Get.
@@ -138,7 +137,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml/status");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
 
         try {
             // Check for a 200 on our Get.
@@ -161,7 +160,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml/pdp");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.XACML_PLUS_XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XACML_PLUS_XML.getApplicationType());
 
         try {
             // Check for a 200 on our Get.
@@ -184,7 +183,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml/pip");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.JSON.applicationType());
+        request.addHeader("Content-Type", ContentType.JSON.getApplicationType());
 
         try {
             // Check for a 401 on our Get.
@@ -207,7 +206,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml/pap");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.XACML_PLUS_JSON.applicationType());
+        request.addHeader("Content-Type", ContentType.XACML_PLUS_JSON.getApplicationType());
 
         try {
             // Check for a 401 on our Get.
@@ -253,7 +252,7 @@ public class TestXacmlContentHandlerService {
         request.addHeader("Host", "example.org");
         request.setURI("/openam/xacml/ping");
         request.setVersion("HTTP/1.1");
-        request.addHeader("Content-Type", ContentType.JSON.applicationType());
+        request.addHeader("Content-Type", ContentType.JSON.getApplicationType());
 
         try {
             // Check for a 401 on our Get.
@@ -324,7 +323,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.addHeader("Content-Type", ContentType.JSON.applicationType());
+        request.addHeader("Content-Type", ContentType.JSON.getApplicationType());
         request.setURI("/openam/xacml/pdp/authorization");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
@@ -348,7 +347,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
         request.setURI("/openam/xacml/pdp/authorization");
         request.setContent(""); // Set content Length to zero.
         request.setVersion("HTTP/1.1");
@@ -359,7 +358,7 @@ public class TestXacmlContentHandlerService {
             response.parse(servletTester.getResponses(request.generate()));
             assertEquals(response.getStatus(),401);
             assertNotNull(response.getHeader("Content-Type"));
-            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
+            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.getApplicationType()));
 
             assertNotNull(response.getHeader("Content-Length"));
             assertTrue(response.getHeader("Content-Length").equals("0"));
@@ -392,7 +391,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
         request.setURI("/openam/xacml/pdp");
         request.setVersion("HTTP/1.1");
 
@@ -406,7 +405,7 @@ public class TestXacmlContentHandlerService {
             response.parse(servletTester.getResponses(request.generate()));
             assertEquals(response.getStatus(),401);
             assertNotNull(response.getHeader("Content-Type"));
-            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
+            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.getApplicationType()));
 
             assertNotNull(response.getHeader("Content-Length"));
             assertTrue(response.getHeader("Content-Length").equals("0"));
@@ -425,7 +424,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
         request.setURI("/openam/xacml/pdp");
         request.setVersion("HTTP/1.1");
 
@@ -439,7 +438,7 @@ public class TestXacmlContentHandlerService {
             response.parse(servletTester.getResponses(request.generate()));
             assertEquals(response.getStatus(),401);
             assertNotNull(response.getHeader("Content-Type"));
-            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
+            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.getApplicationType()));
 
             assertNotNull(response.getHeader("Content-Length"));
             assertTrue(response.getHeader("Content-Length").equals("0"));
@@ -463,7 +462,7 @@ public class TestXacmlContentHandlerService {
         HttpTester request = new HttpTester();
         request.setMethod("POST");
         request.addHeader("Host", "example.org");
-        request.addHeader("Content-Type", ContentType.XML.applicationType());
+        request.addHeader("Content-Type", ContentType.XML.getApplicationType());
         request.setURI("/openam/xacml/pdp/pep-trusted");
         request.setVersion("HTTP/1.1");
 
@@ -477,7 +476,7 @@ public class TestXacmlContentHandlerService {
             response.parse(servletTester.getResponses(request.generate()));
             assertEquals(response.getStatus(),200);
             assertNotNull(response.getHeader("Content-Type"));
-            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.applicationType()));
+            assertTrue(response.getHeader("Content-Type").startsWith(ContentType.XML.getApplicationType()));
 
             assertNotNull(response.getHeader("Content-Length"));
             assertFalse(response.getHeader("Content-Length").equals("0"));

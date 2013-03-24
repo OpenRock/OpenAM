@@ -188,7 +188,7 @@ public class XacmlPEPRequestClient {
         HttpGet httpGet = new HttpGet(this.getUrl());
 
         // Set Headers
-        httpGet.setHeader("content-type", this.getContentType().applicationType());
+        httpGet.setHeader("content-type", this.getContentType().getApplicationType());
         System.out.println("GET Requesting: " + httpGet.getURI());
 
         try {
@@ -256,7 +256,7 @@ public class XacmlPEPRequestClient {
         DefaultHttpClient httpclient2 = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(this.getUrl());
         // Set Headers
-        httpPost.setHeader("content-type", this.getContentType().applicationType());
+        httpPost.setHeader("content-type", this.getContentType().getApplicationType());
         System.out.println("POST Requesting : " + httpPost.getURI());
 
         try {
@@ -328,7 +328,7 @@ public class XacmlPEPRequestClient {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpPut httpPut = new HttpPut(this.getUrl());
         // Set Headers
-        httpPut.setHeader("content-type", this.getContentType().applicationType());
+        httpPut.setHeader("content-type", this.getContentType().getApplicationType());
         System.out.println("PUT Requesting : " + httpPut.getURI());
 
         try {
@@ -358,7 +358,7 @@ public class XacmlPEPRequestClient {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpDelete httpDelete = new HttpDelete(this.getUrl());
         // Set Headers
-        httpDelete.setHeader("content-type", this.getContentType().applicationType());
+        httpDelete.setHeader("content-type", this.getContentType().getApplicationType());
         System.out.println("PUT Requesting : " + httpDelete.getURI());
 
         try {

@@ -74,8 +74,8 @@ public class XacmlHomeResource  {
         StringBuilder sb = new StringBuilder();
         // ************************************************************
         // Determine how to respond based upon Content Type.
-        if ( (xacmlRequestInformation.getContentType().equals(ContentType.NONE.applicationType())) ||
-             (xacmlRequestInformation.getContentType().commonType() == CommonType.JSON) ) {
+        if ( (xacmlRequestInformation.getContentType().equals(ContentType.NONE.getApplicationType())) ||
+             (xacmlRequestInformation.getContentType().getCommonType() == CommonType.JSON) ) {
                 sb.append(getJSONHomeDocument(xacmlRequestInformation));
         } else {
                 // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
@@ -166,10 +166,10 @@ public class XacmlHomeResource  {
          * Content MUST be an array of strings, containing media types.
          */
         JSONArray representations = new JSONArray();
-        representations.put(ContentType.JSON.applicationType());
-        representations.put(ContentType.XML.applicationType());
-        representations.put(ContentType.XACML_PLUS_JSON.applicationType());
-        representations.put(ContentType.XACML_PLUS_XML.applicationType());
+        representations.put(ContentType.JSON.getApplicationType());
+        representations.put(ContentType.XML.getApplicationType());
+        representations.put(ContentType.XACML_PLUS_JSON.getApplicationType());
+        representations.put(ContentType.XACML_PLUS_XML.getApplicationType());
         hints.append("representations", representations);
 
         /**
@@ -182,9 +182,9 @@ public class XacmlHomeResource  {
          * hint.
          */
         JSONArray accept_post = new JSONArray();
-        accept_post.put(ContentType.JSON.applicationType());
-        accept_post.put(ContentType.XML.applicationType());
-        accept_post.put(ContentType.XACML_PLUS_XML.applicationType());
+        accept_post.put(ContentType.JSON.getApplicationType());
+        accept_post.put(ContentType.XML.getApplicationType());
+        accept_post.put(ContentType.XACML_PLUS_XML.getApplicationType());
         hints.append("accept-post", accept_post);
 
         /**

@@ -993,7 +993,7 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
                 queryMetaAlias, pdpEntityID, realm, request);
         // Consume the Request Content, by parsing
         // the Content Depending upon the Content Type.
-        if (contentType.commonType().equals(CommonType.XML)) {
+        if (contentType.getCommonType().equals(CommonType.XML)) {
             parseXMLRequest(xacmlRequestInformation);
         } else {
             // Only can be JSON at this point in Data FLow...
@@ -1083,7 +1083,7 @@ MUST_BE_AUTHENTICATED_AND_AUTHORIZED:
                                 HttpServletResponse response) {
         OutputStream outputStream = null;
         try {
-            response.setContentType(contentType.applicationType());
+            response.setContentType(contentType.getApplicationType());
             response.setCharacterEncoding("UTF-8");
             if ((xacmlStringResponse != null) && (!xacmlStringResponse.trim().isEmpty())) {
                 outputStream = response.getOutputStream();

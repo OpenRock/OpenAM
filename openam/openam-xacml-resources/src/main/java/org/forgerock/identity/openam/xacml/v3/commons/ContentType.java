@@ -51,11 +51,11 @@ public enum ContentType {
         this.commonType = commonType;
     }
 
-    public String applicationType() {
+    public String getApplicationType() {
         return applicationType;
     }
 
-    public CommonType commonType() {
+    public CommonType getCommonType() {
         return commonType;
     }
 
@@ -77,7 +77,7 @@ public enum ContentType {
             if (contentType.equals(ContentType.NONE)) {
                 continue;
             }
-            if (contentType.applicationType().equalsIgnoreCase(toCompare)) {
+            if (contentType.getApplicationType().equalsIgnoreCase(toCompare)) {
                 return contentType;
             }
         }

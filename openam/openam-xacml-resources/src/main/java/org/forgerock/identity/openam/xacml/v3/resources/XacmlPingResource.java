@@ -70,8 +70,8 @@ public class XacmlPingResource  {
         StringBuilder sb = new StringBuilder();
         // ************************************************************
         // Determine how to respond based upon Content Type.
-        if ( (xacmlRequestInformation.getContentType().equals(ContentType.NONE.applicationType())) ||
-                (xacmlRequestInformation.getContentType().commonType() == CommonType.JSON) ) {
+        if ( (xacmlRequestInformation.getContentType().equals(ContentType.NONE.getApplicationType())) ||
+                (xacmlRequestInformation.getContentType().getCommonType() == CommonType.JSON) ) {
             sb.append(getJSONPingDocument(xacmlRequestInformation));
         } else {
             // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287

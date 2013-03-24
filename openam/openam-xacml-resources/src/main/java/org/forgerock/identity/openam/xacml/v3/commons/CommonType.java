@@ -31,6 +31,7 @@ package org.forgerock.identity.openam.xacml.v3.commons;
  *
  * @author jeff.schenk@forgerock.com
  * @see org.forgerock.identity.openam.xacml.v3.commons.ContentType
+ *
  */
 public enum CommonType {
 

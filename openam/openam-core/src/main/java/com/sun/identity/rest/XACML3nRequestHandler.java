@@ -2,7 +2,7 @@
  *
  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  ~
- ~ Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ ~ Copyright (c) 2011-2013 ForgeRock US. All Rights Reserved
  ~
  ~ The contents of this file are subject to the terms
  ~ of the Common Development and Distribution License
@@ -42,8 +42,14 @@ import javax.xml.bind.JAXBElement;
 public class XACML3nRequestHandler {
 
     @GET
-    @Produces({"application/xml","application/json"})
+    @Produces({"application/xml","application/xml+xacml"})
     public String getHomeResource() {
+        return "This is a Home Resource";
+    }
+
+    @GET
+    @Produces({"application/json","application/json+xacml"})
+    public String getJSONHomeResource() {
         return "This is a Home Resource";
     }
 

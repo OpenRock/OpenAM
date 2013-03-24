@@ -51,26 +51,26 @@ public class TestContentType {
     @Test
     public void testContentType() {
         assertEquals(ContentType.JSON_HOME.toString(),ContentType.JSON_HOME.name());
-        assertEquals(ContentType.JSON.applicationType(), MediaType.APPLICATION_JSON);
-        assertNotEquals(ContentType.JSON.applicationType(), ContentType.JSON_HOME.applicationType());
-        assertEquals("application/xacml+xml",ContentType.XACML_PLUS_XML.applicationType());
-        assertEquals("application/xml",ContentType.XML.applicationType());
-        assertEquals(MediaType.APPLICATION_XML.toString(),ContentType.XML.applicationType());
+        assertEquals(ContentType.JSON.getApplicationType(), MediaType.APPLICATION_JSON);
+        assertNotEquals(ContentType.JSON.getApplicationType(), ContentType.JSON_HOME.getApplicationType());
+        assertEquals("application/xacml+xml",ContentType.XACML_PLUS_XML.getApplicationType());
+        assertEquals("application/xml",ContentType.XML.getApplicationType());
+        assertEquals(MediaType.APPLICATION_XML.toString(),ContentType.XML.getApplicationType());
     }
 
     @Test
     public void testLookup() {
         ContentType requestContentType =
-                ContentType.getNormalizedContentType(ContentType.JSON_HOME.applicationType()+"; charset=UTF-8");
-        assertEquals(ContentType.JSON_HOME.applicationType(), requestContentType.applicationType());
+                ContentType.getNormalizedContentType(ContentType.JSON_HOME.getApplicationType()+"; charset=UTF-8");
+        assertEquals(ContentType.JSON_HOME.getApplicationType(), requestContentType.getApplicationType());
 
         requestContentType =
-                ContentType.getNormalizedContentType(ContentType.XACML_PLUS_XML.applicationType()+"; charset=UTF-8");
-        assertEquals(ContentType.XACML_PLUS_XML.applicationType(), requestContentType.applicationType());
+                ContentType.getNormalizedContentType(ContentType.XACML_PLUS_XML.getApplicationType()+"; charset=UTF-8");
+        assertEquals(ContentType.XACML_PLUS_XML.getApplicationType(), requestContentType.getApplicationType());
 
         requestContentType =
-                ContentType.getNormalizedContentType(ContentType.XACML_PLUS_JSON.applicationType()+"; charset=UTF-8");
-        assertEquals(ContentType.XACML_PLUS_JSON.applicationType(), requestContentType.applicationType());
+                ContentType.getNormalizedContentType(ContentType.XACML_PLUS_JSON.getApplicationType()+"; charset=UTF-8");
+        assertEquals(ContentType.XACML_PLUS_JSON.getApplicationType(), requestContentType.getApplicationType());
 
     }
 
