@@ -25,13 +25,16 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.Date;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * A.3.7 Date and time arithmetic functions
@@ -98,8 +101,59 @@ import org.testng.annotations.Test;
  */
 public class TestXacmlDateAndTimeArithmetricFunctions {
 
-    static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
-    static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
+    static final Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("010:01:00:30.001");
+    static final FunctionArgument durationObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
+
+    static final Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("020:02:02:02.002");
+    static final FunctionArgument durationObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
+
+    static final Long duration3 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("030:03:03:03.003");
+    static final FunctionArgument durationObject3 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration3, true);
+
+
+    static final Date date1 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+    static final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, date1, true);
+
+    static final Date date2 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.124");
+    static final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, date2, true);
+
+    static final Date date3 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+    static final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, date3, true);
+
+
+    static final Date date4 = XACML3PrivilegeUtils.stringToDateTime("2013-03-20:02:46:00.127");
+    static final FunctionArgument dateResult1 = new DataValue(DataType.XACMLDATETIME, date4, true);
+
+    static final Date date5 = XACML3PrivilegeUtils.stringToDateTime("2013-03-30:03:47:32.126");
+    static final FunctionArgument dateResult2 = new DataValue(DataType.XACMLDATETIME, date5, true);
+
+    static final Date date6 = XACML3PrivilegeUtils.stringToDateTime("2013-04-09:04:48:33.129");
+    static final FunctionArgument dateResult3 = new DataValue(DataType.XACMLDATETIME, date6, true);
+
+
+    /**
+     *   Expected Results:
+
+     Date: 2013-03-11T01:45:30.126
+     Duration: 781230001
+     ----------- ---------------------------------------------
+     result: 2013-03-20T02:46:00.127
+
+
+     Date: 2013-03-11T01:45:30.124
+     Duration: 1648922002
+     ----------- ---------------------------------------------
+     result: 2013-03-30T03:47:32.126
+
+
+     Date: 2013-03-11T01:45:30.126
+     Duration: 2516583003
+     ----------- ---------------------------------------------
+     result: 2013-04-09T04:48:33.129
+
+
+     *
+     */
 
 
     @BeforeClass
@@ -115,6 +169,49 @@ public class TestXacmlDateAndTimeArithmetricFunctions {
      */
     @Test
     public void testDateTimeAddDayTimeDuration() throws XACML3EntitlementException{
+
+        DatetimeAddDaytimeduration dateTimeAddDaytimeduration = new DatetimeAddDaytimeduration();
+        dateTimeAddDaytimeduration.addArgument(dateObject1);
+        dateTimeAddDaytimeduration.addArgument(durationObject1);
+
+        FunctionArgument result = dateTimeAddDaytimeduration.evaluate(null);
+        assertNotNull(result);
+
+        System.out.println("      Date: "+XACML3PrivilegeUtils.dateToString(dateObject1.asDateTime(null)));
+        System.out.println("  Duration: "+durationObject1.asDayTimeDuration(null).toString());
+        System.out.println("----------- ---------------------------------------------");
+        System.out.println("    result: "+XACML3PrivilegeUtils.dateToString(result.asDateTime(null)) +"\n\n");
+
+        assertTrue(dateResult1.asDateTime(null).getTime() == result.asDateTime(null).getTime());
+
+        dateTimeAddDaytimeduration = new DatetimeAddDaytimeduration();
+        dateTimeAddDaytimeduration.addArgument(dateObject2);
+        dateTimeAddDaytimeduration.addArgument(durationObject2);
+
+        result = dateTimeAddDaytimeduration.evaluate(null);
+        assertNotNull(result);
+
+        System.out.println("      Date: "+XACML3PrivilegeUtils.dateToString(dateObject2.asDateTime(null)));
+        System.out.println("  Duration: "+durationObject2.asDayTimeDuration(null).toString());
+        System.out.println("----------- ---------------------------------------------");
+        System.out.println("    result: "+XACML3PrivilegeUtils.dateToString(result.asDateTime(null)) +"\n\n");
+
+        assertTrue(dateResult2.asDateTime(null).getTime() == result.asDateTime(null).getTime());
+
+
+        dateTimeAddDaytimeduration = new DatetimeAddDaytimeduration();
+        dateTimeAddDaytimeduration.addArgument(dateObject3);
+        dateTimeAddDaytimeduration.addArgument(durationObject3);
+
+        result = dateTimeAddDaytimeduration.evaluate(null);
+        assertNotNull(result);
+
+        System.out.println("      Date: "+XACML3PrivilegeUtils.dateToString(dateObject3.asDateTime(null)));
+        System.out.println("  Duration: "+durationObject3.asDayTimeDuration(null).toString());
+        System.out.println("----------- ---------------------------------------------");
+        System.out.println("    result: "+XACML3PrivilegeUtils.dateToString(result.asDateTime(null)) +"\n\n");
+
+        assertTrue(dateResult3.asDateTime(null).getTime() == result.asDateTime(null).getTime());
 
     }
 
@@ -154,7 +251,7 @@ public class TestXacmlDateAndTimeArithmetricFunctions {
      * urn:oasis:names:tc:xacml:3.0:function:date-subtract-yearMonthDuration
      */
     @Test
-    public void testDateSubtractYearMonthDurationDayTimeDuration() throws XACML3EntitlementException{
+    public void testDateSubtractYearMonthDuration() throws XACML3EntitlementException{
 
     }
 

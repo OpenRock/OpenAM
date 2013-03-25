@@ -25,29 +25,54 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:3.0:function:dateTime-subtract-dayTimeDuration
-This function SHALL take two arguments, the first SHALL be a
-“http://www.w3.org/2001/XMLSchema#dateTime” and the second SHALL be a
-“http://www.w3.org/2001/XMLSchema#dayTimeDuration”.
-It SHALL return a result of “http://www.w3.org/2001/XMLSchema#dateTime”.
-If the second argument is a positive duration,then this function SHALL return the value by adding
-the corresponding negative duration, as per the specification [XS] Appendix E.
-If the second argument is a negative duration, then the result SHALL be as if the function
-“urn:oasis:names:tc:xacml:1.0:function:dateTime-add-4245 dayTimeDuration”
-had been applied to the corresponding positive duration.
-*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:dateTime-subtract-dayTimeDuration
+ This function SHALL take two arguments, the first SHALL be a
+ “http://www.w3.org/2001/XMLSchema#dateTime” and the second
+ SHALL be a “http://www.w3.org/2001/XMLSchema#dayTimeDuration”.
+ It SHALL return a result of “http://www.w3.org/2001/XMLSchema#dateTime”.
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+ If the second argument is a positive duration, then this function SHALL return the value by adding
+ the corresponding negative duration, as per the specification [XS] Appendix E.
 
+ If the second argument is a negative duration, then the result SHALL be as if the function
+ “urn:oasis:names:tc:xacml:1.0:function:dateTime-add-dayTimeDuration” had been applied to the corresponding
+ positive duration.
+ */
+
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.Calendar;
+import java.util.Date;
+
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:dateTime-subtract-dayTimeDuration
+ */
 public class DatetimeSubtractDaytimeduration extends XACMLFunction {
 
     public DatetimeSubtractDaytimeduration()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if ( getArgCount() != 2) {
+            throw new XACML3EntitlementException("Function Requires 2 Arguments");
+        }
+
+        Date date = getArg(0).asDateTime(pip);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        Long duration = getArg(1).asDayTimeDuration(pip);
+
+        // Check Duration...
+        if (duration < 0) {
+            // Negative Duration.
+            calendar.setTimeInMillis(calendar.getTimeInMillis() + duration.longValue());
+        } else {
+            // Positive Duration.
+            calendar.setTimeInMillis(calendar.getTimeInMillis() - duration.longValue());
+        }
+        // Return Calculated DateTime Data Type.
+        return new DataValue(DataType.XACMLDATETIME, calendar.getTime(), true);
     }
+
 }

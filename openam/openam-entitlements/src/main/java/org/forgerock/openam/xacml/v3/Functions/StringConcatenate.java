@@ -25,7 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
+/**
 urn:oasis:names:tc:xacml:2.0:function:string-concatenate
 
 This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
@@ -35,31 +35,32 @@ This function SHALL take two or more arguments of data-type
      The result SHALL be the concatenation, in order, of the arguments.
 */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
+/**
+ * urn:oasis:names:tc:xacml:2.0:function:string-concatenate
+ */
 public class StringConcatenate extends XACMLFunction {
 
     public StringConcatenate()  {
     }
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        FunctionArgument retVal =  FunctionArgument.falseObject;
 
         if ( getArgCount() < 2) {
-            return retVal;
+            if (getArgCount() == 1) {
+                return new DataValue(DataType.XACMLSTRING, getArg(0).asString(pip));
+            } else {
+                throw new XACML3EntitlementException("Nothing to Concatenate");
+            }
         }
+        // Loop Through Arguments to Build up Final Content.
         int args = getArgCount();
-
-        String s = (String)getArg(0).getValue(pip);
-
+        StringBuilder sb = new StringBuilder( getArg(0).asString(pip)) ;
         for (int i=1; i<args; i++) {
-            s.concat((String)getArg(i).getValue(pip));
+            sb.append(getArg(i).asString(pip));
         }
-
-        return retVal;
+        return new DataValue(DataType.XACMLSTRING, sb.toString());
     }
 
 }

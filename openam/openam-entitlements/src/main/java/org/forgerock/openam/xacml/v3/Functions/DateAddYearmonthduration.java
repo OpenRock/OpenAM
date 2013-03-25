@@ -25,20 +25,23 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:3.0:function:date-add-yearMonthDuration
-This function SHALL take two arguments, the first SHALL be a
-“http://www.w3.org/2001/XMLSchema#date” and the second SHALL be a
-“http://www.w3.org/2001/XMLSchema#yearMonthDuration”.
-It SHALL return a result of “http://www.w3.org/2001/XMLSchema#date”.
-This function SHALL return the value by adding the second argument to the first argument
-according to the specification of adding duration to date [XS] Appendix E.*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:date-add-yearMonthDuration
+ This function SHALL take two arguments, the first SHALL be a “http://www.w3.org/2001/XMLSchema#date” and the second
+ SHALL be a “http://www.w3.org/2001/XMLSchema#yearMonthDuration”.
+ It SHALL return a result of “http://www.w3.org/2001/XMLSchema#date”.
+ This function SHALL return the value by adding the second argument to the first argument according to
+ the specification of adding duration to date [XS] Appendix E.
+ */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
+/**
+ *  urn:oasis:names:tc:xacml:3.0:function:date-add-yearMonthDuration
+ */
 public class DateAddYearmonthduration extends XACMLFunction {
 
     public DateAddYearmonthduration()  {

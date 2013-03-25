@@ -25,26 +25,41 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:3.0:function:dateTime-add-yearMonthDuration
-This function SHALL take two arguments, the first SHALL be a
-“http://www.w3.org/2001/XMLSchema#dateTime” and the second SHALL be a
-“http://www.w3.org/2001/XMLSchema#yearMonthDuration”. It SHALL return a result of
-“http://www.w3.org/2001/XMLSchema#dateTime”.
-This function SHALL return the value by adding the second argument to the first argument
-according to the specification of adding durations to date and time [XS] Appendix E.
-*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:dateTime-add-yearMonthDuration
+ This function SHALL take two arguments, the first SHALL be a “http://www.w3.org/2001/XMLSchema#dateTime”
+ and the second SHALL be a “http://www.w3.org/2001/XMLSchema#yearMonthDuration”.
+ It SHALL return a result of “http://www.w3.org/2001/XMLSchema#dateTime”.
+ This function SHALL return the value by adding the second argument to the first argument according to
+ the specification of adding durations to date and time [XS] Appendix E.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
+import java.util.Calendar;
+import java.util.Date;
+
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:dateTime-add-yearMonthDuration
+ */
 public class DatetimeAddYearmonthduration extends XACMLFunction {
 
     public DatetimeAddYearmonthduration()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        if ( getArgCount() != 2) {
+            throw new XACML3EntitlementException("Function Requires 2 Arguments");
+        }
+
+        Date date = getArg(0).asDateTime(pip);
+        Long duration = getArg(1).asYearMonthDuration(pip);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        // Add in the Duration.
+        calendar.setTimeInMillis(calendar.getTimeInMillis() + duration.longValue());
+        // Return Calculated DateTime Data Type.
+        return new DataValue(DataType.XACMLDATETIME, calendar.getTime(), true);
     }
 }

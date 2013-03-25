@@ -251,16 +251,16 @@ public class TestXacmlEqualityPredicateFunctions {
     @Test
     public void testDaytimedurationEqual() throws XACML3EntitlementException {
 
-        Long duration1 = XACML3PrivilegeUtils.stringDayTimedurationToLongDuration("2013-03-11:01:45:30.126");
+        Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
 
-        Long duration2 = XACML3PrivilegeUtils.stringDayTimedurationToLongDuration("2013-03-11:01:45:30.124");
+        Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("012:01:45:30.124");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
 
-        Long duration3 = XACML3PrivilegeUtils.stringDayTimedurationToLongDuration("2013-03-11:01:45:30.126");
+        Long duration3 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration3, true);
 
-        Long duration4 = XACML3PrivilegeUtils.stringDayTimedurationToLongDuration("2014-03-11:01:45:30.126");
+        Long duration4 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("001:01:45:30.126");
         FunctionArgument dateObject4 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration4, true);
 
 

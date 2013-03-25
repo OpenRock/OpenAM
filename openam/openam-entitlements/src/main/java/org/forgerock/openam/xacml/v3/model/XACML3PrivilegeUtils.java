@@ -51,6 +51,7 @@ public class XACML3PrivilegeUtils {
     public static final String YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "yyyy-MM-dd:HH:mm:ss.SSSS";
     public static final String YEAR_MONTH_DAY =  "yyyy-MM-dd";
     public static final String YEAR_MONTH = "yyyy-MM";
+    public static final String DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "ddd:HH:mm:ss.SSS";
     public static final String HOUR_MINUTE_SECOND_MILLISECONDS = "HH:mm:ss.SSS";
     public static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT");
 
@@ -224,9 +225,9 @@ public class XACML3PrivilegeUtils {
 
     }
 
-    public static Long  stringDayTimedurationToLongDuration(String dateTimeString) {
+    public static Long  stringDayTimeDurationToLongDuration(String dateTimeString) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        SimpleDateFormat sdf = new SimpleDateFormat(DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf.setTimeZone(GMT_TIMEZONE);
         Long retVal = new Long(0);
         try {
@@ -239,28 +240,13 @@ public class XACML3PrivilegeUtils {
 
     }
 
-    public static Long  stringYearMonthdurationToLongDuration(String yearMonthString) {
+    public static Long stringYearMonthdurationToLongDuration(String yearMonthString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH);
         sdf.setTimeZone(GMT_TIMEZONE);
         Long retVal = new Long(0);
         try {
             Date date = sdf.parse(yearMonthString);
-            retVal = date.getTime();
-        } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
-        }
-        return retVal;
-
-    }
-
-    public static Long  stringDaydurationToLongDuration(String dateString) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
-        sdf.setTimeZone(GMT_TIMEZONE);
-        Long retVal = new Long(0);
-        try {
-            Date date = sdf.parse(dateString);
             retVal = date.getTime();
         } catch (java.text.ParseException pe) {
             //TODO: log debug warning
