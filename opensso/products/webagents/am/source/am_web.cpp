@@ -118,6 +118,7 @@ typedef unsigned __int32 uint32_t;
 
 #include "agent_configuration.h"
 #include "naming_valid.h"
+#include "version.h"
 
 USING_PRIVATE_NAMESPACE
 
@@ -208,6 +209,15 @@ HANDLE nv_thr;
 #else
 pthread_t nv_thr;
 #endif
+
+extern "C" AM_WEB_EXPORT void am_agent_version(char **info) {
+    if (info != NULL) {
+        info[0] = (char *) Version::getAgentVersion();
+        info[1] = (char *) Version::getBuildRev();
+        info[2] = (char *) Version::getBuildDate();
+        info[3] = (char *) Version::getBuildMachine();
+    }
+}
 
 extern "C" void get_status_info(am_status_t status, const char ** name, const char ** msg);
 extern "C" void *naming_validator(void *arg);

@@ -606,6 +606,20 @@ AM_WEB_EXPORT am_status_t am_agent_init(boolean_t *pAgentAuthenticated);
 AM_WEB_EXPORT am_status_t am_web_cleanup();
 
 /**
+ * Method to retrieve Agent version information
+ * 
+ * Parameters:
+ *  info       Pointer to array of four (constant) char pointers, where,
+ *             first entry will point to agent version information,
+ *             second to SVN revision number,
+ *             third to build date,
+ *             fourth to build machine information.
+ * All entries are NULL terminated C strings. 
+ * Pointers to entry values must not be released (free()) by caller.
+ */
+AM_WEB_EXPORT void am_agent_version(char **info);
+
+/**
  *                   -------- policy methods --------
  */
 
