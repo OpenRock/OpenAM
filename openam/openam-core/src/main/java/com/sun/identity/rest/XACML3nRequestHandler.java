@@ -42,20 +42,18 @@ import javax.xml.bind.JAXBElement;
 public class XACML3nRequestHandler {
 
     @GET
-    @Produces({"application/xml","application/xml+xacml"})
+    @Produces({"application/xml","application/xacml+xml"})
     public String getHomeResource() {
         return "This is a Home Resource";
     }
 
     @GET
-    @Produces({"application/json","application/json+xacml"})
+    @Produces({"application/json","application/xacml+json"})
     public String getJSONHomeResource() {
         return "This is a Home Resource";
     }
 
     @POST
-    // @Consumes({"application/xml","application/json"})
-    // @Produces({"application/xml","application/json"})
     @Consumes("application/xml")
     @Produces("application/xml")
     @Path("/pdp")
@@ -100,5 +98,9 @@ public class XACML3nRequestHandler {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createRequest(request);
     }
+
+
+
+
 }
 

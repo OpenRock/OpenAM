@@ -48,6 +48,9 @@ public class RestService extends Application {
 
         s.add(XACML3RequestHandler.class);
         s.add(XACML3ContextResolver.class);
+
+        s.add(XACML3nRequestHandler.class);
+
         return s;
     }
 
