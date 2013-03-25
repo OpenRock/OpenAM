@@ -379,15 +379,21 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 break;
             case AM_WEB_RESULT_FORBIDDEN:
                 rec->response.status = 403;
+                apr_table_addn(rec->response.headers_out, "Content-Type", "text/plain");
+                ap_custom_response(rec, 403, "403 Forbidden");
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_ERROR:
                 rec->response.status = 500;
+                apr_table_addn(rec->response.headers_out, "Content-Type", "text/plain");
+                ap_custom_response(rec, 500, "500 Internal Server Error");
                 *ret = DONE;
                 break;
             default:
                 am_web_log_error("%s: Unrecognized process result %d", thisfunc, http_result);
                 rec->response.status = 500;
+                apr_table_addn(rec->response.headers_out, "Content-Type", "text/plain");
+                ap_custom_response(rec, 500, "500 Internal Server Error");
                 *ret = DONE;
                 break;
         }
