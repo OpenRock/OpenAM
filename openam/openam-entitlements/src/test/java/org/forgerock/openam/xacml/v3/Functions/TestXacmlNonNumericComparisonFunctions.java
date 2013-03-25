@@ -218,6 +218,31 @@ public class TestXacmlNonNumericComparisonFunctions {
     static final FunctionArgument timeObject5 = new DataValue(DataType.XACMLTIME, time5, true);
 
 
+    static final Date dateTime1 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+    static final FunctionArgument dateTimeObject1 = new DataValue(DataType.XACMLDATETIME, dateTime1, true);
+
+    static final Date dateTime2 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.124");
+    static final FunctionArgument dateTimeObject2 = new DataValue(DataType.XACMLDATETIME, dateTime2, true);
+
+    static final Date dateTime3 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+    static final FunctionArgument dateTimeObject3 = new DataValue(DataType.XACMLDATETIME, dateTime3, true);
+
+    static final Date dateTime4 = XACML3PrivilegeUtils.stringToDateTime("2014-03-11:01:45:30.126");
+    static final FunctionArgument dateTimeObject4 = new DataValue(DataType.XACMLDATETIME, dateTime4, true);
+
+
+    static final Date date1 = XACML3PrivilegeUtils.stringToDate("2013-03-11");
+    static final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATE, date1, true);
+
+    static final Date date2 = XACML3PrivilegeUtils.stringToDate("2013-03-12");
+    static final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATE, date2, true);
+
+    static final Date date3 = XACML3PrivilegeUtils.stringToDate("2013-03-11");
+    static final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATE, date3, true);
+
+    static final Date date4 = XACML3PrivilegeUtils.stringToDate("2014-03-11");
+    static final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATE, date4, true);
+
     @BeforeClass
     public void before() throws Exception {
     }
@@ -497,13 +522,55 @@ public class TestXacmlNonNumericComparisonFunctions {
         assertNotNull(result);
         assertTrue(result.isTrue());
 
+        timeinRange = new TimeInRange();
+        timeinRange.addArgument(timeObject2);  // To be In Range.
+        timeinRange.addArgument(timeObject1);  // In Range Start.
+        timeinRange.addArgument(timeObject5);  // In Range End.
+
+        result = timeinRange.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        timeinRange = new TimeInRange();
+        timeinRange.addArgument(timeObject5);  // To be In Range.
+        timeinRange.addArgument(timeObject1);  // In Range Start.
+        timeinRange.addArgument(timeObject2);  // In Range End.
+
+        result = timeinRange.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
     }
 
     /**
      *   urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than
      */
     @Test
-    public void testDateTimeGreaterThanOrEqual() throws XACML3EntitlementException {
+    public void testDateTimeGreaterThan() throws XACML3EntitlementException {
+
+        DatetimeGreaterThan dateTimeGreaterThan = new DatetimeGreaterThan();
+        dateTimeGreaterThan.addArgument(dateTimeObject1);
+        dateTimeGreaterThan.addArgument(dateTimeObject2);
+
+        FunctionArgument result = dateTimeGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateTimeGreaterThan = new DatetimeGreaterThan();
+        dateTimeGreaterThan.addArgument(dateTimeObject1);
+        dateTimeGreaterThan.addArgument(dateTimeObject3);
+
+        result = dateTimeGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        dateTimeGreaterThan = new DatetimeGreaterThan();
+        dateTimeGreaterThan.addArgument(dateTimeObject4);
+        dateTimeGreaterThan.addArgument(dateTimeObject3);
+
+        result = dateTimeGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
     }
 
@@ -511,7 +578,30 @@ public class TestXacmlNonNumericComparisonFunctions {
      *   urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than-or-equal
      */
     @Test
-    public void testDateTimeGreaterThanOrEqualOrEqual() throws XACML3EntitlementException {
+    public void testDateTimeGreaterThanOrEqual() throws XACML3EntitlementException {
+        DatetimeGreaterThanOrEqual dateTimeGreaterThanOrEqual = new DatetimeGreaterThanOrEqual();
+        dateTimeGreaterThanOrEqual.addArgument(dateTimeObject1);
+        dateTimeGreaterThanOrEqual.addArgument(dateTimeObject2);
+
+        FunctionArgument result = dateTimeGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateTimeGreaterThanOrEqual = new DatetimeGreaterThanOrEqual();
+        dateTimeGreaterThanOrEqual.addArgument(dateTimeObject1);
+        dateTimeGreaterThanOrEqual.addArgument(dateTimeObject3);
+
+        result = dateTimeGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateTimeGreaterThanOrEqual = new DatetimeGreaterThanOrEqual();
+        dateTimeGreaterThanOrEqual.addArgument(dateTimeObject4);
+        dateTimeGreaterThanOrEqual.addArgument(dateTimeObject3);
+
+        result = dateTimeGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
     }
 
@@ -521,6 +611,30 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testDateTimeLessThan() throws XACML3EntitlementException {
 
+        DatetimeLessThan dateTimeLessThan = new DatetimeLessThan();
+        dateTimeLessThan.addArgument(dateTimeObject1);
+        dateTimeLessThan.addArgument(dateTimeObject2);
+
+        FunctionArgument result = dateTimeLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        dateTimeLessThan = new DatetimeLessThan();
+        dateTimeLessThan.addArgument(dateTimeObject1);
+        dateTimeLessThan.addArgument(dateTimeObject4);
+
+        result = dateTimeLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateTimeLessThan = new DatetimeLessThan();
+        dateTimeLessThan.addArgument(dateTimeObject3);
+        dateTimeLessThan.addArgument(dateTimeObject4);
+
+        result = dateTimeLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
     }
 
     /**
@@ -528,7 +642,29 @@ public class TestXacmlNonNumericComparisonFunctions {
      */
     @Test
     public void testDateTimeLessThanOrEqual() throws XACML3EntitlementException {
+        DatetimeLessThanOrEqual dateTimeLessThanOrEqual = new DatetimeLessThanOrEqual();
+        dateTimeLessThanOrEqual.addArgument(dateTimeObject1);
+        dateTimeLessThanOrEqual.addArgument(dateTimeObject2);
 
+        FunctionArgument result = dateTimeLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        dateTimeLessThanOrEqual = new DatetimeLessThanOrEqual();
+        dateTimeLessThanOrEqual.addArgument(dateTimeObject1);
+        dateTimeLessThanOrEqual.addArgument(dateTimeObject3);
+
+        result = dateTimeLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateTimeLessThanOrEqual = new DatetimeLessThanOrEqual();
+        dateTimeLessThanOrEqual.addArgument(dateTimeObject3);
+        dateTimeLessThanOrEqual.addArgument(dateTimeObject4);
+
+        result = dateTimeLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -536,6 +672,30 @@ public class TestXacmlNonNumericComparisonFunctions {
      */
     @Test
     public void testDateGreaterThan() throws XACML3EntitlementException {
+
+        DateGreaterThan dateGreaterThan = new DateGreaterThan();
+        dateGreaterThan.addArgument(dateObject1);
+        dateGreaterThan.addArgument(dateObject2);
+
+        FunctionArgument result = dateGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        dateGreaterThan = new DateGreaterThan();
+        dateGreaterThan.addArgument(dateObject2);
+        dateGreaterThan.addArgument(dateObject1);
+
+        result = dateGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateGreaterThan = new DateGreaterThan();
+        dateGreaterThan.addArgument(dateObject3);
+        dateGreaterThan.addArgument(dateObject4);
+
+        result = dateGreaterThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
 
     }
 
@@ -545,6 +705,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testDateGreaterThanOrEqual() throws XACML3EntitlementException {
 
+        DateGreaterThanOrEqual dateGreaterThanOrEqual = new DateGreaterThanOrEqual();
+        dateGreaterThanOrEqual.addArgument(dateObject1);
+        dateGreaterThanOrEqual.addArgument(dateObject2);
+
+        FunctionArgument result = dateGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        dateGreaterThanOrEqual = new DateGreaterThanOrEqual();
+        dateGreaterThanOrEqual.addArgument(dateObject2);
+        dateGreaterThanOrEqual.addArgument(dateObject1);
+
+        result = dateGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateGreaterThanOrEqual = new DateGreaterThanOrEqual();
+        dateGreaterThanOrEqual.addArgument(dateObject1);
+        dateGreaterThanOrEqual.addArgument(dateObject3);
+
+        result = dateGreaterThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -553,6 +736,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testDateLessThan() throws XACML3EntitlementException {
 
+        DateLessThan dateLessThan = new DateLessThan();
+        dateLessThan.addArgument(dateObject1);
+        dateLessThan.addArgument(dateObject2);
+
+        FunctionArgument result = dateLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateLessThan = new DateLessThan();
+        dateLessThan.addArgument(dateObject1);
+        dateLessThan.addArgument(dateObject3);
+
+        result = dateLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        dateLessThan = new DateLessThan();
+        dateLessThan.addArgument(dateObject3);
+        dateLessThan.addArgument(dateObject4);
+
+        result = dateLessThan.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -561,6 +767,29 @@ public class TestXacmlNonNumericComparisonFunctions {
     @Test
     public void testDateLessThanOrEqual() throws XACML3EntitlementException {
 
+        DateLessThanOrEqual dateLessThanOrEqual = new DateLessThanOrEqual();
+        dateLessThanOrEqual.addArgument(dateObject1);
+        dateLessThanOrEqual.addArgument(dateObject2);
+
+        FunctionArgument result = dateLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateLessThanOrEqual = new DateLessThanOrEqual();
+        dateLessThanOrEqual.addArgument(dateObject1);
+        dateLessThanOrEqual.addArgument(dateObject3);
+
+        result = dateLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        dateLessThanOrEqual = new DateLessThanOrEqual();
+        dateLessThanOrEqual.addArgument(dateObject3);
+        dateLessThanOrEqual.addArgument(dateObject4);
+
+        result = dateLessThanOrEqual.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
 }

@@ -57,8 +57,8 @@ public class DateGreaterThan extends XACMLFunction {
             return retVal;
         }
 
-        Date date1 = getArg(0).asTime(pip);
-        Date date2 = getArg(1).asTime(pip);
+        Date date1 = getArg(0).asDate(pip);
+        Date date2 = getArg(1).asDate(pip);
         if ((date1 == null) || (date2 == null)) {
             return retVal;
         }
