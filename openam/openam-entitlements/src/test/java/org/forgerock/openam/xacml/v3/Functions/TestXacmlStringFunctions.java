@@ -33,6 +33,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -296,6 +298,28 @@ public class TestXacmlStringFunctions {
 
     static final FunctionArgument testStringF = new DataValue(DataType.XACMLSTRING, null);
 
+    static final FunctionArgument testInteger1 = new DataValue(DataType.XACMLINTEGER, 22, true);
+    static final FunctionArgument testInteger2 = new DataValue(DataType.XACMLINTEGER, 456789, true);
+    static final FunctionArgument testInteger3 = new DataValue(DataType.XACMLINTEGER, 1024, true);
+    static final FunctionArgument testInteger4 = new DataValue(DataType.XACMLINTEGER, 0, true);
+
+    static final FunctionArgument testStringInteger1 = new DataValue(DataType.XACMLSTRING, "22", true);
+    static final FunctionArgument testStringInteger2 = new DataValue(DataType.XACMLSTRING, "456789", true);
+    static final FunctionArgument testStringInteger3 = new DataValue(DataType.XACMLSTRING, "1024", true);
+    static final FunctionArgument testStringInteger4 = new DataValue(DataType.XACMLSTRING, "0", true);
+
+    static final FunctionArgument testDouble1 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D, true);
+    static final FunctionArgument testDouble2 = new DataValue(DataType.XACMLDOUBLE, 456789D, true);
+    static final FunctionArgument testDouble3 = new DataValue(DataType.XACMLDOUBLE, 4111223344556677889290876D, true);
+    static final FunctionArgument testDouble4 = new DataValue(DataType.XACMLDOUBLE, 2D, true);
+
+    static final FunctionArgument testStringDouble1 = new DataValue(DataType.XACMLSTRING, "2111111111111111111290876",
+            true);
+    static final FunctionArgument testStringDouble2 = new DataValue(DataType.XACMLSTRING, "456789", true);
+    // Since the number is large the String from Double May not be exactly accurate!
+    static final FunctionArgument testStringDouble3 = new DataValue(DataType.XACMLSTRING, "4111223344556678123094016",
+            true);
+    static final FunctionArgument testStringDouble4 = new DataValue(DataType.XACMLSTRING, "2", true);
 
     @BeforeClass
     public void before() throws Exception {
@@ -435,6 +459,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testIntegerFromString() throws XACML3EntitlementException {
+        IntegerFromString function = new IntegerFromString();
+        function.addArgument(testStringInteger1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null), testInteger1.asInteger(null));
+
+        function = new IntegerFromString();
+        function.addArgument(testStringInteger2);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asInteger(null), testInteger2.asInteger(null));
 
     }
 
@@ -443,7 +478,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringFromInteger() throws XACML3EntitlementException {
+        StringFromInteger function = new StringFromInteger();
+        function.addArgument(testInteger3);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testStringInteger3.asString(null));
 
+        function = new StringFromInteger();
+        function.addArgument(testInteger4);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testStringInteger4.asString(null));
     }
 
     /**
@@ -451,7 +496,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testDoubleFromString() throws XACML3EntitlementException {
+        DoubleFromString function = new DoubleFromString();
+        function.addArgument(testStringDouble1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), testDouble1.asDouble(null));
 
+        function = new DoubleFromString();
+        function.addArgument(testStringDouble2);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDouble(null), testDouble2.asDouble(null));
     }
 
     /**
@@ -459,7 +514,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringFromDouble() throws XACML3EntitlementException {
+        StringFromDouble function = new StringFromDouble();
+        function.addArgument(testDouble3);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testStringDouble3.asString(null));
 
+        function = new StringFromDouble();
+        function.addArgument(testDouble4);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testStringDouble4.asString(null));
     }
 
     /**
