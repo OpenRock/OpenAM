@@ -131,33 +131,33 @@ public class TestXacmlDateAndTimeArithmetricFunctions {
     static final FunctionArgument dateResult3 = new DataValue(DataType.XACMLDATETIME, date6, true);
 
 
-    static final Date date7 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2014-06-09:01:45:30.126");
+    static final Date date7 = XACML3PrivilegeUtils.stringToDateTime("2014-06-09:01:45:30.126");
     static final FunctionArgument dateResult7 = new DataValue(DataType.XACMLDATETIME, date7, true);
 
-    static final Date date8 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2015-06-09:01:45:30.124");
+    static final Date date8 = XACML3PrivilegeUtils.stringToDateTime("2015-06-09:01:45:30.124");
     static final FunctionArgument dateResult8 = new DataValue(DataType.XACMLDATETIME, date8, true);
 
-    static final Date date9 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2016-06-08:01:45:30.126");
+    static final Date date9 = XACML3PrivilegeUtils.stringToDateTime("2016-06-08:01:45:30.126");
     static final FunctionArgument dateResult9 = new DataValue(DataType.XACMLDATETIME, date9, true);
 
 
-    static final Date date10 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2013-03-02:00:45:00.125");
+    static final Date date10 = XACML3PrivilegeUtils.stringToDateTime("2013-03-02:00:45:00.125");
     static final FunctionArgument dateResult10 = new DataValue(DataType.XACMLDATETIME, date10, true);
 
-    static final Date date11 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2013-02-19:23:43:28.122");
+    static final Date date11 = XACML3PrivilegeUtils.stringToDateTime("2013-02-19:23:43:28.122");
     static final FunctionArgument dateResult11 = new DataValue(DataType.XACMLDATETIME, date11, true);
 
-    static final Date date12 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2013-02-09:22:42:27.123");
+    static final Date date12 = XACML3PrivilegeUtils.stringToDateTime("2013-02-09:22:42:27.123");
     static final FunctionArgument dateResult12 = new DataValue(DataType.XACMLDATETIME, date12, true);
 
 
-    static final Date date13 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2011-12-12:01:45:30.126");
+    static final Date date13 = XACML3PrivilegeUtils.stringToDateTime("2011-12-12:01:45:30.126");
     static final FunctionArgument dateResult13 = new DataValue(DataType.XACMLDATETIME, date13, true);
 
-    static final Date date14 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2010-12-12:01:45:30.124");
+    static final Date date14 = XACML3PrivilegeUtils.stringToDateTime("2010-12-12:01:45:30.124");
     static final FunctionArgument dateResult14 = new DataValue(DataType.XACMLDATETIME, date14, true);
 
-    static final Date date15 = XACML3PrivilegeUtils.stringToDateTimeNoTimeZone("2009-12-12:01:45:30.126");
+    static final Date date15 = XACML3PrivilegeUtils.stringToDateTime("2009-12-12:01:45:30.126");
     static final FunctionArgument dateResult15 = new DataValue(DataType.XACMLDATETIME, date15, true);
 
 

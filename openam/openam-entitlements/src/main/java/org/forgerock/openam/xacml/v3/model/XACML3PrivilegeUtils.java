@@ -48,7 +48,7 @@ import org.json.JSONObject;
 public class XACML3PrivilegeUtils {
 
     // Global Pattern Definitions
-    public static final String YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "yyyy-MM-dd:HH:mm:ss.SSSS";
+    public static final String YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "yyyy-MM-dd:HH:mm:ss.SSS";
     public static final String YEAR_MONTH_DAY =  "yyyy-MM-dd";
     public static final String YEAR_MONTH = "yyyy-MM";
     public static final String DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "ddd:HH:mm:ss.SSS";
@@ -224,20 +224,6 @@ public class XACML3PrivilegeUtils {
 
     }
 
-    public static Date stringToDateTimeNoTimeZone(String dateTimeString) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
-        sdf.setTimeZone(GMT_TIMEZONE);
-        Date retVal = new Date();
-        try {
-            retVal = sdf.parse(dateTimeString);
-        } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
-        }
-        return retVal;
-
-    }
-
     public static Long  stringDayTimeDurationToLongDuration(String dateTimeString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
@@ -292,6 +278,17 @@ public class XACML3PrivilegeUtils {
 
     }
 
+    public static String timeToString(Date date){
+        SimpleDateFormat sdf1 = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        if ( (calendar.getTimeZone() == null) ) {
+            calendar.setTimeZone(GMT_TIMEZONE);
+        }
+        sdf1.setTimeZone(TimeZone.getDefault());
+        return sdf1.format(date);
+    }
+
     public static String dateToString(Date date){
         SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
         sdf1.setTimeZone(GMT_TIMEZONE);
@@ -305,7 +302,7 @@ public class XACML3PrivilegeUtils {
         sdf1.setTimeZone(GMT_TIMEZONE);
         sdf2.setTimeZone(GMT_TIMEZONE);
 
-        return sdf1.format (date) + "T" + sdf2.format(date);
+        return sdf1.format(date) + "T" + sdf2.format(date);
     }
 
     public static Date stringToDate(String dateString, final String pattern) {

@@ -25,15 +25,13 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -316,10 +314,38 @@ public class TestXacmlStringFunctions {
     static final FunctionArgument testStringDouble1 = new DataValue(DataType.XACMLSTRING, "2111111111111111111290876",
             true);
     static final FunctionArgument testStringDouble2 = new DataValue(DataType.XACMLSTRING, "456789", true);
+
     // Since the number is large the String from Double May not be exactly accurate!
     static final FunctionArgument testStringDouble3 = new DataValue(DataType.XACMLSTRING, "4111223344556678123094016",
             true);
     static final FunctionArgument testStringDouble4 = new DataValue(DataType.XACMLSTRING, "2", true);
+
+    static final String timeString1 = new String("04:20:30.126");
+    static final Date time1 = XACML3PrivilegeUtils.stringToTime(timeString1);
+    static final FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, time1, true);
+
+    static final String timeString2 = new String("02:05:30.003");
+    static final Date time2 = XACML3PrivilegeUtils.stringToTime(timeString2);
+    static final FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, time2, true);
+
+
+    static final String dateString1 = "2013-03-11";
+    static final Date date1 = XACML3PrivilegeUtils.stringToDate(dateString1);
+    static final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATE, date1, true);
+
+    static final String dateString2 = "2014-02-22";
+    static final Date date2 = XACML3PrivilegeUtils.stringToDate(dateString2);
+    static final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATE, date2, true);
+
+    static final String datetimeString3 = "2014-03-11:01:45:30.126";
+    static final Date date3 = XACML3PrivilegeUtils.stringToDateTime(datetimeString3);
+    static final FunctionArgument dateObject5 = new DataValue(DataType.XACMLDATETIME, date3, true);
+
+    static final String datetimeString4 = "2014-03-11:01:45:30.124";
+    static final Date date4 = XACML3PrivilegeUtils.stringToDateTime(datetimeString4);
+    static final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
+
+
 
     @BeforeClass
     public void before() throws Exception {
@@ -368,6 +394,8 @@ public class TestXacmlStringFunctions {
         assertEquals(result.asString(null), sb.toString());
 
     }
+
+    // String Conversions From String and To String Function Testing.
 
     /**
      * urn:oasis:names:tc:xacml:3.0:function:boolean-from-string
@@ -532,7 +560,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testTimeFromString() throws XACML3EntitlementException {
+        TimeFromString function = new TimeFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, timeString1));
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asTime(null), timeObject1.asTime(null));
 
+        function = new TimeFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, timeString2));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asTime(null), timeObject2.asTime(null));
     }
 
     /**
@@ -540,7 +578,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringFromTime() throws XACML3EntitlementException {
+        StringFromTime function = new StringFromTime();
+        function.addArgument(timeObject1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), XACML3PrivilegeUtils.timeToString(timeObject1.asTime(null)));
 
+        function = new StringFromTime();
+        function.addArgument(timeObject2);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), XACML3PrivilegeUtils.timeToString(timeObject2.asTime(null)));
     }
 
     /**
@@ -548,7 +596,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testDateFromString() throws XACML3EntitlementException {
+        DateFromString function = new DateFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, dateString1));
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDate(null), dateObject1.asDate(null));
 
+        function = new DateFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, dateString2));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDate(null), dateObject2.asDate(null));
     }
 
     /**
@@ -556,7 +614,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringFromDate() throws XACML3EntitlementException {
+        StringFromDate function = new StringFromDate();
+        function.addArgument(dateObject1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), XACML3PrivilegeUtils.dateToString(dateObject1.asDate(null)));
 
+        function = new StringFromDate();
+        function.addArgument(dateObject2);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), XACML3PrivilegeUtils.dateToString(dateObject2.asDate(null)));
     }
 
     /**
@@ -686,6 +754,8 @@ public class TestXacmlStringFunctions {
     public void testStringFromdnsName() throws XACML3EntitlementException {
 
     }
+
+    // String Starts and Ends Comparisons
 
     /**
      * urn:oasis:names:tc:xacml:3.0:function:string-starts-with
