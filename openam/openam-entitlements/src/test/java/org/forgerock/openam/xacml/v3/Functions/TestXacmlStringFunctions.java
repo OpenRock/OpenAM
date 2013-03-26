@@ -33,6 +33,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 /**
  * A.3.9 String functions
  The following functions operate on strings and convert to and from other data types.
@@ -47,8 +51,8 @@ import org.testng.annotations.Test;
  and SHALL return an "http://www.w3.org/2001/XMLSchema#boolean".
  The result SHALL be the string converted to a boolean.
  If the argument is not a valid lexical representation of a boolean,
- then the result SHALL be Indeterminate with status code urn:oasi
- s:names:tc:xacml:1.0:status:syntax-error.
+ then the result SHALL be Indeterminate with status code
+ urn:oasis:names:tc:xacml:1.0:status:syntax-error.
 
  urn:oasis:names:tc:xacml:3.0:function:string-from-boolean
  This function SHALL take one argument of data-type  "http://www.w3.org/2001/XMLSchema#boolean",
@@ -277,6 +281,21 @@ public class TestXacmlStringFunctions {
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
 
+    static final FunctionArgument testString1 = new DataValue(DataType.XACMLSTRING, "     Hello World!      ");
+    static final FunctionArgument testString2 = new DataValue(DataType.XACMLSTRING, "     HELLO WORLD!      ");
+    static final FunctionArgument testString3 = new DataValue(DataType.XACMLSTRING, "Hello World!");
+    static final FunctionArgument testString4 = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+
+    static final FunctionArgument testString5 = new DataValue(DataType.XACMLSTRING, "true");
+    static final FunctionArgument testString6 = new DataValue(DataType.XACMLSTRING, "false");
+    static final FunctionArgument testString7 = new DataValue(DataType.XACMLSTRING, "yes");
+    static final FunctionArgument testString8 = new DataValue(DataType.XACMLSTRING, "no");
+    static final FunctionArgument testString9 = new DataValue(DataType.XACMLSTRING, "1");
+    static final FunctionArgument testStringA = new DataValue(DataType.XACMLSTRING, "0");
+
+
+    static final FunctionArgument testStringF = new DataValue(DataType.XACMLSTRING, null);
+
 
     @BeforeClass
     public void before() throws Exception {
@@ -291,6 +310,38 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringconcatenate() throws XACML3EntitlementException {
+        StringConcatenate stringConcatenate = new StringConcatenate();
+
+        // One String
+        // Place Object in Argument stack.
+        stringConcatenate.addArgument(testString1);
+        FunctionArgument result = stringConcatenate.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testString1.asString(null));
+
+        // Multiple Strings
+        stringConcatenate = new StringConcatenate();
+        // Place Object in Argument stack.
+        stringConcatenate.addArgument(testString3);
+        stringConcatenate.addArgument(testString4);
+        result = stringConcatenate.evaluate(null);
+        assertNotNull(result);
+        StringBuilder sb = new StringBuilder();
+        sb.append(testString3.asString(null)).append(testString4.asString(null));
+        assertEquals(result.asString(null), sb.toString());
+
+        // Multiple Strings
+        stringConcatenate = new StringConcatenate();
+        // Place Object in Argument stack.
+        stringConcatenate.addArgument(testString1);
+        stringConcatenate.addArgument(testString2);
+        stringConcatenate.addArgument(testString3);
+        stringConcatenate.addArgument(testString4);
+        result = stringConcatenate.evaluate(null);
+        assertNotNull(result);
+        sb = new StringBuilder();
+        sb.append(testString1.asString(null)).append(testString2.asString(null)).append(testString3.asString(null)).append(testString4.asString(null));
+        assertEquals(result.asString(null), sb.toString());
 
     }
 
@@ -299,15 +350,84 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testBooleanFromString() throws XACML3EntitlementException {
+        BooleanFromString function = new BooleanFromString();
+        function.addArgument(testString5);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        function = new BooleanFromString();
+        function.addArgument(testString6);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        function = new BooleanFromString();
+        function.addArgument(testString7);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        function = new BooleanFromString();
+        function.addArgument(testString8);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        function = new BooleanFromString();
+        function.addArgument(testString9);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        function = new BooleanFromString();
+        function.addArgument(testStringA);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
 
     }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:boolean-from-string
+     */
+    @Test(expectedExceptions = {XACML3EntitlementException.class})
+    public void testBooleanFromString_Exception() throws XACML3EntitlementException {
+        BooleanFromString function = new BooleanFromString();
+        function.addArgument(testStringF);
+        function.evaluate(null);
+        // Should never get here...
+        assertTrue(false);
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:boolean-from-string
+     */
+    @Test(expectedExceptions = {XACML3EntitlementException.class})
+    public void testBooleanFromString_Exception_2() throws XACML3EntitlementException {
+        BooleanFromString function = new BooleanFromString();
+        function.evaluate(null);
+        // Should never get here...
+        assertTrue(false);
+    }
+
 
     /**
      * urn:oasis:names:tc:xacml:3.0:function:string-from-boolean
      */
     @Test
     public void testStringFromBoolean() throws XACML3EntitlementException {
+        StringFromBoolean function = new StringFromBoolean();
+        function.addArgument(trueObject);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.asString(null).equalsIgnoreCase("true"));
 
+        function = new StringFromBoolean();
+        function.addArgument(falseObject);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.asString(null).equalsIgnoreCase("false"));
     }
 
     /**

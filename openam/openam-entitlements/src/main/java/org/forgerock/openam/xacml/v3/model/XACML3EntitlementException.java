@@ -1,19 +1,50 @@
 package org.forgerock.openam.xacml.v3.model;
 
 /**
- * Created with IntelliJ IDEA.
- * User: allan
- * Date: 3/11/13
- * Time: 8:28 AM
- * To change this template use File | Settings | File Templates.
+ * XACML 3 Entitlement Exception Class.
+ *
+ *
+ * @author allan.foster@forgerock.com
  */
 public class XACML3EntitlementException extends Exception {
 
-        public XACML3EntitlementException() {
-            super();
-        }
+    /**
+     * Optional URN Associated with this Entitlement Exception.
+     */
+    private String urn;
 
-        public XACML3EntitlementException(String message) {
-            super(message);
-        }
+    /**
+     * Default Constructor
+     */
+    public XACML3EntitlementException() {
+        super();
     }
+
+    /**
+     * Constructor with specified Exception Message.
+     * @param message
+     */
+    public XACML3EntitlementException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructor with specified Exception Message and
+     * URN.
+     *
+     * @param message
+     * @param urn
+     */
+    public XACML3EntitlementException(String message, String urn) {
+        super(message);
+
+    }
+
+    public String getUrn() {
+        return urn;
+    }
+
+    public void setUrn(String urn) {
+        this.urn = urn;
+    }
+}

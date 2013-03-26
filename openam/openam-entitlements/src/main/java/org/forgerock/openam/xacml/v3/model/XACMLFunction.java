@@ -35,13 +35,18 @@ import java.util.*;
 /**
  This interface defines the XACML functions.
 
- The Syntax,  is to create a function object with a ResourceID, and a Value,
+ The Syntax, is to create a function object with a ResourceID, and a Value,
  which will be checked when the function is evaluated.
 
  @author allan.foster@forgerock.com
 
  */
 public abstract class XACMLFunction extends FunctionArgument {
+    /**
+     * Constants
+     */
+    public static final String URN_SYNTAX_ERROR = "urn:oasis:names:tc:xacml:1.0:status:syntax-error";
+
     /**
      * Globals
      */
