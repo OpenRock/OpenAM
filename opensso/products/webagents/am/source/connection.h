@@ -223,7 +223,7 @@ private:
    /**
     * Throws NSPRException upon NSPR error
     */
-    PRFileDesc *createSocket(const PRNetAddr& address, bool useSSL,
+    PRFileDesc *createSocket(PRFileDesc *rawSocket, bool useSSL,
 			     const std::string &certDBPasswd,
 			     const std::string &certNickName,
 			     bool alwaysTrustServerCert); 

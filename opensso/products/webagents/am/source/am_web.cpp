@@ -427,48 +427,55 @@ void mbyte_to_wchar(const char * orig_str,char *dest_str,int dest_len)
  * NOTE: this function may be called more than once so don't add
  * any code in here that could cause problems if called twice.
  */
-
 static am_bool_t is_server_alive(const Utils::url_info_t *info_ptr,
         void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
             (AgentConfigurationRefCntPtr*) agent_config;
 
-
     am_bool_t status = AM_FALSE;
-    char buffer[PR_NETDB_BUF_SIZE];
     PRNetAddr address;
-    PRHostEnt hostEntry;
-    PRIntn hostIndex;
     PRStatus prStatus;
-    PRFileDesc *tcpSocket;
-    unsigned timeout = 0;
 
-    prStatus = PR_GetHostByName(info_ptr->host, buffer, sizeof (buffer),
-            &hostEntry);
-    if (PR_SUCCESS == prStatus) {
-        hostIndex = PR_EnumerateHostEnt(0, &hostEntry, info_ptr->port,
-                &address);
-        if (hostIndex >= 0) {
-            timeout = (unsigned) ((*agentConfigPtr)->connection_timeout);
-            Log::log(boot_info.log_module, Log::LOG_DEBUG,
-                    "is_server_alive(): Connection timeout set to %i", timeout);
-            tcpSocket = PR_NewTCPSocket();
-            if (((PRFileDesc *) NULL) != tcpSocket) {
-                prStatus = PR_Connect(tcpSocket, &address,
-                        PR_SecondsToInterval(timeout));
-                if (PR_SUCCESS == prStatus) {
-                    status = AM_TRUE;
-                }
-                PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
-                prStatus = PR_Close(tcpSocket);
-                if (prStatus != PR_SUCCESS) {
-                    PRErrorCode error = PR_GetError();
-                    Log::log(boot_info.log_module, Log::LOG_ERROR,
-                            "is_server_alive(): NSPR Error while calling "
-                            "PR_Close(): %d.", error);
-                }
+    void *enumptr = NULL;
+    PRFileDesc *tcpSocket = static_cast<PRFileDesc *> (NULL);
+    unsigned timeout = 2;
+
+    PRAddrInfo *addrinfo = PR_GetAddrInfoByName(info_ptr->host, PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
+    if (addrinfo) {
+        while ((enumptr = PR_EnumerateAddrInfo(enumptr, addrinfo, info_ptr->port, &address)) != NULL) {
+            if (address.raw.family == PR_AF_INET || address.raw.family == PR_AF_INET6) {
+                PR_InitializeNetAddr(PR_IpAddrNull, info_ptr->port, &address);
+                tcpSocket = PR_OpenTCPSocket(address.raw.family);
+                break;
             }
         }
+        PR_FreeAddrInfo(addrinfo);
+    } else {
+        PRErrorCode error = PR_GetError();
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "is_server_alive(): PR_GetAddrInfoByName returned error: %s",
+                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+        return status;
+    }
+
+    if (static_cast<PRFileDesc *> (NULL) != tcpSocket) {
+        timeout = (unsigned) ((*agentConfigPtr)->connection_timeout) > 0 ? (unsigned) ((*agentConfigPtr)->connection_timeout) : timeout;
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "is_server_alive(): connection timeout set to %d", timeout);
+        prStatus = PR_Connect(tcpSocket, &address, PR_SecondsToInterval(timeout));
+        if (PR_SUCCESS == prStatus) {
+            Log::log(boot_info.log_module, Log::LOG_DEBUG, "is_server_alive(): returned success");
+            status = AM_TRUE;
+        } else {
+            PRErrorCode error = PR_GetError();
+            Log::log(boot_info.log_module, Log::LOG_ERROR, "is_server_alive(): PR_Connect returned error: %s",
+                    PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+        }
+        PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
+        PR_Close(tcpSocket);
+    } else {
+        PRErrorCode error = PR_GetError();
+        Log::log(boot_info.log_module, Log::LOG_ERROR, "is_server_alive(): PR_OpenTCPSocket returned error: %s",
+                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
     }
 
     return status;

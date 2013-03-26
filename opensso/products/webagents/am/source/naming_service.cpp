@@ -404,37 +404,50 @@ void NamingService::addLoadBalancerCookie(NamingInfo& namingInfo,
     return;
 }
 
-am_status_t NamingService::check_server_alive(std::string hostname, unsigned short portnumber)
-{
+am_status_t NamingService::check_server_alive(std::string hostname, unsigned short portnumber) {
     am_status_t status = AM_FAILURE;
-    char	buffer[PR_NETDB_BUF_SIZE];
-    PRNetAddr	address;
-    PRHostEnt	hostEntry;
-    PRIntn	hostIndex;
-    PRStatus	prStatus;
-    PRFileDesc *tcpSocket;
+    PRNetAddr address;
+    PRStatus prStatus;
+    void *enumptr = NULL;
+    PRFileDesc *tcpSocket = static_cast<PRFileDesc *> (NULL);
     unsigned timeout = 2;
 
     if (getUseProxy()) return AM_SUCCESS;
 
-    prStatus = PR_GetHostByName(hostname.c_str(), buffer, sizeof(buffer), &hostEntry);
-    if (PR_SUCCESS == prStatus) {
-	    hostIndex = PR_EnumerateHostEnt(0, &hostEntry, portnumber,&address);
-	    if (hostIndex >= 0) {
-		tcpSocket = PR_NewTCPSocket();
-		if (((PRFileDesc *) NULL) != tcpSocket) {
-		    prStatus = PR_Connect(tcpSocket, &address,
-					PR_SecondsToInterval(timeout));
-		    if (PR_SUCCESS == prStatus) {
-			status = AM_SUCCESS;
-		    }
-		    PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
-		    prStatus = PR_Close(tcpSocket);
-		    if (prStatus != PR_SUCCESS) {
-			PRErrorCode error = PR_GetError();
-		    }
-		}
-	    }
+    PRAddrInfo *addrinfo = PR_GetAddrInfoByName(hostname.c_str(), PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
+    if (addrinfo) {
+        while ((enumptr = PR_EnumerateAddrInfo(enumptr, addrinfo, portnumber, &address)) != NULL) {
+            if (address.raw.family == PR_AF_INET || address.raw.family == PR_AF_INET6) {
+                PR_InitializeNetAddr(PR_IpAddrNull, portnumber, &address);
+                tcpSocket = PR_OpenTCPSocket(address.raw.family);
+                break;
+            }
+        }
+        PR_FreeAddrInfo(addrinfo);
+    } else {
+        PRErrorCode error = PR_GetError();
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): PR_GetAddrInfoByName returned error: %s",
+                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+        return status;
+    }
+
+    if (static_cast<PRFileDesc *> (NULL) != tcpSocket) {
+        prStatus = PR_Connect(tcpSocket, &address,
+                PR_SecondsToInterval(timeout));
+        if (PR_SUCCESS == prStatus) {
+            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "NamingService::check_server_alive(): returned success");
+            status = AM_SUCCESS;
+        } else {
+            PRErrorCode error = PR_GetError();
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): PR_Connect returned error: %s",
+                    PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+        }
+        PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
+        PR_Close(tcpSocket);
+    } else {
+        PRErrorCode error = PR_GetError();
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): PR_OpenTCPSocket returned error: %s",
+                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
     }
 
     return status;

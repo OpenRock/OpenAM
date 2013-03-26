@@ -272,37 +272,47 @@ am_status_t Connection::shutdown_in_child_process(void) {
 /**
  * Throws NSPRException upon NSPR error
  */
-PRFileDesc *Connection::createSocket(const PRNetAddr& address, bool useSSL,
-				     const std::string &certDBPasswd,
-				     const std::string &certNickName,
-				     bool alwaysTrustServerCert) 
-{
-    PRFileDesc *rawSocket = PR_NewTCPSocket();
+PRFileDesc *Connection::createSocket(PRFileDesc *rawSocket, bool useSSL,
+        const std::string &certDBPasswd,
+        const std::string &certNickName,
+        bool alwaysTrustServerCert) {
+
+    PRSocketOptionData socket_opt;
+    PRStatus prStatus;
     
-    if (tcp_nodelay_is_enabled) {
-	   // set the TCP_NODELAY option to disable Nagle algorithm
-	   PRSocketOptionData socket_opt;
-	   socket_opt.option = PR_SockOpt_NoDelay;
-	   socket_opt.value.no_delay = PR_TRUE;
-	   PRStatus prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
-	   if (PR_SUCCESS != prStatus) {
-	       throw NSPRException("Connection::Connection", "PR_SetSocketOption");
-	   }
+    if (static_cast<PRFileDesc *> (NULL) == rawSocket) {
+        throw NSPRException("Connection::createSocket", "PR_OpenTCPSocket");
     }
+
+    if (tcp_nodelay_is_enabled) {
+        /* set the TCP_NODELAY option to disable Nagle algorithm */
+        socket_opt.option = PR_SockOpt_NoDelay;
+        socket_opt.value.no_delay = PR_TRUE;
+        prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
+        if (PR_SUCCESS != prStatus) {
+            throw NSPRException("Connection::createSocket", "PR_SetSocketOption");
+        }
+    }
+
+    /* turn off bind address checking, and allow port numbers to be reused */
+    socket_opt.option = PR_SockOpt_Reuseaddr;
+    socket_opt.value.reuse_addr = PR_TRUE;
+    prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
     
+    socket_opt.option = PR_SockOpt_Nonblocking;
+    socket_opt.value.non_blocking = PR_FALSE;
+    prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
+
+
     PRFileDesc *sslSocket;
     if (certDBPasswd.size() > 0) {
         certdbpasswd = strdup(certDBPasswd.c_str());
-     }
+    }
 
-    if (static_cast<PRFileDesc *>(NULL) != rawSocket) {
-	if (useSSL) {
-		sslSocket = secureSocket(certDBPasswd, certNickName, alwaysTrustServerCert, rawSocket);
-	} else {
-	    sslSocket = rawSocket;
-	}
+    if (useSSL) {
+        sslSocket = secureSocket(certDBPasswd, certNickName, alwaysTrustServerCert, rawSocket);
     } else {
-	throw NSPRException("Connection::createSocket", "PR_NewTCPSocket");
+        sslSocket = rawSocket;
     }
 
     return sslSocket;
@@ -407,25 +417,30 @@ Connection::Connection(const ServerInfo& server,
 		       bool alwaysTrustServerCert) 
     : socket(NULL), certdbpasswd(NULL), certnickname(NULL)
 {
-    char      buffer[PR_NETDB_BUF_SIZE];
     PRNetAddr address;
-    PRHostEnt hostEntry;
-    PRIntn    hostIndex;
     PRStatus	prStatus;
     SECStatus	secStatus;
+    void *enumptr = NULL;
+    PRFileDesc *rawSocket = static_cast<PRFileDesc *> (NULL);
 
-    prStatus = PR_GetHostByName(server.getHost().c_str(), buffer,
-				sizeof(buffer), &hostEntry);
-    if (PR_SUCCESS != prStatus) {
-        throw NSPRException("Connection::Connection", "PR_GetHostByName");
+    PRAddrInfo *addrinfo = PR_GetAddrInfoByName(server.getHost().c_str(), PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
+    if (addrinfo) {
+        while ((enumptr = PR_EnumerateAddrInfo(enumptr, addrinfo, server.getPort(), &address)) != NULL) {
+            if (address.raw.family == PR_AF_INET || address.raw.family == PR_AF_INET6) {
+                PR_InitializeNetAddr(PR_IpAddrNull, server.getPort(), &address);
+                rawSocket = PR_OpenTCPSocket(address.raw.family);
+                break;
+            }
+        }
+        PR_FreeAddrInfo(addrinfo);
+    } else {
+        PRErrorCode error = PR_GetError();
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "PR_GetAddrInfoByName() returned error: %s",
+                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+        throw NSPRException("Connection::Connection", "PR_GetAddrInfoByName", error);
     }
-
-    hostIndex = PR_EnumerateHostEnt(0, &hostEntry, server.getPort(), &address);
-    if (hostIndex < 0) {
-        throw NSPRException("Connection::Connection", "PR_EnumerateHostEnt");
-    }
-
-    socket = createSocket(address, server.useSSL(),
+    
+    socket = createSocket(rawSocket, server.useSSL(),
 			  certDBPasswd,
 			  certNickName,
 			  alwaysTrustServerCert);
