@@ -1617,11 +1617,20 @@
                 <version>20090211</version>
             </dependency>
 
+            <!-- Guice Dependency Injection -->
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>3.0</version>
             </dependency>
+
+            <!-- Joda Time API -->
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.2</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
