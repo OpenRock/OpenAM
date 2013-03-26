@@ -200,7 +200,6 @@ public class XACML3PrivilegeUtils {
 
         SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY);
         sdf.setTimeZone(GMT_TIMEZONE);
-        dateString = dateString.replace("T", ":");
         Date retVal = new Date();
         try {
             retVal = sdf.parse(dateString);
@@ -225,6 +224,20 @@ public class XACML3PrivilegeUtils {
 
     }
 
+    public static Date stringToDateTimeNoTimeZone(String dateTimeString) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Date retVal = new Date();
+        try {
+            retVal = sdf.parse(dateTimeString);
+        } catch (java.text.ParseException pe) {
+            //TODO: log debug warning
+        }
+        return retVal;
+
+    }
+
     public static Long  stringDayTimeDurationToLongDuration(String dateTimeString) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
@@ -234,50 +247,65 @@ public class XACML3PrivilegeUtils {
             Date date = sdf.parse(dateTimeString);
             retVal = date.getTime();
         } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
+            // TODO: log debug warning
         }
         return retVal;
 
     }
 
     public static Long stringYearMonthdurationToLongDuration(String yearMonthString) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(YEAR_MONTH);
-        sdf.setTimeZone(GMT_TIMEZONE);
         Long retVal = new Long(0);
+        if ( (yearMonthString == null) || (yearMonthString.isEmpty()) ||
+             (!yearMonthString.contains("-"))) {
+           return retVal;
+        }
+
         try {
-            Date date = sdf.parse(yearMonthString);
-            retVal = date.getTime();
-        } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
+            String[] yearMonthArray = yearMonthString.split("-",2);
+            if ( (yearMonthArray == null) || (yearMonthArray.length != 2) ) {
+                return retVal;
+            }
+            // This assumes we have 365 Days in a Year and 30 Days per Month.
+            // Perhaps use JodaTime for more Precision.
+            long years = Long.parseLong(yearMonthArray[0]);
+            long yearsInMillisseconds = (years * (((60*60)*24)*365) ) * 1000;
+            long months = Long.parseLong(yearMonthArray[1]);
+            long monthsInMillisseconds = (months * (((60*60)*24)*30) ) * 1000;
+            retVal = new Long(yearsInMillisseconds + monthsInMillisseconds);
+        } catch (Exception pe) {
+            // TODO: log debug warning
         }
         return retVal;
 
     }
 
     public static Date stringToTime(String dateString) {
-
         SimpleDateFormat sdf = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf.setTimeZone(GMT_TIMEZONE);
         Date retVal = new Date();
         try {
             retVal = sdf.parse(dateString);
         } catch (java.text.ParseException pe) {
-            //TODO: log debug warning
+            // TODO: log debug warning
         }
         return retVal;
 
     }
 
     public static String dateToString(Date date){
+        SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
+        sdf1.setTimeZone(GMT_TIMEZONE);
+        return sdf1.format(date);
+    }
+
+    public static String dateTimeToString(Date date){
 
         SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
         SimpleDateFormat sdf2 = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf1.setTimeZone(GMT_TIMEZONE);
         sdf2.setTimeZone(GMT_TIMEZONE);
 
-        String retVal = sdf1.format (date) + "T" + sdf2.format(date);
-        return retVal;
+        return sdf1.format (date) + "T" + sdf2.format(date);
     }
 
     public static Date stringToDate(String dateString, final String pattern) {

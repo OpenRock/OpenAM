@@ -576,16 +576,16 @@ public class TestXacmlEqualityPredicateFunctions {
 
     @Test
     public void testYearmonthdurationEqual() throws XACML3EntitlementException {
-        Long duration1 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("1984-03");
+        Long duration1 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0020-03");
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration1, true);
 
-        Long duration2 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("2016-03");
+        Long duration2 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0016-03");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration2, true);
 
-        Long duration3 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("2013-03");
+        Long duration3 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0013-03");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
 
-        Long duration4 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("1984-03");
+        Long duration4 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0020-03");
         FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
         YearmonthdurationEqual yearmonthdurationEqual = new YearmonthdurationEqual();
