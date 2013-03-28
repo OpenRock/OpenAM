@@ -56,9 +56,8 @@ public class DatetimeAddDaytimeduration extends XACMLFunction {
         Long duration = getArg(1).asDayTimeDuration(pip);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
         // Add in the Duration.
-        calendar.setTimeInMillis(calendar.getTimeInMillis() + duration.longValue());
+        calendar.setTimeInMillis(date.getTime() + duration.longValue());
         // Return Calculated DateTime Data Type.
         return new DataValue(DataType.XACMLDATETIME, calendar.getTime(), true);
     }

@@ -189,7 +189,8 @@ public abstract class FunctionArgument  {
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLDATETYPE)) {
-            throw new IndeterminateException("type conflict");
+            throw new IndeterminateException("type conflict found "+fArg.dataType.getTypeName()+", but requires: "+
+                DataType.Type.XACMLDATETYPE.getTypeName());
         }
         return (Date) fArg.getValue(pip);
     }
@@ -238,14 +239,14 @@ public abstract class FunctionArgument  {
         }
         return (Long) fArg.getValue(pip);
     }
-    public Long asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
+    public XACML3YearMonthDuration asYearMonthDuration(XACMLEvalContext pip) throws XACML3EntitlementException {
 
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
             throw new IndeterminateException("type conflict");
         }
-        return (Long) fArg.getValue(pip);
+        return (XACML3YearMonthDuration) fArg.getValue(pip);
     }
     public String asX500Name(XACMLEvalContext pip) throws XACML3EntitlementException {
 

@@ -28,6 +28,7 @@ package org.forgerock.openam.xacml.v3.model;
 
 import com.sun.identity.entitlement.xacml3.core.*;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map;
@@ -44,6 +45,10 @@ import org.json.JSONObject;
 /**
  * Class with utility methods to map from
  * </code>com.sun.identity.entitlement.xacml3.core.Policy</code>
+ *
+ * @author Allan.Foster@forgerock.com
+ * @author Jeff.Schenk@forgerock.com
+ *
  */
 public class XACML3PrivilegeUtils {
 
@@ -54,7 +59,6 @@ public class XACML3PrivilegeUtils {
     public static final String DAY_HOUR_MINUTE_SECOND_MILLISECONDS = "ddd:HH:mm:ss.SSS";
     public static final String HOUR_MINUTE_SECOND_MILLISECONDS = "HH:mm:ss.SSS";
     public static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT");
-
 
     // Static Methods
 
@@ -224,45 +228,25 @@ public class XACML3PrivilegeUtils {
 
     }
 
-    public static Long  stringDayTimeDurationToLongDuration(String dateTimeString) {
-
+    public static Long  stringDayTimeDurationToLongDuration(String dayTimeString) {
         SimpleDateFormat sdf = new SimpleDateFormat(DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf.setTimeZone(GMT_TIMEZONE);
         Long retVal = new Long(0);
         try {
-            Date date = sdf.parse(dateTimeString);
+            Date date = sdf.parse(dayTimeString);
             retVal = date.getTime();
         } catch (java.text.ParseException pe) {
             // TODO: log debug warning
         }
         return retVal;
-
     }
 
-    public static Long stringYearMonthdurationToLongDuration(String yearMonthString) {
-        Long retVal = new Long(0);
-        if ( (yearMonthString == null) || (yearMonthString.isEmpty()) ||
-             (!yearMonthString.contains("-"))) {
-           return retVal;
-        }
-
-        try {
-            String[] yearMonthArray = yearMonthString.split("-",2);
-            if ( (yearMonthArray == null) || (yearMonthArray.length != 2) ) {
-                return retVal;
-            }
-            // This assumes we have 365 Days in a Year and 30 Days per Month.
-            // Perhaps use JodaTime for more Precision.
-            long years = Long.parseLong(yearMonthArray[0]);
-            long yearsInMillisseconds = (years * (((60*60)*24)*365) ) * 1000;
-            long months = Long.parseLong(yearMonthArray[1]);
-            long monthsInMillisseconds = (months * (((60*60)*24)*30) ) * 1000;
-            retVal = new Long(yearsInMillisseconds + monthsInMillisseconds);
-        } catch (Exception pe) {
-            // TODO: log debug warning
-        }
-        return retVal;
-
+    public static String  dayTimeDurationToString(Long dayTimeDuration) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DAY_HOUR_MINUTE_SECOND_MILLISECONDS);
+        sdf.setTimeZone(GMT_TIMEZONE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dayTimeDuration);
+        return sdf.format(calendar.getTime());
     }
 
     public static Date stringToTime(String dateString) {
@@ -295,14 +279,15 @@ public class XACML3PrivilegeUtils {
         return sdf1.format(date);
     }
 
-    public static String dateTimeToString(Date date){
-
+    public static String dateTimeToString(Date date, char separator){
+        if (separator == 0) {
+            separator = 'T';
+        }
         SimpleDateFormat sdf1 = new SimpleDateFormat(YEAR_MONTH_DAY);
         SimpleDateFormat sdf2 = new SimpleDateFormat(HOUR_MINUTE_SECOND_MILLISECONDS);
         sdf1.setTimeZone(GMT_TIMEZONE);
         sdf2.setTimeZone(GMT_TIMEZONE);
-
-        return sdf1.format(date) + "T" + sdf2.format(date);
+        return sdf1.format(date) + separator + sdf2.format(date);
     }
 
     public static Date stringToDate(String dateString, final String pattern) {

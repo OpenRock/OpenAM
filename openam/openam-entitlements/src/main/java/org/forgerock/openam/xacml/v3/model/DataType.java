@@ -148,7 +148,7 @@ public class DataType {
             return XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration(s);
         }
         if (isType(DataType.Type.XACMLYEARMONTHDURATIONTYPE)) {
-            return XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration(s);
+            return new XACML3YearMonthDuration(s);
         }
         if (isType(DataType.Type.XACMLX500NAMETYPE)) {
             return s;

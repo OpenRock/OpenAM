@@ -292,7 +292,8 @@ public class TestXacmlStringFunctions {
     static final FunctionArgument testString8 = new DataValue(DataType.XACMLSTRING, "no");
     static final FunctionArgument testString9 = new DataValue(DataType.XACMLSTRING, "1");
     static final FunctionArgument testStringA = new DataValue(DataType.XACMLSTRING, "0");
-
+    static final FunctionArgument testStringB = new DataValue(DataType.XACMLSTRING,
+            "HELLO WORLD!  It is a Beautiful Day!");
 
     static final FunctionArgument testStringF = new DataValue(DataType.XACMLSTRING, null);
 
@@ -337,14 +338,27 @@ public class TestXacmlStringFunctions {
     static final Date date2 = XACML3PrivilegeUtils.stringToDate(dateString2);
     static final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATE, date2, true);
 
+
     static final String datetimeString3 = "2014-03-11:01:45:30.126";
     static final Date date3 = XACML3PrivilegeUtils.stringToDateTime(datetimeString3);
-    static final FunctionArgument dateObject5 = new DataValue(DataType.XACMLDATETIME, date3, true);
+    static final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, date3, true);
 
     static final String datetimeString4 = "2014-03-11:01:45:30.124";
     static final Date date4 = XACML3PrivilegeUtils.stringToDateTime(datetimeString4);
     static final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
 
+
+    Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
+    FunctionArgument durationObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
+
+    Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("012:01:45:30.124");
+    FunctionArgument durationObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
+
+    XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration("0020-03");
+    FunctionArgument durationObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
+
+    XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration("0016-03");
+    FunctionArgument durationObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
 
     @BeforeClass
@@ -632,7 +646,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testDateTimeFromString() throws XACML3EntitlementException {
+        DatetimeFromString function = new DatetimeFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, datetimeString3));
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDateTime(null), dateObject3.asDateTime(null));
 
+        function = new DatetimeFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, datetimeString4));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDateTime(null), dateObject4.asDateTime(null));
     }
 
     /**
@@ -640,23 +664,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringFromDateTime() throws XACML3EntitlementException {
+        StringFromDatetime function = new StringFromDatetime();
+        function.addArgument(dateObject3);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), XACML3PrivilegeUtils.dateTimeToString(dateObject3.asDateTime(null),':'));
 
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
-     */
-    @Test
-    public void testAnyURIFromString() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
-     */
-    @Test
-    public void testStringFromAnyURI() throws XACML3EntitlementException {
-
+        function = new StringFromDatetime();
+        function.addArgument(dateObject4);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), XACML3PrivilegeUtils.dateTimeToString(dateObject4.asDateTime(null), ':'));
     }
 
     /**
@@ -688,6 +706,22 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringfromyearMonthDuration() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
+     */
+    @Test
+    public void testAnyURIFromString() throws XACML3EntitlementException {
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
+     */
+    @Test
+    public void testStringFromAnyURI() throws XACML3EntitlementException {
 
     }
 
@@ -762,7 +796,19 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringStartsWith() throws XACML3EntitlementException {
+        StringStartswith function = new StringStartswith();
+        function.addArgument(testString4);
+        function.addArgument(testStringB);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
+        function = new StringStartswith();
+        function.addArgument(testString5);
+        function.addArgument(testStringB);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
     }
 
     /**
@@ -794,7 +840,19 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringcontains() throws XACML3EntitlementException {
+        StringContains function = new StringContains();
+        function.addArgument(testString4);
+        function.addArgument(testStringB);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
+        function = new StringContains();
+        function.addArgument(testString5);
+        function.addArgument(testStringB);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
     }
 
     /**

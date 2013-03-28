@@ -38,8 +38,8 @@ package org.forgerock.openam.xacml.v3.Functions;
  */
 
 import org.forgerock.openam.xacml.v3.model.*;
+import org.joda.time.DateTime;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class DateSubtractYearmonthduration extends XACMLFunction {
@@ -53,19 +53,10 @@ public class DateSubtractYearmonthduration extends XACMLFunction {
         }
 
         Date date = getArg(0).asDate(pip);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        Long duration = getArg(1).asYearMonthDuration(pip);
+        XACML3YearMonthDuration duration = getArg(1).asYearMonthDuration(pip);
 
-        // Check Duration...
-        if (duration < 0) {
-            // Negative Duration.
-            calendar.setTimeInMillis(calendar.getTimeInMillis() + duration.longValue());
-        } else {
-            // Positive Duration.
-            calendar.setTimeInMillis(calendar.getTimeInMillis() - duration.longValue());
-        }
+        DateTime dt = new DateTime(duration.sub(date.getTime()));
         // Return Calculated DateTime Data Type.
-        return new DataValue(DataType.XACMLDATE, calendar.getTime(), true);
+        return new DataValue(DataType.XACMLDATE, dt.toDate(), true);
     }
 }

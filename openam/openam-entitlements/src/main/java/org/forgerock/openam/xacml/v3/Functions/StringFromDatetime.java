@@ -26,37 +26,38 @@
 package org.forgerock.openam.xacml.v3.Functions;
 
 /**
- * urn:oasis:names:tc:xacml:3.0:function:date-add-yearMonthDuration
- This function SHALL take two arguments, the first SHALL be a “http://www.w3.org/2001/XMLSchema#date” and the second
- SHALL be a “http://www.w3.org/2001/XMLSchema#yearMonthDuration”.
- It SHALL return a result of “http://www.w3.org/2001/XMLSchema#date”.
- This function SHALL return the value by adding the second argument to the first argument according to
- the specification of adding duration to date [XS] Appendix E.
+ *  urn:oasis:names:tc:xacml:3.0:function:string-from-dateTime
+ This function SHALL take one argument of data-type  "http://www.w3.org/2001/XMLSchema#dateTime",
+ and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
+ The result SHALL be the dateTime converted to a string in the canonical form specified in [XS].
+
  */
 
 import org.forgerock.openam.xacml.v3.model.*;
-import org.joda.time.DateTime;
 
-import java.util.Calendar;
 import java.util.Date;
 
 /**
- *  urn:oasis:names:tc:xacml:3.0:function:date-add-yearMonthDuration
+ * urn:oasis:names:tc:xacml:3.0:function:string-from-dateTime
  */
-public class DateAddYearmonthduration extends XACMLFunction {
+public class StringFromDatetime extends XACMLFunction {
 
-    public DateAddYearmonthduration()  {
+    public StringFromDatetime()  {
     }
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        if ( getArgCount() != 2) {
-            throw new XACML3EntitlementException("Function Requires 2 Arguments");
+        if (getArgCount() != 1) {
+            throw new XACML3EntitlementException("Not Correct Number of Arguments");
         }
-
-        Date date = getArg(0).asDate(pip);
-        XACML3YearMonthDuration duration = getArg(1).asYearMonthDuration(pip);
-        DateTime dt = new DateTime(duration.add(date.getTime()));
-        // Return Calculated DateTime Data Type.
-        return new DataValue(DataType.XACMLDATE, dt.toDate(), true);
+        Date value = getArg(0).asDateTime(pip);
+        if (value == null) {
+            throw new XACML3EntitlementException("Syntax Error, No Value", URN_SYNTAX_ERROR);
+        }
+        try {
+            String result = XACML3PrivilegeUtils.dateTimeToString(value, ':');
+            return new DataValue(DataType.XACMLSTRING, result, true);
+        } catch(Exception e) {
+            throw new XACML3EntitlementException("Syntax Error, "+e.getMessage(), URN_SYNTAX_ERROR);
+        }
     }
 }

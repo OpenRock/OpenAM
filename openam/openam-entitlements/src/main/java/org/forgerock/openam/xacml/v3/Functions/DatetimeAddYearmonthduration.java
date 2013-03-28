@@ -35,6 +35,7 @@ package org.forgerock.openam.xacml.v3.Functions;
  */
 
 import org.forgerock.openam.xacml.v3.model.*;
+import org.joda.time.DateTime;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -53,13 +54,9 @@ public class DatetimeAddYearmonthduration extends XACMLFunction {
         }
 
         Date date = getArg(0).asDateTime(pip);
-        Long duration = getArg(1).asYearMonthDuration(pip);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        // Add in the Duration.
-        calendar.setTimeInMillis(calendar.getTimeInMillis() + duration.longValue());
+        XACML3YearMonthDuration duration = getArg(1).asYearMonthDuration(pip);
+        DateTime dt = new DateTime(duration.add(date.getTime()));
         // Return Calculated DateTime Data Type.
-        return new DataValue(DataType.XACMLDATETIME, calendar.getTime(), true);
+        return new DataValue(DataType.XACMLDATETIME, dt.toDate(), true);
     }
 }

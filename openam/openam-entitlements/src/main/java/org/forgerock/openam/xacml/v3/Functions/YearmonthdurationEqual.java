@@ -52,13 +52,13 @@ public class YearmonthdurationEqual extends XACMLFunction {
             return retVal;
         }
 
-        Long duration1 = getArg(0).asYearMonthDuration(pip);
-        Long duration2 = getArg(1).asYearMonthDuration(pip);
+        XACML3YearMonthDuration duration1 = getArg(0).asYearMonthDuration(pip);
+        XACML3YearMonthDuration duration2 = getArg(1).asYearMonthDuration(pip);
         if ( (duration1==null) || (duration2==null ) )  {
             return retVal;
         }
 
-        if (duration1.longValue() == duration2.longValue()) {
+        if (duration1.equals(duration2)) {
             retVal = FunctionArgument.trueObject;
         }
         return retVal;

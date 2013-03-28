@@ -25,12 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACML3PrivilegeUtils;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -576,16 +571,16 @@ public class TestXacmlEqualityPredicateFunctions {
 
     @Test
     public void testYearmonthdurationEqual() throws XACML3EntitlementException {
-        Long duration1 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0020-03");
+        XACML3YearMonthDuration duration1 = new XACML3YearMonthDuration("0020-03");
         FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration1, true);
 
-        Long duration2 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0016-03");
+        XACML3YearMonthDuration duration2 = new XACML3YearMonthDuration("0016-03");
         FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration2, true);
 
-        Long duration3 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0013-03");
+        XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration("0013-03");
         FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
 
-        Long duration4 = XACML3PrivilegeUtils.stringYearMonthdurationToLongDuration("0020-03");
+        XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration("0020-03");
         FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
         YearmonthdurationEqual yearmonthdurationEqual = new YearmonthdurationEqual();
