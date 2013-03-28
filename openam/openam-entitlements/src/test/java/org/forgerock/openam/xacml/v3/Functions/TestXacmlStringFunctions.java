@@ -294,6 +294,8 @@ public class TestXacmlStringFunctions {
     static final FunctionArgument testStringA = new DataValue(DataType.XACMLSTRING, "0");
     static final FunctionArgument testStringB = new DataValue(DataType.XACMLSTRING,
             "HELLO WORLD!  It is a Beautiful Day!");
+    static final FunctionArgument testStringC = new DataValue(DataType.XACMLSTRING,
+            "Beautiful Day!");
 
     static final FunctionArgument testStringF = new DataValue(DataType.XACMLSTRING, null);
 
@@ -848,7 +850,19 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringendswith() throws XACML3EntitlementException {
-         // TODO ::
+        StringEndswith function = new StringEndswith();
+        function.addArgument(testStringC);
+        function.addArgument(testStringB);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        function = new StringEndswith();
+        function.addArgument(testString4);
+        function.addArgument(testStringB);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
     }
 
     /**
