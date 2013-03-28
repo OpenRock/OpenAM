@@ -118,18 +118,6 @@ import static org.testng.Assert.assertTrue;
  and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
  The result SHALL be the dateTime converted to a string in the canonical form specified in [XS].
 
- urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
- This function SHALL take one argument of data-type "http://www.w3.org/2001/XMLSchema#string",
- and SHALL return a "http://www.w3.org/2001/XMLSchema#anyURI".
- The result SHALL be the URI constructed by converting the argument to an URI.
- If the argument is not a valid lexical representation of a URI,
- then the result SHALL be Indeterminate with status code urn:oasis:names:tc:xacml:1.0:status:syntax-error.
-
- urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
- This function SHALL take one argument of data-type  "http://www.w3.org/2001/XMLSchema#anyURI",
- and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
- The result SHALL be the URI converted to a string in the form it was originally represented in XML form.
-
  urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-from-string
  This function SHALL take one argument of data-type "http://www.w3.org/2001/XMLSchema#string",
  and SHALL return an "http://www.w3.org/2001/XMLSchema#dayTimeDuration ".
@@ -154,66 +142,10 @@ import static org.testng.Assert.assertTrue;
  and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
  The result SHALL be the yearMonthDuration converted to a string in the canonical form specified in [XPathFunc].
 
- urn:oasis:names:tc:xacml:3.0:function:x500Name-from-string
- This function SHALL take one argument of data-type "http://www.w3.org/2001/XMLSchema#string",
- and SHALL return an "urn:oasis:names:tc:xacml:1.0:data-type:x500Name".
- The result SHALL be the string converted to an x500Name.
- If the argument is not a valid lexical representation of a X500Name, then the result SHALL be
- Indeterminate with status code urn:oasis:names:tc:xacml:1.0:status:syntax-error.
-
- urn:oasis:names:tc:xacml:3.0:function:string-from-x500Name
- This function SHALL take one argument of data-type "urn:oasis:names:tc:xacml:1.0:data-type:x500Name",
- and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
- The result SHALL be the x500Name converted to a string in the form it was originally represented in XML form..
-
- urn:oasis:names:tc:xacml:3.0:function:rfc822Name-from-string
- This function SHALL take one argument of data-type "http://www.w3.org/2001/XMLSchema#string",
- and SHALL return an "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name".
- The result SHALL be the string converted to an rfc822Name.
- If the argument is not a valid lexical representation of an rfc822Name,
- then the result SHALL be Indeterminate with status code urn:oasis:names:tc:xacml:1.0:status:syntax-error.
-
- urn:oasis:names:tc:xacml:3.0:function:string-from-rfc822Name
- This function SHALL take one argument of data-type "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name",
- and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
- The result SHALL be the rfc822Name converted to a string in the form it was originally represented in XML form.
-
- urn:oasis:names:tc:xacml:3.0:function:ipAddress-from-string
- This function SHALL take one argument of data-type "http://www.w3.org/2001/XMLSchema#string", and SHALL
- return an "urn:oasis:names:tc:xacml:2.0:data-type:ipAddress".
- The result SHALL be the string converted to an ipAddress.
- If the argument is not a valid lexical representation of an ipAddress,
- then the result SHALL be Indeterminate with status code urn:oasis:names:tc:xacml:1.0:status:syntax-error.
-
- urn:oasis:names:tc:xacml:3.0:function:string-from-ipAddress
- This function SHALL take one argument of data-type "urn:oasis:names:tc:xacml:2.0:data-type:ipAddress",
- and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
- The result SHALL be the ipAddress converted to a string in the form it was originally represented in XML form.
-
- urn:oasis:names:tc:xacml:3.0:function:dnsName-from-string
- This function SHALL take one argument of data-type "http://www.w3.org/2001/XMLSchema#string",
- and SHALL return an "urn:oasis:names:tc:xacml:2.0:data-type:dnsName".
- The result SHALL be the string converted to a dnsName.
- If the argument is not a valid lexical representation of a dnsName,
- then the result SHALL be Indeterminate with status code urn:oasis:names:tc:xacml:1.0:status:syntax-error.
-
- urn:oasis:names:tc:xacml:3.0:function:string-from-dnsName
- This function SHALL take one argument of data-type "urn:oasis:names:tc:xacml:2.0:data-type:dnsName",
- and SHALL return an "http://www.w3.org/2001/XMLSchema#string".
- The result SHALL be the dnsName converted to a string in the form it was originally represented in XML form.
-
  urn:oasis:names:tc:xacml:3.0:function:string-starts-with
  This function SHALL take two arguments of data-type "http://www.w3.org/2001/XMLSchema#string" and
  SHALL return a "http://www.w3.org/2001/XMLSchema#boolean".
  The result SHALL be true if the second string begins with the first string, and false otherwise.
- Equality testing SHALL be done as defined for urn:oasis:names:tc:xacml:1.0:function:string-equal.
-
- urn:oasis:names:tc:xacml:3.0:function:anyURI-starts-with
- This function SHALL take a first argument of data-type"http://www.w3.org/2001/XMLSchema#string"
- and an a second argument of data-type "http://www.w3.org/2001/XMLSchema#anyURI"
- and SHALL return a "http://www.w3.org/2001/XMLSchema#boolean".
- The result SHALL be true if the URI converted to a string with
- urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI begins with the string, and false otherwise.
  Equality testing SHALL be done as defined for urn:oasis:names:tc:xacml:1.0:function:string-equal.
 
  urn:oasis:names:tc:xacml:3.0:function:string-ends-with
@@ -222,25 +154,11 @@ import static org.testng.Assert.assertTrue;
  The result SHALL be true if the second string ends with the first string, and false otherwise.
  Equality testing SHALL be done as defined for urn:oasis:names:tc:xacml:1.0:function:string-equal.
 
- urn:oasis:names:tc:xacml:3.0:function:anyURI-ends-with
- This function SHALL take a first argument of data-type "http://www.w3.org/2001/XMLSchema#string"
- and an a second argument of data-type "http://www.w3.org/2001/XMLSchema#anyURI" and SHALL return a
- "http://www.w3.org/2001/XMLSchema#boolean".  The result SHALL be true if the URI converted to a string with
- urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI ends with the string, and false otherwise.
- Equality testing SHALL be done as defined for urn:oasis:names:tc:xacml:1.0:function:string-equal.
-
  urn:oasis:names:tc:xacml:3.0:function:string-contains
  This function SHALL take two arguments of data-type "http://www.w3.org/2001/XMLSchema#string" and
  SHALL return a "http://www.w3.org/2001/XMLSchema#boolean".
  The result SHALL be true if the second string contains the first string, and false otherwise
  . Equality testing SHALL be done as defined for urn:oasis:names:tc:xacml:1.0:function:string-equal.
-
- urn:oasis:names:tc:xacml:3.0:function:anyURI-contains
- This function SHALL take a first argument of data-type "http://www.w3.org/2001/XMLSchema#string" and an a
- second argument of data-type "http://www.w3.org/2001/XMLSchema#anyURI" and SHALL return a
- "http://www.w3.org/2001/XMLSchema#boolean".  The result SHALL be true if the URI converted to a
- string with urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI contains the string, and false otherwise.
- Equality testing SHALL be done as defined for urn:oasis:names:tc:xacml:1.0:function:string-equal.
 
  urn:oasis:names:tc:xacml:3.0:function:string-substring
  This function SHALL take a first argument of data-type "http://www.w3.org/2001/XMLSchema#string" and a
@@ -252,20 +170,6 @@ import static org.testng.Assert.assertTrue;
  The negative integer value -1 given for the third arguments indicates the end of the string.
  If the second or third arguments are out of bounds, then the function MUST evaluate to Indeterminate with a
  status code of urn:oasis:names:tc:xacml:1.0:status:processing-error.
-
- urn:oasis:names:tc:xacml:3.0:function:anyURI-substring
- This function SHALL take a first argument of data-type "http://www.w3.org/2001/XMLSchema#anyURI" and a
- second and a third argument of type "http://www.w3.org/2001/XMLSchema#integer" and
- SHALL return a "http://www.w3.org/2001/XMLSchema#string".
- The result SHALL be the substring of the first argument converted to a string with
- urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI beginning at the position given by the second argument
- and ending at the position before the position given by the third argument.
- The first character of the URI converted to a string has position zero.
- The negative integer value -1 given for the third arguments indicates the end of the string.
- If the second or third arguments are out of bounds, then the function MUST evaluate to Indeterminate
- with a status code of urn:oasis:names:tc:xacml:1.0:status:processing-error.
- If the resulting substring is not syntactically a valid URI, then the function MUST evaluate to
- Indeterminate with a status code of urn:oasis:names:tc:xacml:1.0:status:processing-error.
 
  */
 
@@ -413,7 +317,8 @@ public class TestXacmlStringFunctions {
         result = stringConcatenate.evaluate(null);
         assertNotNull(result);
         sb = new StringBuilder();
-        sb.append(testString1.asString(null)).append(testString2.asString(null)).append(testString3.asString(null)).append(testString4.asString(null));
+        sb.append(testString1.asString(null)).append(testString2.asString(null)).append(testString3.asString(null)).
+                append(testString4.asString(null));
         assertEquals(result.asString(null), sb.toString());
 
     }
@@ -758,86 +663,6 @@ public class TestXacmlStringFunctions {
         assertEquals(result.asString(null), durationString4);
     }
 
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:anyURI-from-string
-     */
-    @Test
-    public void testAnyURIFromString() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:string-from-anyURI
-     */
-    @Test
-    public void testStringFromAnyURI() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:x500Name-from-string
-     */
-    @Test
-    public void testX500NameFromString() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:string-from-x500Name
-     */
-    @Test
-    public void testStringFromx500Name() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:rfc822Name-from-string
-     */
-    @Test
-    public void testRfc822NameFromString() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:string-from-rfc822Name
-     */
-    @Test
-    public void testStringFromrfc822Name() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:ipAddress-from-string
-     */
-    @Test
-    public void testIpAddressFromString() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:string-from-ipAddress
-     */
-    @Test
-    public void testStringFromipAddress() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:dnsName-from-string
-     */
-    @Test
-    public void testDnsNameFromString() throws XACML3EntitlementException {
-
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:string-from-dnsName
-     */
-    @Test
-    public void testStringFromdnsName() throws XACML3EntitlementException {
-
-    }
-
     // String Starts and Ends Comparisons
 
     /**
@@ -861,14 +686,6 @@ public class TestXacmlStringFunctions {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:3.0:function:anyURI-starts-with
-     */
-    @Test
-    public void testAnyURIStartsWith() throws XACML3EntitlementException {
-
-    }
-
-    /**
      * urn:oasis:names:tc:xacml:3.0:function:string-ends-with
      */
     @Test
@@ -889,14 +706,6 @@ public class TestXacmlStringFunctions {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:3.0:function:anyURI-ends-with
-     */
-    @Test
-    public void testAnyURIendswith() throws XACML3EntitlementException {
-
-    }
-
-    /**
      * urn:oasis:names:tc:xacml:3.0:function:string-contains
      */
     @Test
@@ -914,14 +723,6 @@ public class TestXacmlStringFunctions {
         result = function.evaluate(null);
         assertNotNull(result);
         assertTrue(result.isFalse());
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:anyURI-contains
-     */
-    @Test
-    public void testAnyURIcontains() throws XACML3EntitlementException {
-
     }
 
     /**
@@ -973,14 +774,5 @@ public class TestXacmlStringFunctions {
         // Should never get here...
         assertTrue(false, "Issue, we should not have reached this codepoint!");
     }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:anyURI-substring
-     */
-    @Test
-    public void testAnyURIsubstring() throws XACML3EntitlementException {
-
-    }
-
 
 }
