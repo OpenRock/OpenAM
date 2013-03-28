@@ -43,9 +43,10 @@ import java.util.*;
  */
 public abstract class XACMLFunction extends FunctionArgument {
     /**
-     * Constants
+     * Status Code Constants
      */
     public static final String URN_SYNTAX_ERROR = "urn:oasis:names:tc:xacml:1.0:status:syntax-error";
+    public static final String URN_PROCESSING_ERROR = "urn:oasis:names:tc:xacml:1.0:status:processing-error";
 
     /**
      * Globals

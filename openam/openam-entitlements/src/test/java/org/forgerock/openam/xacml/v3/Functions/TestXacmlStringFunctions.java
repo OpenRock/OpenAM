@@ -296,6 +296,8 @@ public class TestXacmlStringFunctions {
             "HELLO WORLD!  It is a Beautiful Day!");
     static final FunctionArgument testStringC = new DataValue(DataType.XACMLSTRING,
             "Beautiful Day!");
+    static final FunctionArgument testStringD = new DataValue(DataType.XACMLSTRING,
+            "Beautiful Day");
 
     static final FunctionArgument testStringF = new DataValue(DataType.XACMLSTRING, null);
 
@@ -358,10 +360,12 @@ public class TestXacmlStringFunctions {
     static final FunctionArgument durationObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
 
     static final String durationString3 = "0020-03";
+    static final FunctionArgument durationString3D = new DataValue(DataType.XACMLSTRING, durationString3, true);
     static final XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration(durationString3);
     static final FunctionArgument durationObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
 
     static final String durationString4 = "0016-03";
+    static final FunctionArgument durationString4D = new DataValue(DataType.XACMLSTRING, durationString4, true);
     static final XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration(durationString4);
     static final FunctionArgument durationObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
@@ -468,7 +472,7 @@ public class TestXacmlStringFunctions {
         function.addArgument(testStringF);
         function.evaluate(null);
         // Should never get here...
-        assertTrue(false);
+        assertTrue(false, "Issue, we should not have reached this code-point!");
     }
 
     /**
@@ -479,7 +483,7 @@ public class TestXacmlStringFunctions {
         BooleanFromString function = new BooleanFromString();
         function.evaluate(null);
         // Should never get here...
-        assertTrue(false);
+        assertTrue(false, "Issue, we should not have reached this code-point!");
     }
 
 
@@ -707,7 +711,6 @@ public class TestXacmlStringFunctions {
     public void testStringfromdayTimeDuration() throws XACML3EntitlementException {
         StringFromDayTimeDuration function = new StringFromDayTimeDuration();
         function.addArgument(durationObject1);
-
         FunctionArgument result = function.evaluate(null);
         assertNotNull(result);
         assertEquals(result.asString(null), durationString1);
@@ -724,7 +727,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testYearMonthDurationFromString() throws XACML3EntitlementException {
+        YearMonthDurationFromString function = new YearMonthDurationFromString();
+        function.addArgument(durationString3D);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asYearMonthDuration(null), duration3);
 
+        function = new YearMonthDurationFromString();
+        function.addArgument(durationString4D);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asYearMonthDuration(null), duration4);
     }
 
     /**
@@ -732,7 +745,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringfromyearMonthDuration() throws XACML3EntitlementException {
+        StringFromYearMonthDuration function = new StringFromYearMonthDuration();
+        function.addArgument(durationObject3);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), durationString3);
 
+        function = new StringFromYearMonthDuration();
+        function.addArgument(durationObject4);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), durationString4);
     }
 
     /**
@@ -906,7 +929,49 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringsubstring() throws XACML3EntitlementException {
-        // TODO ::
+
+        // Test Full String Retrieval
+        StringSubString function = new StringSubString();
+        function.addArgument(testString4);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "0"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "-1"));
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testString4.asString(null));
+
+        // Test Middle to End
+        function = new StringSubString();
+        function.addArgument(testStringB);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "22"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "-1"));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testStringC.asString(null));
+
+        // Test Within
+        function = new StringSubString();
+        function.addArgument(testStringB);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "22"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "35"));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), testStringD.asString(null));
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:3.0:function:string-substring
+     */
+    @Test(expectedExceptions = {XACML3EntitlementException.class})
+    public void testStringsubstring_Exception() throws XACML3EntitlementException {
+         // Test Full String Retrieval
+        StringSubString function = new StringSubString();
+        function.addArgument(testString4);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "0"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "24"));
+        function.evaluate(null);
+        // Should never get here...
+        assertTrue(false, "Issue, we should not have reached this codepoint!");
     }
 
     /**
