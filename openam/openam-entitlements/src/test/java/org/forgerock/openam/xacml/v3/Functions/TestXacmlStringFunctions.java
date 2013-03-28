@@ -347,18 +347,21 @@ public class TestXacmlStringFunctions {
     static final Date date4 = XACML3PrivilegeUtils.stringToDateTime(datetimeString4);
     static final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
 
+    static final String durationString1 = "011:01:45:30.126";
+    static final Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration(durationString1);
+    static final FunctionArgument durationObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
 
-    Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
-    FunctionArgument durationObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
+    static final String durationString2 = "012:01:45:30.124";
+    static final Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration(durationString2);
+    static final FunctionArgument durationObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
 
-    Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("012:01:45:30.124");
-    FunctionArgument durationObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
+    static final String durationString3 = "0020-03";
+    static final XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration(durationString3);
+    static final FunctionArgument durationObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
 
-    XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration("0020-03");
-    FunctionArgument durationObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
-
-    XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration("0016-03");
-    FunctionArgument durationObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
+    static final String durationString4 = "0016-03";
+    static final XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration(durationString4);
+    static final FunctionArgument durationObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
 
     @BeforeClass
@@ -682,7 +685,17 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testDayTimeDurationFromString() throws XACML3EntitlementException {
+        DayTimeDurationFromString function = new DayTimeDurationFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, durationString1));
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDayTimeDuration(null), durationObject1.asDayTimeDuration(null));
 
+        function = new DayTimeDurationFromString();
+        function.addArgument(new DataValue(DataType.XACMLSTRING, durationString2));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDayTimeDuration(null), durationObject2.asDayTimeDuration(null));
     }
 
     /**
@@ -690,7 +703,18 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringfromdayTimeDuration() throws XACML3EntitlementException {
+        StringFromDayTimeDuration function = new StringFromDayTimeDuration();
+        function.addArgument(durationObject1);
 
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), durationString1);
+
+        function = new StringFromDayTimeDuration();
+        function.addArgument(durationObject2);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), durationString2);
     }
 
     /**
@@ -824,7 +848,7 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringendswith() throws XACML3EntitlementException {
-
+         // TODO ::
     }
 
     /**
@@ -868,7 +892,7 @@ public class TestXacmlStringFunctions {
      */
     @Test
     public void testStringsubstring() throws XACML3EntitlementException {
-
+        // TODO ::
     }
 
     /**
