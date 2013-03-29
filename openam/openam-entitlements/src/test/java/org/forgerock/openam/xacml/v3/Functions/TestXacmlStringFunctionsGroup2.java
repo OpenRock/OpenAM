@@ -153,46 +153,41 @@ public class TestXacmlStringFunctionsGroup2 {
     static final FunctionArgument anyuriString1D = new DataValue(DataType.XACMLSTRING, anyuriString1);
     static final FunctionArgument anyuri1 = new DataValue(DataType.XACMLANYURI, anyuriString1);
 
-    static final FunctionArgument anyuri2 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
-    static final FunctionArgument anyuri3 = new DataValue(DataType.XACMLANYURI, "/");
-    static final FunctionArgument anyuri4 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
+    static final String anyuriString2 = "/a/b/c/d/e/f";
+    static final FunctionArgument anyuriString2D = new DataValue(DataType.XACMLSTRING, anyuriString2);
+    static final FunctionArgument anyuri2 = new DataValue(DataType.XACMLANYURI, anyuriString2);
 
-    // base64data1 and base64data2 contained the Base 64 encoding of:
-    // ForgeRock - OpenAM XACML says Hello!
-    static final FunctionArgument base64data1 = new DataValue(DataType.XACMLBASE64BINARY,
-            "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
-    // This is a very small Test!
-    static final FunctionArgument base64data2 = new DataValue(DataType.XACMLBASE64BINARY,
-            "VGhpcyBpcyBhIHZlcnkgc21hbGwgVGVzdCE=");
-    // This is a very small Test as well!
-    static final FunctionArgument base64data3 = new DataValue(DataType.XACMLBASE64BINARY,
-            "VGhpcyBpcyBhIHZlcnkgc21hbGwgVGVzdCBhcyB3ZWxsIQ==");
-    // ForgeRock - OpenAM XACML says Hello!
-    static final FunctionArgument base64data4 = new DataValue(DataType.XACMLBASE64BINARY,
-            "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
+    static final String anyuriString3 = "/";
+    static final FunctionArgument anyuriString3D = new DataValue(DataType.XACMLSTRING, anyuriString3);
+    static final FunctionArgument anyuri3 = new DataValue(DataType.XACMLANYURI, anyuriString3);
 
-    static final FunctionArgument hexdata1 = new DataValue(DataType.XACMLHEXBINARY, "0123456789abcdef");
-    static final FunctionArgument hexdata2 = new DataValue(DataType.XACMLHEXBINARY, "FF");
-    static final FunctionArgument hexdata3 = new DataValue(DataType.XACMLHEXBINARY, "0123456789ABCDEF");
-    static final FunctionArgument hexdata4 = new DataValue(DataType.XACMLHEXBINARY, "06F2");
+    static final String anyuriString4 =  "/ws/1/xacml/pep/a/b/c/d/e/f";
+    static final FunctionArgument anyuriString4D = new DataValue(DataType.XACMLSTRING, anyuriString4);
+    static final FunctionArgument anyuri4 = new DataValue(DataType.XACMLANYURI, anyuriString4);
 
-    static final FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLX500NAME,
-            "joe@example.org");
-    static final FunctionArgument rfc822Name2 = new DataValue(DataType.XACMLX500NAME,
-            "joe.smith@example.org");
-    static final FunctionArgument rfc822Name3 = new DataValue(DataType.XACMLX500NAME,
-            "joe.smith@example.org");
-    static final FunctionArgument rfc822Name4 = new DataValue(DataType.XACMLX500NAME,
-            "joe.smith@ExAmPlE.oRg");
 
+    static final String rfc822NameString1 =  "/c=us/o=ForgeRock/ou=Components/cn=OpenAM";
+    static final FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLRFC822NAME,
+            rfc822NameString1);
+    static final FunctionArgument rfc822NameString1D = new DataValue(DataType.XACMLSTRING, rfc822NameString1);
+
+
+    static final String x500NameString1 =  "/c=us/o=ForgeRock/ou=Components/cn=OpenAM";
     static final FunctionArgument x500Name1 = new DataValue(DataType.XACMLX500NAME,
-            "/c=us/o=ForgeRock/ou=Components/cn=OpenAM");
-    static final FunctionArgument x500Name2 = new DataValue(DataType.XACMLX500NAME,
-            "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
-    static final FunctionArgument x500Name3 = new DataValue(DataType.XACMLX500NAME,
-            "/cn=Bob Smith");
-    static final FunctionArgument x500Name4 = new DataValue(DataType.XACMLX500NAME,
-            "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
+            x500NameString1);
+    static final FunctionArgument x500NameString1D = new DataValue(DataType.XACMLSTRING, x500NameString1);
+
+
+    static final String ipAddrString1 =  "10.0.10.1";
+    static final FunctionArgument ipaddr1 = new DataValue(DataType.XACMLIPADDRESS,
+            ipAddrString1);
+    static final FunctionArgument ipAddrString1D = new DataValue(DataType.XACMLSTRING, ipAddrString1);
+
+
+    static final String dnsNameString1 =  "xacml.example.org";
+    static final FunctionArgument dnsName1 = new DataValue(DataType.XACMLDNSNAME,
+            dnsNameString1);
+    static final FunctionArgument dnsNameString1D = new DataValue(DataType.XACMLSTRING, dnsNameString1);
 
 
     @BeforeClass
@@ -233,7 +228,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testX500NameFromString() throws XACML3EntitlementException {
-
+        X500NameFromString function = new X500NameFromString();
+        function.addArgument(x500NameString1D);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asX500Name(null), x500Name1.asX500Name(null));
     }
 
     /**
@@ -241,7 +240,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testStringFromx500Name() throws XACML3EntitlementException {
-
+        StringFromX500Name function = new StringFromX500Name();
+        function.addArgument(x500Name1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), x500NameString1);
     }
 
     /**
@@ -249,7 +252,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testRfc822NameFromString() throws XACML3EntitlementException {
-
+        Rfc822NameFromString function = new Rfc822NameFromString();
+        function.addArgument(rfc822NameString1D);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asRfc822Name(null), rfc822Name1.asRfc822Name(null));
     }
 
     /**
@@ -257,7 +264,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testStringFromrfc822Name() throws XACML3EntitlementException {
-
+        StringFromRfc822Name function = new StringFromRfc822Name();
+        function.addArgument(rfc822Name1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), rfc822NameString1);
     }
 
     /**
@@ -265,7 +276,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testIpAddressFromString() throws XACML3EntitlementException {
-
+        IPAddressFromString function = new IPAddressFromString();
+        function.addArgument(ipAddrString1D);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asIpAddress(null), ipaddr1.asIpAddress(null));
     }
 
     /**
@@ -273,7 +288,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testStringFromipAddress() throws XACML3EntitlementException {
-
+        StringFromIPAddress function = new StringFromIPAddress();
+        function.addArgument(ipaddr1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), ipAddrString1);
     }
 
     /**
@@ -281,7 +300,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testDnsNameFromString() throws XACML3EntitlementException {
-
+        DNSNameFromString function = new DNSNameFromString();
+        function.addArgument(dnsNameString1D);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asDnsName(null), dnsName1.asDnsName(null));
     }
 
     /**
@@ -289,7 +312,11 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testStringFromdnsName() throws XACML3EntitlementException {
-
+        StringFromDNSName function = new StringFromDNSName();
+        function.addArgument(dnsName1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), dnsNameString1);
     }
 
     // String Starts and Ends Comparisons
@@ -299,7 +326,19 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testAnyURIStartsWith() throws XACML3EntitlementException {
+        AnyUriStartswith function = new AnyUriStartswith();
+        function.addArgument(anyuriString1D);
+        function.addArgument(anyuri1);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
+        function = new AnyUriStartswith();
+        function.addArgument(anyuriString2D);
+        function.addArgument(anyuri2);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -307,7 +346,12 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testAnyURIendswith() throws XACML3EntitlementException {
-
+        AnyUriEndswith function = new AnyUriEndswith();
+        function.addArgument(anyuriString2D);
+        function.addArgument(anyuri4);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -315,7 +359,19 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testAnyURIcontains() throws XACML3EntitlementException {
+        AnyUriContains function = new AnyUriContains();
+        function.addArgument(anyuriString2D);
+        function.addArgument(anyuri4);
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
 
+        function = new AnyUriContains();
+        function.addArgument(anyuriString3D);
+        function.addArgument(anyuri4);
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -323,8 +379,47 @@ public class TestXacmlStringFunctionsGroup2 {
      */
     @Test
     public void testAnyURIsubstring() throws XACML3EntitlementException {
+        // Test Full String Retrieval
+        AnyUriSubString function = new AnyUriSubString();
+        function.addArgument(anyuri1);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "0"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "-1"));
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), anyuriString1);
 
+        // Test Middle to End
+        function = new AnyUriSubString();
+        function.addArgument(anyuri2);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "4"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "-1"));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), anyuriString2.substring(4));
+
+        // Test Within
+        function = new AnyUriSubString();
+        function.addArgument(anyuri4);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "12"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "14"));
+        result = function.evaluate(null);
+        assertNotNull(result);
+        assertEquals(result.asString(null), anyuriString4.substring(12,14));
     }
 
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:anyURI-substring
+ */
+ @Test(expectedExceptions = {XACML3EntitlementException.class})
+ public void testAnyURIsubstring_Exception() throws XACML3EntitlementException {
+        // Test Full String Retrieval
+        AnyUriSubString function = new AnyUriSubString();
+        function.addArgument(anyuri3);
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "0"));
+        function.addArgument(new DataValue(DataType.XACMLINTEGER, "24"));
+        function.evaluate(null);
+        // Should never get here...
+        assertTrue(false, "Issue, we should not have reached this codepoint!");
+    }
 
 }

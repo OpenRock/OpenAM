@@ -392,13 +392,13 @@ public class TestXacmlEqualityPredicateFunctions {
 
     @Test
     public void testRfc822NameEqual() throws XACML3EntitlementException {
-        FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLX500NAME,
+        FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLRFC822NAME,
                 "joe@example.org");
-        FunctionArgument rfc822Name2 = new DataValue(DataType.XACMLX500NAME,
+        FunctionArgument rfc822Name2 = new DataValue(DataType.XACMLRFC822NAME,
                 "joe.smith@example.org");
-        FunctionArgument rfc822Name3 = new DataValue(DataType.XACMLX500NAME,
+        FunctionArgument rfc822Name3 = new DataValue(DataType.XACMLRFC822NAME,
                 "joe.smith@example.org");
-        FunctionArgument rfc822Name4 = new DataValue(DataType.XACMLX500NAME,
+        FunctionArgument rfc822Name4 = new DataValue(DataType.XACMLRFC822NAME,
                 "joe.smith@ExAmPlE.oRg");
 
         X500NameEqual rfc822NameEqual = new X500NameEqual();
