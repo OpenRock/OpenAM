@@ -23,7 +23,7 @@
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.xacml.v3.commons;
+package org.forgerock.openam.xacml.v3.model;
 
 import javax.ws.rs.core.MediaType;
 

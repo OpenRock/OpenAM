@@ -26,8 +26,8 @@
 package org.forgerock.identity.openam.xacml.v3.resources;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.xacml.v3.commons.CommonType;
-import org.forgerock.openam.xacml.v3.commons.ContentType;
+import org.forgerock.openam.xacml.v3.model.CommonType;
+import org.forgerock.openam.xacml.v3.model.ContentType;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
@@ -124,7 +124,7 @@ public class XacmlHomeResource  {
 
         JSONObject resource_2 = new JSONObject();
         resource_2.append("href-template", "/xacml/");
-        resource_2.append("hints", getHomeHints(xacmlRequestInformation));
+        resource_2.append("hints", getHomeHints());
         JSONObject resource_2A = new JSONObject();
         resource_2A.append(xacmlRequestInformation.getXacmlHome(), resource_2);
 
@@ -143,7 +143,7 @@ public class XacmlHomeResource  {
      * @return JSONObject - Containing Hints for our Home Application.
      * @throws org.json.JSONException
      */
-    private static JSONObject getHomeHints(XACMLRequestInformation xacmlRequestInformation) throws JSONException {
+    private static JSONObject getHomeHints() throws JSONException {
         JSONObject hints = new JSONObject();
 
         /**

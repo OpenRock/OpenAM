@@ -33,6 +33,8 @@ import org.forgerock.identity.openam.xacml.v3.commons.XACML3Utils;
 import org.forgerock.openam.xacml.v3.commons.*;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolver;
 import org.forgerock.identity.openam.xacml.v3.resources.XacmlPIPResourceResolverFunctionArgumentImpl;
+import org.forgerock.openam.xacml.v3.model.CommonType;
+import org.forgerock.openam.xacml.v3.model.ContentType;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -25,6 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.commons;
 
+import org.forgerock.openam.xacml.v3.model.URN;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

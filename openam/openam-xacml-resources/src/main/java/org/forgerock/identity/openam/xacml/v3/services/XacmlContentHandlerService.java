@@ -52,6 +52,8 @@ import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 import org.forgerock.identity.openam.xacml.v3.model.XACMLRequestInformation;
 import org.forgerock.identity.openam.xacml.v3.resources.*;
 
+import org.forgerock.openam.xacml.v3.model.CommonType;
+import org.forgerock.openam.xacml.v3.model.ContentType;
 import org.json.JSONException;
 import org.xml.sax.SAXException;
 

@@ -38,7 +38,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import org.forgerock.openam.xacml.v3.commons.ContentType;
+import org.forgerock.openam.xacml.v3.model.ContentType;
 import org.forgerock.identity.openam.xacml.v3.model.XACML3Constants;
 
 import java.io.File;
