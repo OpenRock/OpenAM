@@ -58,7 +58,11 @@ public class XACML3Request {
                 for (AttributeValue v : vals) {
                     DataValue dv = new DataValue(v.getDataType(),(String)v.getContent().get(0));
                     dv.setIncludeInResult(a.isIncludeInResult());
-                    bag.add(dv);
+                    try {
+                        bag.add(dv);
+                    } catch(XACML3EntitlementException xee) {
+                        // TODO :: Show Error Message...
+                    }
                 }
                 catMap.put(attID,bag);
                 if (isResource) {

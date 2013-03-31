@@ -27,14 +27,6 @@
 package org.forgerock.openam.xacml.v3.model;
 
 
-/**
- This class Encapsulates a DataValue from the XACML policy.
- In this case, we have the actual Data in the object
-
- @author Allan.Foster@forgerock.com
-
- */
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,6 +34,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ This class Encapsulates a DataValue from the XACML policy.
+ In this case, we have the actual Data in the object
+
+ @author Allan.Foster@forgerock.com
+
+ */
 public class DataBag extends FunctionArgument {
     /**
      * Data Value Object.
@@ -55,23 +54,31 @@ public class DataBag extends FunctionArgument {
         setType((DataType)null);
     }
 
+    /**
+     * Constructor used to specify the value represented by DataType.
+     *
+     * @param type - DataType Of the Bag.
+     */
+    public DataBag(final DataType.Type type) throws XACML3EntitlementException {
+        setType(type.getTypeName());
+    }
 
     /**
      * Constructor used to specify the value represented by String Data.
-
+     *
      * @param value
      */
-    public DataBag(DataValue value) {
+    public DataBag(DataValue value) throws XACML3EntitlementException {
         setType(value.getType());
         this.add(value);
     }
 
-    public DataBag add(DataValue value)  {
+    public DataBag add(DataValue value) throws XACML3EntitlementException {
         if (getType() == null) {
             setType(value.getType());
         }
         if (getType().getIndex() != value.getType().getIndex()) {
-            return this;                             // Should this be an exception???
+            throw new XACML3EntitlementException("Unable to add wrong typed Element to Bag");
         }
         data.add(value);
         return this;
@@ -95,7 +102,7 @@ public class DataBag extends FunctionArgument {
      * @return
      * @throws XACML3EntitlementException
      */
-    public Object getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
+    public List<DataValue> getValue(XACMLEvalContext pip) throws XACML3EntitlementException {
         return data;
     }
 

@@ -76,7 +76,7 @@ import org.testng.annotations.Test;
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
-public class TestXacmlSetFunctions {
+public class TestXacmlSetOnBagFunctions {
 
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");

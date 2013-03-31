@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * This class is the parent class for Function Arguments.
@@ -42,6 +43,7 @@ import java.util.Date;
  * XACMLFunction as a parent class for all functions
  *
  * @author Allan.Foster@forgerock.com
+ *
  */
 public abstract class FunctionArgument {
     public static FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
@@ -513,6 +515,27 @@ public abstract class FunctionArgument {
         }
         return (String) fArg.getValue(pip);
     }
+
+    /**
+     * Return DataValue as a List<DataValue> representing a StringBag.
+     *
+     * @param pip
+     * @return String -- Value
+     * @throws XACML3EntitlementException
+     */
+    public List<DataValue> asStringBag(XACMLEvalContext pip) throws XACML3EntitlementException {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLSTRINGTYPE)) {
+            throw new IndeterminateException("type conflict found " + fArg.dataType.getTypeName() + ", " +
+                "but requires: " +
+                    DataType.Type.XACMLSTRINGTYPE.getTypeName()+"<"+DataType.Type.XACMLSTRINGTYPE.getTypeName()+">");
+        }
+
+        return (List<DataValue>) fArg.getValue(pip);
+    }
+
 
     /**
      * Return DataValue as a XPath Expression String.
