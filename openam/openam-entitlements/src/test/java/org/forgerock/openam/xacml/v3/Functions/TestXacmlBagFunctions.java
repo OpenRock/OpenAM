@@ -49,14 +49,17 @@ import static org.testng.Assert.assertTrue;
  urn:oasis:names:tc:xacml:1.0:function:boolean-bag
  urn:oasis:names:tc:xacml:1.0:function:integer-bag
  urn:oasis:names:tc:xacml:1.0:function:double-bag
+
  urn:oasis:names:tc:xacml:1.0:function:time-bag
  urn:oasis:names:tc:xacml:1.0:function:date-bag
  urn:oasis:names:tc:xacml:1.0:function:dateTime-bag
+
  urn:oasis:names:tc:xacml:1.0:function:anyURI-bag
  urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag
  urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag
  urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-bag
  urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-bag
+
  urn:oasis:names:tc:xacml:1.0:function:x500Name-bag
  urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag
  urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag
@@ -91,83 +94,145 @@ public class TestXacmlBagFunctions {
 
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:anyURI-bag
      */
     @Test
     public void test_AnyuriBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        AnyuriBag function = new AnyuriBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag
      */
     @Test
     public void test_Base64BinaryBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        Base64BinaryBag function = new Base64BinaryBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     * urn:oasis:names:tc:xacml:1.0:function:boolean-bag
      */
     @Test
     public void test_BooleanBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        BooleanBag function = new BooleanBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
+
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:date-bag
      */
     @Test
     public void test_DateBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        DateBag function = new DateBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:dateTime-bag
      */
     @Test
     public void test_DatetimeBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        DatetimeBag function = new DatetimeBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-bag
      */
     @Test
     public void test_DaytimedurationBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        DaytimedurationBag function = new DaytimedurationBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:double-bag
      */
     @Test
     public void test_DoubleBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        DoubleBag function = new DoubleBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag
      */
     @Test
     public void test_HexbinaryBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        HexbinaryBag function = new HexbinaryBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     * urn:oasis:names:tc:xacml:1.0:function:integer-bag
      */
     @Test
     public void test_IntegerBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        IntegerBag function = new IntegerBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag
      */
     @Test
     public void test_Rfc822NameBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        Rfc822NameBag function = new Rfc822NameBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
@@ -233,27 +298,45 @@ public class TestXacmlBagFunctions {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:1.0:function:time-bag
      */
     @Test
     public void test_TimeBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        TimeBag function = new TimeBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     * urn:oasis:names:tc:xacml:1.0:function:x500Name-bag
      */
     @Test
     public void test_X500NameBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        X500NameBag function = new X500NameBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag
+     *  urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-bag
      */
     @Test
     public void test_YearmonthdurationBag() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        YearmonthdurationBag function = new YearmonthdurationBag();
+        FunctionArgument result = function.evaluate(null);
+        assertNotNull(result);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
     }
 
 }

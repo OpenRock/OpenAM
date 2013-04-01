@@ -34,17 +34,17 @@ package org.forgerock.openam.xacml.v3.Functions;
 import org.forgerock.openam.xacml.v3.model.*;
 
 /**
- *  urn:oasis:names:tc:xacml:1.0:function:x500Name-bag
+ *  urn:oasis:names:tc:xacml:2.0:function:dnsName-bag
  */
-public class X500NameBag extends XACMLFunction {
+public class DNSNameBag extends XACMLFunction {
 
-    public X500NameBag()  {
+    public DNSNameBag()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         // Initialize Empty Bag.
         DataBag dataBag = new DataBag();
         // Set the Type of the Contents.
-        dataBag.setType(DataType.XACMLX500NAME);
+        dataBag.setType(DataType.XACMLDNSNAME);
         // Loop Through Arguments in stack and evaluate to Build up Final Content, if any exists.
         int args = getArgCount();
         for (int i=0; i<args; i++) {
