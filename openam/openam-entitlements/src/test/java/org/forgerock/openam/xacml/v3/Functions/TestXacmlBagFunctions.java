@@ -25,10 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -190,7 +187,7 @@ public class TestXacmlBagFunctions {
         assertNotNull(bagValues);
         assertEquals(bagValues.size(),0);
         // Check native unwrapped Result
-        List<String> collection = result.asStringCollection(null);
+        List<String> collection = TestXacmlDataUtils.asStringCollection(result);
         assertNotNull(collection);
         assertEquals(collection.size(), 0);
 
@@ -200,7 +197,7 @@ public class TestXacmlBagFunctions {
         result = function.evaluate(null);
         assertNotNull(result);
 
-        collection = result.asStringCollection(null);
+        collection = TestXacmlDataUtils.asStringCollection(result);
         assertNotNull(collection);
         assertEquals(collection.size(), 1);
         assertEquals( collection.get(0), HELLO_WORLD.asString(null) );
@@ -212,7 +209,7 @@ public class TestXacmlBagFunctions {
         }
         result = function.evaluate(null);
         assertNotNull(result);
-        collection = result.asStringCollection(null);
+        collection = TestXacmlDataUtils.asStringCollection(result);
         assertNotNull(collection);
         assertEquals(collection.size(), 6);
         for(int i=0; i<6; i++) {
@@ -226,7 +223,7 @@ public class TestXacmlBagFunctions {
         }
         result = function.evaluate(null);
         assertNotNull(result);
-        collection = result.asStringCollection(null);
+        collection = TestXacmlDataUtils.asStringCollection(result);
         assertNotNull(collection);
         assertEquals(collection.size(), 6);
         for(int i=0; i<6; i++) {
@@ -258,6 +255,5 @@ public class TestXacmlBagFunctions {
     public void test_YearmonthdurationBag() throws XACML3EntitlementException {
         // TODO :: Finish...
     }
-
 
 }

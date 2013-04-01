@@ -49,7 +49,10 @@ public class StringBag extends XACMLFunction {
         int args = getArgCount();
         for (int i=0; i<args; i++) {
             FunctionArgument result = getArg(i).evaluate(pip);
-            dataBag.add( new DataValue(DataType.XACMLSTRING, result.getValue(pip), true ));
+            if (!(result instanceof DataValue)) {
+                throw new IndeterminateException("Not a DataValue");
+            }
+            dataBag.add((DataValue)result);
         }
         // Return the DataBag.
         return dataBag;
