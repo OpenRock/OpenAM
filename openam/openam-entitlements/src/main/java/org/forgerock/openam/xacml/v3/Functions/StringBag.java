@@ -43,11 +43,13 @@ public class StringBag extends XACMLFunction {
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         // Initialize Empty Bag.
         DataBag dataBag = new DataBag();
+        // Set the Type of the Contents.
         dataBag.setType(DataType.XACMLSTRING);
-        // Loop Through Arguments in stack to Build up Final Content, if any exists.
+        // Loop Through Arguments in stack and evaluate to Build up Final Content, if any exists.
         int args = getArgCount();
         for (int i=0; i<args; i++) {
-            dataBag.add( new DataValue(DataType.XACMLSTRING, getArg(i), true));
+            FunctionArgument result = getArg(i).evaluate(pip);
+            dataBag.add( new DataValue(DataType.XACMLSTRING, result.getValue(pip), true ));
         }
         // Return the DataBag.
         return dataBag;

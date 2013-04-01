@@ -538,8 +538,7 @@ public abstract class FunctionArgument {
         List<String> collection = new ArrayList<String>(bag.size());
         for (int i=0; i<bag.size(); i++) {
             // Cast and Add Object Element to Native Collection.
-            DataValue dataValue = (DataValue)bag.get(i).getValue(pip);
-            collection.add((String) dataValue.getValue(pip));
+            collection.add( (String) bag.get(i).getValue(pip) );
         }
         return collection;
     }
