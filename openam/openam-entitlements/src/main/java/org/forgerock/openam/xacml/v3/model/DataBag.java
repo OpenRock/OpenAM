@@ -69,7 +69,6 @@ public class DataBag extends FunctionArgument {
      * @param value
      */
     public DataBag(DataValue value) throws XACML3EntitlementException {
-        setType(value.getType());
         this.add(value);
     }
 
@@ -82,6 +81,24 @@ public class DataBag extends FunctionArgument {
         }
         data.add(value);
         return this;
+    }
+
+    /**
+     * Get DataValue within the Bag by it's Index Value.
+     * @param index
+     * @return DataValue -- Element within Bag.
+     * @throws XACML3EntitlementException
+     */
+    public DataValue get(int index) throws XACML3EntitlementException {
+        return data.get(index);
+    }
+
+    /**
+     * Return the Size of the Data Collection
+     * @return int - number of entries in Collection.
+     */
+    public Integer size() {
+        return data.size();
     }
 
     /**

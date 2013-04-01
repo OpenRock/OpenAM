@@ -178,28 +178,60 @@ public class TestXacmlBagFunctions {
      */
     @Test
     public void test_StringBag() throws XACML3EntitlementException {
+
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_NUMBER = new DataValue(DataType.XACMLSTRING, "HELLO WORLD Number: ");
+
         StringBag function = new StringBag();
         FunctionArgument result = function.evaluate(null);
         assertNotNull(result);
-        assertNotNull(result.getValue(null));
-        List<DataValue> resultBag = result.asStringBag(null);
-        assertNotNull(resultBag);
-        assertEquals(resultBag.size(), 0);
+        // Check raw Result
+        List<DataValue> bagValues = (List<DataValue>) result.getValue(null);
+        assertNotNull(bagValues);
+        assertEquals(bagValues.size(),0);
+        // Check native unwrapped Result
+        List<String> collection = result.asStringCollection(null);
+        assertNotNull(collection);
+        assertEquals(collection.size(), 0);
 
-
-
+        // Check Single Element Added.
         function = new StringBag();
-        function.addArgument(new DataValue(DataType.XACMLSTRING, "HELLO WORLD!"));
+        function.addArgument(HELLO_WORLD);
         result = function.evaluate(null);
         assertNotNull(result);
-        resultBag = result.asStringBag(null);
-        assertNotNull(resultBag);
-        assertEquals(resultBag.size(), 1);
-        DataValue dataValue = (DataValue) resultBag.get(0).getValue(null);
-        assertEquals( dataValue.getValue(null), new DataValue(DataType.XACMLSTRING,
-                "HELLO WORLD!").asString(null) );
 
+        collection = result.asStringCollection(null);
+        assertNotNull(collection);
+        assertEquals(collection.size(), 1);
+        assertEquals( collection.get(0), HELLO_WORLD.asString(null) );
 
+        // Check Multiple Elements Added.
+        function = new StringBag();
+        for(int i=0; i<6; i++) {
+            function.addArgument(HELLO_WORLD);
+        }
+        result = function.evaluate(null);
+        assertNotNull(result);
+        collection = result.asStringCollection(null);
+        assertNotNull(collection);
+        assertEquals(collection.size(), 6);
+        for(int i=0; i<6; i++) {
+            assertEquals( collection.get(i), HELLO_WORLD.asString(null) );
+        }
+
+        // Check Multiple Elements Added.
+        function = new StringBag();
+        for(int i=0; i<6; i++) {
+            function.addArgument(new DataValue(DataType.XACMLSTRING, "HELLO WORLD Number: "+i));
+        }
+        result = function.evaluate(null);
+        assertNotNull(result);
+        collection = result.asStringCollection(null);
+        assertNotNull(collection);
+        assertEquals(collection.size(), 6);
+        for(int i=0; i<6; i++) {
+            assertEquals( collection.get(i), HELLO_WORLD_NUMBER.asString(null)+i );
+        }
 
     }
 

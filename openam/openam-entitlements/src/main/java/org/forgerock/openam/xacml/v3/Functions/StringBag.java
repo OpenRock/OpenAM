@@ -34,7 +34,7 @@ package org.forgerock.openam.xacml.v3.Functions;
 import org.forgerock.openam.xacml.v3.model.*;
 
 /**
- * urn:oasis:names:tc:xacml:x.x:function:type-bag
+ * urn:oasis:names:tc:xacml:1.0:function:string-bag
  */
 public class StringBag extends XACMLFunction {
 

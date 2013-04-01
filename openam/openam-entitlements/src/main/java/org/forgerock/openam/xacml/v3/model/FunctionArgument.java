@@ -31,6 +31,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -520,21 +521,126 @@ public abstract class FunctionArgument {
      * Return DataValue as a List<DataValue> representing a StringBag.
      *
      * @param pip
-     * @return String -- Value
+     * @return List<String>
      * @throws XACML3EntitlementException
      */
-    public List<DataValue> asStringBag(XACMLEvalContext pip) throws XACML3EntitlementException {
-
+    public List<String> asStringCollection(XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument fArg = getDataContainer(pip);
 
         if (!fArg.dataType.isType(DataType.Type.XACMLSTRINGTYPE)) {
             throw new IndeterminateException("type conflict found " + fArg.dataType.getTypeName() + ", " +
                 "but requires: " +
-                    DataType.Type.XACMLSTRINGTYPE.getTypeName()+"<"+DataType.Type.XACMLSTRINGTYPE.getTypeName()+">");
+                    DataType.Type.XACMLSTRINGTYPE.getTypeName());
+        }
+
+        // Loop to UnWrap the DataValues
+        List<DataValue> bag = (List<DataValue>) fArg.getValue(pip);   // Simple Cast for easy Manipulation.
+        List<String> collection = new ArrayList<String>(bag.size());
+        for (int i=0; i<bag.size(); i++) {
+            // Cast and Add Object Element to Native Collection.
+            DataValue dataValue = (DataValue)bag.get(i).getValue(pip);
+            collection.add((String) dataValue.getValue(pip));
+        }
+        return collection;
+    }
+
+    /**
+     * Return DataValue as a List<DataValue> representing a BooleanBag.
+     *
+     * @param pip
+     * @return List<DataValue>
+     * @throws XACML3EntitlementException
+     */
+    public List<DataValue> asBooleanBag(XACMLEvalContext pip) throws XACML3EntitlementException {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLBOOLEANTYPE)) {
+            throw new IndeterminateException("type conflict found " + fArg.dataType.getTypeName() + ", " +
+                    "but requires: " +
+                    DataType.Type.XACMLBOOLEANTYPE.getTypeName());
         }
 
         return (List<DataValue>) fArg.getValue(pip);
     }
+
+    /**
+     * Return DataValue as a List<DataValue> representing a IntegerBag.
+     *
+     * @param pip
+     * @return List<DataValue>
+     * @throws XACML3EntitlementException
+     */
+    public List<DataValue> asIntegerBag(XACMLEvalContext pip) throws XACML3EntitlementException {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLINTEGERTYPE)) {
+            throw new IndeterminateException("type conflict found " + fArg.dataType.getTypeName() + ", " +
+                    "but requires: " +
+                    DataType.Type.XACMLBOOLEANTYPE.getTypeName());
+        }
+
+        return (List<DataValue>) fArg.getValue(pip);
+    }
+
+    /**
+     * Return DataValue as a List<DataValue> representing a DoubleBag.
+     *
+     * @param pip
+     * @return List<DataValue>
+     * @throws XACML3EntitlementException
+     */
+    public List<DataValue> asDoubleBag(XACMLEvalContext pip) throws XACML3EntitlementException {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLDOUBLETYPE)) {
+            throw new IndeterminateException("type conflict found " + fArg.dataType.getTypeName() + ", " +
+                    "but requires: " +
+                    DataType.Type.XACMLDOUBLETYPE.getTypeName());
+        }
+
+        return (List<DataValue>) fArg.getValue(pip);
+    }
+
+    /**
+     * Return DataValue as a List<DataValue> representing a TimeBag.
+     *
+     * @param pip
+     * @return List<DataValue>
+     * @throws XACML3EntitlementException
+     */
+    public List<DataValue> asTimeBag(XACMLEvalContext pip) throws XACML3EntitlementException {
+
+        FunctionArgument fArg = getDataContainer(pip);
+
+        if (!fArg.dataType.isType(DataType.Type.XACMLTIMETYPE)) {
+            throw new IndeterminateException("type conflict found " + fArg.dataType.getTypeName() + ", " +
+                    "but requires: " +
+                    DataType.Type.XACMLTIMETYPE.getTypeName());
+        }
+
+        return (List<DataValue>) fArg.getValue(pip);
+    }
+
+
+    /**
+     urn:oasis:names:tc:xacml:1.0:function:date-bag
+     urn:oasis:names:tc:xacml:1.0:function:dateTime-bag
+     urn:oasis:names:tc:xacml:1.0:function:anyURI-bag
+     urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag
+     urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag
+     urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-bag
+     urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-bag
+     urn:oasis:names:tc:xacml:1.0:function:x500Name-bag
+     urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag
+     urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag
+     urn:oasis:names:tc:xacml:2.0:function:dnsName-bag
+     */
+
+
+
 
 
     /**
