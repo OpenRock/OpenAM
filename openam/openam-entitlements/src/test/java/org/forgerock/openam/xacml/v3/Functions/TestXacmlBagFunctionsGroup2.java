@@ -520,4 +520,66 @@ public class TestXacmlBagFunctionsGroup2 {
 
     }
 
+    /**
+     * urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size
+     */
+    @Test
+    public void test_DNSNameBagSize() throws XACML3EntitlementException {
+        final FunctionArgument dnsName1 = new DataValue(DataType.XACMLDNSNAME,
+                "www.example.org");
+        final FunctionArgument dnsName2 = new DataValue(DataType.XACMLDNSNAME,
+                "example.com");
+        final FunctionArgument dnsName3 = new DataValue(DataType.XACMLDNSNAME,
+                "www.example.com");
+        final FunctionArgument dnsName4 = new DataValue(DataType.XACMLDNSNAME,
+                "openam.example.org");
+
+        // Establish a Bag with Several Elements.
+        DNSNameBag bag = new DNSNameBag();
+        bag.addArgument(dnsName1);
+        bag.addArgument(dnsName2);
+        bag.addArgument(dnsName3);
+        bag.addArgument(dnsName4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        DNSNameBagSize size = new DNSNameBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size
+     */
+    @Test
+    public void test_IPAddressBagSize() throws XACML3EntitlementException {
+        final FunctionArgument ipaddr1 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.0.1");
+        final FunctionArgument ipaddr2 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.200.1");
+        final FunctionArgument ipaddr3 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.12.1");
+        final FunctionArgument ipaddr4 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.195.1");
+
+        // Establish a Bag with Several Elements.
+        IPAddressBag bag = new IPAddressBag();
+        bag.addArgument(ipaddr1);
+        bag.addArgument(ipaddr2);
+        bag.addArgument(ipaddr3);
+        bag.addArgument(ipaddr4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        IPAddressBagSize size = new IPAddressBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
+    }
+
 }
