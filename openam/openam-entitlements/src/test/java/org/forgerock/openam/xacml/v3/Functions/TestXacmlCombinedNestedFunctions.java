@@ -25,13 +25,15 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.List;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * A.3.16 Other functions
@@ -77,6 +79,12 @@ public class TestXacmlCombinedNestedFunctions {
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
 
+    static final FunctionArgument testString1 = new DataValue(DataType.XACMLSTRING, "Forge");
+    static final FunctionArgument testString2 = new DataValue(DataType.XACMLSTRING, "Rock");
+    static final FunctionArgument testString3 = new DataValue(DataType.XACMLSTRING, " says Hello World!");
+    static final FunctionArgument testString4 = new DataValue(DataType.XACMLSTRING, " HELLO WORLD!");
+
+    FunctionArgument testInteger1 = new DataValue(DataType.XACMLINTEGER, 195, true);
 
     @BeforeClass
     public void before() throws Exception {
@@ -91,11 +99,42 @@ public class TestXacmlCombinedNestedFunctions {
      */
     @Test
     public void test_UseCase_Combined_Nested_Functions() throws XACML3EntitlementException {
+        StringBag stringBag = new StringBag();
 
+        StringConcatenate stringConcatenate = new StringConcatenate();
+        // Place Objects in Argument stack.
+        stringConcatenate.addArgument(testString1);
+        stringConcatenate.addArgument(testString2);
+        stringConcatenate.addArgument(testString3);
+        stringConcatenate.addArgument(testString4);
 
-        // TODO::
-        //StringBag(StringConcat(req(arg1),req(arg2),req(arg3)) , req.(anotherArg), "Allan");
-        //new StringBag(new StringConcatenate( req(arg1), req(arg2), req(arg3) ) , req.(anotherArg), "Allan");
+        StringFromInteger stringFromInteger = new StringFromInteger();
+        stringFromInteger.addArgument(testInteger1);
+
+        StringFromBoolean stringFromBoolean = new StringFromBoolean();
+        stringFromBoolean.addArgument(trueObject);
+        StringFromBoolean stringFromBoolean2 = new StringFromBoolean();
+        stringFromBoolean2.addArgument(falseObject);
+
+        stringBag.addArgument(stringConcatenate);
+        stringBag.addArgument(stringFromInteger);
+        stringBag.addArgument(stringFromBoolean);
+        stringBag.addArgument(stringFromBoolean2);
+
+        // Trigger Evaluation
+        DataBag dataBag = (DataBag) stringBag.evaluate(null);
+        // Check raw Result
+        assertNotNull(dataBag);
+        assertEquals(dataBag.size(), 4);
+
+        // Check native unwrapped Result
+        List<String> collection = TestXacmlDataUtils.asStringCollection(dataBag);
+        assertNotNull(collection);
+        assertEquals(collection.size(), 4);
+        assertEquals(collection.get(0),"ForgeRock says Hello World! HELLO WORLD!");
+        assertEquals(collection.get(1),"195");
+        assertEquals(collection.get(2),"true");
+        assertEquals(collection.get(3),"false");
 
     }
 

@@ -54,10 +54,6 @@ import org.testng.annotations.Test;
  The function SHALL evaluate to "True" if and only if the first argument matches by the
  "urn:oasis:names:tc:xacml:x.x:function:type-equal" any value in the bag.  Otherwise, it SHALL return “False”.
 
- urn:oasis:names:tc:xacml:x.x:function:type-bag
- This function SHALL take any number of arguments of ‘type’ and return a bag of ‘type’ values containing
- the values of the arguments.  An application of this function to zero arguments SHALL produce
- an empty bag of the specified data-type.
  */
 
 /**
@@ -82,11 +78,19 @@ public class TestXacmlBagFunctionsGroup2 {
     }
 
     /**
+     * One and Only
+     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
+     This function SHALL take a bag of ‘type’ values as an argument and SHALL return a value of ‘type’.
+     It SHALL return the only value in the bag.  If the bag does not have one and only one value,
+     then the expression SHALL evaluate to "Indeterminate".
+     */
+
+    /**
      * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
      */
     @Test
     public void test_AnyuriOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
+                        // TODO :: Finish...
     }
 
     /**
@@ -192,6 +196,13 @@ public class TestXacmlBagFunctionsGroup2 {
     public void test_YearmonthdurationOneAndOnly() throws XACML3EntitlementException {
         // TODO :: Finish...
     }
+
+    // Size Methods
+    /**
+     *  urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     This function SHALL take a bag of ‘type’ values as an argument and SHALL return an
+     “http://www.w3.org/2001/XMLSchema#integer” indicating the number of values in the bag.
+     */
 
     /**
      * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
@@ -304,6 +315,16 @@ public class TestXacmlBagFunctionsGroup2 {
     public void test_YearmonthdurationBagSize() throws XACML3EntitlementException {
         // TODO :: Finish...
     }
+
+    // Is In Methods
+    /**
+     *  urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     This function SHALL take an argument of ‘type’ as the first argument and a bag of ‘type’ values as the second argument
+     and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+     The function SHALL evaluate to "True" if and only if the first argument matches by the
+     "urn:oasis:names:tc:xacml:x.x:function:type-equal" any value in the bag.  Otherwise, it SHALL return “False”.
+
+     */
 
     /**
      * urn:oasis:names:tc:xacml:x.x:function:type-is-in

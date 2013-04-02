@@ -97,7 +97,7 @@ public class DataBag extends FunctionArgument {
      * Return the Size of the Data Collection
      * @return int - number of entries in Collection.
      */
-    public Integer size() {
+    public int size() {
         return data.size();
     }
 

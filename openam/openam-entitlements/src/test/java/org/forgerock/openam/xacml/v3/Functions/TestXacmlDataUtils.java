@@ -36,12 +36,35 @@ import java.util.List;
  * XACML Test Data Utility Tools.
  *
  *
+ * Defined Bags:
+ *
+ * urn:oasis:names:tc:xacml:1.0:function:string-bag
+ * urn:oasis:names:tc:xacml:1.0:function:boolean-bag
+ * urn:oasis:names:tc:xacml:1.0:function:integer-bag
+ * urn:oasis:names:tc:xacml:1.0:function:double-bag
+ *
+ * urn:oasis:names:tc:xacml:1.0:function:time-bag
+ * urn:oasis:names:tc:xacml:1.0:function:date-bag
+ * urn:oasis:names:tc:xacml:1.0:function:dateTime-bag
+ *
+ * urn:oasis:names:tc:xacml:1.0:function:anyURI-bag
+ * urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag
+ * urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag
+ * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-bag
+ * urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-bag
+ *
+ * urn:oasis:names:tc:xacml:1.0:function:x500Name-bag
+ * urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag
+ * urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag
+ * urn:oasis:names:tc:xacml:2.0:function:dnsName-bag
+ *
+ *
  * @author Jeff.Schenk@ForgeRock.com
  */
 public class TestXacmlDataUtils {
 
     /**
-     * Return DataValue as a List<DataValue> representing a StringBag.
+     * Return Native Implementation of Collection Contents from a List<DataValue> representing a Bag.
      *
      * @param fArg
      * @return List<String>
@@ -57,4 +80,59 @@ public class TestXacmlDataUtils {
         }
         return collection;
     }
+
+    /**
+     * Return Native Implementation of Collection Contents from a List<DataValue> representing a Bag.
+     *
+     * @param fArg
+     * @return List<Boolean>
+     * @throws org.forgerock.openam.xacml.v3.model.XACML3EntitlementException
+     */
+    public static List<Boolean> asBooleanCollection(FunctionArgument fArg) throws XACML3EntitlementException {
+        // Loop to UnWrap the DataValues
+        List<DataValue> bag = (List<DataValue>) fArg.getValue(null);   // Simple Cast for easy Manipulation.
+        List<Boolean> collection = new ArrayList<Boolean>(bag.size());
+        for (int i=0; i<bag.size(); i++) {
+            // Cast and Add Object Element to Native Collection.
+            collection.add( (Boolean) bag.get(i).getValue(null) );
+        }
+        return collection;
+    }
+
+    /**
+     * Return Native Implementation of Collection Contents from a List<DataValue> representing a Bag.
+     *
+     * @param fArg
+     * @return List<Integer>
+     * @throws org.forgerock.openam.xacml.v3.model.XACML3EntitlementException
+     */
+    public static List<Integer> asIntegerCollection(FunctionArgument fArg) throws XACML3EntitlementException {
+        // Loop to UnWrap the DataValues
+        List<DataValue> bag = (List<DataValue>) fArg.getValue(null);   // Simple Cast for easy Manipulation.
+        List<Integer> collection = new ArrayList<Integer>(bag.size());
+        for (int i=0; i<bag.size(); i++) {
+            // Cast and Add Object Element to Native Collection.
+            collection.add( (Integer) bag.get(i).getValue(null) );
+        }
+        return collection;
+    }
+
+    /**
+     * Return Native Implementation of Collection Contents from a List<DataValue> representing a Bag.
+     *
+     * @param fArg
+     * @return List<Integer>
+     * @throws org.forgerock.openam.xacml.v3.model.XACML3EntitlementException
+     */
+    public static List<Double> asDoubleCollection(FunctionArgument fArg) throws XACML3EntitlementException {
+        // Loop to UnWrap the DataValues
+        List<DataValue> bag = (List<DataValue>) fArg.getValue(null);   // Simple Cast for easy Manipulation.
+        List<Double> collection = new ArrayList<Double>(bag.size());
+        for (int i=0; i<bag.size(); i++) {
+            // Cast and Add Object Element to Native Collection.
+            collection.add( (Double) bag.get(i).getValue(null) );
+        }
+        return collection;
+    }
+
 }
