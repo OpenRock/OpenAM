@@ -83,6 +83,24 @@ public class TestXacmlBagFunctionsGroup2 {
      This function SHALL take a bag of ‘type’ values as an argument and SHALL return a value of ‘type’.
      It SHALL return the only value in the bag.  If the bag does not have one and only one value,
      then the expression SHALL evaluate to "Indeterminate".
+
+     urn:oasis:names:tc:xacml:1.0:function:string-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:boolean-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:double-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:time-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:date-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:dateTime-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:hexBinary-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:base64Binary-one-and-only
+     urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-one-and-only
+     urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:x500Name-one-and-only
+     urn:oasis:names:tc:xacml:1.0:function:rfc822Name-one-and-only
+     urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only
+     urn:oasis:names:tc:xacml:2.0:function:dnsName-one-and-only
+
      */
 
     /**
@@ -201,6 +219,25 @@ public class TestXacmlBagFunctionsGroup2 {
      *  urn:oasis:names:tc:xacml:x.x:function:type-bag-size
      This function SHALL take a bag of ‘type’ values as an argument and SHALL return an
      “http://www.w3.org/2001/XMLSchema#integer” indicating the number of values in the bag.
+
+     urn:oasis:names:tc:xacml:1.0:function:string-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:boolean-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:integer-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:double-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:time-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:date-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:dateTime-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:anyURI-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag-size
+     urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-bag-size
+     urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:x500Name-bag-size
+     urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag-size
+     urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size
+     urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size
+
+
      */
 
     /**
@@ -322,6 +359,22 @@ public class TestXacmlBagFunctionsGroup2 {
      and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
      The function SHALL evaluate to "True" if and only if the first argument matches by the
      "urn:oasis:names:tc:xacml:x.x:function:type-equal" any value in the bag.  Otherwise, it SHALL return “False”.
+
+     urn:oasis:names:tc:xacml:1.0:function:string-is-in
+     urn:oasis:names:tc:xacml:1.0:function:boolean-is-in
+     urn:oasis:names:tc:xacml:1.0:function:integer-is-in
+     urn:oasis:names:tc:xacml:1.0:function:double-is-in
+     urn:oasis:names:tc:xacml:1.0:function:time-is-in
+     urn:oasis:names:tc:xacml:1.0:function:date-is-in
+     urn:oasis:names:tc:xacml:1.0:function:dateTime-is-in
+     urn:oasis:names:tc:xacml:1.0:function:anyURI-is-in
+     urn:oasis:names:tc:xacml:1.0:function:hexBinary-is-in
+     urn:oasis:names:tc:xacml:1.0:function:base64Binary-is-in
+     urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-is-in
+     urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-is-in
+     urn:oasis:names:tc:xacml:1.0:function:x500Name-is-in
+     urn:oasis:names:tc:xacml:1.0:function:rfc822Name-is-in
+
 
      */
 

@@ -43,5 +43,29 @@ public class NotApplicableException extends XACML3EntitlementException {
     public NotApplicableException(String message) {
         super(message);
     }
+
+    /**
+     * Constructor with specified Exception Message and
+     * URN.
+     *
+     * @param message
+     * @param urn
+     */
+    public NotApplicableException(String message, String urn) {
+        super(message, urn);
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message.  The
+     * cause is not initialized, and may subsequently be initialized by
+     * a call to {@link #initCause}.
+     *
+     * @param message the detail message. The detail message is saved for
+     *                later retrieval by the {@link #getMessage()} method.
+     */
+    public NotApplicableException(String message, String urn, String codeLocationTag) {
+        super(message, urn, codeLocationTag);
+    }
+
 }
 

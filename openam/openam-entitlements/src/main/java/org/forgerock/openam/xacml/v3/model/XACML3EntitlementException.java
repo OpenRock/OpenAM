@@ -14,6 +14,11 @@ public class XACML3EntitlementException extends Exception {
     private String urn;
 
     /**
+     * Internal Code Location Meta Tag
+     */
+    private String codeLocationTag;
+
+    /**
      * Default Constructor
      */
     public XACML3EntitlementException() {
@@ -37,7 +42,22 @@ public class XACML3EntitlementException extends Exception {
      */
     public XACML3EntitlementException(String message, String urn) {
         super(message);
+        this.urn=urn;
 
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message.  The
+     * cause is not initialized, and may subsequently be initialized by
+     * a call to {@link #initCause}.
+     *
+     * @param message the detail message. The detail message is saved for
+     *                later retrieval by the {@link #getMessage()} method.
+     */
+    public XACML3EntitlementException(String message, String urn, String codeLocationTag) {
+        super(message);
+        this.urn = urn;
+        this.codeLocationTag = codeLocationTag;
     }
 
     public String getUrn() {
@@ -46,5 +66,13 @@ public class XACML3EntitlementException extends Exception {
 
     public void setUrn(String urn) {
         this.urn = urn;
+    }
+
+    public String getCodeLocationTag() {
+        return codeLocationTag;
+    }
+
+    public void setCodeLocationTag(String codeLocationTag) {
+        this.codeLocationTag = codeLocationTag;
     }
 }
