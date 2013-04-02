@@ -196,9 +196,8 @@ public class TestXacmlBagFunctionsGroup2 {
     public void test_YearmonthdurationOneAndOnly() throws XACML3EntitlementException {
         // TODO :: Finish...
     }
-
-    // Size Methods
     /**
+     * Size Methods
      *  urn:oasis:names:tc:xacml:x.x:function:type-bag-size
      This function SHALL take a bag of ‘type’ values as an argument and SHALL return an
      “http://www.w3.org/2001/XMLSchema#integer” indicating the number of values in the bag.
@@ -316,8 +315,8 @@ public class TestXacmlBagFunctionsGroup2 {
         // TODO :: Finish...
     }
 
-    // Is In Methods
     /**
+     * Is In Methods
      *  urn:oasis:names:tc:xacml:x.x:function:type-is-in
      This function SHALL take an argument of ‘type’ as the first argument and a bag of ‘type’ values as the second argument
      and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
