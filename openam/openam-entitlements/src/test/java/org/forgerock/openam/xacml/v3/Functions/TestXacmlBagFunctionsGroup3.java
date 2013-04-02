@@ -34,6 +34,7 @@ import java.util.Date;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * A.3.10 Bag functions
@@ -182,11 +183,45 @@ public class TestXacmlBagFunctionsGroup3 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
+     * urn:oasis:names:tc:xacml:1.0:function:string-one-and-only
+     */
+    @Test(expectedExceptions = {IndeterminateException.class})
+    public void test_StringOneAndOnly_Indeterminate() throws XACML3EntitlementException {
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+
+        // Establish a Bag with Several Elements.
+        StringBag stringBag = new StringBag();
+        stringBag.addArgument(HELLO_WORLD);
+        stringBag.addArgument(HELLO_WORLD_FORGEROCK);
+        DataBag dataBag = (DataBag) stringBag.evaluate(null);
+        assertNotNull(dataBag);
+
+        StringOneAndOnly oneAndOnly = new StringOneAndOnly();
+        oneAndOnly.addArgument(dataBag);
+        oneAndOnly.evaluate(null);
+        // Should not get to Here...
+        assertTrue(false);
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:1.0:function:string-one-and-only
      */
     @Test
     public void test_StringOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+
+        // Establish a Bag with Several Elements.
+        StringBag stringBag = new StringBag();
+        stringBag.addArgument(HELLO_WORLD);
+        DataBag dataBag = (DataBag) stringBag.evaluate(null);
+        assertNotNull(dataBag);
+
+        StringOneAndOnly oneAndOnly = new StringOneAndOnly();
+        oneAndOnly.addArgument(dataBag);
+        FunctionArgument functionArgument = oneAndOnly.evaluate(null);
+        assertNotNull(functionArgument);
+        assertEquals(functionArgument.asString(null), "HELLO WORLD!");
     }
 
     /**
