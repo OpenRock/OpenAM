@@ -34,7 +34,6 @@ package org.forgerock.openam.xacml.v3.Functions;
 
 import org.forgerock.openam.xacml.v3.model.*;
 
-import java.util.List;
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:string-one-and-only
@@ -66,7 +65,7 @@ public class StringOneAndOnly extends XACMLFunction {
         if ( ((DataBag) functionArgument).size() == 1  ) {
             return ((DataBag) functionArgument).get(0).evaluate(pip);
         } else if ( ((DataBag) functionArgument).size() > 1  ) {
-            throw new IndeterminateException("More than One and Only: "+((DataBag) functionArgument).size());
+            throw new IndeterminateException("Multiple Values in Bag: "+((DataBag) functionArgument).size());
         } else {
             throw new IndeterminateException("Nothing in Bag");
         }

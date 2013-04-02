@@ -25,42 +25,47 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
+ This function SHALL take a bag of ‘type’ values as an argument and SHALL return a value of ‘type’.
+ It SHALL return the only value in the bag.  If the bag does not have one and only one value,
+ then the expression SHALL evaluate to "Indeterminate".
+ */
 
 import org.forgerock.openam.xacml.v3.model.*;
 
-import java.util.List;
-
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:x500Name-one-and-only
+ */
 public class X500NameOneAndOnly extends XACMLFunction {
 
     public X500NameOneAndOnly()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-
-        if ( getArgCount() != 1) {
-            throw new IndeterminateException("Should only be one");
+        // Only should have one Argument, a Bag of the applicable type.
+        int args = getArgCount();
+        if (args != 1) {
+            throw new IndeterminateException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
         }
-        FunctionArgument fArg = getArg(0).evaluate(pip);
-        if (!(fArg instanceof DataBag)) {
-            throw new IndeterminateException("Not a DataBag");
+        // Ensure Contents are of Applicable Type.
+        FunctionArgument functionArgument = getArg(0).evaluate(pip);
+        if (!functionArgument.getType().isType(DataType.Type.XACMLX500NAMETYPE)) {
+            throw new IndeterminateException("Expecting a X500 Name Type of Bag, but encountered a "+
+                    functionArgument.getType().getTypeName());
         }
-        List<DataValue> vals = (List<DataValue>)fArg.getValue(pip);
-        if (vals.size() > 1) {
-            throw new IndeterminateException("Multiple Values in Bag");
+        // Ensure we have a DataBag.
+        if (!(functionArgument instanceof DataBag))  {
+            throw new IndeterminateException("Expecting a Bag, but encountered instead a "+
+                    functionArgument.getType().getTypeName());
         }
-        DataValue dv =  vals.get(0);
-        if (!dv.getType().isType(DataType.Type.XACMLX500NAMETYPE)) {
-            throw new IndeterminateException("Wrong Type");
+        // return the one and Only Entry, if Applicable.
+        if ( ((DataBag) functionArgument).size() == 1  ) {
+            return ((DataBag) functionArgument).get(0).evaluate(pip);
+        } else if ( ((DataBag) functionArgument).size() > 1  ) {
+            throw new IndeterminateException("Multiple Values in Bag: "+((DataBag) functionArgument).size());
+        } else {
+            throw new IndeterminateException("Nothing in Bag");
         }
-        return dv;
     }
 }

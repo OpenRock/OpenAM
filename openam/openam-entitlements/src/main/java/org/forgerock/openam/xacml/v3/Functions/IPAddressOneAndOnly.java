@@ -34,12 +34,13 @@ package org.forgerock.openam.xacml.v3.Functions;
 
 import org.forgerock.openam.xacml.v3.model.*;
 
-/**
- * urn:oasis:names:tc:xacml:1.0:function:date-one-and-only
- */
-public class DateOneAndOnly extends XACMLFunction {
 
-    public DateOneAndOnly()  {
+/**
+ * urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only
+ */
+public class IPAddressOneAndOnly extends XACMLFunction {
+
+    public IPAddressOneAndOnly()  {
     }
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
@@ -51,8 +52,8 @@ public class DateOneAndOnly extends XACMLFunction {
         }
         // Ensure Contents are of Applicable Type.
         FunctionArgument functionArgument = getArg(0).evaluate(pip);
-        if (!functionArgument.getType().isType(DataType.Type.XACMLDATETYPE)) {
-            throw new IndeterminateException("Expecting a Date Type of Bag, but encountered a "+
+        if (!functionArgument.getType().isType(DataType.Type.XACMLIPADDRESSTYPE)) {
+            throw new IndeterminateException("Expecting a IP Address of Bag, but encountered a "+
                     functionArgument.getType().getTypeName());
         }
         // Ensure we have a DataBag.
