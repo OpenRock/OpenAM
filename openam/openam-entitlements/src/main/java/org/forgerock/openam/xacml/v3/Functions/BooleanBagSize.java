@@ -25,27 +25,40 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+ This function SHALL take a bag of ‘type’ values as an argument and SHALL return an
+ “http://www.w3.org/2001/XMLSchema#integer” indicating the number of values in the bag.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
+/**
+ *  urn:oasis:names:tc:xacml:1.0:function:boolean-bag-size
+ */
 public class BooleanBagSize extends XACMLFunction {
 
     public BooleanBagSize()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        // Only should have one Argument, a Bag of the applicable type.
+        int args = getArgCount();
+        if (args != 1) {
+            throw new IndeterminateException("Function Requires 1 argument, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        // Ensure Contents are of Applicable Type.
+        FunctionArgument functionArgument = getArg(0);
+        if (!functionArgument.getType().isType(DataType.Type.XACMLBOOLEANTYPE)) {
+            throw new IndeterminateException("Expecting a Boolean Type of Bag, but encountered a "+
+                    functionArgument.getType().getTypeName());
+        }
+        // Ensure we have a DataBag.
+        if (!(functionArgument instanceof DataBag))  {
+            throw new IndeterminateException("Expecting a Bag, but encountered instead a "+
+                    functionArgument.getType().getTypeName());
+        }
+        // return the Bag Size.
+        return new DataValue(DataType.XACMLINTEGER, ((DataBag) functionArgument).size(), true);
     }
 }

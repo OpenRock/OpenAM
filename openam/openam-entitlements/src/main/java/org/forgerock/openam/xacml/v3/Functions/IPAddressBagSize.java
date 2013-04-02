@@ -34,11 +34,11 @@ package org.forgerock.openam.xacml.v3.Functions;
 import org.forgerock.openam.xacml.v3.model.*;
 
 /**
- *  urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag-size
+ * urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size
  */
-public class Rfc822NameBagSize extends XACMLFunction {
+public class IPAddressBagSize extends XACMLFunction {
 
-    public Rfc822NameBagSize()  {
+    public IPAddressBagSize()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         // Only should have one Argument, a Bag of the applicable type.
@@ -49,8 +49,8 @@ public class Rfc822NameBagSize extends XACMLFunction {
         }
         // Ensure Contents are of Applicable Type.
         FunctionArgument functionArgument = getArg(0);
-        if (!functionArgument.getType().isType(DataType.Type.XACMLRFC822NAMETYPE)) {
-            throw new IndeterminateException("Expecting a RFC822 Name Type of Bag, but encountered a "+
+        if (!functionArgument.getType().isType(DataType.Type.XACMLIPADDRESSTYPE)) {
+            throw new IndeterminateException("Expecting a IP Address Type of Bag, but encountered a "+
                     functionArgument.getType().getTypeName());
         }
         // Ensure we have a DataBag.

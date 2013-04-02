@@ -25,13 +25,16 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.Date;
+import java.util.List;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * A.3.10 Bag functions
@@ -39,20 +42,9 @@ import org.testng.annotations.Test;
  and x.x is a version of XACML where the function has been defined.
  Some additional conditions defined for each function below SHALL cause the expression to evaluate to "Indeterminate".
 
- urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
- This function SHALL take a bag of ‘type’ values as an argument and SHALL return a value of ‘type’.
- It SHALL return the only value in the bag.  If the bag does not have one and only one value,
- then the expression SHALL evaluate to "Indeterminate".
-
  urn:oasis:names:tc:xacml:x.x:function:type-bag-size
  This function SHALL take a bag of ‘type’ values as an argument and SHALL return an
  “http://www.w3.org/2001/XMLSchema#integer” indicating the number of values in the bag.
-
- urn:oasis:names:tc:xacml:x.x:function:type-is-in
- This function SHALL take an argument of ‘type’ as the first argument and a bag of ‘type’ values as the second argument
- and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
- The function SHALL evaluate to "True" if and only if the first argument matches by the
- "urn:oasis:names:tc:xacml:x.x:function:type-equal" any value in the bag.  Otherwise, it SHALL return “False”.
 
  */
 
@@ -78,143 +70,6 @@ public class TestXacmlBagFunctionsGroup2 {
     }
 
     /**
-     * One and Only
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     This function SHALL take a bag of ‘type’ values as an argument and SHALL return a value of ‘type’.
-     It SHALL return the only value in the bag.  If the bag does not have one and only one value,
-     then the expression SHALL evaluate to "Indeterminate".
-
-     urn:oasis:names:tc:xacml:1.0:function:string-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:boolean-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:double-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:time-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:date-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:dateTime-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:hexBinary-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:base64Binary-one-and-only
-     urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-one-and-only
-     urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:x500Name-one-and-only
-     urn:oasis:names:tc:xacml:1.0:function:rfc822Name-one-and-only
-     urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only
-     urn:oasis:names:tc:xacml:2.0:function:dnsName-one-and-only
-
-     */
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_AnyuriOneAndOnly() throws XACML3EntitlementException {
-                        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_Base64BinaryOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_BooleanOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_DateOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_DatetimeOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_DaytimedurationOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_DoubleOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_HexbinaryOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_IntegerOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_Rfc822NameOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_StringOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_TimeOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_X500NameOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-one-and-only
-     */
-    @Test
-    public void test_YearmonthdurationOneAndOnly() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-    /**
      * Size Methods
      *  urn:oasis:names:tc:xacml:x.x:function:type-bag-size
      This function SHALL take a bag of ‘type’ values as an argument and SHALL return an
@@ -237,257 +92,432 @@ public class TestXacmlBagFunctionsGroup2 {
      urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size
      urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size
 
-
      */
 
+
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:anyURI-bag-size
      */
     @Test
     public void test_AnyuriBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument anyuri1 = new DataValue(DataType.XACMLANYURI, "/openam/xacml");
+        final FunctionArgument anyuri2 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
+        final FunctionArgument anyuri3 = new DataValue(DataType.XACMLANYURI, "/");
+        final FunctionArgument anyuri4 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
+
+        // Establish a Bag with Several Elements.
+        AnyuriBag bag = new AnyuriBag();
+        bag.addArgument(anyuri1);
+        bag.addArgument(anyuri2);
+        bag.addArgument(anyuri3);
+        bag.addArgument(anyuri4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        AnyuriBagSize size = new AnyuriBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag-size
      */
     @Test
     public void test_Base64BinaryBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // base64data1 and base64data2 contained the Base 64 encoding of:
+        // ForgeRock - OpenAM XACML says Hello!
+        final FunctionArgument base64data1 = new DataValue(DataType.XACMLBASE64BINARY,
+                "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
+        // This is a very small Test!
+        final FunctionArgument base64data2 = new DataValue(DataType.XACMLBASE64BINARY,
+                "VGhpcyBpcyBhIHZlcnkgc21hbGwgVGVzdCE=");
+        // This is a very small Test as well!
+        final FunctionArgument base64data3 = new DataValue(DataType.XACMLBASE64BINARY,
+                "VGhpcyBpcyBhIHZlcnkgc21hbGwgVGVzdCBhcyB3ZWxsIQ==");
+        // ForgeRock - OpenAM XACML says Hello!
+        final FunctionArgument base64data4 = new DataValue(DataType.XACMLBASE64BINARY,
+                "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
+
+
+        // Establish a Bag with Several Elements.
+        Base64BinaryBag bag = new Base64BinaryBag();
+        bag.addArgument(base64data1);
+        bag.addArgument(base64data2);
+        bag.addArgument(base64data3);
+        bag.addArgument(base64data4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        Base64BinaryBagSize size = new Base64BinaryBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     *  urn:oasis:names:tc:xacml:1.0:function:boolean-bag-size
      */
     @Test
     public void test_BooleanBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+
+        // Establish a Bag with Several Elements.
+        BooleanBag bag = new BooleanBag();
+        bag.addArgument(trueObject);
+        bag.addArgument(trueObject);
+        bag.addArgument(falseObject);
+        bag.addArgument(trueObject);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        BooleanBagSize size = new BooleanBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:date-bag-size
      */
     @Test
     public void test_DateBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Date date1 = XACML3PrivilegeUtils.stringToDate("2013-03-11");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATE, date1, true);
+
+        final Date date2 = XACML3PrivilegeUtils.stringToDate("2013-03-12");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATE, date2, true);
+
+        final Date date3 = XACML3PrivilegeUtils.stringToDate("2013-03-11");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATE, date3, true);
+
+        final Date date4 = XACML3PrivilegeUtils.stringToDate("2014-03-11");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATE, date4, true);
+
+        // Establish a Bag with Several Elements.
+        DateBag bag = new DateBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        DateBagSize size = new DateBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:dateTime-bag-size
      */
     @Test
     public void test_DatetimeBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Date date1 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, date1, true);
+
+        final Date date2 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.124");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, date2, true);
+
+        final Date date3 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, date3, true);
+
+        final Date date4 = XACML3PrivilegeUtils.stringToDateTime("2014-03-11:01:45:30.126");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
+
+
+        // Establish a Bag with Several Elements.
+        DatetimeBag bag = new DatetimeBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        DatetimeBagSize size = new DatetimeBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-bag-size
      */
     @Test
     public void test_DaytimedurationBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
+
+        final Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("012:01:45:30.124");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
+
+        final Long duration3 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration3, true);
+
+        final Long duration4 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("001:01:45:30.126");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration4, true);
+
+
+        // Establish a Bag with Several Elements.
+        DaytimedurationBag bag = new DaytimedurationBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        DaytimedurationBagSize size = new DaytimedurationBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     *  urn:oasis:names:tc:xacml:1.0:function:double-bag-size
      */
     @Test
     public void test_DoubleBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D, true);
+        final FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 456789D, true);
+        final FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D, true);
+        final FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D, true);
+
+        // Establish a Bag with Several Elements.
+        DoubleBag bag = new DoubleBag();
+        bag.addArgument(double1);
+        bag.addArgument(double2);
+        bag.addArgument(double3);
+        bag.addArgument(double4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        DoubleBagSize size = new DoubleBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     *  urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag-size
      */
     @Test
     public void test_HexbinaryBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument hexdata1 = new DataValue(DataType.XACMLHEXBINARY, "0123456789abcdef");
+        final FunctionArgument hexdata2 = new DataValue(DataType.XACMLHEXBINARY, "FF");
+        final FunctionArgument hexdata3 = new DataValue(DataType.XACMLHEXBINARY, "0123456789ABCDEF");
+        final FunctionArgument hexdata4 = new DataValue(DataType.XACMLHEXBINARY, "06F2");
+        final FunctionArgument hexdata5 = new DataValue(DataType.XACMLHEXBINARY, "CED");
+
+        // Establish a Bag with Several Elements.
+        HexbinaryBag bag = new HexbinaryBag();
+        bag.addArgument(hexdata1);
+        bag.addArgument(hexdata2);
+        bag.addArgument(hexdata3);
+        bag.addArgument(hexdata4);
+        bag.addArgument(hexdata5);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        HexbinaryBagSize size = new HexbinaryBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 5);
+
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:integer-bag-size
      */
     @Test
     public void test_IntegerBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, 22, true);
+        final FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, 456789, true);
+        final FunctionArgument integer3 = new DataValue(DataType.XACMLINTEGER, 22, true);
+        final FunctionArgument integer4 = new DataValue(DataType.XACMLINTEGER, 0, true);
+
+        // Establish a Bag with Several Elements.
+        IntegerBag bag = new IntegerBag();
+        bag.addArgument(integer1);
+        bag.addArgument(integer2);
+        bag.addArgument(integer3);
+        bag.addArgument(integer4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        IntegerBagSize size = new IntegerBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag-size
      */
     @Test
     public void test_Rfc822NameBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe@example.org");
+        final FunctionArgument rfc822Name2 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe.smith@example.org");
+        final FunctionArgument rfc822Name3 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe.smith@example.org");
+        final FunctionArgument rfc822Name4 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe.smith@ExAmPlE.oRg");
+
+        // Establish a Bag with Several Elements.
+        Rfc822NameBag bag = new Rfc822NameBag();
+        bag.addArgument(rfc822Name1);
+        bag.addArgument(rfc822Name2);
+        bag.addArgument(rfc822Name3);
+        bag.addArgument(rfc822Name4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        Rfc822NameBagSize size = new Rfc822NameBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     *  urn:oasis:names:tc:xacml:1.0:function:string-bag-size
      */
     @Test
     public void test_StringBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+
+        // Establish a Bag with Several Elements.
+        StringBag stringBag = new StringBag();
+        stringBag.addArgument(HELLO_WORLD);
+        stringBag.addArgument(HELLO_WORLD_FORGEROCK);
+        DataBag dataBag = (DataBag) stringBag.evaluate(null);
+        assertNotNull(dataBag);
+
+        StringBagSize size = new StringBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 2);
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:time-bag-size
      */
     @Test
     public void test_TimeBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Date time1 = XACML3PrivilegeUtils.stringToTime("01:45:30.126");
+        final FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, time1, true);
+
+        final Date time2 = XACML3PrivilegeUtils.stringToTime("02:45:30.126");
+        final FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, time2, true);
+
+        final Date time3 = XACML3PrivilegeUtils.stringToTime("01:45:30.126");
+        final FunctionArgument timeObject3 = new DataValue(DataType.XACMLTIME, time3, true);
+
+        final Date time4 = XACML3PrivilegeUtils.stringToTime("01:45:30.127");
+        final FunctionArgument timeObject4 = new DataValue(DataType.XACMLTIME, time4, true);
+
+        // Establish a Bag with Several Elements.
+        TimeBag bag = new TimeBag();
+        bag.addArgument(timeObject1);
+        bag.addArgument(timeObject2);
+        bag.addArgument(timeObject3);
+        bag.addArgument(timeObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        TimeBagSize size = new TimeBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:1.0:function:x500Name-bag-size
      */
     @Test
     public void test_X500NameBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument x500Name1 = new DataValue(DataType.XACMLX500NAME,
+                "/c=us/o=ForgeRock/ou=Components/cn=OpenAM");
+        final FunctionArgument x500Name2 = new DataValue(DataType.XACMLX500NAME,
+                "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
+        final FunctionArgument x500Name3 = new DataValue(DataType.XACMLX500NAME,
+                "/cn=Bob Smith");
+        final FunctionArgument x500Name4 = new DataValue(DataType.XACMLX500NAME,
+                "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
+
+        // Establish a Bag with Several Elements.
+        X500NameBag bag = new X500NameBag();
+        bag.addArgument(x500Name1);
+        bag.addArgument(x500Name2);
+        bag.addArgument(x500Name3);
+        bag.addArgument(x500Name4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        X500NameBagSize size = new X500NameBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-bag-size
+     * urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-bag-size
      */
     @Test
     public void test_YearmonthdurationBagSize() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
+        final XACML3YearMonthDuration duration1 = new XACML3YearMonthDuration("0020-03");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration1, true);
 
-    /**
-     * Is In Methods
-     *  urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     This function SHALL take an argument of ‘type’ as the first argument and a bag of ‘type’ values as the second argument
-     and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-     The function SHALL evaluate to "True" if and only if the first argument matches by the
-     "urn:oasis:names:tc:xacml:x.x:function:type-equal" any value in the bag.  Otherwise, it SHALL return “False”.
+        final XACML3YearMonthDuration duration2 = new XACML3YearMonthDuration("0016-03");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration2, true);
 
-     urn:oasis:names:tc:xacml:1.0:function:string-is-in
-     urn:oasis:names:tc:xacml:1.0:function:boolean-is-in
-     urn:oasis:names:tc:xacml:1.0:function:integer-is-in
-     urn:oasis:names:tc:xacml:1.0:function:double-is-in
-     urn:oasis:names:tc:xacml:1.0:function:time-is-in
-     urn:oasis:names:tc:xacml:1.0:function:date-is-in
-     urn:oasis:names:tc:xacml:1.0:function:dateTime-is-in
-     urn:oasis:names:tc:xacml:1.0:function:anyURI-is-in
-     urn:oasis:names:tc:xacml:1.0:function:hexBinary-is-in
-     urn:oasis:names:tc:xacml:1.0:function:base64Binary-is-in
-     urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-is-in
-     urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-is-in
-     urn:oasis:names:tc:xacml:1.0:function:x500Name-is-in
-     urn:oasis:names:tc:xacml:1.0:function:rfc822Name-is-in
+        final XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration("0013-03");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
 
+        final XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration("0020-03");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
-     */
+        // Establish a Bag with Several Elements.
+        YearmonthdurationBag bag = new YearmonthdurationBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_AnyuriIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
+        YearmonthdurationBagSize size = new YearmonthdurationBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
 
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_Base64BinaryIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_BooleanIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_DateIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_DatetimeIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_DaytimedurationIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_DoubleIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_HexbinaryIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_IntegerIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_Rfc822NameIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_StringIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_TimeIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_X500NameIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
-     */
-    @Test
-    public void test_YearmonthdurationIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
     }
 
 }
