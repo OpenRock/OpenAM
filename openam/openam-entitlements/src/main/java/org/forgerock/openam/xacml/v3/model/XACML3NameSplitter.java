@@ -52,7 +52,7 @@ public class XACML3NameSplitter implements ISearchIndex {
      * @param resName Resource name.
      * @return the different components on a resource.
      */
-    public ResourceSearchIndexes getIndexes(String resName) {
+    public ResourceSearchIndexes getIndexes(String resName, String realm)  {
             Set<String> hostIndexes = new HashSet<String>();
 
             Set<String> pathIndexes = new HashSet<String>();

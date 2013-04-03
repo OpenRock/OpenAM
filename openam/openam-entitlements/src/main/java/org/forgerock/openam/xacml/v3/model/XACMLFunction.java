@@ -491,16 +491,22 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-subset","org.forgerock.openam.xacml.v3.Functions.Rfc822nameSubset");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-set-equals","org.forgerock.openam.xacml.v3.Functions.Rfc822nameSetEquals");
 
-        // TODO: Fix Unimplemented.
 
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-is-in","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag","org.forgerock.openam.xacml.v3.Functions.IPAddressBag");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only",
+                "org.forgerock.openam.xacml.v3.Functions.IPAddressOneAndOnly");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size",
+                "org.forgerock.openam.xacml.v3.Functions.IPAddressBagSize");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-is-in",
+                "org.forgerock.openam.xacml.v3.Functions.IPAddressIsIn");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag",
+                "org.forgerock.openam.xacml.v3.Functions.IPAddressBag");
 
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-one-and-only","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-is-in","org.forgerock.openam.xacml.v3.Functions.Unimplemented");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-one-and-only",
+                "org.forgerock.openam.xacml.v3.Functions.DNSNameOneAndOnly");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size",
+                "org.forgerock.openam.xacml.v3.Functions.DNSNameBagSize");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-is-in",
+                "org.forgerock.openam.xacml.v3.Functions.DNSNameIsIn");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-bag","org.forgerock.openam.xacml.v3.Functions.DNSNameBag");
 
         /**

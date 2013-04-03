@@ -93,7 +93,6 @@ public class TestXacmlBagFunctionsGroup4 {
      urn:oasis:names:tc:xacml:1.0:function:x500Name-is-in
      urn:oasis:names:tc:xacml:1.0:function:rfc822Name-is-in
 
-
      */
 
     /**
@@ -106,6 +105,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument anyuri3 = new DataValue(DataType.XACMLANYURI, "/");
         final FunctionArgument anyuri4 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
 
+        // Establish a Bag with Several Elements.
+        AnyuriBag bag = new AnyuriBag();
+        bag.addArgument(anyuri1);
+        bag.addArgument(anyuri2);
+        bag.addArgument(anyuri3);
+        bag.addArgument(anyuri4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        AnyuriIsIn isIn = new AnyuriIsIn();
+        isIn.addArgument(anyuri2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -128,6 +141,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument base64data4 = new DataValue(DataType.XACMLBASE64BINARY,
                 "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
 
+        // Establish a Bag with Several Elements.
+        Base64BinaryBag bag = new Base64BinaryBag();
+        bag.addArgument(base64data1);
+        bag.addArgument(base64data2);
+        bag.addArgument(base64data3);
+        bag.addArgument(base64data4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        Base64BinaryIsIn isIn = new Base64BinaryIsIn();
+        isIn.addArgument(base64data4);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -136,7 +163,20 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_BooleanIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // Establish a Bag with Several Elements.
+        BooleanBag bag = new BooleanBag();
+        bag.addArgument(trueObject);
+        bag.addArgument(trueObject);
+        bag.addArgument(falseObject);
+        bag.addArgument(trueObject);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        BooleanIsIn isIn = new BooleanIsIn();
+        isIn.addArgument(falseObject);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -156,6 +196,21 @@ public class TestXacmlBagFunctionsGroup4 {
         final Date date4 = XACML3PrivilegeUtils.stringToDate("2014-03-11");
         final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATE, date4, true);
 
+        // Establish a Bag with Several Elements.
+        DateBag bag = new DateBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+
+        DateIsIn isIn = new DateIsIn();
+        isIn.addArgument(dateObject2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -176,7 +231,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final Date date4 = XACML3PrivilegeUtils.stringToDateTime("2014-03-11:01:45:30.126");
         final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
 
+        // Establish a Bag with Several Elements.
+        DatetimeBag bag = new DatetimeBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
+        DatetimeIsIn isIn = new DatetimeIsIn();
+        isIn.addArgument(dateObject2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -197,7 +265,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final Long duration4 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("001:01:45:30.126");
         final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration4, true);
 
+        // Establish a Bag with Several Elements.
+        DaytimedurationBag bag = new DaytimedurationBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
+        DaytimedurationIsIn isIn = new DaytimedurationIsIn();
+        isIn.addArgument(dateObject2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -211,7 +292,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D, true);
         final FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D, true);
 
+        // Establish a Bag with Several Elements.
+        DoubleBag bag = new DoubleBag();
+        bag.addArgument(double1);
+        bag.addArgument(double2);
+        bag.addArgument(double3);
+        bag.addArgument(double4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
+        DoubleIsIn isIn = new DoubleIsIn();
+        isIn.addArgument(double4);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -226,7 +320,21 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument hexdata4 = new DataValue(DataType.XACMLHEXBINARY, "06F2");
         final FunctionArgument hexdata5 = new DataValue(DataType.XACMLHEXBINARY, "CED");
 
+        // Establish a Bag with Several Elements.
+        HexbinaryBag bag = new HexbinaryBag();
+        bag.addArgument(hexdata1);
+        bag.addArgument(hexdata2);
+        bag.addArgument(hexdata3);
+        bag.addArgument(hexdata4);
+        bag.addArgument(hexdata5);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
+        HexbinaryIsIn isIn = new HexbinaryIsIn();
+        isIn.addArgument(hexdata1);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -240,6 +348,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument integer3 = new DataValue(DataType.XACMLINTEGER, 22, true);
         final FunctionArgument integer4 = new DataValue(DataType.XACMLINTEGER, 0, true);
 
+        // Establish a Bag with Several Elements.
+        IntegerBag bag = new IntegerBag();
+        bag.addArgument(integer1);
+        bag.addArgument(integer2);
+        bag.addArgument(integer3);
+        bag.addArgument(integer4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        IntegerIsIn isIn = new IntegerIsIn();
+        isIn.addArgument(integer2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
 
     }
@@ -258,8 +380,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument rfc822Name4 = new DataValue(DataType.XACMLRFC822NAME,
                 "joe.smith@ExAmPlE.oRg");
 
+        // Establish a Bag with Several Elements.
+        Rfc822NameBag bag = new Rfc822NameBag();
+        bag.addArgument(rfc822Name1);
+        bag.addArgument(rfc822Name2);
+        bag.addArgument(rfc822Name3);
+        bag.addArgument(rfc822Name4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
-
+        Rfc822NameIsIn isIn = new Rfc822NameIsIn();
+        isIn.addArgument(rfc822Name3);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -317,8 +451,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final Date time4 = XACML3PrivilegeUtils.stringToTime("01:45:30.127");
         final FunctionArgument timeObject4 = new DataValue(DataType.XACMLTIME, time4, true);
 
+        // Establish a Bag with Several Elements.
+        TimeBag bag = new TimeBag();
+        bag.addArgument(timeObject1);
+        bag.addArgument(timeObject2);
+        bag.addArgument(timeObject3);
+        bag.addArgument(timeObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
-
+        TimeIsIn isIn = new TimeIsIn();
+        isIn.addArgument(timeObject4);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -336,8 +482,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final FunctionArgument x500Name4 = new DataValue(DataType.XACMLX500NAME,
                 "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
 
+        // Establish a Bag with Several Elements.
+        X500NameBag bag = new X500NameBag();
+        bag.addArgument(x500Name1);
+        bag.addArgument(x500Name2);
+        bag.addArgument(x500Name3);
+        bag.addArgument(x500Name4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
-
+        X500NameIsIn isIn = new X500NameIsIn();
+        isIn.addArgument(x500Name2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -358,8 +516,20 @@ public class TestXacmlBagFunctionsGroup4 {
         final XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration("0020-03");
         final FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
 
+        // Establish a Bag with Several Elements.
+        YearmonthdurationBag bag = new YearmonthdurationBag();
+        bag.addArgument(dateObject1);
+        bag.addArgument(dateObject2);
+        bag.addArgument(dateObject3);
+        bag.addArgument(dateObject4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
 
-
+        X500NameIsIn isIn = new X500NameIsIn();
+        isIn.addArgument(dateObject2);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -386,11 +556,11 @@ public class TestXacmlBagFunctionsGroup4 {
         DataBag dataBag = (DataBag) bag.evaluate(null);
         assertNotNull(dataBag);
 
-        DNSNameBagSize size = new DNSNameBagSize();
-        size.addArgument(dataBag);
-        DataValue dv = (DataValue) size.evaluate(null);
-        assertNotNull(dv);
-        assertEquals(dv.asInteger(null).intValue(), 4);
+        IPAddressIsIn isIn = new IPAddressIsIn();
+        isIn.addArgument(dnsName4);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 
@@ -417,11 +587,11 @@ public class TestXacmlBagFunctionsGroup4 {
         DataBag dataBag = (DataBag) bag.evaluate(null);
         assertNotNull(dataBag);
 
-        IPAddressBagSize size = new IPAddressBagSize();
-        size.addArgument(dataBag);
-        DataValue dv = (DataValue) size.evaluate(null);
-        assertNotNull(dv);
-        assertEquals(dv.asInteger(null).intValue(), 4);
+        IPAddressIsIn isIn = new IPAddressIsIn();
+        isIn.addArgument(ipaddr4);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
 
     }
 

@@ -25,7 +25,6 @@
  */
 package org.forgerock.openam.xacml.v3.model;
 
-import javax.ws.rs.core.MediaType;
 
 /**
  * Various Content Types which are dealt with using XACML 3 via HTTP/REST.
@@ -37,8 +36,8 @@ import javax.ws.rs.core.MediaType;
 public enum ContentType {
 
     JSON_HOME("application/json-home", CommonType.JSON),
-    JSON(MediaType.APPLICATION_JSON, CommonType.JSON),
-    XML(MediaType.APPLICATION_XML, CommonType.XML),
+    JSON("application/json", CommonType.JSON),
+    XML( "application/xml" , CommonType.XML),
     XACML_PLUS_JSON("application/xacml+json", CommonType.JSON),
     XACML_PLUS_XML("application/xacml+xml", CommonType.XML),
     NONE(null, null);
