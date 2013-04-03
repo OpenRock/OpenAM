@@ -35,9 +35,12 @@ package org.forgerock.openam.xacml.v3.Functions;
 
 import org.forgerock.openam.xacml.v3.model.*;
 
-public class TimeIsIn extends XACMLFunction {
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:ipaddress-is-in
+ */
+public class IPAddressIsIn extends XACMLFunction {
 
-    public TimeIsIn()  {
+    public IPAddressIsIn()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument returnValue = FunctionArgument.falseObject;
@@ -49,8 +52,8 @@ public class TimeIsIn extends XACMLFunction {
         DataBag bag = null;
         DataValue bagElement = null;
         try {
-            bagElement = (DataValue) getArg(0).evaluate(pip);
-            bag = (DataBag) getArg(1).evaluate(pip);
+             bagElement = (DataValue) getArg(0).evaluate(pip);
+             bag = (DataBag) getArg(1).evaluate(pip);
         } catch (Exception e) {
             throw new IndeterminateException("Accessing Arguments Exception: "+e.getMessage());
         }

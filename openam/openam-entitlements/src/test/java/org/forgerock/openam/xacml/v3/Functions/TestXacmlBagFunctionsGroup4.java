@@ -95,7 +95,7 @@ public class TestXacmlBagFunctionsGroup4 {
      */
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:1.0:function:anyURI-is-in
      */
     @Test
     public void test_AnyuriIsIn() throws XACML3EntitlementException {
@@ -103,7 +103,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:1.0:function:base64Binary-is-in
      */
     @Test
     public void test_Base64BinaryIsIn() throws XACML3EntitlementException {
@@ -111,7 +111,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:1.0:function:boolean-is-in
      */
     @Test
     public void test_BooleanIsIn() throws XACML3EntitlementException {
@@ -119,7 +119,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:1.0:function:date-is-in
      */
     @Test
     public void test_DateIsIn() throws XACML3EntitlementException {
@@ -127,7 +127,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:1.0:function:dateTime-is-in
      */
     @Test
     public void test_DatetimeIsIn() throws XACML3EntitlementException {
@@ -135,7 +135,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:3.0:function:dayTimeDuration-is-in
      */
     @Test
     public void test_DaytimedurationIsIn() throws XACML3EntitlementException {
@@ -143,7 +143,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:1.0:function:double-is-in
      */
     @Test
     public void test_DoubleIsIn() throws XACML3EntitlementException {
@@ -151,7 +151,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:1.0:function:hexBinary-is-in
      */
     @Test
     public void test_HexbinaryIsIn() throws XACML3EntitlementException {
@@ -159,7 +159,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:1.0:function:integer-is-in
      */
     @Test
     public void test_IntegerIsIn() throws XACML3EntitlementException {
@@ -167,7 +167,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:1.0:function:rfc822Name-is-in
      */
     @Test
     public void test_Rfc822NameIsIn() throws XACML3EntitlementException {
@@ -175,15 +175,44 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:1.0:function:string-is-in
      */
     @Test
     public void test_StringIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue HELLO_WORLD_DIFFERENT = new DataValue(DataType.XACMLSTRING, "HELLO WORLD");
+
+        // Establish a Bag with Several Elements.
+        StringBag stringBag = new StringBag();
+        stringBag.addArgument(HELLO_WORLD);
+        stringBag.addArgument(HELLO_WORLD_FORGEROCK);
+        DataBag dataBag = (DataBag) stringBag.evaluate(null);
+        assertNotNull(dataBag);
+
+        StringIsIn isIn = new StringIsIn();
+        isIn.addArgument(HELLO_WORLD);
+        isIn.addArgument(dataBag);
+        FunctionArgument result = isIn.evaluate(null);
+        assertTrue(result.isTrue());
+
+        // Establish a new Bag with Several Elements.
+        stringBag = new StringBag();
+        stringBag.addArgument(HELLO_WORLD);
+        stringBag.addArgument(HELLO_WORLD_FORGEROCK);
+        dataBag = (DataBag) stringBag.evaluate(null);
+        assertNotNull(dataBag);
+
+        isIn = new StringIsIn();
+        isIn.addArgument(HELLO_WORLD_DIFFERENT);
+        isIn.addArgument(dataBag);
+        result = isIn.evaluate(null);
+        assertTrue(result.isFalse());
+
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:1.0:function:time-is-in
      */
     @Test
     public void test_TimeIsIn() throws XACML3EntitlementException {
@@ -191,7 +220,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     * urn:oasis:names:tc:xacml:1.0:function:x500Name-is-in
      */
     @Test
     public void test_X500NameIsIn() throws XACML3EntitlementException {
@@ -199,7 +228,7 @@ public class TestXacmlBagFunctionsGroup4 {
     }
 
     /**
-     * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+     *  urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-is-in
      */
     @Test
     public void test_YearmonthdurationIsIn() throws XACML3EntitlementException {

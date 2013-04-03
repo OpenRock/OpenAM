@@ -25,27 +25,52 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-is-in
+ This function SHALL take an argument of ‘type’ as the first argument and a bag of ‘type’ values as the second argument
+ and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+ The function SHALL evaluate to "True" if and only if the first argument matches by the
+ "urn:oasis:names:tc:xacml:x.x:function:type-equal" any value in the bag.  Otherwise, it SHALL return “False”.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
 public class AnyuriIsIn extends XACMLFunction {
 
     public AnyuriIsIn()  {
     }
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        FunctionArgument returnValue = FunctionArgument.falseObject;
+        if ( getArgCount() != 2) {
+            throw new IndeterminateException("Function Requires 2 arguments, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        // Verify the Arguments
+        DataBag bag = null;
+        DataValue bagElement = null;
+        try {
+            bagElement = (DataValue) getArg(0).evaluate(pip);
+            bag = (DataBag) getArg(1).evaluate(pip);
+        } catch (Exception e) {
+            throw new IndeterminateException("Accessing Arguments Exception: "+e.getMessage());
+        }
+        if ( (bag == null) || (bagElement == null) ) {
+            throw new IndeterminateException("No Element or Bag Arguments");
+        }
+        if (bag.getType().getIndex() != bagElement.getType().getIndex()) {
+            throw new IndeterminateException("Bag Type: "+bag.getType().getTypeName()+", trying to compare against "+
+                    bagElement.getType().getTypeName());
+        }
+        // Now Iterate over Bag contents to find bagElement hit.
+        for(int i=0; i<bag.size(); i++) {
+            DataValue dataValue = bag.get(i);
+            // This in theory accomplishes and uses the <type>Equal FunctionArgument.
+            if (dataValue.equals(bagElement)) {
+                returnValue = FunctionArgument.trueObject;
+                break;
+            }
+        } // End of Bag Iteration Loop.
+        // Return our Evaluated Return Value.
+        return returnValue;
     }
 }
