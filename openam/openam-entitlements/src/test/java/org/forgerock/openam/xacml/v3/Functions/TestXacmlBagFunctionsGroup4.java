@@ -30,6 +30,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.Date;
+
 import static org.testng.Assert.*;
 
 /**
@@ -99,7 +101,12 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_AnyuriIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument anyuri1 = new DataValue(DataType.XACMLANYURI, "/openam/xacml");
+        final FunctionArgument anyuri2 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
+        final FunctionArgument anyuri3 = new DataValue(DataType.XACMLANYURI, "/");
+        final FunctionArgument anyuri4 = new DataValue(DataType.XACMLANYURI, "/a/b/c/e/f");
+
+
     }
 
     /**
@@ -107,7 +114,21 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_Base64BinaryIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // base64data1 and base64data2 contained the Base 64 encoding of:
+        // ForgeRock - OpenAM XACML says Hello!
+        final FunctionArgument base64data1 = new DataValue(DataType.XACMLBASE64BINARY,
+                "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
+        // This is a very small Test!
+        final FunctionArgument base64data2 = new DataValue(DataType.XACMLBASE64BINARY,
+                "VGhpcyBpcyBhIHZlcnkgc21hbGwgVGVzdCE=");
+        // This is a very small Test as well!
+        final FunctionArgument base64data3 = new DataValue(DataType.XACMLBASE64BINARY,
+                "VGhpcyBpcyBhIHZlcnkgc21hbGwgVGVzdCBhcyB3ZWxsIQ==");
+        // ForgeRock - OpenAM XACML says Hello!
+        final FunctionArgument base64data4 = new DataValue(DataType.XACMLBASE64BINARY,
+                "Rm9yZ2VSb2NrIC0gT3BlbkFNIFhBQ01MIHNheXMgSGVsbG8h");
+
+
     }
 
     /**
@@ -123,7 +144,19 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_DateIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Date date1 = XACML3PrivilegeUtils.stringToDate("2013-03-11");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATE, date1, true);
+
+        final Date date2 = XACML3PrivilegeUtils.stringToDate("2013-03-12");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATE, date2, true);
+
+        final Date date3 = XACML3PrivilegeUtils.stringToDate("2013-03-11");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATE, date3, true);
+
+        final Date date4 = XACML3PrivilegeUtils.stringToDate("2014-03-11");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATE, date4, true);
+
+
     }
 
     /**
@@ -131,7 +164,20 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_DatetimeIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Date date1 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDATETIME, date1, true);
+
+        final Date date2 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.124");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDATETIME, date2, true);
+
+        final Date date3 = XACML3PrivilegeUtils.stringToDateTime("2013-03-11:01:45:30.126");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDATETIME, date3, true);
+
+        final Date date4 = XACML3PrivilegeUtils.stringToDateTime("2014-03-11:01:45:30.126");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDATETIME, date4, true);
+
+
+
     }
 
     /**
@@ -139,7 +185,20 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_DaytimedurationIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Long duration1 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration1, true);
+
+        final Long duration2 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("012:01:45:30.124");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration2, true);
+
+        final Long duration3 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("011:01:45:30.126");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration3, true);
+
+        final Long duration4 = XACML3PrivilegeUtils.stringDayTimeDurationToLongDuration("001:01:45:30.126");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLDAYTIMEDURATION, duration4, true);
+
+
+
     }
 
     /**
@@ -147,7 +206,13 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_DoubleIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument double1 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D, true);
+        final FunctionArgument double2 = new DataValue(DataType.XACMLDOUBLE, 456789D, true);
+        final FunctionArgument double3 = new DataValue(DataType.XACMLDOUBLE, 2111111111111111111290876D, true);
+        final FunctionArgument double4 = new DataValue(DataType.XACMLDOUBLE, 2D, true);
+
+
+
     }
 
     /**
@@ -155,7 +220,14 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_HexbinaryIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument hexdata1 = new DataValue(DataType.XACMLHEXBINARY, "0123456789abcdef");
+        final FunctionArgument hexdata2 = new DataValue(DataType.XACMLHEXBINARY, "FF");
+        final FunctionArgument hexdata3 = new DataValue(DataType.XACMLHEXBINARY, "0123456789ABCDEF");
+        final FunctionArgument hexdata4 = new DataValue(DataType.XACMLHEXBINARY, "06F2");
+        final FunctionArgument hexdata5 = new DataValue(DataType.XACMLHEXBINARY, "CED");
+
+
+
     }
 
     /**
@@ -163,7 +235,13 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_IntegerIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument integer1 = new DataValue(DataType.XACMLINTEGER, 22, true);
+        final FunctionArgument integer2 = new DataValue(DataType.XACMLINTEGER, 456789, true);
+        final FunctionArgument integer3 = new DataValue(DataType.XACMLINTEGER, 22, true);
+        final FunctionArgument integer4 = new DataValue(DataType.XACMLINTEGER, 0, true);
+
+
+
     }
 
     /**
@@ -171,7 +249,18 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_Rfc822NameIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument rfc822Name1 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe@example.org");
+        final FunctionArgument rfc822Name2 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe.smith@example.org");
+        final FunctionArgument rfc822Name3 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe.smith@example.org");
+        final FunctionArgument rfc822Name4 = new DataValue(DataType.XACMLRFC822NAME,
+                "joe.smith@ExAmPlE.oRg");
+
+
+
+
     }
 
     /**
@@ -216,7 +305,21 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_TimeIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final Date time1 = XACML3PrivilegeUtils.stringToTime("01:45:30.126");
+        final FunctionArgument timeObject1 = new DataValue(DataType.XACMLTIME, time1, true);
+
+        final Date time2 = XACML3PrivilegeUtils.stringToTime("02:45:30.126");
+        final FunctionArgument timeObject2 = new DataValue(DataType.XACMLTIME, time2, true);
+
+        final Date time3 = XACML3PrivilegeUtils.stringToTime("01:45:30.126");
+        final FunctionArgument timeObject3 = new DataValue(DataType.XACMLTIME, time3, true);
+
+        final Date time4 = XACML3PrivilegeUtils.stringToTime("01:45:30.127");
+        final FunctionArgument timeObject4 = new DataValue(DataType.XACMLTIME, time4, true);
+
+
+
+
     }
 
     /**
@@ -224,7 +327,18 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_X500NameIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final FunctionArgument x500Name1 = new DataValue(DataType.XACMLX500NAME,
+                "/c=us/o=ForgeRock/ou=Components/cn=OpenAM");
+        final FunctionArgument x500Name2 = new DataValue(DataType.XACMLX500NAME,
+                "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
+        final FunctionArgument x500Name3 = new DataValue(DataType.XACMLX500NAME,
+                "/cn=Bob Smith");
+        final FunctionArgument x500Name4 = new DataValue(DataType.XACMLX500NAME,
+                "/c=us/o=ForgeRock/ou=People/cn=Bob Smith");
+
+
+
+
     }
 
     /**
@@ -232,7 +346,83 @@ public class TestXacmlBagFunctionsGroup4 {
      */
     @Test
     public void test_YearmonthdurationIsIn() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        final XACML3YearMonthDuration duration1 = new XACML3YearMonthDuration("0020-03");
+        final FunctionArgument dateObject1 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration1, true);
+
+        final XACML3YearMonthDuration duration2 = new XACML3YearMonthDuration("0016-03");
+        final FunctionArgument dateObject2 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration2, true);
+
+        final XACML3YearMonthDuration duration3 = new XACML3YearMonthDuration("0013-03");
+        final FunctionArgument dateObject3 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration3, true);
+
+        final XACML3YearMonthDuration duration4 = new XACML3YearMonthDuration("0020-03");
+        final FunctionArgument dateObject4 = new DataValue(DataType.XACMLYEARMONTHDURATION, duration4, true);
+
+
+
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:2.0:function:dnsName-bag-size
+     */
+    @Test
+    public void test_DNSNameIsIn() throws XACML3EntitlementException {
+        final FunctionArgument dnsName1 = new DataValue(DataType.XACMLDNSNAME,
+                "www.example.org");
+        final FunctionArgument dnsName2 = new DataValue(DataType.XACMLDNSNAME,
+                "example.com");
+        final FunctionArgument dnsName3 = new DataValue(DataType.XACMLDNSNAME,
+                "www.example.com");
+        final FunctionArgument dnsName4 = new DataValue(DataType.XACMLDNSNAME,
+                "openam.example.org");
+
+        // Establish a Bag with Several Elements.
+        DNSNameBag bag = new DNSNameBag();
+        bag.addArgument(dnsName1);
+        bag.addArgument(dnsName2);
+        bag.addArgument(dnsName3);
+        bag.addArgument(dnsName4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        DNSNameBagSize size = new DNSNameBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
+    }
+
+    /**
+     * urn:oasis:names:tc:xacml:2.0:function:ipAddress-bag-size
+     */
+    @Test
+    public void test_IPAddressIsIn() throws XACML3EntitlementException {
+        final FunctionArgument ipaddr1 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.0.1");
+        final FunctionArgument ipaddr2 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.200.1");
+        final FunctionArgument ipaddr3 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.12.1");
+        final FunctionArgument ipaddr4 = new DataValue(DataType.XACMLIPADDRESS,
+                "10.0.195.1");
+
+        // Establish a Bag with Several Elements.
+        IPAddressBag bag = new IPAddressBag();
+        bag.addArgument(ipaddr1);
+        bag.addArgument(ipaddr2);
+        bag.addArgument(ipaddr3);
+        bag.addArgument(ipaddr4);
+        DataBag dataBag = (DataBag) bag.evaluate(null);
+        assertNotNull(dataBag);
+
+        IPAddressBagSize size = new IPAddressBagSize();
+        size.addArgument(dataBag);
+        DataValue dv = (DataValue) size.evaluate(null);
+        assertNotNull(dv);
+        assertEquals(dv.asInteger(null).intValue(), 4);
+
     }
 
 }
