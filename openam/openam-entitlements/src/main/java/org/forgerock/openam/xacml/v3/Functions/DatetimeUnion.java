@@ -25,27 +25,61 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-union
+ This function SHALL take two or more arguments that are both a bag of ‘type’ values.
+ The expression SHALL return a bag of ‘type’ such that it contains all elements of all the argument bags.
+ No duplicates, as determined by "urn:oasis:names:tc:xacml:x.x:function:type-equal", SHALL exist in the result.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
 public class DatetimeUnion extends XACMLFunction {
 
     public DatetimeUnion()  {
     }
+
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+        int args = getArgCount();
+        if ( args < 2) {
+            throw new IndeterminateException("Function Requires at least 2 arguments, " +
+                    "however " + getArgCount() + " in stack.");
+        }
+        // Create our union DataBag from other Bags.
+        DataBag unionBag = new DataBag();
+        // Iterate Over All DataBag's in Stack, Evaluate and create a Union of all Bags with Unique Objects.
+        try {
+            for (int i=0; i<args; i++) {
+                DataBag bag  = (DataBag) getArg(i).evaluate(pip);
+                if (bag == null) {
+                    continue;
+                }
+                // Set our Union Data Bag with First Bag's Data Type and check subsequent Bags.
+                if (i==0) {
+                    unionBag.setType(bag.getType());
+                } else {
+                    // Verify our Data Type with First Data Bag's Data Type.
+                    if (bag.getType().getIndex() != unionBag.getType().getIndex()) {
+                        throw new IndeterminateException("First Bag Type: "+unionBag.getType().getTypeName()+
+                                ", however a subsequent Bag Type was "+bag.getType()
+                                .getTypeName());
+                    }
+                }
+                // Iterate over the current Bag.
+                for (int b=0; b<bag.size(); b++) {
+                    DataValue dataValue = (DataValue) bag.get(b).evaluate(pip);
+                    // Although specification requires the use of Equal Function and iterate over Bag, the
+                    // contains method provides the same result.
+                    if (unionBag.contains(dataValue)) {
+                        continue;
+                    }
+                    unionBag.add(dataValue);
+                } // End of Inner For Loop.
+            } // End of Outer For Loop.
+        } catch (Exception e) {
+            throw new IndeterminateException("Iterating over Arguments Exception: "+e.getMessage());
+        }
+        // Return our UnionBag Value.
+        return unionBag;
     }
 }
