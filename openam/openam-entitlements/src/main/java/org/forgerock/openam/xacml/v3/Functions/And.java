@@ -47,14 +47,12 @@ public class And extends XACMLFunction {
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
         FunctionArgument retVal =  FunctionArgument.trueObject;
-
         if ( getArgCount() == 0) {
             return retVal;
         }
         int args = getArgCount();
-
         for (int i=0;i<args;i++) {
-            Boolean argument = getArg(i).asBoolean(pip);
+            Boolean argument = getArg(i).evaluate(pip).asBoolean(pip);
             if ((argument == null) || !(argument instanceof Boolean)){
                 throw new IndeterminateException("Argument is null!");
             }

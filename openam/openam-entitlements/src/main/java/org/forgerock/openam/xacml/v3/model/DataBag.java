@@ -102,6 +102,15 @@ public class DataBag extends FunctionArgument {
     }
 
     /**
+     * return Indicator if Object is Contained within this DataBag.
+     * @param dataValue
+     * @return
+     */
+    public boolean contains(DataValue dataValue) {
+        return (dataValue == null) ? false : this.data.contains(dataValue);
+    }
+
+    /**
      * Evaluate the Function Argument Set.
      *
      * @param pip
@@ -168,5 +177,20 @@ public class DataBag extends FunctionArgument {
         return retVal;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        DataBag dataBag = (DataBag) o;
+
+        if (data != null ? !data.equals(dataBag.data) : dataBag.data != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return data != null ? data.hashCode() : 0;
+    }
 }

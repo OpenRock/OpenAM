@@ -25,13 +25,14 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * A.3.11 Set functions
@@ -76,7 +77,7 @@ import org.testng.annotations.Test;
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
-public class TestXacmlSetOnBagFunctions {
+public class TestXacmlBagSetFunctions {
 
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
@@ -175,7 +176,54 @@ public class TestXacmlSetOnBagFunctions {
      */
     @Test
     public void test_StringIntersection() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // define DataValues, normally generated during Request Marshaling.
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
+
+        // Create a StringBag Array and stuff it with DataValues.
+        StringBag[] stringBags = new StringBag[2];
+        for (int i = 0; i < stringBags.length; i++) {
+            stringBags[i] = new StringBag();
+            stringBags[i].addArgument(HELLO_WORLD);
+            stringBags[i].addArgument(HELLO_WORLD_FORGEROCK);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+        }
+
+        // Establish Intersection Function
+        StringIntersection intersection = new StringIntersection();
+        // Push Bags Into Function
+        for (int i = 0; i < stringBags.length; i++) {
+            intersection.addArgument(stringBags[i]);
+        }
+        // Trigger Evaluation to Create Intersection
+        FunctionArgument result = intersection.evaluate(null);
+        assertTrue(result instanceof DataBag);
+        // Cast
+        DataBag dataBag = (DataBag) result;
+        assertEquals(dataBag.size(), 8);
     }
 
     /**
@@ -288,7 +336,54 @@ public class TestXacmlSetOnBagFunctions {
      */
     @Test
     public void test_StringAtLeastOneMemberOf() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // define DataValues, normally generated during Request Marshaling.
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
+
+        // Create a StringBag Array and stuff it with DataValues.
+        StringBag[] stringBags = new StringBag[2];
+        for (int i = 0; i < stringBags.length; i++) {
+            stringBags[i] = new StringBag();
+            stringBags[i].addArgument(HELLO_WORLD);
+            stringBags[i].addArgument(HELLO_WORLD_FORGEROCK);
+            if (i == 1) {
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+            }
+        }
+
+        // Establish Function
+        StringAtLeastOneMemberOf atLeastOneMemberOf = new StringAtLeastOneMemberOf();
+        // Push Bags Into Function
+        for (int i = 0; i < stringBags.length; i++) {
+            atLeastOneMemberOf.addArgument(stringBags[i]);
+        }
+        // Trigger Evaluation to Create Union
+        FunctionArgument result = atLeastOneMemberOf.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -400,7 +495,56 @@ public class TestXacmlSetOnBagFunctions {
      */
     @Test
     public void test_StringUnion() throws XACML3EntitlementException {
-        // TODO :: Finish...
+
+        // define DataValues, normally generated during Request Marshaling.
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
+
+        // Create a StringBag Array and stuff it with DataValues.
+        StringBag[] stringBags = new StringBag[6];
+        for (int i = 0; i < stringBags.length; i++) {
+            stringBags[i] = new StringBag();
+            stringBags[i].addArgument(HELLO_WORLD);
+            stringBags[i].addArgument(HELLO_WORLD_FORGEROCK);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+        }
+
+        // Establish Union Function
+        StringUnion union = new StringUnion();
+        // Push Bags Into Function
+        for (int i = 0; i < stringBags.length; i++) {
+            union.addArgument(stringBags[i]);
+        }
+        // Trigger Evaluation to Create Union
+        FunctionArgument result = union.evaluate(null);
+        assertTrue(result instanceof DataBag);
+        // Cast
+        DataBag dataBag = (DataBag) result;
+        assertEquals(dataBag.size(), 8);
+
     }
 
     /**
@@ -512,7 +656,54 @@ public class TestXacmlSetOnBagFunctions {
      */
     @Test
     public void test_StringSubset() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // define DataValues, normally generated during Request Marshaling.
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
+
+        // Create a StringBag Array and stuff it with DataValues.
+        StringBag[] stringBags = new StringBag[2];
+        for (int i = 0; i < stringBags.length; i++) {
+            stringBags[i] = new StringBag();
+            stringBags[i].addArgument(HELLO_WORLD);
+            stringBags[i].addArgument(HELLO_WORLD_FORGEROCK);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            if (i == 1) {
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+            }
+        }
+
+        // Establish Intersection Function
+        StringSubset stringSubset = new StringSubset();
+        // Push Bags Into Function
+        for (int i = 0; i < stringBags.length; i++) {
+            stringSubset.addArgument(stringBags[i]);
+        }
+        // Trigger Evaluation to verify if we have a Subset or not...
+        FunctionArgument result = stringSubset.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
 
     /**
@@ -624,8 +815,109 @@ public class TestXacmlSetOnBagFunctions {
      */
     @Test
     public void test_StringSetEquals() throws XACML3EntitlementException {
-        // TODO :: Finish...
+        // define DataValues, normally generated during Request Marshaling.
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
+
+        // Create a StringBag Array and stuff it with DataValues.
+        StringBag[] stringBags = new StringBag[2];
+        for (int i = 0; i < stringBags.length; i++) {
+            stringBags[i] = new StringBag();
+            stringBags[i].addArgument(HELLO_WORLD);
+            stringBags[i].addArgument(HELLO_WORLD_FORGEROCK);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+            stringBags[i].addArgument(ONE);
+            stringBags[i].addArgument(TWO);
+            stringBags[i].addArgument(THREE);
+            stringBags[i].addArgument(FOUR);
+            stringBags[i].addArgument(FIVE);
+            stringBags[i].addArgument(SIX);
+        }
+
+        // Establish Intersection Function
+        StringSetEquals stringsetEquals = new StringSetEquals();
+        // Push Bags Into Function
+        for (int i = 0; i < stringBags.length; i++) {
+            stringsetEquals.addArgument(stringBags[i]);
+        }
+        // Trigger Evaluation to verify if we have a Subset or not...
+        FunctionArgument result = stringsetEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
     }
+
+    /**
+     * urn:oasis:names:tc:xacml:x.x:function:type-set-equals
+     */
+    @Test
+    public void test_StringSetEquals_FALSE() throws XACML3EntitlementException {
+        // define DataValues, normally generated during Request Marshaling.
+        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
+
+        // Create a StringBag Array and stuff it with DataValues.
+        StringBag[] stringBags = new StringBag[2];
+        for (int i = 0; i < stringBags.length; i++) {
+            stringBags[i] = new StringBag();
+            stringBags[i].addArgument(HELLO_WORLD);
+            stringBags[i].addArgument(HELLO_WORLD_FORGEROCK);
+            if (i==0) {
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+                stringBags[i].addArgument(ONE);
+                stringBags[i].addArgument(TWO);
+                stringBags[i].addArgument(THREE);
+                stringBags[i].addArgument(FOUR);
+                stringBags[i].addArgument(FIVE);
+                stringBags[i].addArgument(SIX);
+            }
+        }
+
+        // Establish Intersection Function
+        StringSetEquals stringsetEquals = new StringSetEquals();
+        // Push Bags Into Function
+        for (int i = 0; i < stringBags.length; i++) {
+            stringsetEquals.addArgument(stringBags[i]);
+        }
+        // Trigger Evaluation to verify if we have a Subset or not...
+        FunctionArgument result = stringsetEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+    }
+
 
     /**
      * urn:oasis:names:tc:xacml:x.x:function:type-set-equals
@@ -650,7 +942,6 @@ public class TestXacmlSetOnBagFunctions {
     public void test_YearmonthdurationSetEquals() throws XACML3EntitlementException {
         // TODO :: Finish...
     }
-
 
 
 }
