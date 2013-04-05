@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<EntityConfig entityID="http://test.idp.com:8080/opensso" hosted="0" xmlns="urn:sun:fm:SAML:2.0:entityconfig">
+<EntityConfig entityID="@HOME_URL@" hosted="0" xmlns="urn:sun:fm:SAML:2.0:entityconfig">
     <IDPSSOConfig metaAlias="/idp">
         <Attribute name="description">
             <Value/>
@@ -88,7 +88,7 @@
         </Attribute>
         <Attribute name="saeAppSecretList"/>
         <Attribute name="saeIDPUrl">
-            <Value>http://test.idp.com:8080/opensso/idpsaehandler/metaAlias/idp</Value>
+            <Value>@HOME_URL@/idpsaehandler/metaAlias/idp</Value>
         </Attribute>
         <Attribute name="AuthUrl">
             <Value/>

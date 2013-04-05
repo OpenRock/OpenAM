@@ -38,6 +38,7 @@ import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -62,6 +63,8 @@ public class FedletAGConfigurationImpl implements ConfigurationInstance {
     private static String fedletHomeDir;
     // property name to point to the fedlet home
     // if not defined, default to "$user_home/fedlet"
+    private static Map<String,String> tagSwap;
+
     private static final String FEDLET_HOME_DIR =
         "com.sun.identity.fedlet.home";
     private String componentName = null;
@@ -72,6 +75,9 @@ public class FedletAGConfigurationImpl implements ConfigurationInstance {
     // Map to store metadata information
     private static Map entityMap = new HashMap();
 
+    public static void setTagSwap(Map<String,String> tags) {
+        tagSwap = tags;
+    }
     /**
      * Initializer.
      * @param componentName Name of the components, e.g. SAML1, SAML2, ID-FF
@@ -163,6 +169,7 @@ public class FedletAGConfigurationImpl implements ConfigurationInstance {
         if (metaXML == null) {
             return;
         }
+        metaXML = StringUtils.tagSwap(metaXML, tagSwap);
         metaXML = workaroundAbstractRoleDescriptor(metaXML);
         String entityId = getEntityID(metaXML);
         if (entityId == null) {

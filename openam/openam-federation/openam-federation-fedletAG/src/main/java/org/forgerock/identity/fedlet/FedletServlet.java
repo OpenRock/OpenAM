@@ -100,14 +100,9 @@ public final class FedletServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
             IOException {
         logger.debug("GET call on {}", req);
-        AssertionGen ag = new AssertionGen();
+        AssertionGen ag = new AssertionGen("home", "cert", "target", req.getParameter("ATTR_UID"),"certAlias");
 
-        String[] attrs = { "ATTR_UID" };
-        String[] vals = { "VALUE" };
-
-        vals[0] = req.getParameter("ATTR_UID");
-
-        String encodedResMsg = SAML2Utils.encodeForPOST(ag.getResponse(attrs, vals));
+        String encodedResMsg = SAML2Utils.encodeForPOST(ag.getResponse());
         MetaDataParser lparser = new MetaDataParser();
         String relayState = null;
         String acsURL = lparser.getSPbaseUrl();

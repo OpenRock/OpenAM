@@ -33,11 +33,10 @@ import com.sun.identity.saml2.assertion.*;
 import com.sun.identity.saml2.protocol.*;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.key.KeyUtil;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,11 +46,34 @@ import java.util.logging.Logger;
  *
  */ 
 public class AssertionGen {
-/**
+    private static SecureRandom random = new SecureRandom();
+    protected static final String SAML2ID_PREFIX = "s2";
+    private static final String USERID_LABEL = "ATTR_UID";
+    protected Map<String,String> tags;
+    protected String userID;
+    protected String certificateAlias;
+
+    /**
  *Generate SAML response and return the xml string
  *
  */
-    public String getResponse(String [] attrName, String [] attrValue){
+    private AssertionGen() {
+
+    }
+    public AssertionGen(String home, String cert, String target, String userID, String certAlias) {
+
+        tags = new HashMap<String,String>();
+        tags.put("@HOME_URL@",home);
+        tags.put("@CERTIFICATE@",cert);
+        tags.put("@TARGET_URL@",target);
+        this.userID = userID;
+        this.certificateAlias = certAlias;
+
+        FedletAGConfigurationImpl.setTagSwap(tags);
+    }
+
+
+    public String getResponse(){
         try {
             Response res = ProtocolFactory.getInstance().createResponse();
             List assertionList = new ArrayList();
@@ -62,10 +84,10 @@ public class AssertionGen {
             String SPEntityID = lparser.getSPEntityID();
 
 
-            Assertion assertion = getAssertion(attrName, attrValue);
+            Assertion assertion = getAssertion(USERID_LABEL, userID);
             assertionList.add(assertion);
             res.setAssertion(assertionList);
-            res.setID(SAML2Utils.generateID());
+            res.setID(generateID());
             res.setVersion(SAML2Constants.VERSION_2_0);
             res.setIssueInstant(new Date());
 
@@ -90,7 +112,7 @@ public class AssertionGen {
  *Generate SAML arrestion and return Assertion object
  *
  */
-    private Assertion getAssertion(String [] attrName, String [] attrValue)
+    private Assertion getAssertion(String attrName, String attrValue)
     {
         Assertion assertion = AssertionFactory.getInstance().createAssertion();
         MetaDataParser lparser = new MetaDataParser();
@@ -99,7 +121,7 @@ public class AssertionGen {
         String SPBaseUrl = lparser.getSPbaseUrl();
 
         try {
-            assertion.setID(SAML2Utils.generateID());
+            assertion.setID(generateID());
             assertion.setVersion(SAML2Constants.VERSION_2_0);
             assertion.setIssueInstant(new Date());
             
@@ -110,13 +132,11 @@ public class AssertionGen {
             assertion.setAuthnStatements(getAuthStatementList());
             assertion.setSubject(getSubject(SPEntityID, SPBaseUrl, IDPEntityID));
             assertion.setConditions(getCondition(SPEntityID));
-            if(attrName.length > 0 && !attrName[0].equals("null"))
             assertion.setAttributeStatements(getAttributeList(attrName, attrValue));
             
             KeyProvider kp = KeyUtil.getKeyProviderInstance();
-            
-                
-            assertion.sign(kp.getPrivateKey("test"),kp.getX509Certificate("test"));
+
+            assertion.sign(kp.getPrivateKey( certificateAlias),kp.getX509Certificate(certificateAlias));
             
             return assertion;
         } catch (SAML2Exception ex) {
@@ -125,19 +145,19 @@ public class AssertionGen {
         
         return assertion;
     }
- /**
- *Add attributes to the SAML assertion
- *
- */
+    /**
+     *Add attributes to the SAML assertion
+     *
+     */
     private List getAttributeList(String [] attrName, String [] attrValue) throws SAML2Exception{
-        
+
         List attrStatementList = new ArrayList();
         AttributeStatement attrStatement = AssertionFactory.getInstance().createAttributeStatement();
         List AttributeList = new ArrayList();
-        
-        
+
+
         for(int i = 0; i < attrName.length; i++){
-            
+
             Attribute attribute = AssertionFactory.getInstance().createAttribute();
             List AttributeValueList = new ArrayList();
 
@@ -147,6 +167,27 @@ public class AssertionGen {
 
             AttributeList.add(attribute);
         }
+        attrStatement.setAttribute(AttributeList);
+        attrStatementList.add(attrStatement);
+        return attrStatementList;
+    } /**
+     *Add attributes to the SAML assertion
+     *
+     */
+    private List getAttributeList(String attrName, String attrValue) throws SAML2Exception{
+
+        List attrStatementList = new ArrayList();
+        AttributeStatement attrStatement = AssertionFactory.getInstance().createAttributeStatement();
+        List AttributeList = new ArrayList();
+
+        Attribute attribute = AssertionFactory.getInstance().createAttribute();
+        List AttributeValueList = new ArrayList();
+
+        attribute.setName(attrName);
+        AttributeValueList.add(attrValue);
+        attribute.setAttributeValueString(AttributeValueList);
+
+        AttributeList.add(attribute);
         attrStatement.setAttribute(AttributeList);
         attrStatementList.add(attrStatement);
         return attrStatementList;
@@ -240,5 +281,35 @@ public class AssertionGen {
         
         return conditions;
     }
-    
+    /**
+     * Converts byte array to <code>Hex</code> String.
+     *
+     * @param byteArray Byte Array to be converted.
+     * @return result of the conversion.
+     */
+    private static String byteArrayToHexString(byte[] byteArray) {
+        int readBytes = byteArray.length;
+        StringBuffer hexData = new StringBuffer();
+        int onebyte;
+        for (int i=0; i < readBytes; i++) {
+            onebyte = ((0x000000ff & byteArray[i]) | 0xffffff00);
+            hexData.append(Integer.toHexString(onebyte).substring(6));
+        }
+        return hexData.toString();
+    }
+
+    /**
+     * Generates ID.
+     * @return ID value.
+     */
+    private static String generateID() {
+        if (random == null) {
+            return null;
+        }
+        byte bytes[] = new byte[SAML2Constants.ID_LENGTH];
+        random.nextBytes(bytes);
+        return (SAML2ID_PREFIX + byteArrayToHexString(bytes));
+    }
+
+
 }

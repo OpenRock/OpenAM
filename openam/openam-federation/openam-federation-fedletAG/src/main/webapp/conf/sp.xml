@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <EntityDescriptor entityID="https://saml.salesforce.com" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
-    <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <SPSSODescriptor
+            AuthnRequestsSigned="false"
+            WantAssertionsSigned="false"
+            protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
-        <AssertionConsumerService index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://login.salesforce.com/?saml=02HKiPoin4E9WBo_uCaHhrjz5R0Sa_wMIbYSDucljYEHxt0LT3RkW5T0dv"/>
+        <AssertionConsumerService
+                index="1"
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                Location="@TARGET_URL@"
+        />
     </SPSSODescriptor>
 </EntityDescriptor>

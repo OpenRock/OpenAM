@@ -29,6 +29,9 @@
 package com.sun.identity.fedlet.ag;
 
 
+import com.sun.identity.plugin.configuration.ConfigurationException;
+import com.sun.identity.plugin.configuration.ConfigurationInstance;
+import com.sun.identity.plugin.configuration.ConfigurationManager;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
@@ -56,7 +59,7 @@ public class MetaDataParser {
 
     String fedletHomeDir;
     public MetaDataParser() {
-    
+
         fedletHomeDir = System.getProperty("com.sun.identity.fedlet.home");
         if ((fedletHomeDir == null) || (fedletHomeDir.trim().length() == 0)) {
             if (System.getProperty("user.home").equals(File.separator)) {
