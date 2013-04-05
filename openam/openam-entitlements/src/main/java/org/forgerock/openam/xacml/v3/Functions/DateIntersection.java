@@ -25,27 +25,57 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-intersection
+ This function SHALL take two arguments that are both a bag of ‘type’ values.
+ It SHALL return a bag of ‘type’ values such that it contains only elements that are common between the two bags,
+ which is determined by "urn:oasis:names:tc:xacml:x.x:function:type-equal".
+ No duplicates, as determined by "urn:oasis:names:tc:xacml:x.x:function:type-equal", SHALL exist in the result.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
 public class DateIntersection extends XACMLFunction {
 
     public DateIntersection()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        int args = getArgCount();
+        if (args != 2) {
+            throw new IndeterminateException("Function Requires 2 arguments, " +
+                    "however " + args + " in stack.");
+        }
+        // Create our union DataBag from other Bags.
+        DataBag intersection = new DataBag();
+        // Iterate Over the 2 DataBag's in Stack, Evaluate and create an Intersection of all common unique Objects.
+        try {
+            DataBag[] bags = new DataBag[2];
+            bags[0] = (DataBag) getArg(0).evaluate(pip);
+            bags[1] = (DataBag) getArg(1).evaluate(pip);
+
+            // Verify our Data Type with First Data Bag's Data Type.
+            if (bags[0].getType().getIndex() != bags[1].getType().getIndex()) {
+                throw new IndeterminateException("First Bag Type: " + bags[0].getType().getTypeName() +
+                        ", however the subsequent Bag Type was " + bags[1].getType()
+                        .getTypeName());
+            }
+            // Iterate over the current Bag.
+            for (int b = 0; b < bags[0].size(); b++) {
+                DataValue dataValue = (DataValue) bags[0].get(b).evaluate(pip);
+                // Although specification requires the use of Equal Function and iterate over Bag, the
+                // contains method provides the same result.
+                if (intersection.contains(dataValue)) {
+                    continue;
+                }
+                if (bags[1].contains(dataValue)) {
+                    // Element Common Object between both Bags.
+                    intersection.add(dataValue);
+                }
+            } // End of Inner For Loop.
+        } catch (Exception e) {
+            throw new IndeterminateException("Iterating over Arguments Exception: " + e.getMessage());
+        }
+        // Return our Intersection Value.
+        return intersection;
     }
 }

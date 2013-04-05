@@ -25,27 +25,76 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-set-equals
+ This function SHALL take two arguments that are both a bag of ‘type’ values.
+ It SHALL return a “http://www.w3.org/2001/XMLSchema#boolean”.  It SHALL return the result of applying
+ "urn:oasis:names:tc:xacml:1.0:function:and" to the application of "urn:oasis:names:tc:xacml:x.x:function:type-subset"
+ to the first and second arguments and the application of "urn:oasis:names:tc:xacml:x.x:function:type-subset"
+ to the second and first arguments.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
 public class X500NameSetEquals extends XACMLFunction {
 
     public X500NameSetEquals()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        int args = getArgCount();
+        if (args != 2) {
+            throw new IndeterminateException("Function Requires 2 arguments, " +
+                    "however " + args + " in stack.");
+        }
+        // Iterate Over the 2 DataBag's in Stack, Evaluate and determine if First Bag is a Subset of the Second Bag and
+        // in reverse and then And against each result.
+        boolean firstSubSet = false;
+        boolean secondSubSet = false;
+
+        DataBag firstBag = null;
+        DataBag secondBag = null;
+        try {
+            firstBag = (DataBag) getArg(0).evaluate(pip);
+            secondBag = (DataBag) getArg(1).evaluate(pip);
+
+            // Verify our Data Type with First Data Bag's Data Type.
+            if (firstBag.getType().getIndex() != secondBag.getType().getIndex()) {
+                throw new IndeterminateException("First Bag Type: " + firstBag.getType().getTypeName() +
+                        ", however the subsequent Bag Type was " + secondBag.getType()
+                        .getTypeName());
+            }
+            // Is the First Bag a SubSet of the Second?
+            firstSubSet = this.SubSet(firstBag, secondBag, pip);
+            // Is the Second Bag a SubSet of the First?
+            secondSubSet = this.SubSet(secondBag, firstBag, pip);
+        } catch (Exception e) {
+            throw new IndeterminateException("Iterating over Arguments Exception: " + e.getMessage());
+        }
+        // And our Conditions.
+        return (firstSubSet & secondSubSet) ? FunctionArgument.trueObject : FunctionArgument.falseObject;
+    }
+
+    /**
+     * Perform a SubSet function against two defined Bags.
+     * @param firstBag
+     * @param secondBag
+     * @param pip
+     * @return
+     * @throws XACML3EntitlementException
+     */
+    private boolean SubSet(DataBag firstBag, DataBag secondBag, XACMLEvalContext pip) throws
+            XACML3EntitlementException {
+        int subSetCount = 0;
+        // Iterate over the First Bag.
+        for (int b = 0; b < firstBag.size(); b++) {
+            DataValue dataValue = (DataValue) firstBag.get(b).evaluate(pip);
+            // Although specification requires the use of Equal Function and iterate over Bag, the
+            // contains method provides the same result.
+            if (secondBag.contains(dataValue)) {
+                subSetCount++;
+            }
+        } // End of Inner For Loop.
+        // Determine if we have in-fact a subSet.
+        return (subSetCount == firstBag.size());
     }
 }

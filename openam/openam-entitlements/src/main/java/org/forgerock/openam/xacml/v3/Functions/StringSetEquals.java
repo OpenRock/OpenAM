@@ -96,6 +96,6 @@ public class StringSetEquals extends XACMLFunction {
             }
         } // End of Inner For Loop.
         // Determine if we have in-fact a subSet.
-        return (subSetCount == firstBag.size()) ? true : false;
+        return (subSetCount == firstBag.size());
     }
 }

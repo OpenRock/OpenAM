@@ -44,8 +44,6 @@ import java.util.*;
 public abstract class XACMLFunction extends FunctionArgument {
     /**
      * Status Code Constants
-     *
-     * TODO :: Should these be placed elsewhere?
      */
     public static final String URN_SYNTAX_ERROR = "urn:oasis:names:tc:xacml:1.0:status:syntax-error";
     public static final String URN_PROCESSING_ERROR = "urn:oasis:names:tc:xacml:1.0:status:processing-error";

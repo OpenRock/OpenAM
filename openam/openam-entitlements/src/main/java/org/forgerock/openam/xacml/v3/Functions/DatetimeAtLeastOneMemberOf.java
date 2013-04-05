@@ -25,27 +25,54 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:x.x:function:type-at-least-one-member-of
+ This function SHALL take two arguments that are both a bag of ‘type’ values.
+ It SHALL return a “http://www.w3.org/2001/XMLSchema#boolean”.  The function SHALL evaluate to "True" if and
+ only if at least one element of the first argument is contained in the second argument as determined by
+ "urn:oasis:names:tc:xacml:x.x:function:type-is-in".
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
 public class DatetimeAtLeastOneMemberOf extends XACMLFunction {
 
     public DatetimeAtLeastOneMemberOf()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+        int args = getArgCount();
+        if (args != 2) {
+            throw new IndeterminateException("Function Requires 2 arguments, " +
+                    "however " + args + " in stack.");
+        }
+        // Iterate Over the 2 DataBag's in Stack, Evaluate and determine if the Contents of a Another Bag contains
+        // At least one Member of the First.
+        try {
+            DataBag[] bags = new DataBag[2];
+            bags[0] = (DataBag) getArg(0).evaluate(pip);
+            bags[1] = (DataBag) getArg(1).evaluate(pip);
+
+            // Verify our Data Type with First Data Bag's Data Type.
+            if (bags[0].getType().getIndex() != bags[1].getType().getIndex()) {
+                throw new IndeterminateException("First Bag Type: " + bags[0].getType().getTypeName() +
+                        ", however the subsequent Bag Type was " + bags[1].getType()
+                        .getTypeName());
+            }
+            // Iterate over the First Bag.
+            for (int b = 0; b < bags[0].size(); b++) {
+                DataValue dataValue = (DataValue) bags[0].get(b).evaluate(pip);
+                // Although specification requires the use of Equal Function and iterate over Bag, the
+                // contains method provides the same result.
+                if (bags[1].contains(dataValue)) {
+                    retVal =  FunctionArgument.trueObject;
+                    break;
+                }
+            } // End of Inner For Loop.
+        } catch (Exception e) {
+            throw new IndeterminateException("Iterating over Arguments Exception: " + e.getMessage());
+        }
+        // Return our Boolean Indicator for the At Least One Member Of.
+        return retVal;
     }
 }

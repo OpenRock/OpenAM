@@ -82,6 +82,14 @@ public class TestXacmlBagSetFunctions {
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
 
+    static final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
+    static final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
+    static final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
+    static final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
+    static final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
+    static final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
+    static final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
+    static final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
 
     @BeforeClass
     public void before() throws Exception {
@@ -176,15 +184,6 @@ public class TestXacmlBagSetFunctions {
      */
     @Test
     public void test_StringIntersection() throws XACML3EntitlementException {
-        // define DataValues, normally generated during Request Marshaling.
-        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
-        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
-        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
-        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
-        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
-        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
-        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
-        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
 
         // Create a StringBag Array and stuff it with DataValues.
         StringBag[] stringBags = new StringBag[2];
@@ -336,15 +335,6 @@ public class TestXacmlBagSetFunctions {
      */
     @Test
     public void test_StringAtLeastOneMemberOf() throws XACML3EntitlementException {
-        // define DataValues, normally generated during Request Marshaling.
-        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
-        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
-        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
-        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
-        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
-        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
-        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
-        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
 
         // Create a StringBag Array and stuff it with DataValues.
         StringBag[] stringBags = new StringBag[2];
@@ -496,16 +486,6 @@ public class TestXacmlBagSetFunctions {
     @Test
     public void test_StringUnion() throws XACML3EntitlementException {
 
-        // define DataValues, normally generated during Request Marshaling.
-        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
-        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
-        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
-        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
-        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
-        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
-        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
-        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
-
         // Create a StringBag Array and stuff it with DataValues.
         StringBag[] stringBags = new StringBag[6];
         for (int i = 0; i < stringBags.length; i++) {
@@ -656,15 +636,6 @@ public class TestXacmlBagSetFunctions {
      */
     @Test
     public void test_StringSubset() throws XACML3EntitlementException {
-        // define DataValues, normally generated during Request Marshaling.
-        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
-        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
-        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
-        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
-        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
-        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
-        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
-        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
 
         // Create a StringBag Array and stuff it with DataValues.
         StringBag[] stringBags = new StringBag[2];
@@ -815,15 +786,6 @@ public class TestXacmlBagSetFunctions {
      */
     @Test
     public void test_StringSetEquals() throws XACML3EntitlementException {
-        // define DataValues, normally generated during Request Marshaling.
-        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
-        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
-        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
-        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
-        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
-        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
-        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
-        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
 
         // Create a StringBag Array and stuff it with DataValues.
         StringBag[] stringBags = new StringBag[2];
@@ -868,15 +830,6 @@ public class TestXacmlBagSetFunctions {
      */
     @Test
     public void test_StringSetEquals_FALSE() throws XACML3EntitlementException {
-        // define DataValues, normally generated during Request Marshaling.
-        final DataValue HELLO_WORLD = new DataValue(DataType.XACMLSTRING, "HELLO WORLD!");
-        final DataValue HELLO_WORLD_FORGEROCK = new DataValue(DataType.XACMLSTRING, "HELLO WORLD From ForgeRock!");
-        final DataValue ONE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD ONE");
-        final DataValue TWO = new DataValue(DataType.XACMLSTRING, "HELLO WORLD TWO");
-        final DataValue THREE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD THREE");
-        final DataValue FOUR = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FOUR");
-        final DataValue FIVE = new DataValue(DataType.XACMLSTRING, "HELLO WORLD FIVE");
-        final DataValue SIX = new DataValue(DataType.XACMLSTRING, "HELLO WORLD SIX");
 
         // Create a StringBag Array and stuff it with DataValues.
         StringBag[] stringBags = new StringBag[2];
