@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -35,6 +35,9 @@ typedef CRITICAL_SECTION MUTEX;
 #define MUTEX_LOCK(mutex) EnterCriticalSection(&(mutex))
 #define MUTEX_TRY_LOCK(mutex) (TryEnterCriticalSection(&(mutex)) != 0)
 #define MUTEX_UNLOCK(mutex) LeaveCriticalSection(&(mutex))
+#if !defined(snprintf)
+#define snprintf _snprintf
+#endif
 #else
 #define _XOPEN_SOURCE 500
 #include <pthread.h>
@@ -65,12 +68,16 @@ typedef void (timer_callback) (union sigval);
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include "am_types.h"
 
 typedef struct {
     char *url;
-    int status;
+    int ok;
+    int fail;
     int run;
+    unsigned long ping_ok_count;
+    unsigned long ping_fail_count;
 } naming_url_t;
 
 typedef struct {
@@ -82,6 +89,7 @@ typedef struct {
     char *url;
     int idx;
     void (*log)(const char *, ...);
+    void (*debug)(const char *, ...);
     int (*validate)(const char *, const char **, int *httpcode);
 } naming_validator_int_t;
 
@@ -93,43 +101,111 @@ naming_status_t* nlist = NULL;
 void write_naming_value(const char *key, const char *value);
 char *read_naming_value(const char *key);
 
+static void store_index_value(int ix, int *map) {
+    char idx[8];
+    int i = map[ix];
+    snprintf(idx, sizeof (idx), "%d", i);
+    write_naming_value(AM_NAMING_LOCK, idx);
+}
+
 static void *url_watchdog(void *arg) {
-    int i, j = 0, s = 0, t;
+    int i, current_ok, default_ok, current_fail, next_ok, first_run = 1;
     naming_validator_t *v = (naming_validator_t *) arg;
-    t = v->poll_scan;
     while (keep_going) {
+        int current_index = 0;
+        char *current_value = NULL;
+        /* for initial run persisted index might not yet be available */
+        if (!first_run) {
+            sleep(v->ping_interval);
+        }
+        first_run = 0;
+        /* fetch current index value */
+        current_value = read_naming_value(AM_NAMING_LOCK);
+        if (current_value != NULL) {
+            current_index = strtol(current_value, NULL, 10);
+            if (current_index < 0 || current_index > nlist->size || errno == ERANGE) {
+                v->log("naming_validator(): invalid current index value, defaulting to %s", v->url_list[0]);
+                store_index_value(0, v->default_set);
+                current_index = 0;
+            } else {
+                /* map stored index to our ordered list index */
+                for (i = 0; i < v->default_set_size; i++) {
+                    if (current_index == v->default_set[i]) {
+                        current_index = i;
+                        break;
+                    }
+                }
+            }
+            free(current_value);
+        } else {
+            v->log("naming_validator(): failed to read current index value, defaulting to %s", v->url_list[0]);
+            store_index_value(0, v->default_set);
+        }
+        /* check if current index value is valid; double check whether default has 
+         * become valid again (ping.ok.count) and fail-back to it if so */
+        MUTEX_LOCK(mutex);
+        current_ok = nlist->list[current_index].ok;
+        current_fail = nlist->list[current_index].fail;
+        default_ok = nlist->list[0].ok;
+        MUTEX_UNLOCK(mutex);
+        if (current_ok > 0) {
+            if (current_index > 0 && default_ok >= v->ping_ok_count) {
+                store_index_value(0, v->default_set);
+                v->log("naming_validator(): fail-back to %s", v->url_list[0]);
+            } else {
+                v->log("naming_validator(): continue with %s", v->url_list[current_index]);
+            }
+            continue;
+        }
+        /* current index is not valid; check its ping.miss.count */
+        if (current_ok == 0 && current_fail <= v->ping_fail_count) {
+            v->log("naming_validator(): still staying with %s", v->url_list[current_index]);
+            continue;
+        }
+        /* find next valid index value to fail-over to */
+        next_ok = 0;
+        MUTEX_LOCK(mutex);
         for (i = 0; i < nlist->size; i++) {
-            MUTEX_LOCK(mutex);
-            s = nlist->list[i].status;
-            MUTEX_UNLOCK(mutex);
-            if (s == 1) {
-                write_naming_value(AM_NAMING_LOCK, nlist->list[i].url);
-                j = 0;
+            if (nlist->list[i].ok > 0) {
+                next_ok = nlist->list[i].ok;
                 break;
             }
-            j++;
         }
-        if (j > 0) {
-            write_naming_value(AM_NAMING_LOCK, NULL);
-            v->log("naming_validator(): none of url values are valid");
+        default_ok = nlist->list[0].ok;
+        MUTEX_UNLOCK(mutex);
+        if (next_ok == 0) {
+            v->log("naming_validator(): none of the values are valid, defaulting to %s", v->url_list[0]);
+            store_index_value(0, v->default_set);
+            continue;
         }
-        sleep(t);
+        if (current_index > 0 && default_ok >= v->ping_ok_count) {
+            v->log("naming_validator(): fail-back to %s", v->url_list[0]);
+            store_index_value(0, v->default_set);
+        } else {
+            v->log("naming_validator(): fail-over to %s", v->url_list[i]);
+            store_index_value(i, v->default_set);
+        }
     }
     return 0;
 }
 
 static void *url_validator(void *arg) {
     const char *status_message;
-    int vst, httpcode = 0;
+    int validate_status, httpcode = 0;
     naming_validator_int_t *v = (naming_validator_int_t *) arg;
-    vst = v->validate(v->url, &status_message, &httpcode);
+    validate_status = v->validate(v->url, &status_message, &httpcode);
     MUTEX_LOCK(mutex);
-    if (vst == 0) {
-        v->log("naming_validator(): %s validation succeeded", v->url);
-        nlist->list[v->idx].status = 1;
+    if (validate_status == 0) {
+        v->log("url_validator(%d): %s validation succeeded", v->idx, v->url);
+        if ((nlist->list[v->idx].ok)++ > nlist->list[v->idx].ping_ok_count)
+            nlist->list[v->idx].ok = nlist->list[v->idx].ping_ok_count;
+        nlist->list[v->idx].fail = 0;
     } else {
-        v->log("naming_validator(): %s validation failed with %s (%d), http status code: %d", v->url, status_message, vst, httpcode);
-        nlist->list[v->idx].status = 0;
+        v->log("url_validator(%d): %s validation failed with %s (%d), http status (%d)", v->idx,
+                v->url, status_message, validate_status, httpcode);
+        if ((nlist->list[v->idx].fail)++ > nlist->list[v->idx].ping_fail_count)
+            nlist->list[v->idx].fail = nlist->list[v->idx].ping_fail_count;
+        nlist->list[v->idx].ok = 0;
     }
     nlist->list[v->idx].run = 0;
     MUTEX_UNLOCK(mutex);
@@ -173,6 +249,7 @@ static void callback(union sigval si) {
             return;
         }
         arg->log = v->log;
+        arg->debug = v->debug;
         arg->validate = v->validate;
         arg->url = v->url_list[i];
         arg->idx = i;
@@ -256,21 +333,24 @@ void *naming_validator(void *arg) {
             MUTEX_CREATE(mutex);
             nlist->size = v->url_size;
             for (i = 0; i < v->url_size; i++) {
-                nlist->list[i].status = 0;
+                nlist->list[i].ok = 0;
+                nlist->list[i].fail = 0;
+                nlist->list[i].ping_ok_count = v->ping_ok_count;
+                nlist->list[i].ping_fail_count = v->ping_fail_count;
                 nlist->list[i].run = 0;
                 nlist->list[i].url = v->url_list[i];
             }
 #ifdef _MSC_VER
             tick_q = CreateTimerQueue();
             CreateTimerQueueTimer(&tick, tick_q,
-                    (WAITORTIMERCALLBACK) callback, arg, 1000, (v->poll_valid * 1000), WT_EXECUTELONGFUNCTION);
+                    (WAITORTIMERCALLBACK) callback, arg, 1000, (v->ping_interval * 1000), WT_EXECUTELONGFUNCTION);
 #else
 #if defined(__sun) && defined(__SunOS_5_10) 
             if ((port = port_create()) == -1) {
                 v->log("naming_validator(): port_create failed");
             }
 #endif
-            status = set_timer(&tick, 1, v->poll_valid, callback, arg);
+            status = set_timer(&tick, 1, v->ping_interval, callback, arg);
 #endif
             THREAD_CREATE(wthr, url_watchdog, arg);
             while (keep_going) {

@@ -31,7 +31,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 
 #ifndef AM_TYPES_H
@@ -83,11 +83,15 @@ typedef enum {
 #define AM_NAMING_LOCK ".am_naming_lock"
 
 typedef struct {
-    unsigned long poll_valid; //timer run-interval in sec
-    unsigned long poll_scan; //value re-scan interval in sec
+    unsigned long ping_interval;
+    unsigned long ping_ok_count;
+    unsigned long ping_fail_count;
+    int default_set_size;
+    int *default_set;
     int url_size;
     char **url_list;
     void (*log)(const char *, ...);
+    void (*debug)(const char *, ...);
     int (*validate)(const char *, const char **, int *httpcode);
 } naming_validator_t;
 

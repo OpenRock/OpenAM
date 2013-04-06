@@ -32,7 +32,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 
 #ifndef BASE_SERVICE_H
@@ -111,8 +111,7 @@ protected:
             const Properties& props,
             const std::string &cert_passwd,
             const std::string &cert_nick_name,
-            bool alwaysTrustServerCert,
-            bool namingRequestParam = false);
+            bool alwaysTrustServerCert);
     virtual ~BaseService() = 0;
 
     am_status_t doHttpGet(const ServiceInfo& service,
@@ -193,8 +192,6 @@ private:
     std::string poll_primary_server;
     bool alwaysTrustServerCert;
     
-    bool namingRequest;
-
     /* proxy parameters */
     bool useProxy;
     bool useProxyAuth;

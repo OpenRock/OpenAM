@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -65,9 +65,7 @@ class NamingValidateHttp : public BaseService {
 private:
     ServiceInfo service;
     const Properties &properties;
-    // com.sun.identity.agents.config.receive.timeout = 0
-    // com.sun.identity.agents.config.connect.timeout = 2000
-
+    
 public:
 
     NamingValidateHttp(const char *url, const Properties &props) : BaseService("NamingValidateHttp",

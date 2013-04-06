@@ -26,7 +26,7 @@
  *
  */ 
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 
 #include <prlock.h>
@@ -36,8 +36,6 @@
 #include <prprf.h>
 #include "naming_service.h"
 #include "xml_tree.h"
-
-extern "C" unsigned long am_web_naming_validation_status();
 
 USING_PRIVATE_NAMESPACE
 
@@ -105,8 +103,7 @@ NamingService::NamingService(const Properties& props,
         const std::string &cert_nick_name,
         bool trustServerCert)
 : BaseService("NamingService", props, cert_passwd, cert_nick_name,
-trustServerCert,
-(am_web_naming_validation_status() == 2 ? false : true)),
+trustServerCert),
 namingURL(props.get(AM_COMMON_NAMING_URL_PROPERTY)),
 ignorePreferredNamingURL(props.getBool(AM_COMMON_IGNORE_PREFERRED_NAMING_URL_PROPERTY, true)) {
 }
@@ -477,7 +474,7 @@ am_status_t NamingService::doNamingRequest(const ServiceInfo& service,
     BodyChunkList& bodyChunkList = request.getBodyChunkList();
 
     bodyChunkList.push_back(suffixChunk);
-
+    
     status = doHttpPost(service, std::string(), cookieList,
                             bodyChunkList, response, 
                             0, "", false, true, &serverInfo);

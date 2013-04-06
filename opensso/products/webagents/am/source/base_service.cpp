@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 #include <stdio.h>
 #include <stdexcept>
@@ -48,6 +48,7 @@
 
 #define AM_NAMING_LOCK ".am_naming_lock"
 extern "C" char *read_naming_value(const char *key);
+extern "C" unsigned long am_web_naming_validation_status();
 
 USING_PRIVATE_NAMESPACE
 
@@ -134,8 +135,7 @@ BaseService::BaseService(const std::string& name,
         const Properties& props,
         const std::string &cert_passwd,
         const std::string &cert_nick_name,
-        bool trustServerCert,
-        bool namingRequestParam)
+        bool trustServerCert)
 : logModule(Log::addModule(name)), objLock(), serviceRequestId(0),
 certDBPasswd((cert_passwd.size() > 0) ?
 cert_passwd : props.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, "")),
@@ -146,8 +146,7 @@ alwaysTrustServerCert(trustServerCert),
 proxyHost(props.get(AM_COMMON_FORWARD_PROXY_HOST, "")),
 proxyPort(atoi(props.get(AM_COMMON_FORWARD_PROXY_PORT, "0").c_str())),
 proxyUser(props.get(AM_COMMON_FORWARD_PROXY_USER, "")),
-proxyPassword(props.get(AM_COMMON_FORWARD_PROXY_PASSWORD, "")),
-namingRequest(namingRequestParam) {
+proxyPassword(props.get(AM_COMMON_FORWARD_PROXY_PASSWORD, "")) {
     useProxy = proxyHost.size() > 0 ? true : false;
     useProxyAuth = proxyUser.size() > 0 ? true : false;
 }
@@ -295,35 +294,47 @@ BaseService::doRequest(const ServiceInfo& service,
         BodyChunk contentLineChunk(contentLine, contentLineLen);
         ServiceInfo::const_iterator iter;
         ServiceInfo svc(service);
-        if (namingRequest) {
-            svc.clear();
-            char *nurl = read_naming_value(AM_NAMING_LOCK);
-            if (nurl != NULL) {
-                ServerInfo si(nurl);
-                svc.addServer(si);
-                Log::log(logModule, Log::LOG_ALWAYS, "BaseService::doRequest(): naming request to %s", nurl);
-                free(nurl);
+        int j = -1, current_index = -1;
+        if (am_web_naming_validation_status() < 2 && svc.getNumberOfServers() > 1) {
+            /* validation is enabled and number of servers is more than one */
+            char *current_value = read_naming_value(AM_NAMING_LOCK);
+            if (current_value != NULL) {
+                current_index = strtol(current_value, NULL, 10);
+                if (current_index < 0 || errno == ERANGE) {
+                    current_index = 0;
+                } else {
+                    Log::log(logModule, Log::LOG_MAX_DEBUG,
+                            "BaseService::doRequest(): will be using url index: %d",
+                            current_index);
+                }
+                free(current_value);
             } else {
-                Log::log(logModule, Log::LOG_ALWAYS, "BaseService::doRequest(): failed to get valid naming url");
+                current_index = 0;
+            }
+            if ((size_t) current_index >= svc.getNumberOfServers()) {
+                Log::log(logModule, Log::LOG_WARNING,
+                        "BaseService::doRequest(): invalid url index: %d (out of %d); validation results ignored.",
+                        current_index, svc.getNumberOfServers());
+                current_index = -1;
             }
         }
         
         for (iter = svc.begin(); iter != svc.end(); ++iter) {
             ServerInfo svrInfo = ServerInfo((const ServerInfo&) (*iter));
-            if (!namingRequest) {
-                if (!svrInfo.isHealthy(poll_primary_server)) {
-                    Log::log(logModule, Log::LOG_WARNING,
-                            "BaseService::doRequest(): "
-                            "Server is unavailable: %s.",
-                            svrInfo.getURL().c_str());
+            
+            if (current_index != -1) {
+                if ((++j) != current_index) {
+                    Log::log(logModule, Log::LOG_MAX_DEBUG,
+                            "BaseService::doRequest(): skipping url(%d) %s",
+                            j, svrInfo.getURL().c_str());
                     continue;
                 } else {
-                Log::log(logModule, Log::LOG_DEBUG,
-                            "BaseService::doRequest(): Using server: %s.",
-                            iter->getURL().c_str());
+                    Log::log(logModule, Log::LOG_MAX_DEBUG,
+                            "BaseService::doRequest(): using url(%d) %s",
+                            j, svrInfo.getURL().c_str());
                 }
             }
-
+            
             Http::HeaderList headerList, proxyHeaderList;
             Http::Cookie hostHeader("Host", svrInfo.getHost());
             headerList.push_back(hostHeader);
@@ -507,10 +518,7 @@ BaseService::doRequest(const ServiceInfo& service,
                 if (serverInfo != NULL) *serverInfo = &(*iter);
                 break;
             }
-            if (status = AM_NSPR_ERROR) {
-                continue;
-            }
-
+            
         } // end of for
     } else {
         status = AM_BUFFER_TOO_SMALL;

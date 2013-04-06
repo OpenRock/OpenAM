@@ -23,6 +23,8 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 #
+# Portions Copyrighted 2013 ForgeRock Inc
+#
 
 #------------------------------------------------------------------------------
 # Web Agents Bootstrap File
@@ -211,4 +213,26 @@ com.sun.identity.agents.config.forward.proxy.password =
 #      ./agentadmin --encrypt <agentInstance> <passwordFile>
 # Hot-Swap Enabled: No
 #
-com.sun.identity.agents.config.profilename = @AGENT_PROFILE_NAME@ 
+com.sun.identity.agents.config.profilename = @AGENT_PROFILE_NAME@
+
+#
+# Extended URL validation
+#
+# - level:              0 - extended URL validation; 1 - simple URL validation;
+#                           2 - (default) validation disabled.
+# - ping.interval:      validation run interval (value in seconds; default value is 60);
+#                           connect.timeout and receive.timeout values (total, in msec) must not exceed ping.interval value.
+# - ping.miss.count:    when validation request is continuously failing and reached the number of ping.miss.count,
+#                           policy agent will fail-over to the next URL value.
+# - ping.ok.count:      when validation request is continuously succeeding and reached the number of ping.ok.count,
+#                           policy agent will fail-back to the default URL value.
+# - default.url.set:    comma-separated URL value indexes; must correspond to actual entries in naming.url values;
+#                           For example: for two space separated entries in naming.url property, set
+#                           default.url.set = 0,1 to specify fail-over order and default (first index) entry; 
+#                           Default is not set.
+# 
+com.forgerock.agents.ext.url.validation.level = 2
+com.forgerock.agents.ext.url.validation.ping.interval = 60
+com.forgerock.agents.ext.url.validation.ping.miss.count = 3
+com.forgerock.agents.ext.url.validation.ping.ok.count = 3
+com.forgerock.agents.ext.url.validation.default.url.set =  

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010 - 2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #include <ctype.h>
@@ -223,11 +223,11 @@ extern "C" void get_status_info(am_status_t status, const char ** name, const ch
 extern "C" void *naming_validator(void *arg);
 extern "C" void stop_naming_validator();
 
-int naming_validate_helper(const char *url, const char **msg, int *hs) {
+extern "C" int naming_validate_helper(const char *url, const char **msg, int *hs) {
     const char *name;
     am_status_t status = AM_FAILURE;
     const Properties& propPtr = *reinterpret_cast<Properties *> (boot_info.properties);
-    if (boot_info.ext_url_validation_disable == 1) {
+    if (boot_info.url_validation_level == 1) {
         NamingValidateHttp v(url, propPtr);
         status = v.validate_url(hs);
     } else {
@@ -236,7 +236,45 @@ int naming_validate_helper(const char *url, const char **msg, int *hs) {
     }
     get_status_info(status, &name, msg);
     return (AM_SUCCESS == status && Http::OK == *hs ? 0 : status);
-} 
+}
+
+static int *parse_default_url_set(const char *values, int lsz, int *sz) {
+    int *ret = NULL, count = 0;
+    char *v = (char *) values;
+    char *a, *b, *c = NULL;
+    if (v != NULL) {
+        while (*v) {
+            count = (',' == *v++) ? count + 1 : count;
+        }
+        if (count >= 0) {
+            if ((ret = (int *) calloc(1, (++count) * sizeof (int))) != NULL) {
+                *sz = count;
+                if (count == 1) {
+                    /* no value for default.url.set is set - use only one (default) entry */
+                    ret[0] = 0;
+                } else {
+                    if ((c = strdup(values)) != NULL) {
+                        count = 0;
+                        for ((a = strtok_r(c, ",", &b)); a; (a = strtok_r(NULL, ",", &b))) {
+                            int d = strtol(a, NULL, 10);
+                            /* skip invalid values; including indexes out of range of list size (lsz) */
+                            if (d < 0 || d >= lsz || errno == ERANGE) continue;
+                            ret[count++] = d;
+                        }
+                        free(c);
+                    } else {
+                        *sz = 0;
+                        free(ret);
+                        ret = NULL;
+                    }
+                }
+            } else {
+                *sz = 0;
+            }
+        }
+    }
+    return ret;
+}
 
 static void release_char_list(char **list, unsigned int listsize) {
     unsigned int i;
@@ -709,23 +747,37 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
     
     if (AM_SUCCESS == status) {
         function_name = "am_properties_get";
-        parameter = "com.forgerock.agents.ext.url.validation.disable";
+        parameter = "com.forgerock.agents.ext.url.validation.level";
         status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 2,
-            &boot_ptr->ext_url_validation_disable);
+            &boot_ptr->url_validation_level);
     }
     
     if (AM_SUCCESS == status) {
         function_name = "am_properties_get";
-        parameter = "com.forgerock.agents.ext.url.validation.poll.interval";
+        parameter = "com.forgerock.agents.ext.url.validation.ping.interval";
         status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 60,
-            &boot_ptr->ext_url_validation_poll);
+            &boot_ptr->ping_interval);
     }
     
     if (AM_SUCCESS == status) {
         function_name = "am_properties_get";
-        parameter = "com.forgerock.agents.ext.url.validation.scan.interval";
+        parameter = "com.forgerock.agents.ext.url.validation.ping.miss.count";
         status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 3,
-            &boot_ptr->ext_url_validation_scan);
+            &boot_ptr->ping_fail_count);
+    }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = "com.forgerock.agents.ext.url.validation.ping.ok.count";
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 3,
+            &boot_ptr->ping_ok_count);
+    }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = "com.forgerock.agents.ext.url.validation.default.url.set";
+        status = am_properties_get(boot_ptr->properties, parameter,
+            &boot_ptr->default_url_set);
     }
     
     if (AM_SUCCESS == status) {
@@ -944,7 +996,7 @@ am_agent_init(boolean_t* pAgentInitialized)
 
 extern "C" unsigned long
 am_web_naming_validation_status() {
-    return boot_info.ext_url_validation_disable;
+    return boot_info.url_validation_level;
 }
 
 /**
@@ -990,39 +1042,67 @@ am_web_init(const char *agent_bootstrap_file,
                 status = Connection::initialize(propPtr);
             }
 
-            if (boot_info.ext_url_validation_disable == 2) {
+            if (boot_info.url_validation_level == 2) {
                 am_web_log_always("naming_validator(): validation disabled");
             }
-            if (AM_SUCCESS == status && nvld == NULL && boot_info.ext_url_validation_disable != 2) {
+            if (AM_SUCCESS == status && nvld == NULL && boot_info.url_validation_level != 2) {
                 char fn[64];
                 unsigned long ct = boot_info.connect_timeout;
                 unsigned long rt = boot_info.receive_timeout;
                 if (ct == 0 || ct > 2000 || rt == 0 || rt > 2000) {
-                    am_web_log_always("naming_validator(): network connect.timeout and receive.timeout values are not set"
+                    am_web_log_warning("naming_validator(): network connect.timeout and receive.timeout values are not set"
                             " or are set to more than 2 sec. timeout");
                 }
-                nvld = (naming_validator_t *) malloc(sizeof (naming_validator_t));
-                if (nvld == NULL) return AM_NO_MEMORY;
+                nvld = (naming_validator_t *) calloc(1, sizeof (naming_validator_t));
+                if (nvld == NULL) {
+                    return AM_NO_MEMORY;
+                }
+                
                 nvld->validate = naming_validate_helper;
                 nvld->log = am_web_log_always;
+                nvld->debug = am_web_log_max_debug;
                 nvld->url_size = (int) boot_info.naming_url_list.size;
-                /* poll values in sec */
-                nvld->poll_valid = boot_info.ext_url_validation_poll;
-                nvld->poll_scan = boot_info.ext_url_validation_scan;
+                nvld->ping_interval = boot_info.ping_interval;
+                nvld->ping_ok_count = boot_info.ping_ok_count;
+                nvld->ping_fail_count = boot_info.ping_fail_count;
+                nvld->default_set = parse_default_url_set(boot_info.default_url_set,
+                        nvld->url_size, &nvld->default_set_size);
+                                
                 if (boot_info.naming_url_list.size > 0) {
                     nvld->url_list = (char **) malloc(boot_info.naming_url_list.size * sizeof (char *));
                     if (nvld->url_list == NULL) {
+                        if (nvld->default_set != NULL) free(nvld->default_set);
+                        nvld->default_set = NULL;
                         free(nvld);
                         nvld = NULL;
                         return AM_NO_MEMORY;
                     }
+                    if (nvld->url_size != nvld->default_set_size) {
+                        am_web_log_error("naming_validator(): default.url.set values do not correspond to config.naming.url property entries");
+                        if (nvld->default_set != NULL) free(nvld->default_set);
+                        nvld->default_set = NULL;
+                        free(nvld);
+                        nvld = NULL;
+                        return AM_FAILURE;
+                    }
                     for (int i = 0; i < boot_info.naming_url_list.size; i++) {
-                        nvld->url_list[i] = strdup(boot_info.naming_url_list.list[i].url);
+                        /* default.url.set contains fail-over order;
+                         * will keep internal value list ordered 
+                         **/
+                        int j = nvld->default_set[i];
+                        nvld->url_list[i] = strdup(boot_info.naming_url_list.list[j].url);
+                        if (nvld->url_list[i] == NULL) {
+                            if (nvld->default_set != NULL) free(nvld->default_set);
+                            nvld->default_set = NULL;
+                            free(nvld);
+                            nvld = NULL;
+                            return AM_NO_MEMORY;
+                        }
                     }
                 }
 #ifdef _MSC_VER
                 nv_thr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) naming_validator, nvld, 0, NULL);
-                SleepEx((nvld->poll_scan + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
+                SleepEx((nvld->ping_interval + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
 #else
                 sprintf(fn, "/tmp/%s", AM_NAMING_LOCK);
                 unlink(fn);
@@ -1053,7 +1133,10 @@ am_web_cleanup() {
         if (nvld != NULL) {
             stop_naming_validator();
             release_char_list(nvld->url_list, nvld->url_size);
+            if (nvld->default_set != NULL) free(nvld->default_set);
+            nvld->default_set = NULL;
             free(nvld);
+            nvld = NULL;
             am_web_log_debug("%s: Naming Validator stopped.", thisfunc);
         }
         
