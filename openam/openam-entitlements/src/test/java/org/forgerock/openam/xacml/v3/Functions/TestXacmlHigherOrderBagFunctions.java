@@ -50,14 +50,14 @@ import org.testng.annotations.Test;
 
  For example, the following expression SHALL return "True":
  <Apply FunctionId=”urn:oasis:names:tc:xacml:3.0:function:any-of”>
- <Function FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-equal”/>
- <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Paul</AttributeValue>
- <Apply FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-bag”>
- <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>John</AttributeValue>
- <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Paul</AttributeValue>
- <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>George</AttributeValue>
- <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Ringo</AttributeValue>
- </Apply>
+     <Function FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-equal”/>
+     <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Paul</AttributeValue>
+     <Apply FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-bag”>
+            <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>John</AttributeValue>
+             <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Paul</AttributeValue>
+             <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>George</AttributeValue>
+            <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Ringo</AttributeValue>
+     </Apply>
  </Apply>
  This expression is "True" because the first argument is equal to at least one of the elements of the bag,
  according to the function.

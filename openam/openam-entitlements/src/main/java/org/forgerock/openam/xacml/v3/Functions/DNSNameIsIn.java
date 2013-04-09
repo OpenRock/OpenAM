@@ -67,8 +67,12 @@ public class DNSNameIsIn extends XACMLFunction {
         // Now Iterate over Bag contents to find bagElement hit.
         for(int i=0; i<bag.size(); i++) {
             DataValue dataValue = bag.get(i);
-            // This in theory accomplishes and uses the <type>Equal FunctionArgument.
-            if (dataValue.equals(bagElement)) {
+            // Check Equality by using this Types Equality Function.
+            DNSNameEqual fEquals = new DNSNameEqual();
+            fEquals.addArgument(bagElement);
+            fEquals.addArgument(dataValue);
+            FunctionArgument result = fEquals.evaluate(null);
+            if (result.isTrue()) {
                 returnValue = FunctionArgument.trueObject;
                 break;
             }

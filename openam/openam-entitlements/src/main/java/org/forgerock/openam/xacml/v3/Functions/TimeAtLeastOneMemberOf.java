@@ -49,26 +49,36 @@ public class TimeAtLeastOneMemberOf extends XACMLFunction {
         // Iterate Over the 2 DataBag's in Stack, Evaluate and determine if the Contents of a Another Bag contains
         // At least one Member of the First.
         try {
-            DataBag[] bags = new DataBag[2];
-            bags[0] = (DataBag) getArg(0).evaluate(pip);
-            bags[1] = (DataBag) getArg(1).evaluate(pip);
+            DataBag firstBag = (DataBag) getArg(0).evaluate(pip);
+            DataBag secondBag = (DataBag) getArg(1).evaluate(pip);
 
             // Verify our Data Type with First Data Bag's Data Type.
-            if (bags[0].getType().getIndex() != bags[1].getType().getIndex()) {
-                throw new IndeterminateException("First Bag Type: " + bags[0].getType().getTypeName() +
-                        ", however the subsequent Bag Type was " + bags[1].getType()
+            if (firstBag.getType().getIndex() != secondBag.getType().getIndex()) {
+                throw new IndeterminateException("First Bag Type: " + firstBag.getType().getTypeName() +
+                        ", however the subsequent Bag Type was " + secondBag.getType()
                         .getTypeName());
             }
             // Iterate over the First Bag.
-            for (int b = 0; b < bags[0].size(); b++) {
-                DataValue dataValue = (DataValue) bags[0].get(b).evaluate(pip);
-                // Although specification requires the use of Equal Function and iterate over Bag, the
-                // contains method provides the same result.
-                if (bags[1].contains(dataValue)) {
-                    retVal =  FunctionArgument.trueObject;
+            boolean breakIt = false;
+            for (int b = 0; b < firstBag.size(); b++) {
+                DataValue dataValue1 = (DataValue) firstBag.get(b).evaluate(pip);
+                for (int z = 0; z < secondBag.size(); z++) {
+                    DataValue dataValue2 = (DataValue) secondBag.get(z).evaluate(pip);
+                    // Check Equality by using this Types Equality Function.
+                    TimeEqual fEquals = new TimeEqual();
+                    fEquals.addArgument(dataValue2);
+                    fEquals.addArgument(dataValue1);
+                    FunctionArgument result = fEquals.evaluate(pip);
+                    if (result.isTrue()) {
+                        retVal = FunctionArgument.trueObject;
+                        breakIt = true;
+                        break;
+                    }
+                } // End of Inner Loop.
+                if (breakIt) {
                     break;
                 }
-            } // End of Inner For Loop.
+            } // End of Outer For Loop.
         } catch (Exception e) {
             throw new IndeterminateException("Iterating over Arguments Exception: " + e.getMessage());
         }

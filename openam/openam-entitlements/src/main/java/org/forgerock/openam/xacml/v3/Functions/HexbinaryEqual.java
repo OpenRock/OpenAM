@@ -41,7 +41,6 @@ import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.Arrays;
 
-// TODO : Verify incoming content....
 
 /**
  * urn:oasis:names:tc:xacml:1.0:function:hexBinary-equal

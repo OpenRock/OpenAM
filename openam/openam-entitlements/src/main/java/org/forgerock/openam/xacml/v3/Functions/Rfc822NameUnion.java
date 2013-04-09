@@ -67,12 +67,24 @@ public class Rfc822NameUnion extends XACMLFunction {
                 // Iterate over the current Bag.
                 for (int b=0; b<bag.size(); b++) {
                     DataValue dataValue = (DataValue) bag.get(b).evaluate(pip);
-                    // Although specification requires the use of Equal Function and iterate over Bag, the
-                    // contains method provides the same result.
-                    if (unionBag.contains(dataValue)) {
-                        continue;
+                    boolean contained = false;
+                    for (int z=0; z<unionBag.size(); z++) {
+                        // Apply the Typed Equal Function to determine if
+                        // the object already exists in the Union Bag.
+                        Rfc822NameEqual fEquals = new Rfc822NameEqual();
+                        fEquals.addArgument(unionBag.get(z));
+                        fEquals.addArgument(dataValue);
+                        FunctionArgument result = fEquals.evaluate(pip);
+                        if (result.isTrue()) {
+                            contained=true;
+                            break;
+                        }
                     }
-                    unionBag.add(dataValue);
+                    // Add the Object if not contained.
+                    if (!contained) {
+                        // Add the Unique DataValue Element into the Union Bag.
+                        unionBag.add(dataValue);
+                    }
                 } // End of Inner For Loop.
             } // End of Outer For Loop.
         } catch (Exception e) {

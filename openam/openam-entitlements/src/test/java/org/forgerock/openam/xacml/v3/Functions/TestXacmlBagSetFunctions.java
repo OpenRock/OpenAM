@@ -1934,7 +1934,7 @@ public class TestXacmlBagSetFunctions {
         assertTrue(result instanceof DataBag);
         // Cast
         DataBag dataBag = (DataBag) result;
-        assertEquals(dataBag.size(), 5);
+        assertEquals(dataBag.size(), 4);
     }
 
     /**
@@ -2022,7 +2022,7 @@ public class TestXacmlBagSetFunctions {
         assertTrue(result instanceof DataBag);
         // Cast
         DataBag dataBag = (DataBag) result;
-        assertEquals(dataBag.size(), 5);   // should be 4, but we need to fix Inner Types Equal to ignoreCase.
+        assertEquals(dataBag.size(), 4);
 
     }
 
@@ -2446,7 +2446,7 @@ public class TestXacmlBagSetFunctions {
         assertTrue(result instanceof DataBag);
         // Cast
         DataBag dataBag = (DataBag) result;
-        assertEquals(dataBag.size(), 3);
+        assertEquals(dataBag.size(), 2);
     }
 
     /**
@@ -2519,7 +2519,7 @@ public class TestXacmlBagSetFunctions {
         assertTrue(result instanceof DataBag);
         // Cast
         DataBag dataBag = (DataBag) result;
-        assertEquals(dataBag.size(), 3);
+        assertEquals(dataBag.size(), 2);
     }
 
     /**

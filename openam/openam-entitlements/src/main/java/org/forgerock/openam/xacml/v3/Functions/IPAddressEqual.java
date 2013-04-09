@@ -25,23 +25,9 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:rfc822Name-equal
-This function SHALL take two arguments of data-type
-“urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-It SHALL return “True” if and only if the two arguments are equal.
-Otherwise, it SHALL return “False”.
-
-An RFC822 name consists of a local-part followed by "@" followed by a domain-part.
-The local-part is case-sensitive, while the domain-part (which is usually a DNS host name) is not case-sensitive.
-Perform the following operations:
-
-1. Normalize the domain-part of each argument to lower case
-
-2. Compare the expressions by applying the function
-    “urn:oasis:names:tc:xacml:1.0:function:string-equal” to the normalized arguments.
-*/
+/**
+urn:oasis:names:tc:xacml:1.0:function:IPAddress-equal
+ */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
@@ -49,11 +35,11 @@ import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
 /**
- * urn:oasis:names:tc:xacml:1.0:function:rfc822Name-equal
+ * urn:oasis:names:tc:xacml:1.0:function:IPAddress-equal
  */
-public class Rfc822NameEqual extends XACMLFunction {
+public class IPAddressEqual extends XACMLFunction {
 
-    public Rfc822NameEqual()  {
+    public IPAddressEqual()  {
     }
 
     public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
@@ -65,16 +51,8 @@ public class Rfc822NameEqual extends XACMLFunction {
         if ( (getArg(0).getValue(pip)==null) || (getArg(1).getValue(pip)==null ) )  {
             return retVal;
         }
-        // Split at the @ sign.
-        String[] names1 = ((String)getArg(0).getValue(pip)).split("@");
-        String[] names2 = ((String)getArg(1).getValue(pip)).split("@");
-        if ( (names1 == null) || (names1.length != 2) ) {
-            return retVal;
-        }
-        if ( (names2 == null) || (names2.length != 2) ) {
-            return retVal;
-        }
-        if ( (names1[0].equals(names2[0])) && (names1[1].equalsIgnoreCase(names2[1])) ) {
+        String s = (String)getArg(0).getValue(pip);
+        if ( s.equalsIgnoreCase((String)getArg(1).getValue(pip))) {
             retVal =   FunctionArgument.trueObject;
         } else {
             retVal =   FunctionArgument.falseObject;

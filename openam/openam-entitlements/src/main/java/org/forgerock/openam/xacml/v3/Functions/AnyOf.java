@@ -25,16 +25,32 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ *  urn:oasis:names:tc:xacml:3.0:function:any-of
+ This function applies a Boolean function between specific primitive values and a bag of values, and SHALL return
+ "True" if and only if the predicate is "True" for at least one element of the bag.
+ This function SHALL take n+1 arguments, where n is one or greater. The first argument SHALL be an
+ <Function> element that names a Boolean function that takes n arguments of primitive types.
+ Under the remaining n arguments, n-1 parameters SHALL be values of primitive data-types and one SHALL be a
+ bag of a primitive data-type.  The expression SHALL be evaluated as if the function named in the
+ <Function> argument were applied to the n-1 non-bag arguments and each element of the bag argument
+ and the results are combined with “urn:oasis:names:tc:xacml:1.0:function:or”.
+
+ For example, the following expression SHALL return "True":
+ <Apply FunctionId=”urn:oasis:names:tc:xacml:3.0:function:any-of”>
+ <Function FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-equal”/>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Paul</AttributeValue>
+ <Apply FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-bag”>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>John</AttributeValue>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Paul</AttributeValue>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>George</AttributeValue>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Ringo</AttributeValue>
+ </Apply>
+ </Apply>
+ This expression is "True" because the first argument is equal to at least one of the elements of the bag,
+ according to the function.
+
+ */
 
 import org.forgerock.openam.xacml.v3.model.*;
 

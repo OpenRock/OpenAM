@@ -609,5 +609,94 @@ public class TestXacmlEqualityPredicateFunctions {
 
     }
 
+    @Test
+    public void testIPAddressEqual() throws XACML3EntitlementException {
+        FunctionArgument anyuri1 = new DataValue(DataType.XACMLIPADDRESS, "10.0.1.2");
+        FunctionArgument anyuri2 = new DataValue(DataType.XACMLIPADDRESS, "10.0.1.12");
+        FunctionArgument anyuri3 = new DataValue(DataType.XACMLIPADDRESS, "10.0.1.42");
+        FunctionArgument anyuri4 = new DataValue(DataType.XACMLIPADDRESS, "10.0.12.2");
+        FunctionArgument anyuri5 = new DataValue(DataType.XACMLIPADDRESS, "10.0.12.2");
+        FunctionArgument anyuri6 = new DataValue(DataType.XACMLIPADDRESS, "fdff:cafe:babe:cab1:426c:8fff:fe2c:1e65");
+        FunctionArgument anyuri7 = new DataValue(DataType.XACMLIPADDRESS, "fdff:cafe:babe:cab1:426c:8fff:fe2c:1e65");
+
+        IPAddressEqual fEquals = new IPAddressEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri1);
+        fEquals.addArgument(anyuri2);
+        FunctionArgument result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        fEquals = new IPAddressEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri1);
+        fEquals.addArgument(anyuri3);
+        result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        fEquals = new IPAddressEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri4);
+        fEquals.addArgument(anyuri5);
+        result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        fEquals = new IPAddressEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri6);
+        fEquals.addArgument(anyuri7);
+        result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+    }
+
+    @Test
+    public void testIDNSNameEqual() throws XACML3EntitlementException {
+        FunctionArgument anyuri1 = new DataValue(DataType.XACMLDNSNAME, "example.org");
+        FunctionArgument anyuri2 = new DataValue(DataType.XACMLDNSNAME, "www.example.org");
+        FunctionArgument anyuri3 = new DataValue(DataType.XACMLDNSNAME, "test.example.org");
+        FunctionArgument anyuri4 = new DataValue(DataType.XACMLDNSNAME, "openam.example.org");
+        FunctionArgument anyuri5 = new DataValue(DataType.XACMLDNSNAME, "openam.example.org");
+        FunctionArgument anyuri6 = new DataValue(DataType.XACMLDNSNAME, "openam.example.co.uk");
+        FunctionArgument anyuri7 = new DataValue(DataType.XACMLDNSNAME, "openam.example.co.uk");
+
+        DNSNameEqual fEquals = new DNSNameEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri1);
+        fEquals.addArgument(anyuri2);
+        FunctionArgument result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        fEquals = new DNSNameEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri1);
+        fEquals.addArgument(anyuri3);
+        result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isFalse());
+
+        fEquals = new DNSNameEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri4);
+        fEquals.addArgument(anyuri5);
+        result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+        fEquals = new DNSNameEqual();
+        // Place Objects in Argument stack for comparison.
+        fEquals.addArgument(anyuri6);
+        fEquals.addArgument(anyuri7);
+        result = fEquals.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result.isTrue());
+
+    }
+
+
 
 }

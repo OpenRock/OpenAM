@@ -62,16 +62,40 @@ public class DaytimedurationIntersection extends XACMLFunction {
             // Iterate over the current Bag.
             for (int b = 0; b < bags[0].size(); b++) {
                 DataValue dataValue = (DataValue) bags[0].get(b).evaluate(pip);
-                // Although specification requires the use of Equal Function and iterate over Bag, the
-                // contains method provides the same result.
-                if (intersection.contains(dataValue)) {
-                    continue;
+                boolean contained = false;
+                for (int z=0; z<intersection.size(); z++) {
+                    // Apply the Typed Equal Function to determine if
+                    // the object already exists in the Intersection Bag.
+                    DaytimedurationEqual fequals = new DaytimedurationEqual();
+                    fequals.addArgument(intersection.get(z));
+                    fequals.addArgument(dataValue);
+                    FunctionArgument result = fequals.evaluate(null);
+                    if (result.isTrue()) {
+                        contained=true;
+                        break;
+                    }
                 }
-                if (bags[1].contains(dataValue)) {
-                    // Element Common Object between both Bags.
-                    intersection.add(dataValue);
+                // Add the Object if not contained.
+                if (!contained) {
+                    for (int z=0; z<bags[1].size(); z++) {
+                        // Apply the Typed Equal Function to determine if
+                        // the object already exists in the Intersection Bag.
+                        DaytimedurationEqual fequals = new DaytimedurationEqual();
+                        fequals.addArgument(bags[1].get(z));
+                        fequals.addArgument(dataValue);
+                        FunctionArgument result = fequals.evaluate(null);
+                        if (result.isTrue()) {
+                            contained=true;
+                            break;
+                        }
+                    } // End of Inner For Loop.
+                    // This will have tripped to true, within above loop.
+                    if (contained) {
+                        // Add the Unique DataValue Element into the Union Bag.
+                        intersection.add(dataValue);
+                    }
                 }
-            } // End of Inner For Loop.
+            } // End of Outer For Loop.
         } catch (Exception e) {
             throw new IndeterminateException("Iterating over Arguments Exception: " + e.getMessage());
         }

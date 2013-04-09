@@ -53,8 +53,6 @@ import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
-// TODO : Needs to be addressed per comparison to recognize all of the above Requirements...
-
 /**
  * urn:oasis:names:tc:xacml:1.0:function:x500Name-equal
  */

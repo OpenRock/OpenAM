@@ -56,7 +56,6 @@ public class HexbinarySetEquals extends XACMLFunction {
         try {
             firstBag = (DataBag) getArg(0).evaluate(pip);
             secondBag = (DataBag) getArg(1).evaluate(pip);
-
             // Verify our Data Type with First Data Bag's Data Type.
             if (firstBag.getType().getIndex() != secondBag.getType().getIndex()) {
                 throw new IndeterminateException("First Bag Type: " + firstBag.getType().getTypeName() +
@@ -87,13 +86,20 @@ public class HexbinarySetEquals extends XACMLFunction {
         int subSetCount = 0;
         // Iterate over the First Bag.
         for (int b = 0; b < firstBag.size(); b++) {
-            DataValue dataValue = (DataValue) firstBag.get(b).evaluate(pip);
-            // Although specification requires the use of Equal Function and iterate over Bag, the
-            // contains method provides the same result.
-            if (secondBag.contains(dataValue)) {
-                subSetCount++;
-            }
-        } // End of Inner For Loop.
+            DataValue dataValue1 = (DataValue) firstBag.get(b).evaluate(pip);
+            for (int z = 0; z<secondBag.size(); z++) {
+                DataValue dataValue2 = (DataValue) secondBag.get(z).evaluate(pip);
+                // Check Equality by using this Types Equality Function.
+                HexbinaryEqual fEquals = new HexbinaryEqual();
+                fEquals.addArgument(dataValue2);
+                fEquals.addArgument(dataValue1);
+                FunctionArgument result = fEquals.evaluate(pip);
+                if (result.isTrue()) {
+                    subSetCount++;
+                    break;
+                }
+            } // End of Inner Loop.
+        } // End of Outer For Loop.
         // Determine if we have in-fact a subSet.
         return (subSetCount == firstBag.size());
     }

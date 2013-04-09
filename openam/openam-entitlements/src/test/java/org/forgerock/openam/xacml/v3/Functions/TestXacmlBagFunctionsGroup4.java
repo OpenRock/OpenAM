@@ -525,7 +525,7 @@ public class TestXacmlBagFunctionsGroup4 {
         DataBag dataBag = (DataBag) bag.evaluate(null);
         assertNotNull(dataBag);
 
-        X500NameIsIn isIn = new X500NameIsIn();
+        YearmonthdurationIsIn isIn = new YearmonthdurationIsIn();
         isIn.addArgument(dateObject2);
         isIn.addArgument(dataBag);
         FunctionArgument result = isIn.evaluate(null);

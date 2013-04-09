@@ -25,16 +25,28 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:map
+ This function converts a bag of values to another bag of values.
+ This function SHALL take n+1 arguments, where n is one or greater.
+ The first argument SHALL be a <Function> element naming a function that takes a n arguments of a primitive
+ data-type and returns a value of a primitive data-type Under the remaining n arguments,
+ n-1 parameters SHALL be values of primitive data-types and one SHALL be a bag of a primitive data-type.
+ The expression SHALL be evaluated as if the function named in the <Function> argument were applied to the n-1
+ non-bag arguments and each element of the bag argument and resulting in a bag of the converted value.
+ The result SHALL be a bag of the primitive data-type that is returned by the
+ function named in the <xacml:Function> element.
+
+ For example, the following expression,
+ <Apply FunctionId=”urn:oasis:names:tc:xacml:3.0:function:map”>
+ <Function FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-normalize-to-lower-case”>
+ <Apply FunctionId=”urn:oasis:names:tc:xacml:1.0:function:string-bag”>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>Hello</AttributeValue>
+ <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>World!</AttributeValue>
+ </Apply>
+ </Apply>
+ evaluates to a bag containing “hello” and “world!”.
+ */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;

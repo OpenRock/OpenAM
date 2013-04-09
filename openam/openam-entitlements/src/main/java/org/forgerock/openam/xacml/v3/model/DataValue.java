@@ -158,10 +158,26 @@ public class DataValue extends FunctionArgument {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DataValue dataValue = (DataValue) o;
-
-        if (data != null ? !data.equals(dataValue.data) : dataValue.data != null) return false;
-
+        DataValue otherDataValue = (DataValue) o;
+        DataType otherDataType = otherDataValue.getType();
+        // depending upon the DataType, we may need to perform an equalsIgnoreCase, instead of equals.
+        if ( (otherDataType.isType(DataType.Type.XACMLDNSNAMETYPE)) ||
+             (otherDataType.isType(DataType.Type.XACMLX500NAMETYPE)) ||
+             (otherDataType.isType(DataType.Type.XACMLRFC822NAMETYPE)) ) {
+            if (data != null ?
+                    !((String)data).equalsIgnoreCase((String)otherDataValue.data) : otherDataValue.data != null) {
+                    return false;
+            }
+        } else if ( (otherDataType.isType(DataType.Type.XACMLHEXBINARYTYPE)) &&
+                    (otherDataValue.data instanceof String) ) {
+                byte[] this_byteArray = XACML3PrivilegeUtils.convertHexBinaryStringToByteArray((String)data);
+                byte[] other_byteArray = XACML3PrivilegeUtils.convertHexBinaryStringToByteArray((String)otherDataValue.data);
+            if (this_byteArray != null ? !this_byteArray.equals(other_byteArray) : other_byteArray != null) {
+                return false;
+            }
+        } else {
+            if (data != null ? !data.equals(otherDataValue.data) : otherDataValue.data != null) return false;
+        }
         return true;
     }
 
