@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of company]"
- */
-/*
- * "Portions Copyrighted 2012-2013 ForgeRock Inc"
  */
 
 package org.forgerock.openam.oauth2.model;
@@ -184,11 +181,11 @@ public class BearerToken extends CoreToken {
      */
     public Map<String, Object> getTokenInfo() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(rb.getString(OAuth2Constants.Params.ACCESS_TOKEN), getTokenID());
-        tokenMap.put(rb.getString(OAuth2Constants.Params.TOKEN_TYPE), getTokenType());
-        tokenMap.put(rb.getString(OAuth2Constants.Params.EXPIRES_IN), (getExpireTime() - System.currentTimeMillis())/1000);
-        tokenMap.put(rb.getString(OAuth2Constants.Params.REALM), getRealm());
-        tokenMap.put(rb.getString(OAuth2Constants.Params.SCOPE), getScope());
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.ID), getTokenID());
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (getExpireTime() - System.currentTimeMillis())/1000);
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.REALM), getRealm());
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenMap;
     }
 

@@ -362,6 +362,16 @@
                       </DefaultValues>
                   </AttributeSchema>
 
+                  <AttributeSchema
+                          name="com.forgerock.openam.oauth2provider.accessToken"
+                          type="single"
+                          syntax="string"
+                          i18nKey="a744">
+                      <DefaultValues>
+                          <Value></Value>
+                      </DefaultValues>
+                  </AttributeSchema>
+
                    <AttributeSchema name="sunIdentityServerDeviceStatus"
                                      type="single_choice"
                                      syntax="string"

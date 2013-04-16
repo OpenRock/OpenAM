@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.restlet.ext.oauth2.flow;
@@ -62,8 +62,8 @@ public class RefreshTokenServerResource extends AbstractFlow {
         // Find Token
         CoreToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
 
-        SessionClient refreshTokenClient = new SessionClientImpl(refreshToken.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID),
-                                                                 refreshToken.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI));
+        SessionClient refreshTokenClient = new SessionClientImpl(refreshToken.getClientID(),
+                                                                 refreshToken.getRedirectURI());
 
         if (null == refreshToken) {
             OAuth2Utils.DEBUG.error("Refresh token does not exist for id: " + refresh_token );
@@ -86,8 +86,8 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
             Set<String> granted_after = null;
             // Get the granted scope
-            if (null != refreshToken.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)){
-                granted_after = new TreeSet<String>(OAuth2Utils.stringToSet(refreshToken.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)));
+            if (null != refreshToken.getScope()){
+                granted_after = new TreeSet<String>(refreshToken.getScope());
             } else {
                 granted_after = new TreeSet<String>();
             }
@@ -122,8 +122,8 @@ public class RefreshTokenServerResource extends AbstractFlow {
      */
     protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope,OAuth2Utils.getRealm(getRequest()), refreshToken.getParameter(OAuth2Constants.CoreTokenParams.USERNAME),
-                refreshToken.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID), refreshToken.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI), null, refreshToken.getTokenID());
+                checkedScope,OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
+                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID());
     }
 
 }

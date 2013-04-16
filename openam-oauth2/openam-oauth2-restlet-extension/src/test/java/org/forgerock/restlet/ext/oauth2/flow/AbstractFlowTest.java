@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -225,7 +225,7 @@ public class AbstractFlowTest {
                 CoreToken token = mock(CoreToken.class);
                 String code = UUID.randomUUID().toString();
 
-                when(OAuth2Utils.stringToSet(token.getParameter(OAuth2Constants.CoreTokenParams.SCOPE))).thenReturn((Set<String>) invocation.getArguments()[0]);
+                when(token.getScope()).thenReturn((Set<String>) invocation.getArguments()[0]);
                 when(token.getRealm()).thenReturn((String) invocation.getArguments()[1]);
                 when(token.getUserID()).thenReturn((String) invocation.getArguments()[2]);
                 // TODO We don't have redirect URI
@@ -258,12 +258,12 @@ public class AbstractFlowTest {
                 tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, 3600);
 
                 when(accessToken.convertToMap()).thenReturn(tokenMap);
-                when(OAuth2Utils.stringToSet(accessToken.getParameter(OAuth2Constants.CoreTokenParams.SCOPE))).thenReturn((Set<String>) invocation.getArguments()[1]);
+                when(accessToken.getScope()).thenReturn((Set<String>) invocation.getArguments()[1]);
                 String value = refreshToken.getRealm();
                 when(accessToken.getRealm()).thenReturn(value);
                 value = refreshToken.getUserID();
                 when(accessToken.getUserID()).thenReturn(value);
-                when(accessToken.getParameter(OAuth2Constants.CoreTokenParams.ID)).thenReturn(token);
+                when(accessToken.getTokenID()).thenReturn(token);
                 when(accessToken.getExpireTime()).thenReturn(System.currentTimeMillis() + 3600000L);
                 when(accessToken.isExpired()).thenReturn(false);
                 accessTokenMap.put(token, accessToken);

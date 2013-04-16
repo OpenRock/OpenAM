@@ -466,6 +466,11 @@
             <name>Public online Restlet repository</name>
             <url>http://maven.restlet.org</url>
         </repository>
+        <repository>
+            <id>powermock</id>
+            <name>Public online PowerMock repository</name>
+            <url>http://maven.restlet.org</url>
+        </repository>
 
     </repositories>
 
@@ -1454,6 +1459,16 @@
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>

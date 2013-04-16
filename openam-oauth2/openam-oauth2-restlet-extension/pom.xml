@@ -99,6 +99,10 @@
         </dependency>
         <dependency>
             <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.freemarker</artifactId>
             <version>${restlet.version}</version>
             <exclusions>

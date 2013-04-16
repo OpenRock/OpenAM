@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 package org.forgerock.restlet.ext.oauth2.flow;
 
@@ -35,7 +35,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
-import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
+import org.forgerock.openam.oauth2.model.BearerToken;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -64,7 +64,7 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
         Form parameters = new Form();
         parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN);
         parameters.add(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenID());
-        parameters.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(OAuth2Utils.stringToSet(refreshToken.getParameter(OAuth2Constants.CoreTokenParams.SCOPE)), null));
+        parameters.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(refreshToken.getScope(), ""));
         parameters.add(OAuth2Constants.Params.STATE, "random");
         request.setEntity(parameters.getWebRepresentation());
 

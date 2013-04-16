@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,11 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions copyright [year] [name of copyright owner]"
- */
-
-/**
- * Portions copyright 2012-2013 ForgeRock Inc
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package com.sun.identity.shared;
@@ -626,6 +622,11 @@ public class OAuth2Constants {
          * The request is for data which does not exist.
          */
         public static final String NOT_FOUND = "not_found";
+
+        /**
+         * The request contains invalid client metadata.
+         */
+        public static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
     }
 
     public class Custom {
@@ -707,4 +708,46 @@ public class OAuth2Constants {
      */
     public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
     public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
+
+    public class OAuth2Client{
+        public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";
+        public static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
+        public static final String DEFAULT_SCOPES = "com.forgerock.openam.oauth2provider.defaultScopes";
+        public static final String NAME = "com.forgerock.openam.oauth2provider.name";
+        public static final String DESCRIPTION = "com.forgerock.openam.oauth2provider.description";
+        public static final String GRANT_TYPES = "com.forgerock.openam.oauth2provider.grantTypes";
+        public static final String RESPONSE_TYPES = "com.forgerock.openam.oauth2provider.responseTypes";
+        public static final String CONTACTS = "com.forgerock.openam.oauth2provider.contacts";
+        public static final String LOGO_URI = "com.forgerock.openam.oauth2provider.logoURI";
+        public static final String TOKEN_ENDPOINT_AUTH_METHOD = "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod";
+        public static final String POLICY_URI = "com.forgerock.openam.oauth2provider.policyURI";
+        public static final String TOS_URI = "com.forgerock.openam.oauth2provider.tosURI";
+        public static final String JKWS_URI = "com.forgerock.openam.oauth2provider.jwksURI";
+        public static final String SECTOR_IDENTIFIER_URI = "com.forgerock.openam.oauth2provider.sectorIdentifierURI";
+        public static final String SUBJECT_TYPE = "com.forgerock.openam.oauth2provider.subjectType";
+        public static final String REQUEST_OBJECT_SIGNING_ALG = "com.forgerock.openam.oauth2provider.requestObjectSigningAlg";
+        public static final String USERINFO_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoSignedResponseAlg";
+        public static final String USERINFO_ENCRYPTED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseAlg";
+        public static final String USERINFO_SIGN_AND_ENC_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseEnc";
+        public static final String IDTOKEN_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg";
+        public static final String IDTOKEN_ENCRYPTED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseAlg";
+        public static final String IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseEnc";
+        public static final String DEFAULT_MAX_AGE = "com.forgerock.openam.oauth2provider.defaultMaxAge";
+        public static final String REQUIRE_AUTH_TIME = "com.forgerock.openam.oauth2provider.requireAuthTime";
+        public static final String DEFAULT_ACR_VALS = "com.forgerock.openam.oauth2provider.defaultACRValues";
+        public static final String INIT_LOGIN_URL = "com.forgerock.openam.oauth2provider.initiateLoginUri";
+        public static final String POST_LOGOUT_URI = "com.forgerock.openam.oauth2provider.postLogoutRedirectURI";
+        public static final String REQUEST_URLs = "com.forgerock.openam.oauth2provider.requestURIs";
+        public static final String ACTIVE = "sunIdentityServerDeviceStatus";
+        public static final String CLIENT_TYPE = "com.forgerock.openam.oauth2provider.clientType";
+        public static final String USERPASSWORD = "userpassword";
+        public static final String REALM = "REALM";
+        public static final String CLIENT_ID = "client_id";
+        public static final String CLIENT_SECRET = "client_secret";
+        public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";
+    }
+
+    public class OpenIDConnectClient{
+
+    }
 }
