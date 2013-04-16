@@ -1470,6 +1470,14 @@
                 <version>1.1</version>
             </dependency>
 
+            <!-- JavaTuples -->
+            <dependency>
+                <groupId>org.javatuples</groupId>
+                <artifactId>javatuples</artifactId>
+                <version>1.2</version>
+                <scope>compile</scope>
+            </dependency>
+
             <!-- Session HA Module Dependencies-->
             <dependency>
                 <groupId>commons-net</groupId>

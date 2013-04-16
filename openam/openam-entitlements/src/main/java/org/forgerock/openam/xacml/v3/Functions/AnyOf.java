@@ -29,8 +29,10 @@ package org.forgerock.openam.xacml.v3.Functions;
  *  urn:oasis:names:tc:xacml:3.0:function:any-of
  This function applies a Boolean function between specific primitive values and a bag of values, and SHALL return
  "True" if and only if the predicate is "True" for at least one element of the bag.
+
  This function SHALL take n+1 arguments, where n is one or greater. The first argument SHALL be an
  <Function> element that names a Boolean function that takes n arguments of primitive types.
+
  Under the remaining n arguments, n-1 parameters SHALL be values of primitive data-types and one SHALL be a
  bag of a primitive data-type.  The expression SHALL be evaluated as if the function named in the
  <Function> argument were applied to the n-1 non-bag arguments and each element of the bag argument

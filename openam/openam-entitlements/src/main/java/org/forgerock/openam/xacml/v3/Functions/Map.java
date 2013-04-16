@@ -45,7 +45,7 @@ package org.forgerock.openam.xacml.v3.Functions;
  <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>World!</AttributeValue>
  </Apply>
  </Apply>
- evaluates to a bag containing “hello” and “world!”.
+         Evaluates to a bag containing “hello” and “world!”.
  */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;

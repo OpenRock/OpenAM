@@ -25,13 +25,20 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * urn:oasis:names:tc:xacml:1.0:function:all-of-all
  This function applies a Boolean function between the elements of two bags.
  The expression SHALL be "True" if and only if the supplied predicate is "True" between each and every element of the
  first bag collectively against all the elements of the second bag.
 
- This function SHALL take three arguments.  The first argument SHALL be an <Function> element that names a
+ This function SHALL take three arguments.
+
+ The first argument SHALL be an <Function> element that names a
  Boolean function that takes two arguments of primitive types.
 
  The second argument SHALL be a bag of a primitive data-type.
@@ -59,15 +66,11 @@ package org.forgerock.openam.xacml.v3.Functions;
  <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#integer”>4</AttributeValue>
  </Apply>
  </Apply>
+
  This expression is "True" because all elements of the first bag, “5” and “6”,
  are each greater than all of the integer values “1”, ”2”, ”3”, ”4” of the second bag.
 
-
  */
-
-import org.forgerock.openam.xacml.v3.model.*;
-
-import java.util.List;
 
 public class AllOfAll extends XACMLFunction {
 
@@ -75,62 +78,63 @@ public class AllOfAll extends XACMLFunction {
     }
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
-        FunctionArgument retVal = FunctionArgument.trueObject;
-
+        // Initialize
+        XACMLFunction func = null;
+        DataBag bagOne = null;
+        DataBag bagTwo = null;
         int args = getArgCount();
-        if (args < 3) {
-            throw new NotApplicableException("Not enough arguments");
-        }
-        XACMLFunction func = (XACMLFunction) getArg(0);
-        FunctionArgument bag = getArg(args - 1).evaluate(pip);
-        if (bag instanceof DataValue) {
-            bag = new DataBag((DataValue) bag);
-        }
-        if (!(bag instanceof DataBag)) {
-            throw new NotApplicableException("AllOf can not be applied to a NON bag");
+        // Validate the number of Function Arguments.
+        if (args != 3) {
+            throw new NotApplicableException("Not Correct Number of Arguments, must provide 3");
         }
 
-        for (int i = 1; i < args - 1; i++) {
-            FunctionArgument res = getArg(i).evaluate(pip);
-            List<DataValue> bagVals = (List<DataValue>) bag.getValue(pip);
-            boolean oneIsTrue = false;
+        if ((getArg(0) == null) || (!(getArg(0) instanceof XACMLFunction))) {
+            throw new NotApplicableException("AllOfAll first argument is null or not a XACML Function");
+        }
+        if ((getArg(1) == null) || (!(getArg(1) instanceof XACMLFunction))) {
+            throw new NotApplicableException("AllOfAll second argument is null or not a Bag");
+        }
+        if ((getArg(2) == null) || (!(getArg(2) instanceof XACMLFunction))) {
+            throw new NotApplicableException("AllOfAll third argument is null or not a Bag");
+        }
+        // Cast our Arguments...
+        func = (XACMLFunction) getArg(0);
+        bagOne = (DataBag) getArg(1).evaluate(pip);
+        bagTwo = (DataBag) getArg(2).evaluate(pip);
 
-            for (DataValue dv : bagVals) {
+        // Create our Result List for Applying an And against all results.
+        List<DataValue> results = new ArrayList<DataValue>();
+        // Cast the Bag Values.
+        List<DataValue> bagOneValues = bagOne.getValue(pip);
+        List<DataValue> bagTwoValues = bagTwo.getValue(pip);
+        // Iterate over our First Bag against our Second Bag.
+        for (DataValue dataValue1 : bagOneValues) {
+            dataValue1.evaluate(pip);
+            for (DataValue dataValue2 : bagTwoValues) {
+                dataValue1.evaluate(pip);
+                // Perform the Function upon our two Arguments.
                 func.clearArguments();
-                func.addArgument(res).addArgument(dv);
+                func.addArgument(dataValue1);
+                func.addArgument(dataValue2);
                 FunctionArgument result = func.evaluate(pip);
-                if (result.isTrue()) {
-                    oneIsTrue = true;
+                if ((result == null) || (!(result instanceof DataValue))) {
+                    throw new NotApplicableException("AllOfAll Resultant Function Argument is Invalid");
                 }
-            }
-            if (!oneIsTrue) {
-                retVal = FunctionArgument.falseObject;
-            }
+                results.add((DataValue) result);
+            } // End of Inner First Bag Loop.
+        } // End of Outer Second Bag Loop.
+
+        // Now Perform an And Function based upon all Results Received.
+        And fAnd = new And();
+        for(DataValue result : results) {
+            fAnd.addArgument(result);
         }
-        return retVal;
+        FunctionArgument result = fAnd.evaluate(pip);
+        if ((result == null) || (!(result instanceof DataValue))) {
+            throw new NotApplicableException("AllOfAll Resultant Function Argument is Invalid");
+        }
+        // Return final And Resultant
+        return result;
     }
 
-    public String toXML(String type) {
-        String retVal = "";
-        /*
-             Handle Match AnyOf and AllOf specially
-        */
-
-        if (type.equals("Match")) {
-            retVal = "<AllOf>";
-        } else if (type.equals("Allow")) {
-            retVal = "<Allow FunctionId=\"" + functionID + "\">";
-        }
-
-        for (FunctionArgument arg : arguments) {
-            retVal = retVal + arg.toXML(type);
-        }
-        if (type.equals("Match")) {
-            retVal = retVal + "</AllOf>";
-        } else if (type.equals("Allow")) {
-            retVal = retVal + "</Allow>";
-        }
-
-        return retVal;
-    }
 }

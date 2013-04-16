@@ -28,11 +28,19 @@ package org.forgerock.openam.xacml.v3.Functions;
 /**
  * urn:oasis:names:tc:xacml:1.0:function:all-of-any
  This function applies a Boolean function between the elements of two bags.
+
  The expression SHALL be “True” if and only if the supplied predicate is “True” between each element of the
  first bag and any element of the second bag.
- This function SHALL take three arguments.  The first argument SHALL be an <Function> element that names a
- Boolean function that takes two arguments of primitive types.  The second argument SHALL be a bag of a
- primitive data-type.  The third argument SHALL be a bag of a primitive data-type.
+
+ This function SHALL take three arguments.
+
+ The first argument SHALL be an <Function> element that names a
+ Boolean function that takes two arguments of primitive types.
+
+ The second argument SHALL be a bag of a primitive data-type.
+
+ The third argument SHALL be a bag of a primitive data-type.
+
  The expression SHALL be evaluated as if the “urn:oasis:names:tc:xacml:3.0:function:any-of” function had been
  applied to each value of the first bag and the whole of the second bag using the supplied xacml:Function, and the
  results were then combined using “urn:oasis:names:tc:xacml:1.0:function:and”.
@@ -56,16 +64,72 @@ package org.forgerock.openam.xacml.v3.Functions;
 
  */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AllOfAny extends XACMLFunction {
 
     public AllOfAny()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        // Initialize
+        XACMLFunction func = null;
+        DataBag bagOne = null;
+        DataBag bagTwo = null;
+        int args = getArgCount();
+        // Validate the number of Function Arguments.
+        if (args != 3) {
+            throw new NotApplicableException("Not Correct Number of Arguments, must provide 3");
+        }
+
+        if ((getArg(0) == null) || (!(getArg(0) instanceof XACMLFunction))) {
+            throw new NotApplicableException("AnyOfAll first argument is null or not a XACML Function");
+        }
+        if ((getArg(1) == null) || (!(getArg(1) instanceof XACMLFunction))) {
+            throw new NotApplicableException("AnyOfAll second argument is null or not a Bag");
+        }
+        if ((getArg(2) == null) || (!(getArg(2) instanceof XACMLFunction))) {
+            throw new NotApplicableException("AnyOfAll third argument is null or not a Bag");
+        }
+        // Cast our Arguments...
+        func = (XACMLFunction) getArg(0);
+        bagOne = (DataBag) getArg(1).evaluate(pip);
+        bagTwo = (DataBag) getArg(2).evaluate(pip);
+
+        // Create our Result List for Applying an And against all results.
+        List<DataValue> results = new ArrayList<DataValue>();
+        // Cast the Bag Values.
+        List<DataValue> bagOneValues = bagOne.getValue(pip);
+        List<DataValue> bagTwoValues = bagTwo.getValue(pip);
+        // Iterate over our Second Bag against our First Bag.
+        for (DataValue dataValue1 : bagOneValues) {
+            dataValue1.evaluate(pip);
+            for (DataValue dataValue2 : bagTwoValues) {
+                dataValue2.evaluate(pip);
+                // Perform the Function upon our two Arguments.
+                func.clearArguments();
+                func.addArgument(dataValue1);
+                func.addArgument(dataValue2);
+                FunctionArgument result = func.evaluate(pip);
+                if ((result == null) || (!(result instanceof DataValue))) {
+                    throw new NotApplicableException("AllOfAny Resultant Function Argument is Invalid");
+                }
+                results.add((DataValue) result);
+            } // End of Inner First Bag Loop.
+        } // End of Outer Second Bag Loop.
+
+        // Now Perform an And Function based upon all Results Received.
+        And fAnd = new And();
+        for(DataValue result : results) {
+            fAnd.addArgument(result);
+        }
+        FunctionArgument result = fAnd.evaluate(pip);
+        if ((result == null) || (!(result instanceof DataValue))) {
+            throw new NotApplicableException("AllOfAny Resultant Function Argument is Invalid");
+        }
+        // Return final And Resultant
+        return result;
     }
 }

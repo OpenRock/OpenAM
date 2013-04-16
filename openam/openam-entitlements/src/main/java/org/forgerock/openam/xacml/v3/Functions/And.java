@@ -25,11 +25,13 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
+/**
 urn:oasis:names:tc:xacml:1.0:function:and
 This function SHALL return "True" if it has no arguments and SHALL return "False"
-if one of its arguments evaluates to "False". The order of evaluation SHALL be from first argument to last.
-The evaluation SHALL stop with a result of "False" if any argument evaluates to "False",
+if one of its arguments evaluates to "False".
+ The order of evaluation SHALL be from first argument to last.
+
+ The evaluation SHALL stop with a result of "False" if any argument evaluates to "False",
 leaving the rest of the arguments unevaluated.
 */
 
@@ -52,11 +54,14 @@ public class And extends XACMLFunction {
         }
         int args = getArgCount();
         for (int i=0;i<args;i++) {
-            Boolean argument = getArg(i).evaluate(pip).asBoolean(pip);
-            if ((argument == null) || !(argument instanceof Boolean)){
-                throw new IndeterminateException("Argument is null!");
+            if (getArg(i)==null) {
+                throw new IndeterminateException("Argument is null");
             }
-            if (argument.booleanValue() != true) {
+            Boolean argument = getArg(i).evaluate(pip).asBoolean(pip);
+            if (argument == null) {
+
+            }
+            if (!argument) {
                 return  FunctionArgument.falseObject;
             }
         }

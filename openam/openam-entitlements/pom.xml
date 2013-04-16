@@ -184,6 +184,13 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
+        <!-- JavaTuples -->
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.testng</groupId>

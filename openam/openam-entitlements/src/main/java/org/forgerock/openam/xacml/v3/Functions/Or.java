@@ -25,13 +25,16 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:or
-This function SHALL return "False" if it has no arguments and SHALL return "True"
-if at least one of its arguments evaluates to "True". The order of evaluation SHALL be from first argument to last.
-The evaluation SHALL stop with a result of "True" if any argument evaluates to "True",
-leaving the rest of the arguments unevaluated.
-*/
+/**
+ urn:oasis:names:tc:xacml:1.0:function:or
+ This function SHALL return "False" if it has no arguments and SHALL return "True"
+ if at least one of its arguments evaluates to "True".
+
+ The order of evaluation SHALL be from first argument to last.
+
+ The evaluation SHALL stop with a result of "True" if any argument evaluates to "True",
+ leaving the rest of the arguments unevaluated.
+ */
 
 import org.forgerock.openam.xacml.v3.model.*;
 
@@ -40,23 +43,24 @@ import org.forgerock.openam.xacml.v3.model.*;
  */
 public class Or extends XACMLFunction {
 
-    public Or()  {
+    public Or() {
     }
 
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        FunctionArgument retVal =  FunctionArgument.falseObject;
-
-        if ( getArgCount() == 0) {
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        if (getArgCount() == 0) {
             return retVal;
         }
         int args = getArgCount();
-
-        for (int i=0;i<args;i++) {
+        for (int i = 0; i < args; i++) {
             try {
-            Boolean ob = getArg(i).asBoolean(pip);
-            if (ob.booleanValue() == true) {
-                return    FunctionArgument.trueObject;
-            }
+                if (getArg(i) == null) {
+                    throw new IndeterminateException("Argument is null");
+                }
+                Boolean ob = getArg(i).asBoolean(pip);
+                if (ob.booleanValue() == true) {
+                    return FunctionArgument.trueObject;
+                }
             } catch (XACML3EntitlementException ex) {
                 // Ignore the error
             }
