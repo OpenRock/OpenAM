@@ -127,11 +127,16 @@ public abstract class XACMLFunction extends FunctionArgument {
     protected FunctionArgument getArg(int index) {
         return arguments.get(index);
     }
-    protected int getArgCount() {
-        return arguments.size();
-    }
     protected final List<FunctionArgument> getArguments() {
         return arguments;
+    }
+
+    /**
+     * Required this as Public to properly interrogate Number of Arguments.
+     * @return int -- Number of Current Arguments.
+     */
+    public int getArgCount() {
+        return arguments.size();
     }
 
     /**

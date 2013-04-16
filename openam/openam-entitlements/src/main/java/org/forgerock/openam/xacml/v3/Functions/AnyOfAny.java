@@ -86,63 +86,74 @@ public class AnyOfAny extends XACMLFunction {
         }
         // Cast our Function to be Applied.
         func = (XACMLFunction) getArg(0);
-        // Create our Result List for Applying an And against all results.
-        List<DataValue>  results = new ArrayList<DataValue>();
 
         // Create and initialize our Argument List Stack.
-        java.util.Map<Integer,DataValue> dataArgumentStack = new HashMap<Integer,DataValue>();
+        List<DataArgumentStack> dataArgumentStacks = new ArrayList<DataArgumentStack>();
 
-        for (int i = 1; i < args; i++) {
+        // Itrate over all argument to create necessary Argument Stack.
+        for (int i = 1; i < args-1; i++) {
             FunctionArgument functionArgument = getArg(i).evaluate(pip);
             Object topDataValue = functionArgument.getValue(pip);
+
             // Check for Collection
             if (topDataValue instanceof Collection) {
                     // Iterate over Collection DataValue Contents.
                     for ( DataValue innerDataValue : ((Collection<DataValue>) topDataValue) ) {
-                        System.out.println("innerDataValue: "+innerDataValue.toString());
                         // Get every Available Cross DataValue Arguments.
                         List<DataValue> preparedDataArgumentStack =
-                                prepareCrossArgumentArray(pip, args+1, args);
-
-
+                                prepareCrossArgumentArray(pip, i+1, args);
+                        DataArgumentStack dataArgumentStack = new DataArgumentStack(innerDataValue,
+                                preparedDataArgumentStack);
+                        dataArgumentStacks.add(dataArgumentStack);
                     } // End of Inner While Loop.
 
-
             } else {
-
                 // Get every Available Cross DataValue Arguments.
                 List<DataValue> preparedDataArgumentStack =
-                        prepareCrossArgumentArray(pip, args+1, args);
-
-
+                        prepareCrossArgumentArray(pip, i+1, args);
+                DataArgumentStack dataArgumentStack = new DataArgumentStack((DataValue) topDataValue,
+                        preparedDataArgumentStack);
+                dataArgumentStacks.add(dataArgumentStack);
             } // End of Else.
-
         } // End of Outer Main For Loop.
 
+        // Create our Result List for Applying an And against all results.
+        List<DataValue>  results = new ArrayList<DataValue>();
 
-
-        /**
-        // Prepare our Cross argument Array to Process against the designated Function.
-        java.util.Map<Integer, List<DataValue>>  crossArgumentArray =
-                prepareCrossArgumentArray(dataArgumentStackColumns);
-        int rows = crossArgumentArray.get(0).size();
-        int columns = crossArgumentArray.size();
-
-        // Iterate over Prepared Argument Rows
-        for(int row=0; row<rows; row++) {
+        // Perform the Function against our Argument Stacks.
+        // All DataValues at this point have all been flattened.
+        for (DataArgumentStack dataArgumentStack : dataArgumentStacks)  {
             // Build up the Function to be Applied.
             func.clearArguments();
-            for (int column = 0; column<columns; column++) {
-                DataValue dataValue = crossArgumentArray.get(column).get(row);
-                func.addArgument(dataValue);
+            int functionArguments = 1;
+            func.addArgument(dataArgumentStack.getArgument());
+            // Iterate over Arument Stack
+            for (DataValue dataValue : dataArgumentStack.getDataValues()) {
+                if (functionArguments < args-1) {
+                    func.addArgument(dataValue);
+                    functionArguments++;
+                } else {
+                    // Evaluate the Function with required Arguments.
+                    FunctionArgument result = func.evaluate(pip);
+                    results.add((DataValue) result);
+
+                    func.clearArguments();
+                    functionArguments=1;
+                    func.addArgument(dataArgumentStack.getArgument());
+                    func.addArgument(dataValue);
+                    functionArguments++;
+
+                    System.out.println("A Function Result: "+result.asBoolean(pip));
+                }
             }
-            // Evaluate the Function.
-            FunctionArgument result = func.evaluate(pip);
-            results.add((DataValue) result);
-        } // End of For Loop.
+            // Anything left to be evaluated?
+            if (func.getArgCount() == args-1) {
+                FunctionArgument result = func.evaluate(pip);
+                results.add((DataValue) result);
 
-        **/
-
+                System.out.println("Last Function Result: "+result.asBoolean(pip));
+            }
+        } // End of For Each Loop for Data Argument Stack.
 
         // Now Perform an Or Function based upon all Results Received.
         Or _OrFunction = new Or();
@@ -173,14 +184,14 @@ public class AnyOfAny extends XACMLFunction {
         // Iterate over Values for Prior Value.
         for (int i = start; i < end; i++) {
             FunctionArgument functionArgument = getArg(i).evaluate(pip);
-            DataValue dataValue = (DataValue) functionArgument.getValue(pip);
+            Object dataValue = functionArgument.getValue(pip);
             if (dataValue instanceof Collection) {
                 // Iterate over Collection DataValue Contents.
                 for ( DataValue innerDataValue : ((Collection<DataValue>) dataValue) ) {
                     crossArgumentArray.add(innerDataValue);
                 }
             } else {
-                crossArgumentArray.add(dataValue);
+                crossArgumentArray.add( (DataValue) dataValue);
             }
         }
         // Return the formulated Array for Function Application.

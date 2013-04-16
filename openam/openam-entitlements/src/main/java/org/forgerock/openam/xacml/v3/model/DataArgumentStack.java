@@ -27,6 +27,8 @@ package org.forgerock.openam.xacml.v3.model;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides a Wrapper Class for Creating, Manipulating and traversing
@@ -39,7 +41,44 @@ import java.io.Serializable;
  */
 public class DataArgumentStack implements Serializable {
 
+    private DataValue argument;
 
+    private List<DataValue> dataValues = new ArrayList<DataValue>();
 
+    public DataArgumentStack() {
+    }
+
+    public DataArgumentStack(DataValue argument) {
+        this.argument = argument;
+    }
+
+    public DataArgumentStack(DataValue argument, List<DataValue> dataValues) {
+        this.argument = argument;
+        this.dataValues = dataValues;
+    }
+
+    public DataValue getArgument() {
+        return argument;
+    }
+
+    public void setArgument(DataValue argument) {
+        this.argument = argument;
+    }
+
+    public List<DataValue> getDataValues() {
+        return dataValues;
+    }
+
+    public void setDataValues(List<DataValue> dataValues) {
+        this.dataValues = dataValues;
+    }
+
+    public boolean add(DataValue dataValue) {
+        return this.dataValues.add(dataValue);
+    }
+
+    public boolean add(List<DataValue> dataValues) {
+        return this.dataValues.addAll(dataValues);
+    }
 
 }
