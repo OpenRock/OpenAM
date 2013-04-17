@@ -102,23 +102,20 @@ public class AnyOfAll extends XACMLFunction {
         List<DataValue> results = new ArrayList<DataValue>();
         // Cast the Bag Values.
         List<DataValue> bagOneValues = bagOne.getValue(pip);
-        List<DataValue> bagTwoValues = bagTwo.getValue(pip);
-        // Iterate over our Second Bag against our First Bag.
-        for (DataValue dataValue2 : bagTwoValues) {
-            dataValue2.evaluate(pip);
-            for (DataValue dataValue1 : bagOneValues) {
-                dataValue1.evaluate(pip);
-                // Perform the Function upon our two Arguments.
-                func.clearArguments();
-                func.addArgument(dataValue1);
-                func.addArgument(dataValue2);
-                FunctionArgument result = func.evaluate(pip);
-                if ((result == null) || (!(result instanceof DataValue))) {
-                    throw new NotApplicableException("AnyOfAll Resultant Function Argument is Invalid");
-                }
-                results.add((DataValue) result);
-            } // End of Inner First Bag Loop.
-        } // End of Outer Second Bag Loop.
+        // Iterate over our First Bag against our Second Bag.
+        for (DataValue dataValue1 : bagOneValues) {
+            dataValue1.evaluate(pip);
+            // Perform the AnyOf Function.
+            AnyOf anyOf = new AnyOf();
+            anyOf.addArgument(func); // Apply Function
+            anyOf.addArgument(dataValue1);
+            anyOf.addArgument(bagTwo);
+            FunctionArgument result = anyOf.evaluate(pip);
+            if ((result == null) || (!(result instanceof DataValue))) {
+                throw new NotApplicableException("AllOfAny Resultant Function Argument is Invalid");
+            }
+            results.add((DataValue) result);
+        } // End of  First Bag Loop.
 
         // Now Perform an And Function based upon all Results Received.
         And fAnd = new And();
