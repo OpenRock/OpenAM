@@ -25,27 +25,56 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:2.0:function:dnsName-regexp-match
+ This function decides a regular expression match.  It SHALL take two arguments; the first is of type
+ “http://www.w3.org/2001/XMLSchema#string” and the second is of type “urn:oasis:names:tc:xacml:2.0:data-type:dnsName”.
+ It SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.  The first argument SHALL be a regular expression
+ and the second argument SHALL be a DNS name.  The function SHALL convert the second argument to
+ type “http://www.w3.org/2001/XMLSchema#string” with urn:oasis:names:tc:xacml:3.0:function:string-from-dnsName,
+ then apply “urn:oasis:names:tc:xacml:1.0:function:string-regexp-match”.
+ */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * urn:oasis:names:tc:xacml:2.0:function:dnsName-regexp-match
+ */
 public class DnsnameRegexpMatch extends XACMLFunction {
 
     public DnsnameRegexpMatch()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        // Validate argument List
+        if (getArgCount() != 2) {
+            return retVal;
+        }
+        // Check and Cast arguments.
+        DataValue patternValue = (DataValue) getArg(0).evaluate(pip);
+        DataValue dataValue = (DataValue) getArg(1).evaluate(pip);
+        if ((patternValue == null) || (dataValue == null)) {
+            throw new XACML3EntitlementException("No Pattern or Data Value Specified");
+        }
+        // Convert our URI to a simple String as per specification.
+        StringFromDNSName stringFromDNSName = new StringFromDNSName();
+        stringFromDNSName.addArgument(dataValue);
+        dataValue = (DataValue) stringFromDNSName.evaluate(pip);
+        // Apply the Pattern
+        try {
+            Pattern pattern = Pattern.compile(patternValue.asString(pip));
+            Matcher matcher = pattern.matcher(dataValue.asString(pip));
+            if (matcher.lookingAt()) {
+                retVal = FunctionArgument.trueObject;
+            }
+        } catch (java.util.regex.PatternSyntaxException pse) {
+            throw new XACML3EntitlementException("Pattern Syntax Exception: " + pse.getMessage());
+        }
+        return retVal;
     }
+
 }

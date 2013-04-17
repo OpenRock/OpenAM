@@ -142,16 +142,12 @@ public class AnyOfAny extends XACMLFunction {
                     func.addArgument(dataArgumentStack.getArgument());
                     func.addArgument(dataValue);
                     functionArguments++;
-
-                    System.out.println("A Function Result: "+result.asBoolean(pip));
                 }
             }
             // Anything left to be evaluated?
             if (func.getArgCount() == args-1) {
                 FunctionArgument result = func.evaluate(pip);
                 results.add((DataValue) result);
-
-                System.out.println("Last Function Result: "+result.asBoolean(pip));
             }
         } // End of For Each Loop for Data Argument Stack.
 

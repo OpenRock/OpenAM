@@ -25,22 +25,23 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:xpath-node-equal
+ *
+ This function SHALL take two “urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression” arguments and SHALL
+ return an “http://www.w3.org/2001/XMLSchema#boolean”.
+ The function SHALL return "True" if any of the XML nodes in the node-set matched by the first argument
+ equals any of the XML nodes in the node-set matched by the second argument.
+ Two nodes are considered equal if they have the same identity. If the <Content> element of the category
+ to which either XPath expression applies to is not present in the request, this function SHALL return a value of “False”.
+ */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
+@Deprecated
 public class XpathNodeEqual extends XACMLFunction {
 
     public XpathNodeEqual()  {

@@ -25,27 +25,63 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ *
+ * A.3.14 Special match functions
+ These functions operate on various types and evaluate to “http://www.w3.org/2001/XMLSchema#boolean”
+ based on the specified standard matching algorithm.
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+ urn:oasis:names:tc:xacml:1.0:function:x500Name-match
+ This function shall take two arguments of "urn:oasis:names:tc:xacml:1.0:data-type:x500Name"
+ and shall return an "http://www.w3.org/2001/XMLSchema#boolean".
 
+ It shall return “True” if and only if the first argument matches some terminal sequence of
+ RDNs from the second argument when compared using x500Name-equal.
+
+ As an example (non-normative), if the first argument is “O=Medico Corp,C=US” and
+ the second argument is “cn=John Smith,o=Medico Corp, c=US”, then the function will return “True”.
+ *
+ */
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:x500Name-match
+ */
 public class X500NameMatch extends XACMLFunction {
 
     public X500NameMatch()  {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        // Validate argument List
+        if (getArgCount() != 2) {
+            return retVal;
+        }
+        // Check and Cast arguments.
+        DataValue patternValue = (DataValue) getArg(0).evaluate(pip);
+        DataValue dataValue = (DataValue) getArg(1).evaluate(pip);
+        if ((patternValue == null) || (dataValue == null)) {
+            throw new XACML3EntitlementException("No Pattern or Data Value Specified");
+        }
+        // Convert our URI to a simple String as per specification.
+        StringFromX500Name stringFromX500Name= new StringFromX500Name();
+        stringFromX500Name.addArgument(dataValue);
+        dataValue = (DataValue) stringFromX500Name.evaluate(pip);
+        // Apply the Pattern
+        try {
+            Pattern pattern = Pattern.compile(patternValue.asString(pip));
+            Matcher matcher = pattern.matcher(dataValue.asString(pip));
+            if (matcher.lookingAt()) {
+                retVal = FunctionArgument.trueObject;
+            }
+        } catch (java.util.regex.PatternSyntaxException pse) {
+            throw new XACML3EntitlementException("Pattern Syntax Exception: " + pse.getMessage());
+        }
+        return retVal;
     }
+
 }

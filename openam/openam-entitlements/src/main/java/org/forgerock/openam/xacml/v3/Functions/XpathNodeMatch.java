@@ -25,22 +25,29 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:xpath-node-match
+ This function SHALL take two “urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression” arguments and
+ SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
+ This function SHALL evaluate to "True" if one of the following two conditions is satisfied:
+     (1) Any of the XML nodes in the node-set matched by the first argument is equal to any of the XML nodes in the
+         node-set matched by the second argument;
 
+     (2) any node below any of the XML nodes in the node-set matched by the first argument is equal to any of the XML
+         nodes in the node-set matched by the second argument.
+
+ Two nodes are considered equal if they have the same identity If the <Content> element of the category to
+ which either XPath expression applies to is not present in the request, this function SHALL return a value of “False”.
+
+ NOTE: The first condition is equivalent to "xpath-node-equal", and guarantees that "xpath-node-equal"
+ is a special case of "xpath-node-match".
+ */
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
+@Deprecated
 public class XpathNodeMatch extends XACMLFunction {
 
     public XpathNodeMatch()  {

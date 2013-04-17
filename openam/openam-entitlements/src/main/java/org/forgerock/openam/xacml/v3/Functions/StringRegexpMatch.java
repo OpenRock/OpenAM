@@ -25,27 +25,56 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * A.3.13 Regular-expression-based functions
+ These functions operate on various types using regular expressions and evaluate to
+ “http://www.w3.org/2001/XMLSchema#boolean”.
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+ urn:oasis:names:tc:xacml:1.0:function:string-regexp-match
+ This function decides a regular expression match.  It SHALL take two arguments of
+ “http://www.w3.org/2001/XMLSchema#string” and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
 
+ The first argument SHALL be a regular expression and the second argument SHALL be a general string.
+
+ The function specification SHALL be that of the “xf:matches” function with the arguments reversed [XF] Section 7.6.2.
+
+ */
+
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * urn:oasis:names:tc:xacml:1.0:function:string-regexp-match
+ */
 public class StringRegexpMatch extends XACMLFunction {
 
-    public StringRegexpMatch()  {
+    public StringRegexpMatch() {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal = FunctionArgument.falseObject;
+        // Validate argument List
+        if (getArgCount() != 2) {
+            return retVal;
+        }
+        // Check and Cast arguments.
+        DataValue patternValue = (DataValue) getArg(0).evaluate(pip);
+        DataValue dataValue = (DataValue) getArg(1).evaluate(pip);
+        if ((patternValue == null) || (dataValue == null)) {
+            throw new XACML3EntitlementException("No Pattern or Data Value Specified");
+        }
+        // Apply the Pattern
+        try {
+            Pattern pattern = Pattern.compile(patternValue.asString(pip));
+            Matcher matcher = pattern.matcher(dataValue.asString(pip));
+            if (matcher.lookingAt()) {
+                retVal = FunctionArgument.trueObject;
+            }
+        } catch (java.util.regex.PatternSyntaxException pse) {
+            throw new XACML3EntitlementException("Pattern Syntax Exception: " + pse.getMessage());
+        }
+        return retVal;
     }
 }

@@ -25,27 +25,28 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
-urn:oasis:names:tc:xacml:1.0:function:string-equal
-This function SHALL take two arguments of data-type “http://www.w3.org/2001/XMLSchema#string”
-and SHALL return an “http://www.w3.org/2001/XMLSchema#boolean”.
-The function SHALL return "True" if and only if the value of both of its arguments
-are of equal length and each string is determined to be equal.
-Otherwise, it SHALL return “False”.
-The comparison SHALL use Unicode codepoint collation,
-as defined for the identifier http://www.w3.org/2005/xpath-functions/collation/codepoint by [XF].
-*/
+/**
+ * urn:oasis:names:tc:xacml:3.0:function:xpath-node-count
+ *
+ This function SHALL take an “urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression” as an argument
+ and evaluates to an “http://www.w3.org/2001/XMLSchema#integer”.
+ The value returned from the function SHALL be the count of the nodes within the node-set that
+ match the given XPath expression. If the <Content> element of the category to which the
+ XPath expression applies to is not present in the request, this function SHALL return a value of zero.
+ */
 
 import org.forgerock.openam.xacml.v3.model.FunctionArgument;
 import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
 import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
 import org.forgerock.openam.xacml.v3.model.XACMLFunction;
 
+@Deprecated
 public class XpathNodeCount extends XACMLFunction {
 
-    public XpathNodeCount()  {
+    public XpathNodeCount() {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         return FunctionArgument.falseObject;
     }
 }
