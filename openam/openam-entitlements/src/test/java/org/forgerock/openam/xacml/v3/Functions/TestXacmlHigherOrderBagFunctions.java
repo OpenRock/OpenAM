@@ -25,14 +25,12 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -627,14 +625,18 @@ public class TestXacmlHigherOrderBagFunctions {
     /**
      * urn:oasis:names:tc:xacml:3.0:function:map
      * This function converts a bag of values to another bag of values.
+     *
      * This function SHALL take n+1 arguments, where n is one or greater.
+     *
      * The first argument SHALL be a <Function> element naming a function that takes a n arguments of a primitive
      * data-type and returns a value of a primitive data-type Under the remaining n arguments,
      * n-1 parameters SHALL be values of primitive data-types and one SHALL be a bag of a primitive data-type.
      * The expression SHALL be evaluated as if the function named in the <Function> argument were applied to the n-1
      * non-bag arguments and each element of the bag argument and resulting in a bag of the converted value.
+     *
      * The result SHALL be a bag of the primitive data-type that is returned by the
      * function named in the <xacml:Function> element.
+     *
      * <p/>
      * For example, the following expression,
      * <Apply FunctionId=”urn:oasis:names:tc:xacml:3.0:function:map”>
@@ -650,6 +652,27 @@ public class TestXacmlHigherOrderBagFunctions {
      */
     @Test
     public void testMap() throws XACML3EntitlementException {
+        final FunctionArgument testString1 = new DataValue(DataType.XACMLSTRING, "Hello");
+        final FunctionArgument testString2 = new DataValue(DataType.XACMLSTRING, "World!");
+
+        Map map = new Map();
+        StringNormalizeToLowerCase stringNormalizeToLowerCase = new StringNormalizeToLowerCase();
+
+        StringBag bag = new StringBag();
+        bag.addArgument(testString1);
+        bag.addArgument(testString2);
+
+        map.addArgument(stringNormalizeToLowerCase);
+        map.addArgument(bag);
+
+        FunctionArgument result = map.evaluate(null);
+        assertNotNull(result);
+        assertTrue(result instanceof DataBag, "Result is not a DataBag, very Bad!");
+        assertEquals(((DataBag) result).size(), 2);
+
+        // Check Bag Elements...
+        assertEquals(((DataBag) result).get(0).asString(null), "hello");
+        assertEquals(((DataBag) result).get(1).asString(null), "world!");
 
     }
 

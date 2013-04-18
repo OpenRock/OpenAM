@@ -31,8 +31,10 @@ package org.forgerock.openam.xacml.v3.Functions;
  This function SHALL take n+1 arguments, where n is one or greater.
 
  The first argument SHALL be a <Function> element naming a function that takes a n arguments of a primitive
- data-type and returns a value of a primitive data-type Under the remaining n arguments,
- n-1 parameters SHALL be values of primitive data-types and one SHALL be a bag of a primitive data-type.
+ data-type and returns a value of a primitive data-type.
+
+ Under the remaining n arguments, n-1 parameters SHALL be values of primitive data-types and one SHALL be a bag of a
+ primitive data-type.
 
  The expression SHALL be evaluated as if the function named in the <Function> argument were applied to the n-1
  non-bag arguments and each element of the bag argument and resulting in a bag of the converted value.
@@ -48,19 +50,74 @@ package org.forgerock.openam.xacml.v3.Functions;
  <AttributeValue DataType=”http://www.w3.org/2001/XMLSchema#string”>World!</AttributeValue>
  </Apply>
  </Apply>
-         Evaluates to a bag containing “hello” and “world!”.
+ Evaluates to a bag containing “hello” and “world!”.
  */
 
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
-import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+import org.forgerock.openam.xacml.v3.model.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Map extends XACMLFunction {
 
-    public Map()  {
+    public Map() {
     }
-    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
-        return FunctionArgument.falseObject;
+
+    public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
+        // Initialize
+        XACMLFunction func = null;
+        int args = getArgCount();
+        // Validate the number of Function Arguments.
+        if (args < 2) {
+            throw new NotApplicableException("Not Correct Number of Arguments, must provide at least 2");
+        }
+        // Obtain our Primary Function to be Applied...
+        if ((getArg(0) == null) || (!(getArg(0) instanceof XACMLFunction))) {
+            throw new NotApplicableException("Map first argument is null or not a XACML Function");
+        }
+        // Cast our Function to be Applied.
+        func = (XACMLFunction) getArg(0);
+        // Create and initialize our Argument Result Stack.
+        List<DataValue> results = new ArrayList<DataValue>();
+
+        // Iterate over all arguments within the Argument Stack.
+        for (int i = 1; i < args; i++) {
+            func.clearArguments();
+            FunctionArgument functionArgument = getArg(i).evaluate(pip);
+            Object topDataValue = functionArgument.getValue(pip);
+
+            // Check for Collection
+            if (topDataValue instanceof Collection) {
+                // Iterate over Collection DataValue Contents.
+                for (DataValue innerDataValue : ((Collection<DataValue>) topDataValue)) {
+                    func.clearArguments();
+                    func.addArgument(innerDataValue);
+                    // Evaluate the Function with required Arguments and Save Results.
+                    FunctionArgument result = func.evaluate(pip);
+                    results.add((DataValue) result);
+                } // End of Inner While Loop.
+            } else {
+                func.clearArguments();
+                func.addArgument((DataValue) topDataValue);
+                // Evaluate the Function with required Argument and Save Result.
+                FunctionArgument result = func.evaluate(pip);
+                results.add((DataValue) result);
+            } // End of Else.
+
+        } // End of Outer Main For Loop.
+
+        // Initialize Empty Bag.
+        DataBag dataBag = new DataBag();
+        if (results.size() > 0) {
+            dataBag.setType(results.get(0).getType());
+        }
+        // Iterate Over our DataValue Results and Create an Appropriate Bag to Return with the results.
+        for(DataValue dataValue : results) {
+            dataBag.add(dataValue);
+        }
+        // Return our Resultant Data Bag Containing our Results.
+        return dataBag;
     }
+
 }

@@ -74,7 +74,7 @@ public class AnyOfAny extends XACMLFunction {
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
         // Initialize
-        XACMLFunction func = null;
+        XACMLFunction func;
         int args = getArgCount();
         // Validate the number of Function Arguments.
         if (args < 2) {
@@ -90,7 +90,7 @@ public class AnyOfAny extends XACMLFunction {
         // Create and initialize our Argument List Stack.
         List<DataArgumentStack> dataArgumentStacks = new ArrayList<DataArgumentStack>();
 
-        // Itrate over all argument to create necessary Argument Stack.
+        // Iterate over all argument to create necessary Argument Stack.
         for (int i = 1; i < args-1; i++) {
             FunctionArgument functionArgument = getArg(i).evaluate(pip);
             Object topDataValue = functionArgument.getValue(pip);
@@ -127,7 +127,7 @@ public class AnyOfAny extends XACMLFunction {
             func.clearArguments();
             int functionArguments = 1;
             func.addArgument(dataArgumentStack.getArgument());
-            // Iterate over Arument Stack
+            // Iterate over Argument Stack
             for (DataValue dataValue : dataArgumentStack.getDataValues()) {
                 if (functionArguments < args-1) {
                     func.addArgument(dataValue);
