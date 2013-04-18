@@ -67,13 +67,13 @@ import org.testng.annotations.Test;
  */
 
 /**
- * XACML Other Functions
+ * XACML Access Permitted
  * <p/>
  * Testing Functions as specified by OASIS XACML v3 Core specification.
  *
  * @author Jeff.Schenk@ForgeRock.com
  */
-public class TestXacmlOtherFunctions {
+public class TestXacmlAccessPermitted {
 
     static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
     static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
@@ -91,8 +91,8 @@ public class TestXacmlOtherFunctions {
      * urn:oasis:names:tc:xacml:3.0:function:access-permitted
      */
     @Test
-    public void testPermitted() throws XACML3EntitlementException {
-                  // TODO ::  TBD
+    public void testXPathNodeCount() throws XACML3EntitlementException {
+        // TODO ::
     }
 
 }

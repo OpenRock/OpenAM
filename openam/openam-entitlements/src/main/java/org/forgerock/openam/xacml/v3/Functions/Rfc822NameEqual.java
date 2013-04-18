@@ -25,7 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-/*
+/**
 urn:oasis:names:tc:xacml:1.0:function:rfc822Name-equal
 This function SHALL take two arguments of data-type
 “urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name”

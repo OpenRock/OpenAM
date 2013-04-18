@@ -42,6 +42,7 @@ package org.forgerock.openam.xacml.v3.Functions;
  the second argument is “cn=John Smith,o=Medico Corp, c=US”, then the function will return “True”.
  *
  */
+
 import org.forgerock.openam.xacml.v3.model.*;
 
 import java.util.regex.Matcher;
@@ -52,7 +53,7 @@ import java.util.regex.Pattern;
  */
 public class X500NameMatch extends XACMLFunction {
 
-    public X500NameMatch()  {
+    public X500NameMatch() {
     }
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
@@ -62,24 +63,29 @@ public class X500NameMatch extends XACMLFunction {
             return retVal;
         }
         // Check and Cast arguments.
-        DataValue patternValue = (DataValue) getArg(0).evaluate(pip);
-        DataValue dataValue = (DataValue) getArg(1).evaluate(pip);
-        if ((patternValue == null) || (dataValue == null)) {
+        DataValue rndValue = (DataValue) getArg(0).evaluate(pip);
+        DataValue x500NameValue = (DataValue) getArg(1).evaluate(pip);
+        if ((rndValue == null) || (x500NameValue == null)) {
             throw new XACML3EntitlementException("No Pattern or Data Value Specified");
         }
-        // Convert our URI to a simple String as per specification.
-        StringFromX500Name stringFromX500Name= new StringFromX500Name();
-        stringFromX500Name.addArgument(dataValue);
-        dataValue = (DataValue) stringFromX500Name.evaluate(pip);
-        // Apply the Pattern
         try {
-            Pattern pattern = Pattern.compile(patternValue.asString(pip));
-            Matcher matcher = pattern.matcher(dataValue.asString(pip));
-            if (matcher.lookingAt()) {
+            // Parse our DN.
+            DN distinguishedName = new DN(x500NameValue.asX500Name(pip));
+            if (!distinguishedName.isValid()) {
+                throw new XACML3EntitlementException("Distinguished Name is Invalid");
+            }
+            // Parse our RDN.
+            DN relativeDistinguishedName = new DN(rndValue.asX500Name(pip));
+            if (!relativeDistinguishedName.isValid()) {
+                throw new XACML3EntitlementException("Relative Distinguished Name is Invalid");
+            }
+
+            // Check if the RDN is contained within the X500Name or LDAP Name construct.
+            if (distinguishedName.getDN().toLowerCase().contains(relativeDistinguishedName.getDN().toLowerCase())) {
                 retVal = FunctionArgument.trueObject;
             }
-        } catch (java.util.regex.PatternSyntaxException pse) {
-            throw new XACML3EntitlementException("Pattern Syntax Exception: " + pse.getMessage());
+        } catch (Exception e) {
+            throw new XACML3EntitlementException("X500Name Exception: " + e.getMessage());
         }
         return retVal;
     }

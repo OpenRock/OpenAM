@@ -74,25 +74,25 @@ public class TestXacmlXPathFunctions {
     /**
      * urn:oasis:names:tc:xacml:3.0:function:xpath-node-count
      */
-    @Test
+    @Test(enabled = false)
+    @Deprecated
     public void testXPathNodeCount() throws XACML3EntitlementException {
-
     }
 
     /**
      * urn:oasis:names:tc:xacml:3.0:function:xpath-node-equal
      */
-    @Test
+    @Test(enabled = false)
+    @Deprecated
     public void testXPathNodeEqual() throws XACML3EntitlementException {
-
     }
 
     /**
      * urn:oasis:names:tc:xacml:3.0:function:xpath-node-match
      */
-    @Test
+    @Test(enabled = false)
+    @Deprecated
     public void testXPathNodeMatch() throws XACML3EntitlementException {
-
     }
 
 }

@@ -59,8 +59,9 @@ package org.forgerock.openam.xacml.v3.Functions;
  this matches a value in the second argument of “Anderson@sun.com” or “Baxter@SUN.COM”, but not “Anderson@east.sun.com”.
 
  In order to match any address in a particular domain in the second argument, the
- first argument must specify the desired domain-part with a leading ".".  For example, if the first argument
- is “.east.sun.com”, this matches a value in the second argument of
+ first argument must specify the desired domain-part with a leading ".".
+
+ For example, if the first argument is “.east.sun.com”, this matches a value in the second argument of
  "Anderson@east.sun.com" and "anne.anderson@ISRG.EAST.SUN.COM" but not "Anderson@sun.com".
 
  */
@@ -76,7 +77,7 @@ import java.util.regex.Pattern;
  */
 public class Rfc822NameMatch extends XACMLFunction {
 
-    public Rfc822NameMatch()  {
+    public Rfc822NameMatch() {
     }
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
@@ -86,24 +87,46 @@ public class Rfc822NameMatch extends XACMLFunction {
             return retVal;
         }
         // Check and Cast arguments.
-        DataValue patternValue = (DataValue) getArg(0).evaluate(pip);
-        DataValue dataValue = (DataValue) getArg(1).evaluate(pip);
-        if ((patternValue == null) || (dataValue == null)) {
+        DataValue cop_rfc822NameValue = (DataValue) getArg(0).evaluate(pip);
+        DataValue rfc822NameValue = (DataValue) getArg(1).evaluate(pip);
+        if ((cop_rfc822NameValue == null) || (rfc822NameValue == null)) {
             throw new XACML3EntitlementException("No Pattern or Data Value Specified");
         }
-        // Convert our URI to a simple String as per specification.
-        StringFromRfc822Name stringFromRfc822Name = new StringFromRfc822Name();
-        stringFromRfc822Name.addArgument(dataValue);
-        dataValue = (DataValue) stringFromRfc822Name.evaluate(pip);
-        // Apply the Pattern
         try {
-            Pattern pattern = Pattern.compile(patternValue.asString(pip));
-            Matcher matcher = pattern.matcher(dataValue.asString(pip));
-            if (matcher.lookingAt()) {
-                retVal = FunctionArgument.trueObject;
+            // Verify the rfc822 Names provided.
+            // Split at the @ sign.
+            String[] cop_rfc822NameString = cop_rfc822NameValue.asRfc822Name(pip).split("@");
+            String[] rfc822NameString = rfc822NameValue.asRfc822Name(pip).split("@");
+            if ((cop_rfc822NameString == null) || (cop_rfc822NameString.length > 2) ||
+                    (cop_rfc822NameString.length < 0)) {
+                return retVal;
             }
-        } catch (java.util.regex.PatternSyntaxException pse) {
-            throw new XACML3EntitlementException("Pattern Syntax Exception: " + pse.getMessage());
+            if ((rfc822NameString == null) || (rfc822NameString.length != 2)) {
+                return retVal;
+            }
+
+            // Now based upon the length of the Complete or partial rfcName, perform necessary checks.
+            if (cop_rfc822NameString.length == 2) {
+                // Check if the Complete or Partial rfc822 Name is contained within the full rfc822 Name
+                if ( (rfc822NameString[0].equals(cop_rfc822NameString[0])) &&
+                     (rfc822NameString[1].equalsIgnoreCase(cop_rfc822NameString[1])) ) {
+                    retVal = FunctionArgument.trueObject;
+                }
+            } else {
+                // We have a Partial Name, 1 entry in the Array,
+                // Check Partial rfc822 Domain Name is contained within the full rfc822 Name
+                if (cop_rfc822NameString[0].startsWith(".")) {
+                    if (rfc822NameString[1].toLowerCase().contains(cop_rfc822NameString[0].toLowerCase())) {
+                        retVal = FunctionArgument.trueObject;
+                    }
+                } else {
+                    if (rfc822NameString[1].equalsIgnoreCase(cop_rfc822NameString[0])) {
+                        retVal = FunctionArgument.trueObject;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new XACML3EntitlementException("RFC822Name Exception: " + e.getMessage());
         }
         return retVal;
     }

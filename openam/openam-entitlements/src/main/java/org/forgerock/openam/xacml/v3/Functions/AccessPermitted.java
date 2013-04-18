@@ -25,14 +25,6 @@
  */
 package org.forgerock.openam.xacml.v3.Functions;
 
-import org.forgerock.openam.xacml.v3.model.DataType;
-import org.forgerock.openam.xacml.v3.model.DataValue;
-import org.forgerock.openam.xacml.v3.model.FunctionArgument;
-import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 /**
  * A.3.16 Other functions
  urn:oasis:names:tc:xacml:3.0:function:access-permitted
@@ -66,33 +58,22 @@ import org.testng.annotations.Test;
  Also, see the security considerations in section 9.1.8.
  */
 
+import org.forgerock.openam.xacml.v3.model.FunctionArgument;
+import org.forgerock.openam.xacml.v3.model.XACML3EntitlementException;
+import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.XACMLFunction;
+
 /**
- * XACML Other Functions
- * <p/>
- * Testing Functions as specified by OASIS XACML v3 Core specification.
- *
- * @author Jeff.Schenk@ForgeRock.com
+ * urn:oasis:names:tc:xacml:3.0:function:access-permitted
  */
-public class TestXacmlOtherFunctions {
+public class AccessPermitted extends XACMLFunction {
 
-    static final FunctionArgument trueObject = new DataValue(DataType.XACMLBOOLEAN, "true");
-    static final FunctionArgument falseObject = new DataValue(DataType.XACMLBOOLEAN, "false");
-
-
-    @BeforeClass
-    public void before() throws Exception {
+    public AccessPermitted()  {
     }
 
-    @AfterClass
-    public void after() throws Exception {
-    }
-
-    /**
-     * urn:oasis:names:tc:xacml:3.0:function:access-permitted
-     */
-    @Test
-    public void testPermitted() throws XACML3EntitlementException {
-                  // TODO ::  TBD
+    public FunctionArgument evaluate( XACMLEvalContext pip) throws XACML3EntitlementException {
+        FunctionArgument retVal =  FunctionArgument.falseObject;
+        return retVal;
     }
 
 }
