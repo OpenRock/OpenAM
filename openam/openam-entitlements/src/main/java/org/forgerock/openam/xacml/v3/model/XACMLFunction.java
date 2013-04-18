@@ -255,10 +255,15 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:3.0:function:yearMonthDuration-equal", "org.forgerock.openam.xacml.v3.Functions.YearmonthdurationEqual");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case", "org.forgerock.openam.xacml.v3.Functions.StringEqualIgnoreCase");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:anyURI-equal", "org.forgerock.openam.xacml.v3.Functions.AnyuriEqual");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-equal", "org.forgerock.openam.xacml.v3.Functions.X500nameEqual");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-equal", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameEqual");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-equal", "org.forgerock.openam.xacml.v3.Functions.X500NameEqual");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-equal", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameEqual");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:hexBinary-equal", "org.forgerock.openam.xacml.v3.Functions.HexbinaryEqual");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal", "org.forgerock.openam.xacml.v3.Functions.Base64binaryEqual");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryEqual");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:DNSName-equal",
+                "org.forgerock.openam.xacml.v3.Functions.DNSNameEqual");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:IPAddress-equal",
+                "org.forgerock.openam.xacml.v3.Functions.IPAddressEqual");
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:integer-add", "org.forgerock.openam.xacml.v3.Functions.IntegerAdd");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:double-add", "org.forgerock.openam.xacml.v3.Functions.DoubleAdd");
@@ -294,7 +299,8 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:double-less-than", "org.forgerock.openam.xacml.v3.Functions.DoubleLessThan");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:double-less-than-or-equal", "org.forgerock.openam.xacml.v3.Functions.DoubleLessThanOrEqual");
 
-        functions.put("urn:oasis:names:tc:xacml:3.0:function:dateTime-add-dayTimeDuration", "org.forgerock.openam.xacml.v3.Functions.DatetimeAddDayTimeduration");
+        functions.put("urn:oasis:names:tc:xacml:3.0:function:dateTime-add-dayTimeDuration",
+                "org.forgerock.openam.xacml.v3.Functions.DatetimeAddDaytimeduration");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:dateTime-add-yearMonthDuration", "org.forgerock.openam.xacml.v3.Functions.DatetimeAddYearmonthduration");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:dateTime-subtract-dayTimeDuration", "org.forgerock.openam.xacml.v3.Functions.DatetimeSubtractDaytimeduration");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:dateTime-subtractyearMonthDuration", "org.forgerock.openam.xacml.v3.Functions.DatetimeSubtractyearmonthduration");
@@ -368,10 +374,17 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:hexBinary-is-in", "org.forgerock.openam.xacml.v3.Functions.HexbinaryIsIn");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:hexBinary-bag", "org.forgerock.openam.xacml.v3.Functions.HexbinaryBag");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-one-and-only", "org.forgerock.openam.xacml.v3.Functions.Base64binaryOneAndOnly");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag-size", "org.forgerock.openam.xacml.v3.Functions.Base64binaryBagSize");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-is-in", "org.forgerock.openam.xacml.v3.Functions.Base64binaryIsIn");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag", "org.forgerock.openam.xacml.v3.Functions.Base64binaryBag");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-one-and-only",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryOneAndOnly");
+
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag-size",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryBagSize");
+
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-is-in",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryIsIn");
+
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-bag",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryBag");
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:dayTimeDuration-one-and-only", "org.forgerock.openam.xacml.v3.Functions.DaytimedurationOneAndOnly");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:dayTimeDuration-bag-size", "org.forgerock.openam.xacml.v3.Functions.DaytimedurationBagSize");
@@ -383,15 +396,19 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:yearMonthDuration-is-in", "org.forgerock.openam.xacml.v3.Functions.YearmonthdurationIsIn");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:yearMonthDuration-bag", "org.forgerock.openam.xacml.v3.Functions.YearmonthdurationBag");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-one-and-only", "org.forgerock.openam.xacml.v3.Functions.X500nameOneAndOnly");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-bag-size", "org.forgerock.openam.xacml.v3.Functions.X500nameBagSize");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-is-in", "org.forgerock.openam.xacml.v3.Functions.X500nameIsIn");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-bag", "org.forgerock.openam.xacml.v3.Functions.X500nameBag");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-one-and-only", "org.forgerock.openam.xacml.v3.Functions.X500NameOneAndOnly");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-bag-size", "org.forgerock.openam.xacml.v3.Functions.X500NameBagSize");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-is-in", "org.forgerock.openam.xacml.v3.Functions.X500NameIsIn");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-bag", "org.forgerock.openam.xacml.v3.Functions.X500NameBag");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-one-and-only", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameOneAndOnly");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag-size", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameBagSize");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-is-in", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameIsIn");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameBag");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-one-and-only",
+                "org.forgerock.openam.xacml.v3.Functions.Rfc822NameOneAndOnly");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag-size",
+                "org.forgerock.openam.xacml.v3.Functions.Rfc822NameBagSize");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-is-in",
+                "org.forgerock.openam.xacml.v3.Functions.Rfc822NameIsIn");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-bag",
+                "org.forgerock.openam.xacml.v3.Functions.Rfc822NameBag");
 
         functions.put("urn:oasis:names:tc:xacml:2.0:function:string-concatenate", "org.forgerock.openam.xacml.v3.Functions.StringConcatenate");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:uri-string-concatenate", "org.forgerock.openam.xacml.v3.Functions.UriStringConcatenate");
@@ -405,14 +422,15 @@ public abstract class XACMLFunction extends FunctionArgument {
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:map", "org.forgerock.openam.xacml.v3.Functions.Map");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-match", "org.forgerock.openam.xacml.v3.Functions.X500nameMatch");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-match", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameMatch");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-match", "org.forgerock.openam.xacml.v3.Functions.X500NameMatch");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-match", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameMatch");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-regexp-match", "org.forgerock.openam.xacml.v3.Functions.StringRegexpMatch");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:anyURI-regexp-match", "org.forgerock.openam.xacml.v3.Functions.AnyuriRegexpMatch");
         functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-regexp-match", "org.forgerock.openam.xacml.v3.Functions.IpaddressRegexpMatch");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-regexp-match", "org.forgerock.openam.xacml.v3.Functions.dnsNameRegexpMatch");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:rfc822Name-regexp-match", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameRegexpMatch");
-        functions.put("urn:oasis:names:tc:xacml:2.0:function:x500Name-regexp-match", "org.forgerock.openam.xacml.v3.Functions.X500nameRegexpMatch");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:dnsName-regexp-match",
+                "org.forgerock.openam.xacml.v3.Functions.DnsnameRegexpMatch");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:rfc822Name-regexp-match", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameRegexpMatch");
+        functions.put("urn:oasis:names:tc:xacml:2.0:function:x500Name-regexp-match", "org.forgerock.openam.xacml.v3.Functions.X500NameRegexpMatch");
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-intersection", "org.forgerock.openam.xacml.v3.Functions.StringIntersection");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.StringAtLeastOneMemberOf");
@@ -441,7 +459,8 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-intersection", "org.forgerock.openam.xacml.v3.Functions.TimeIntersection");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.TimeAtLeastOneMemberOf");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-union", "org.forgerock.openam.xacml.v3.Functions.TimeUnion");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:time-subset", "org.forgerock.openam.xacml.v3.Functions.timeSubset");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:time-subset",
+                "org.forgerock.openam.xacml.v3.Functions.TimeSubset");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:time-set-equals", "org.forgerock.openam.xacml.v3.Functions.TimeSetEquals");
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:date-intersection", "org.forgerock.openam.xacml.v3.Functions.DateIntersection");
@@ -468,11 +487,16 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:hexBinary-subset", "org.forgerock.openam.xacml.v3.Functions.HexbinarySubset");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:hexBinary-set-equals", "org.forgerock.openam.xacml.v3.Functions.HexbinarySetEquals");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-intersection", "org.forgerock.openam.xacml.v3.Functions.Base64binaryIntersection");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.Base64binaryAtLeastOneMemberOf");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-union", "org.forgerock.openam.xacml.v3.Functions.Base64binaryUnion");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-subset", "org.forgerock.openam.xacml.v3.Functions.Base64binarySubset");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-set-equals", "org.forgerock.openam.xacml.v3.Functions.Base64binarySetEquals");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-intersection",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryIntersection");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-at-least-one-member-of",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryAtLeastOneMemberOf");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-union",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinaryUnion");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-subset",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinarySubset");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:base64Binary-set-equals",
+                "org.forgerock.openam.xacml.v3.Functions.Base64BinarySetEquals");
 
         functions.put("urn:oasis:names:tc:xacml:1.0:function:dayTimeDuration-intersection", "org.forgerock.openam.xacml.v3.Functions.DaytimedurationIntersection");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:dayTimeDuration-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.DaytimedurationAtLeastOneMemberOf");
@@ -486,17 +510,18 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:1.0:function:yearMonthDuration-subset", "org.forgerock.openam.xacml.v3.Functions.YearmonthdurationSubset");
         functions.put("urn:oasis:names:tc:xacml:1.0:function:yearMonthDuration-set-equals", "org.forgerock.openam.xacml.v3.Functions.YearmonthdurationSetEquals");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-intersection", "org.forgerock.openam.xacml.v3.Functions.X500nameIntersection");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.X500nameAtLeastOneMemberOf");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-union", "org.forgerock.openam.xacml.v3.Functions.X500nameUnion");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-subset", "org.forgerock.openam.xacml.v3.Functions.X500nameSubset");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-set-equals", "org.forgerock.openam.xacml.v3.Functions.X500nameSetEquals");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-intersection", "org.forgerock.openam.xacml.v3.Functions.X500NameIntersection");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.X500NameAtLeastOneMemberOf");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-union", "org.forgerock.openam.xacml.v3.Functions.X500NameUnion");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-subset", "org.forgerock.openam.xacml.v3.Functions.X500NameSubset");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:x500Name-set-equals", "org.forgerock.openam.xacml.v3.Functions.X500NameSetEquals");
 
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-intersection", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameIntersection");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-at-least-one-member-of", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameAtLeastOneMemberOf");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-union", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameUnion");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-subset", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameSubset");
-        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-set-equals", "org.forgerock.openam.xacml.v3.Functions.Rfc822nameSetEquals");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-intersection", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameIntersection");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-at-least-one-member-of",
+                "org.forgerock.openam.xacml.v3.Functions.Rfc822NameAtLeastOneMemberOf");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-union", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameUnion");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-subset", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameSubset");
+        functions.put("urn:oasis:names:tc:xacml:1.0:function:rfc822Name-set-equals", "org.forgerock.openam.xacml.v3.Functions.Rfc822NameSetEquals");
 
 
         functions.put("urn:oasis:names:tc:xacml:2.0:function:ipAddress-one-and-only",
@@ -554,7 +579,7 @@ public abstract class XACMLFunction extends FunctionArgument {
         functions.put("urn:oasis:names:tc:xacml:3.0:function:string-contains", "org.forgerock.openam.xacml.v3.Functions.StringContains");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:anyURI-contains", "org.forgerock.openam.xacml.v3.Functions.AnyUriContains");
         functions.put("urn:oasis:names:tc:xacml:3.0:function:string-substring", "org.forgerock.openam.xacml.v3.Functions.StringSubString");
-        functions.put("urn:oasis:names:tc:xacml:3.0:function:anyURI-substring", "org.forgerock.openam.xacml.v3.Functions.AnyuriFromString");
+        functions.put("urn:oasis:names:tc:xacml:3.0:function:anyURI-substring", "org.forgerock.openam.xacml.v3.Functions.AnyUriSubString");
 
         /**
          * Specialized Functions
