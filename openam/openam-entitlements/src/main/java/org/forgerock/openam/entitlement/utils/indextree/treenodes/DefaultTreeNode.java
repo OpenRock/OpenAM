@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
+
 /**
  * Provides the default implementation of a tree node.
  * 
@@ -36,7 +38,7 @@ public class DefaultTreeNode extends BasicTreeNode {
 	}
 
 	@Override
-	public boolean hasInterestIn(char value) {
+	public boolean hasInterestIn(char value, SearchContext context) {
 		return nodeValue == value;
 	}
 
