@@ -91,7 +91,7 @@ public class TestXacmlAccessPermitted {
      * urn:oasis:names:tc:xacml:3.0:function:access-permitted
      */
     @Test
-    public void testXPathNodeCount() throws XACML3EntitlementException {
+    public void testAccessPermitted() throws XACML3EntitlementException {
         // TODO ::
     }
 
