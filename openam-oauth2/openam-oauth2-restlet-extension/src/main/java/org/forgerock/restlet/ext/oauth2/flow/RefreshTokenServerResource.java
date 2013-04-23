@@ -24,10 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
@@ -100,7 +97,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
             Map<String, Object> response = token.convertToMap();
 
             //execute post token creation pre return scope plugin for extra return data.
-            Set<String> data = new HashSet<String>();
+            Map<String, String> data = new HashMap<String, String>();
             response.putAll(executeExtraDataScopePlugin(data ,token));
 
             return new JacksonRepresentation<Map>(response);

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,11 +19,12 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
         Map<String, Object> response = token.convertToMap();
 
         //execute post token creation pre return scope plugin for extra return data.
-        Set<String> data = new HashSet<String>();
+        Map<String,String> data = new HashMap<String,String>();
         response.putAll(executeExtraDataScopePlugin(data ,token));
 
         return new JacksonRepresentation<Map>(response);

@@ -62,10 +62,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     private long REFRESH_TOKEN_LIFETIME = 1;
     private long ACCESS_TOKEN_LIFETIME = 1;
 
-    // Removed: long requestTime
-    // Removed: String clientID
-    // Removed: String redirectURI
-
     private JsonResource repository;
 
     /**
@@ -105,7 +101,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public CoreToken createAuthorizationCode(Set<String> scope, String realm, String uuid,
             SessionClient client) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
@@ -172,7 +167,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public CoreToken readAuthorizationCode(String id) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Reading Authorization code: " + id);
@@ -203,7 +197,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void deleteAuthorizationCode(String id) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Deleting Authorization code: " + id);
@@ -289,7 +282,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public CoreToken readAccessToken(String id) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Reading access token");
@@ -320,7 +312,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void deleteAccessToken(String id) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Deleting access token");
@@ -342,7 +333,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public CoreToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId, String redirectURI)
             throws OAuthProblemException{
         if (OAuth2Utils.DEBUG.messageEnabled()){
@@ -381,7 +371,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public CoreToken readRefreshToken(String id) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Read refresh token");
@@ -411,7 +400,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void deleteRefreshToken(String id) {
         JsonValue response = null;
 
@@ -430,7 +418,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    @Override
     public JsonValue queryForToken(String id) throws OAuthProblemException{
         JsonValue response = null;
 
@@ -459,10 +446,10 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * {@inheritDoc}
      */
-    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk){
+    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce){
         long timeInSeconds = System.currentTimeMillis()/1000;
         getSettings(realm);
-        JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm);
+        JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
         String jwt = null;
         try {
             jwt = jwtToken.sign(pk).build();

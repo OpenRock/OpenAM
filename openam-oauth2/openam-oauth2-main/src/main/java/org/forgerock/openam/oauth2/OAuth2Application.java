@@ -30,6 +30,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
+import org.forgerock.openam.oauth2.openid.UserInfo;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -85,6 +86,17 @@ public class OAuth2Application extends Application {
                         OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
         authenticator.setNext(ConnectClientRegistration.class);
         root.attach("/connect/register", authenticator);
+
+        //connect userinfo
+        validationServerRef = new Reference(OAuth2Utils.getDeploymentURL(Request.getCurrent())+ "/oauth2" + OAuth2Utils.getTokenInfoPath(getContext()));
+        validator =
+                new ValidationServerResource(getContext(), validationServerRef);
+        tokenVerifier = new BearerTokenVerifier(validator);
+        authenticator =
+                new OAuth2Authenticator(getContext(), null,
+                        OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
+        authenticator.setNext(UserInfo.class);
+        root.attach("/userinfo", authenticator);
 
         return root;
     }

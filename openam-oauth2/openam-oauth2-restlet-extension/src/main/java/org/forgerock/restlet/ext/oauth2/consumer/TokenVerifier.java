@@ -60,7 +60,6 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
 
         private OAuth2Utils.ParameterLocation tokenLocation;
 
-        @Override
         public int verify(Request request, Response response) {
             int result = RESULT_INVALID;
             try {
@@ -75,6 +74,7 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                                         OAuth2Utils.ParameterLocation.HTTP_BODY, request);
                         break;
                     }
+                    break;
                 }
                 case HTTP_HEADER: {
                     if (request.getChallengeResponse() == null) {
@@ -92,7 +92,13 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                 } else {
                     U t = getTokenValidator().verify(token);
                     if (null != t || !t.isExpired()) {
-                        request.getClientInfo().setUser(createUser(t));
+                        try {
+                            if (request.getClientInfo() != null){
+                                request.getClientInfo().setUser(createUser(t));
+                            }
+                        } catch (Exception e){
+                            //do nothing
+                        }
                         result = RESULT_VALID;
                     }
                 }

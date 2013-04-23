@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,9 +22,6 @@
  * "Portions copyright [year] [name of copyright owner]"
  */
 
-/**
- * Portions copyright 2012-2013 ForgeRock Inc
- */
 package org.forgerock.openam.oauth2.provider;
 
 import java.security.PrivateKey;
@@ -185,8 +182,9 @@ public interface OAuth2TokenStore {
      * @param deploymentURI the issuer of the token
      * @param authorizationParty the client allowed to use the token as an access token
      * @param pk the private key to sign the JWT with
+     * @param nonce The nonce passed in from the request
      * @return
      */
-    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk);
+    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce);
 
 }

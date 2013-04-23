@@ -24,6 +24,7 @@
 
 package org.forgerock.openam.oauth2.provider.impl;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
@@ -32,6 +33,7 @@ import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.JWTToken;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
@@ -58,6 +60,37 @@ public class ScopeImpl implements Scope {
         } catch (NoSuchAlgorithmException e){
 
         }
+    }
+
+    private static Map<String, Object> scopeToUserUserProfileAttributes;
+
+    static {
+        scopeToUserUserProfileAttributes = new HashMap<String, Object>();
+        scopeToUserUserProfileAttributes.put("email","mail");
+        scopeToUserUserProfileAttributes.put("address", "postaladdress");
+        scopeToUserUserProfileAttributes.put("phone", "telephonenumber");
+
+        Map<String, Object> profileSet = new HashMap<String, Object>();
+        profileSet.put("name", "cn");
+        profileSet.put("given_name", "givenname");
+        profileSet.put("family_name", "sn");
+        profileSet.put("locale", "preferredlocale");
+        profileSet.put("zoneinfo", "preferredtimezone");
+
+        scopeToUserUserProfileAttributes.put("profile", profileSet);
+    }
+
+    private OAuth2TokenStore store = null;
+    private AMIdentity id = null;
+
+    public ScopeImpl(){
+        this.store = new DefaultOAuthTokenStoreImpl();
+        this.id = null;
+    }
+
+    public ScopeImpl(OAuth2TokenStore store, AMIdentity id){
+        this.store = store;
+        this.id = id;
     }
 
     /**
@@ -116,7 +149,11 @@ public class ScopeImpl implements Scope {
         if (resourceOwner != null){
             AMIdentity id = null;
             try {
-            id = getIdentity(resourceOwner, token.getRealm());
+                if (this.id == null){
+                    id = getIdentity(resourceOwner, token.getRealm());
+                } else {
+                    id = this.id;
+                }
             } catch (Exception e){
                 OAuth2Utils.DEBUG.error("Unable to get user identity", e);
             }
@@ -179,20 +216,21 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Object> extraDataToReturnForTokenEndpoint(Set<String> parameters, CoreToken token){
+    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters, CoreToken token){
         Map<String, Object> map = new HashMap<String, Object>();
         Set<String> scope = token.getScope();
 
         //OpenID Connect
         // if an openid scope return the id_token
-        if (scope.contains("openid")){
+        if (scope != null && scope.contains("openid")){
             DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
             String jwtToken = store.createSignedJWT(token.getRealm(),
                     token.getUserID(),
                     token.getClientID(),
                     OAuth2Utils.getDeploymentURL(Request.getCurrent()),
                     token.getClientID(),
-                    keyPair.getPrivate());
+                    keyPair.getPrivate(),
+                    parameters.get(OAuth2Constants.Custom.NONCE));
             map.put("id_token", jwtToken);
         }
         //END OpenID Connect
@@ -202,7 +240,7 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Set<String> parameters, Map<String, CoreToken> tokens){
+    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters, Map<String, CoreToken> tokens){
         Map<String, String> map = new HashMap<String, String>();
 
         // OpenID Connect
@@ -210,26 +248,127 @@ public class ScopeImpl implements Scope {
         if (tokens != null && !tokens.isEmpty()){
             for(Map.Entry<String, CoreToken> token : tokens.entrySet() ){
                 Set<String> scope = token.getValue().getScope();
-                if (scope.contains("openid") && !token.getKey().equalsIgnoreCase(OAuth2Constants.AuthorizationEndpoint.CODE)){
-                    DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
+                String responseType = null;
+                Set<String> responseTypes = null;
+
+                //get the set of response types passed in
+                if (parameters != null){
+                    responseType = parameters.get(OAuth2Constants.Params.RESPONSE_TYPE);
+                    if (responseType != null && !responseType.isEmpty()){
+                        responseTypes = new HashSet<String>(Arrays.asList(responseType.split(" ")));
+                    }
+                }
+
+                //create an id token if requested and we are in an openid flow.
+                if (scope != null && scope.contains("openid") && !token.getKey().equalsIgnoreCase(OAuth2Constants.AuthorizationEndpoint.CODE)
+                    && responseTypes != null && responseTypes.contains("id_token")){
+                    String nonce = parameters.get(OAuth2Constants.Custom.NONCE);
+                    if (nonce == null || nonce.isEmpty()){
+                        // nonce is required
+                        OAuth2Utils.DEBUG.error("Nonce is required for the authorization endpoint.");
+                        throw OAuthProblemException.OAuthError.INVALID_CODE.handle(Request.getCurrent(),
+                                "Nonce is required for the authorization endpoint.");
+                    }
+
                     String jwtToken = store.createSignedJWT(token.getValue().getRealm(),
                                                 token.getValue().getUserID(),
                                                 token.getValue().getClientID(),
                                                 OAuth2Utils.getDeploymentURL(Request.getCurrent()),
                                                 token.getValue().getClientID(),
-                                                keyPair.getPrivate());
+                                                keyPair.getPrivate(),
+                                                parameters.get(OAuth2Constants.Custom.NONCE));
                     map.put("id_token", jwtToken);
                     fragment = true;
                     break;
                 }
             }
         }
+        //set the return type for the redirect uri.
         if (fragment){
             map.put("returnType", "FRAGMENT");
         }
         //end OpenID Connect
 
         return map;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String,Object> getUserInfo(CoreToken token){
+
+        Set<String> scopes = token.getScope();
+        Map<String,Object> response = new HashMap<String, Object>();
+        AMIdentity id = null;
+        if (this.id == null){
+            id = getIdentity(token.getUserID(), token.getRealm());
+        } else {
+            id = this.id;
+        }
+
+        //add the subject identifier to the response
+        response.put("sub", token.getUserID());
+        for(String scope: scopes){
+
+            //get the attribute associated with the scope
+            Object attributes = scopeToUserUserProfileAttributes.get(scope);
+            if (attributes == null){
+             OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo()::Invalid Scope in token scope="+ scope);
+            } else if (attributes instanceof String){
+                Set<String> attr = null;
+
+                //if the attribute is a string get the attribute
+                try {
+                    attr = id.getAttribute((String)attributes);
+                } catch (IdRepoException e) {
+                    OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                } catch (SSOException e) {
+                    OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                }
+
+                //add a single object to the response.
+                if (attr != null && attr.size() == 1){
+                    response.put(scope, attr.iterator().next());
+                } else if (attr != null && attr.size() > 1){ // add a set to the response
+                    response.put(scope, attr);
+                } else {
+                    //attr is null or attr is empty
+                    OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
+                }
+            } else if (attributes instanceof Map){
+
+                //the attribute is a collection of attributes
+                //for example profile can be address, email, etc...
+                if (attributes != null && !((Map<String,String>) attributes).isEmpty()){
+                    for (Map.Entry<String, String> entry: ((Map<String, String>) attributes).entrySet()){
+                        String attribute = null;
+                        attribute = (String)entry.getValue();
+                        Set<String> attr = null;
+
+                        //get the attribute
+                        try {
+                            attr = id.getAttribute(attribute);
+                        } catch (IdRepoException e) {
+                            OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                        } catch (SSOException e) {
+                            OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                        }
+
+                        //add the attribute value(s) to the response
+                        if (attr != null && attr.size() == 1){
+                            response.put(entry.getKey(), attr.iterator().next());
+                        } else if (attr != null && attr.size() > 1){
+                            response.put(entry.getKey(), attr);
+                        } else {
+                            //attr is null or attr is empty
+                            OAuth2Utils.DEBUG.error("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
+                        }
+                    }
+                }
+            }
+        }
+
+        return response;
     }
 
 }

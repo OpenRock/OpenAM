@@ -83,6 +83,7 @@ public class ClientApplicationImpl implements ClientApplication{
         Set<URI> redirectionURIs = null;
         try {
             Set<String> redirectionURIsSet = id.getAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI);
+            redirectionURIsSet = convertAttributeValues(redirectionURIsSet);
             redirectionURIs = new HashSet<URI>();
             for (String uri : redirectionURIsSet){
                 redirectionURIs.add(URI.create(uri));
@@ -132,7 +133,7 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SCOPES +" from repository");
         }
-        return scopes;
+        return convertAttributeValues(scopes);
     }
 
     /**
@@ -147,7 +148,7 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_SCOPES +" from repository");
         }
-        return scopes;
+        return convertAttributeValues(scopes);
     }
 
     /**
@@ -179,7 +180,7 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
-        return displayName;
+        return convertAttributeValues(displayName);
     }
 
     /**
@@ -194,7 +195,7 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
-        return displayDescription;
+        return convertAttributeValues(displayDescription);
     }
 
     /**
@@ -210,7 +211,7 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
-        return set;
+        return convertAttributeValues(set);
 
     }
 
@@ -227,7 +228,7 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.GRANT_TYPES +" from repository");
         }
-        return set;
+        return convertAttributeValues(set);
 
     }
 
@@ -623,5 +624,20 @@ public class ClientApplicationImpl implements ClientApplication{
         }
         return set.iterator().next();
 
+    }
+
+    private Set<String> convertAttributeValues(Set<String> input) {
+        Set<String> result = new HashSet<String>();
+        for (String param : input) {
+            int idx = param.indexOf('=');
+            if (idx != -1) {
+                String value = param.substring(idx + 1).trim();
+                if (!value.isEmpty()) {
+                    result.add(value);
+                }
+            }
+        }
+
+        return result;
     }
 }

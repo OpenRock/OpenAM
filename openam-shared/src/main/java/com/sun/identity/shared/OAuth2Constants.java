@@ -641,12 +641,14 @@ public class OAuth2Constants {
          * even if he has already granted access to your application for a
          * particular set of scopes."
          */
+        public static final String PROMPT = "prompt";
         public static final String APPROVAL_PROMPT = "approval_prompt";
         public static final String AUTO = "auto";
         public static final String FORCE = "force";
         public static final String DECISION = "decision";
         public static final String ALLOW = "allow";
         public static final String DENY = "deny";
+        public static final String NONCE = "nonce";
         /**
          * The display mode in which to render the dialog. The default is
          * {@code page} on the www subdomain and {@code wap} on the m subdomain.
@@ -677,7 +679,7 @@ public class OAuth2Constants {
     }
 
     public enum DisplayType {
-        IFRAME, PAGE, POPUP, TOUCH, WAP;
+        PAGE, POPUP, TOUCH, WAP;
 
         public String getFolder() {
             return name().toLowerCase();

@@ -61,7 +61,6 @@ public class ClientVerifierImpl implements ClientVerifier{
     /**
      * {@inheritDoc}
      */
-    @Override
     public ClientApplication verify(Request request, Response response){
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("ClientVerifierImpl::Verifying client application");
@@ -185,7 +184,6 @@ public class ClientVerifierImpl implements ClientVerifier{
     /**
      * {@inheritDoc}
      */
-    @Override
     public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String clientId){
 
         return null;

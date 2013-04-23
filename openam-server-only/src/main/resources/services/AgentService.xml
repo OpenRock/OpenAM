@@ -97,7 +97,7 @@
                                      i18nKey="a704"
                                      uitype="unorderedlist">
                        <DefaultValues>
-                           <Value></Value>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.scopes"
@@ -106,6 +106,7 @@
                                      i18nKey="a705"
                                      uitype="unorderedlist">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.defaultScopes"
@@ -114,6 +115,7 @@
                                      i18nKey="a708"
                                      uitype="unorderedlist">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.name"
@@ -122,6 +124,7 @@
                                      i18nKey="a706"
                                      uitype="unorderedlist">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.description"
@@ -130,6 +133,7 @@
                                      i18nKey="a707"
                                      uitype="unorderedlist">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                   <AttributeSchema
@@ -165,7 +169,7 @@
                           i18nKey="a716"
                           uitype="unorderedlist">
                       <DefaultValues>
-                          <Value></Value>
+                          <Value>[0]=</Value>
                       </DefaultValues>
                   </AttributeSchema>
                   <AttributeSchema
@@ -358,7 +362,7 @@
                           i18nKey="a739"
                           uitype="unorderedlist">
                       <DefaultValues>
-                          <Value></Value>
+                          <Value>[0]=</Value>
                       </DefaultValues>
                   </AttributeSchema>
 
