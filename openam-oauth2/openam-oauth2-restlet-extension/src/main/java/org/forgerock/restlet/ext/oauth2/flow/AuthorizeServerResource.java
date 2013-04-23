@@ -164,7 +164,10 @@ public class AuthorizeServerResource extends AbstractFlow {
             Form tokenForm = tokensToForm(listOfTokens);
 
             //execute post token creation pre return scope plugin for extra return data.
-            Set<String> extraData = new HashSet<String>();
+            Map<String, String> extraData = new HashMap<String, String>();
+            String nonce = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
+            extraData.put(OAuth2Constants.Custom.NONCE, nonce);
+            extraData.put(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class));
             Map<String, String> valuesToAdd = executeAuthorizationExtraDataScopePlugin(extraData, listOfTokens);
             if (valuesToAdd != null && !valuesToAdd.isEmpty()){
                 String returnType = valuesToAdd.remove("returnType");

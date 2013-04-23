@@ -24,6 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.io.IOException;
 import java.security.AccessController;
 import java.util.*;
 
@@ -303,7 +304,21 @@ public abstract class AbstractFlow extends ServerResource {
             } catch (IllegalArgumentException e) {
             }
         }
-        Representation r = getPage(displayType.getFolder(), templateName, dataModel);
+        Representation r = null;
+        if (display != null && display.equalsIgnoreCase(OAuth2Constants.DisplayType.POPUP.name())){
+            Representation popup = getPage(displayType.getFolder(), "authorize.ftl", dataModel);
+
+            try {
+                ((Map)dataModel).put("htmlCode", popup.getText());
+            } catch (IOException e) {
+                OAuth2Utils.DEBUG.error("AbstractFlow::Server can not serve the content of authorization page");
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
+                        "Server can not serve the content of authorization page");
+            }
+            r = getPage(displayType.getFolder(), "popup.ftl", dataModel);
+        } else {
+            r = getPage(displayType.getFolder(), templateName, dataModel);
+        }
         if (null != r) {
             return r;
         }
@@ -668,7 +683,7 @@ public abstract class AbstractFlow extends ServerResource {
         return checkedScope;
     }
 
-    protected Map<String, Object> executeExtraDataScopePlugin(Set<String> data, CoreToken token){
+    protected Map<String, Object> executeExtraDataScopePlugin(Map<String, String> data, CoreToken token){
         Map<String, Object> jsonData = null;
         String pluginClass = null;
         Scope scopeClass = null;
@@ -689,7 +704,7 @@ public abstract class AbstractFlow extends ServerResource {
         return jsonData;
     }
 
-    protected Map<String, String> executeAuthorizationExtraDataScopePlugin(Set<String> data, Map<String, CoreToken> token){
+    protected Map<String, String> executeAuthorizationExtraDataScopePlugin(Map<String, String> data, Map<String, CoreToken> token){
         Map<String, String> jsonData = null;
         String pluginClass = null;
         Scope scopeClass = null;

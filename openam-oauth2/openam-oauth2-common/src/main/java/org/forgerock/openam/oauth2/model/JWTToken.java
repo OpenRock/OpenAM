@@ -1,22 +1,25 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information:
- *
- * "Portions copyright [year] [name of copyright owner]".
- *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.model;
@@ -47,8 +50,9 @@ public class JWTToken extends CoreToken {
      * @param iat The time the JWT was issued at in seconds since epoc.
      * @param ath The time the authorization for the JWT was made.
      * @param realm The realm the JWT belongs too.
+     * @param nonce The nonce passed into the request
      */
-    public JWTToken(String iss, String sub, String aud, String azp, long exp, long iat, long ath, String realm){
+    public JWTToken(String iss, String sub, String aud, String azp, long exp, long iat, long ath, String realm, String nonce){
         setIssuer(iss);
         setSubject(sub);
         setAudience(aud);
@@ -57,6 +61,7 @@ public class JWTToken extends CoreToken {
         setIssueTime(iat);
         setAuthTime(ath);
         setRealm(realm);
+        setNonce(nonce);
         builder.addValuePairs(super.asMap());
     }
 
@@ -153,5 +158,13 @@ public class JWTToken extends CoreToken {
      */
     private void setAuthTime(long time){
         super.put("ath", time);
+    }
+
+    /**
+     * Adds the request nonce to the JWT
+     * @param nonce
+     */
+    private void setNonce(String nonce){
+        super.put("nonce", nonce);
     }
 }
