@@ -229,15 +229,13 @@
         <!-- OpenAM OAuth2 Token Service -->
         <module>openam-oauth2</module>
 
+        <!-- UI Modules -->
         <module>openam-common-auth-ui</module>
-
         <module>openam-server-auth-ui</module>
-
         <module>openam-ui-ria</module>
 
-        <module>openam-server-only</module>
-
         <!-- OpenAM Server -->
+        <module>openam-server-only</module>
         <module>openam-server</module>
 
         <!-- Tools Artifacts -->
@@ -289,16 +287,14 @@
         </developer>
 
         <developer>
-            <id>jeff.schenk</id>
-            <name>Jeff Schenk</name>
-            <email>jeff.schenk@forgerock.com</email>
+            <id>jonathan.scudder</id>
+            <name>Jonathan Scudder</name>
+            <email>jonathan.scudder@forgerock.com</email>
             <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
+            <organization>ForgeRock UK - Oslo</organization>
             <organizationUrl>http://www.forgerock.com</organizationUrl>
             <roles>
-                <role>Build Master</role>
-                <role>Senior Software Development Engineer</role>
-                <role>Support Staff</role>
+                <role>OpenAM Chief Architect</role>
             </roles>
         </developer>
 
@@ -325,18 +321,6 @@
             <roles>
                 <role>Support Staff</role>
                 <role>Software Engineer</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>jonathan.scudder</id>
-            <name>Jonathan Scudder</name>
-            <email>jonathan.scudder@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock UK - Oslo</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>OpenAM Chief Architect</role>
             </roles>
         </developer>
 
@@ -464,6 +448,12 @@
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
             <url>http://maven.restlet.org</url>
+        </repository>
+
+        <repository>
+            <id>maven-one</id>
+            <name>Maven One</name>
+            <url>http://download.java.net/maven/1</url>
         </repository>
 
     </repositories>
@@ -1494,46 +1484,67 @@
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>1.9.7</version>
             </dependency>
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.jackson</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
+
+            <!-- RESTlet OSGI Components -->
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.jackson</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.servlet</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.freemarker</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.ssl</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
+            <!-- RESTlet JAVA SE Components -->
+            <dependency>
+<<<<<<< .working
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet</artifactId>
+=======
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.freemarker</artifactId>
+>>>>>>> .merge-right.r5138
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.simple</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.crypto</artifactId>
@@ -1544,6 +1555,43 @@
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.httpclient</artifactId>
                 <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.atom</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jaxrs</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.xml</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jaxb</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.test</artifactId>
+                <version>${restlet.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- Commons Dependencies -->

@@ -25,9 +25,9 @@
  */
 package org.forgerock.openam.xacml.v3.rest;
 
-
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.ext.ContextResolver;
