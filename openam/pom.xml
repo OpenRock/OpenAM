@@ -1518,18 +1518,20 @@
 
             <!-- RESTlet JAVA SE Components -->
             <dependency>
-<<<<<<< .working
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet</artifactId>
-=======
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.json</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.freemarker</artifactId>
->>>>>>> .merge-right.r5138
                 <version>${restlet.version}</version>
             </dependency>
 
