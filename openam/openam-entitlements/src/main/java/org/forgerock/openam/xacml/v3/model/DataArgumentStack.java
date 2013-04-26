@@ -35,7 +35,7 @@ import java.util.List;
  * a set of arguments which must be applied to a given Function.
  * <p/>
  *
- * @author jeff.schenk@forgerock.com
+ * X500Name
  * @see org.forgerock.openam.xacml.v3.Functions.AnyOfAny
  *
  */

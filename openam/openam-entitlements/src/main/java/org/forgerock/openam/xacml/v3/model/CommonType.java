@@ -29,7 +29,7 @@ package org.forgerock.openam.xacml.v3.model;
  * Normalized Content Types from Specific Types.
  * <p/>
  *
- * @author jeff.schenk@forgerock.com
+ * X500Name
  * @see ContentType
  *
  */

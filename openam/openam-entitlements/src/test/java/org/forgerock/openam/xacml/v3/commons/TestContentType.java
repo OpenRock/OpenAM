@@ -36,8 +36,6 @@ import static org.testng.Assert.*;
 
 /**
  * Very simple test to check parsing and validation of URNs.
- *
- * @author jeff.schenk@forgerock.com
  */
 public class TestContentType {
 

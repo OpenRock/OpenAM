@@ -31,7 +31,7 @@ package org.forgerock.openam.xacml.v3.resources;
  * Provides Top Level Object for XACML v3 Resources
  * which represent end components for the overall XACML Framework.
  *
- * @author Jeff.Schenk@forgerock.com
+ * X500Name
  */
 public abstract class XACML3Resource {
 

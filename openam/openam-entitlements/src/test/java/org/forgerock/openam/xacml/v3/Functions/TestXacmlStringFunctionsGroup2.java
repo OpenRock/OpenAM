@@ -142,7 +142,7 @@ import static org.testng.Assert.assertEquals;
  * <p/>
  * Testing Functions as specified by OASIS XACML v3 Core specification.
  *
- * @author Jeff.Schenk@ForgeRock.com
+ * X500Name
  */
 public class TestXacmlStringFunctionsGroup2 {
 

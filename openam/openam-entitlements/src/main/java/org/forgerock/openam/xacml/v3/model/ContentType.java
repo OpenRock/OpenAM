@@ -31,7 +31,7 @@ package org.forgerock.openam.xacml.v3.model;
  * <p/>
  * Extending MediaTypes, @see javax.ws.rs.core.MediaType.
  *
- * @author jeff.schenk@forgerock.com
+ * X500Name
  */
 public enum ContentType {
 

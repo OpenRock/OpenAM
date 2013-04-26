@@ -23,8 +23,6 @@ package com.iplanet.dpro.session.exceptions;
 /**
  * Provides a specific Exception for Entries which already exist
  * in the Repository.
- * 
- * @author jeff.schenk@forgerock.com
  */
 public class EntryAlreadyExistsException extends Exception {
     private static final long serialVersionUID = 42L;

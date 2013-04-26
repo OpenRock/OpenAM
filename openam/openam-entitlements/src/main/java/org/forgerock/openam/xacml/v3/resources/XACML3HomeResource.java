@@ -14,7 +14,7 @@ import java.io.IOException;
  * <p/>
  * Provides main end-point for all XACML Home requests.
  *
- * @author Jeff.Schenk@forgerock.com
+ * X500Name
  */
 public class XACML3HomeResource extends XACML3Resource {
     /**

@@ -24,7 +24,6 @@ package org.forgerock.openam.utils;
  * Simple Class to Provide Time Duration Calculation for certain
  * events within the OpenAM framework.
  *
- * @author jeff.schenk@forgerock.com
  */
 public class TimeDuration {
     /**

@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * RFC2141. @see http://www.ietf.org/rfc/rfc2141.txt
  * RFC2169, HTTP in URN Resolution @see http://tools.ietf.org/html/rfc2169
  *
- * @author jeff.schenk@forgerock.com
+ * X500Name
  */
 public class URN implements Serializable {
 

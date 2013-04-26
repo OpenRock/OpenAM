@@ -36,8 +36,6 @@ import java.io.Serializable;
  * Provides necessary information to perform a Session Repository Event against the
  * appropriate backend.
  *
- * @author jeff.schenk@forgerock.org
- *
  */
 public class AMSessionRepositoryDeferredOperation implements Serializable {
     private static final long serialVersionUID = 101L;   //  10.1

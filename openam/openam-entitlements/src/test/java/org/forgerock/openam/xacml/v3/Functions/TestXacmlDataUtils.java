@@ -59,7 +59,7 @@ import java.util.List;
  * urn:oasis:names:tc:xacml:2.0:function:dnsName-bag
  *
  *
- * @author Jeff.Schenk@ForgeRock.com
+ * X500Name
  */
 public class TestXacmlDataUtils {
 

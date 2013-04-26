@@ -51,7 +51,6 @@ import java.util.Map;
  * This utility is only called a single time and should only be called
  * once within the lifetime of an OpenAM instance install.
  *
- * @author jeff.schenk@forgerock.com
  */
 public class SessionHAFailoverSetupSubConfig implements Constants {
 

@@ -22,8 +22,6 @@
  ~ your own identifying information:
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2001 Jeff A. Schenk
- *
  */
 package org.forgerock.openam.xacml.v3.model;
 
@@ -34,7 +32,7 @@ import java.util.StringTokenizer;
  * DN utility for Parsing Directory Naming Constructs
  * either X500 or LDAP Naming based.
  *
- * @author jeff.schenk@forgerock.com  -- Originally Written 2001.
+ * X500Name  -- Originally Written 2001.
  *
  */
 public class DN implements Serializable {

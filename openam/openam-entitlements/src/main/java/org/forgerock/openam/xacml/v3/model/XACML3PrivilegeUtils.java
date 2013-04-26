@@ -47,7 +47,7 @@ import org.json.JSONObject;
  * </code>com.sun.identity.entitlement.xacml3.core.Policy</code>
  *
  * @author Allan.Foster@forgerock.com
- * @author Jeff.Schenk@forgerock.com
+ * X500Name
  *
  */
 public class XACML3PrivilegeUtils {

@@ -35,7 +35,7 @@ import static org.testng.Assert.assertTrue;
 /**
  * Very simple test to check DN parsing and validation of Distinguished Names.
  *
- * @author jeff.schenk@forgerock.com
+ * X500Name
  */
 public class TestDNValidation {
 

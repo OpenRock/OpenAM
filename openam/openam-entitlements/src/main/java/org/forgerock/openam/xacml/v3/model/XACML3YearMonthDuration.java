@@ -35,7 +35,7 @@ import java.io.Serializable;
  * Provides consistent preservation of distinct Year and Month
  * data points.
  *
- * @author Jeff.Schenk@forgerock.com
+ * X500Name
  */
 public class XACML3YearMonthDuration implements Serializable {
     /**

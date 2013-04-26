@@ -74,7 +74,6 @@ import org.opends.server.types.*;
  * <p/>
  *
  * @author steve
- * @author jeff.schenk@forgerock.com
  * @author jason.lemay@forgerock.com
  */
 public class CTSPersistentStore extends GeneralTaskRunnable

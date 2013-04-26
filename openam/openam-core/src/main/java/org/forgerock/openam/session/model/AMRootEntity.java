@@ -32,7 +32,6 @@ import java.io.Serializable;
  *
  * @author peter.major@forgerock.com
  * @author steve.ferris@forgerock.com
- * @author jeff.schenk@forgerock.com
  *
  */
 public abstract class AMRootEntity implements Serializable {

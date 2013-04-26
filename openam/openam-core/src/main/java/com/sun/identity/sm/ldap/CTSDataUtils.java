@@ -41,7 +41,6 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  * Public class to provide Additional Data Utilities for the CTS Directory Store
  * Implementation.  Such as verification of DIT for CTS storage.
  *
- * @author jeff.schenk@forgerock.com
  */
 class CTSDataUtils {
     private static final String WEB_INF = "/WEB-INF";

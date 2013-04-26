@@ -30,7 +30,6 @@ import com.sun.identity.shared.ldap.LDAPException;
  * Protected Static Helper Accessor class to Access the protected SMDataLayer.
  * Allows us to securely hack around the accessing a package protected resource.
  *
- * @author jeff.schenk@forgerock.com
  */
 class CTSDataLayer {
 

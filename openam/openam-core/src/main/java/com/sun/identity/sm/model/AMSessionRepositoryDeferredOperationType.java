@@ -3,7 +3,6 @@ package com.sun.identity.sm.model;
 /**
  * Type of AM Session Repository Deferred Operation to be performed.
  *
- * @author  jeff.schenk@forgerock.com
  */
 public enum AMSessionRepositoryDeferredOperationType {
 
