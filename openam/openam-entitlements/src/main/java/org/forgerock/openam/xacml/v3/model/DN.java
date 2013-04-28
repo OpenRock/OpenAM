@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
  * DN utility for Parsing Directory Naming Constructs
  * either X500 or LDAP Naming based.
  *
- * X500Name  -- Originally Written 2001.
+ * X500Name  -- Jeff A Schenk, Originally Written 2001.
  *
  */
 public class DN implements Serializable {

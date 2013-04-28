@@ -556,7 +556,7 @@ public class TestXacmlBagFunctionsGroup4 {
         DataBag dataBag = (DataBag) bag.evaluate(null);
         assertNotNull(dataBag);
 
-        IPAddressIsIn isIn = new IPAddressIsIn();
+        DNSNameIsIn isIn = new DNSNameIsIn();
         isIn.addArgument(dnsName4);
         isIn.addArgument(dataBag);
         FunctionArgument result = isIn.evaluate(null);
