@@ -28,7 +28,6 @@ package com.sun.identity.rest;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.xml.bind.JAXBElement;
@@ -36,6 +35,7 @@ import javax.xml.bind.JAXBElement;
 import com.sun.identity.entitlement.xacml3.core.*;
 import com.sun.identity.shared.debug.Debug;
 
+import org.forgerock.openam.xacml.v3.model.CommonType;
 import org.forgerock.openam.xacml.v3.model.ContentType;
 import org.forgerock.openam.xacml.v3.model.XACML3PrivilegeUtils;
 import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
@@ -63,10 +63,10 @@ import org.forgerock.openam.xacml.v3.resources.XACML3HomeResource;
  * <b>The following XACML v3 End Points are currently viable:</b>
  * <table>
  * <tr><th>Method</th><th>XACML Path</th><th>Description</th></tr>
- * <tr><td>GET</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Provides Home Document</em></td></tr>
+ * <tr><td>GET</td><td><ul><li>&#47;xacml&#47;</li></ul></td><td><em>Default, Provides Home Document</em></td></tr>
  * <p/>
- * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
- * <tr><td>POST</td><td><ul><li>&#47;openam&#47;xacml&#47;pdp&#47;</li></ul></td><td><em>Request from PEP</em></td></tr>
+ * <tr><td>POST</td><td><ul><li>&#47;xacml&#47;</li></ul></td><td><em>Default, Request from PEP</em></td></tr>
+ * <tr><td>POST</td><td><ul><li>&#47;xacml&#47;pdp&#47;</li></ul></td><td><em>Request from PEP</em></td></tr>
  * </table>
  * <b><i>Future intended EndPoints which are not Implemented yet:</i></b>
  * <table>
@@ -95,11 +95,9 @@ public class XACML3RequestHandler {
      */
     private static Debug DEBUG = Debug.getInstance("amXACML");
 
-
     /**
      * GET
      * Provides the [HomeDocument] per OASIS Specification.
-     *
      *
      * @param httpServletRequest --  HttpServletRequest
      * @param securityContext -- SecurityContext
@@ -120,7 +118,6 @@ public class XACML3RequestHandler {
      * GET
      * Provides the [HomeDocument] per OASIS Specification.
      *
-     *
      * @param httpServletRequest --  HttpServletRequest
      * @param securityContext -- SecurityContext
      * @return String - rendered content.
@@ -136,24 +133,19 @@ public class XACML3RequestHandler {
 
     /**
      * GET
-     * Provides Query Capabilities.
+     * Provides the [HomeDocument] per OASIS Specification.
      *
      * @param httpServletRequest --  HttpServletRequest
      * @param securityContext -- SecurityContext
-     *
+     * @return String - rendered content.
      */
     @GET
     @Consumes // Consume All and any Application or Media Types
-    @Produces({"application/xml", "application/json"})
-    @Path("/query/{resource}")
-    public String getQuery(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
-                         @Context HttpServletResponse httpServletResponse,
-                         @Context javax.ws.rs.core.SecurityContext securityContext) {
-        // Obtain our Content Type we are dealing with...
-        ContentType requestContentType = getContentType(httpServletRequest);
-
-        // TODO ::
-        return "";
+    @Produces({"application/xml", "application/json", "application/json-home"})
+    @Path("/pdp")
+    public String getPDPHomeResource(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
+                                  @Context javax.ws.rs.core.SecurityContext securityContext) {
+        return getDefaultHomeResource(httpServletRequest,securityContext);
     }
 
     /**
@@ -212,6 +204,29 @@ public class XACML3RequestHandler {
 
     /**
      * POST
+     * Handle either XML or JSON Requests
+     *
+     * @param req JAXBElement<Request>
+     * @return JAXBElement<Response>
+     */
+    @POST
+    @Consumes // Consume All and any Application or Media Types
+    @Produces({"application/xml","application/xacml+xml", "application/json","application/xacml+json"})
+    public JAXBElement<Response> getDecision( JAXBElement<Request> req,
+                                              @Context javax.servlet.http.HttpServletRequest httpServletRequest,
+                                              @Context javax.ws.rs.core.SecurityContext securityContext) {
+        // Obtain our Content Type we are dealing with...
+        ContentType requestContentType = getContentType(httpServletRequest);
+
+        if (requestContentType.getCommonType().equals(CommonType.XML)) {
+             return getXMLDecision(req);
+        } else {
+             return getJSONDecision(req);
+        }
+    }
+
+    /**
+     * POST
      * provides a simple debugging tool to dump and echo the request back to ensure
      * Data is in sync and correct for a quick eyeballing.
      *
@@ -219,42 +234,13 @@ public class XACML3RequestHandler {
      * @return JAXBElement<Request>
      */
     @POST
-    @Consumes({"application/xml","application/json"})
-    @Produces({"application/xml","application/json"})
+    @Consumes // Consume All and any Application or Media Types
+    @Produces({"application/xml","application/xacml+xml", "application/json","application/xacml+json"})
     @Path("/dumprequest")
     public JAXBElement<Request> getDumpRequest( JAXBElement<Request> req   ) {
         Request request = req.getValue();
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createRequest(request);
-    }
-
-
-    /**
-     * TODO ::
-     * Placeholder for PUT Request.
-     *
-     * Eventually I would imagine we would use 'PUT' for performing a
-     * Policy Import perhaps.
-     *
-     *
-     */
-    @PUT
-    public void putMethodNotImplemented(@Context HttpServletResponse httpServletResponse) {
-        httpServletResponse.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * TODO ::
-     * Placeholder for DELETE Request.
-     *
-     * Eventually I would imagine we would use 'DELETE' for performing a
-     * removal of an existing named Policy perhaps.
-     *
-     *
-     */
-    @DELETE
-    public void deleteMethodNotImplemented(@Context HttpServletResponse httpServletResponse) {
-        httpServletResponse.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
     }
 
     /**

@@ -49,14 +49,14 @@ public class XACML3HomeResource extends XACML3Resource {
      * Home Document
      * XML Home Document using ATOM RFC4287
      *
-     * @return
+     * @return String -- Containing Rendered HomeDocument in Atom format.
      */
     private static String getXMLHomeDocument(HttpServletRequest httpServletRequest) {
         StringBuilder sb = new StringBuilder();
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
         sb.append(XML_HEADER);
-        sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042\n");
-        sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>\n");
+        sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042");
+        sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>");
         sb.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
         sb.append("<atom:link href=\042" + PDP_ENDPOINT + "\042/>");
         sb.append("</resource>");
@@ -67,30 +67,20 @@ public class XACML3HomeResource extends XACML3Resource {
     /**
      * Formulate our Home Document.
      *
-     * @return JSONObject
-     * @throws org.json.JSONException
+     * @return String -- Containing Rendering of Home Document in JSON
      */
     private static String getJSONHomeDocument(HttpServletRequest httpServletRequest) {
         JSONObject resources = new JSONObject();
         JSONArray resourceArray = new JSONArray();
         try {
+            // Main End-Point
             JSONObject resource_1 = new JSONObject();
             resource_1.append("href", PDP_ENDPOINT);
+            resource_1.append("hints", getPDPHints(httpServletRequest));
             JSONObject resource_1A = new JSONObject();
-
-            resource_1A.append(getXACMLHome(httpServletRequest), resource_1);
-
-            JSONObject resource_2 = new JSONObject();
-            resource_2.append("href-template", "/ws/xacml/");
-            resource_2.append("hints", getHomeHints(httpServletRequest));
-            JSONObject resource_2A = new JSONObject();
-
-            resource_2A.append(getXACMLHome(httpServletRequest), resource_2);
-
+            resource_1A.append(getPDPHome(httpServletRequest), resource_1);
+            // Assemble
             resourceArray.put(resource_1A);
-            resourceArray.put(resource_2A);
-
-
             resources.append("resources", resourceArray);
         } catch (JSONException je) {
             DEBUG.error("JSON Processing Exception: "+je.getMessage(),je);
@@ -103,9 +93,9 @@ public class XACML3HomeResource extends XACML3Resource {
      * Per Internet Draft: draft-nottingham-json-home-02
      *
      * @return JSONObject - Containing Hints for our Home Application.
-     * @throws org.json.JSONException
+     *
      */
-    private static JSONObject getHomeHints(HttpServletRequest httpServletRequest) {
+    private static JSONObject getPDPHints(HttpServletRequest httpServletRequest) {
         JSONObject hints = new JSONObject();
         try {
             /**
@@ -116,13 +106,12 @@ public class XACML3HomeResource extends XACML3Resource {
              * Content MUST be an array of strings, containing HTTP methods.
              */
             JSONArray allow = new JSONArray();
-            allow.put("GET");
             allow.put("POST");
             hints.append("allow", allow);
 
             /**
              * Hints the representation types that the resource produces and
-             * consumes, using the GET and PUT methods respectively, subject to the
+             * consumes, using POST methods respectively, subject to the
              * ’allow’ hint.
              *
              * Content MUST be an array of strings, containing media types.
@@ -146,6 +135,7 @@ public class XACML3HomeResource extends XACML3Resource {
             JSONArray accept_post = new JSONArray();
             accept_post.put(ContentType.JSON.getApplicationType());
             accept_post.put(ContentType.XML.getApplicationType());
+            accept_post.put(ContentType.XACML_PLUS_JSON.getApplicationType());
             accept_post.put(ContentType.XACML_PLUS_XML.getApplicationType());
             hints.append("accept-post", accept_post);
         } catch (JSONException je) {
@@ -162,7 +152,7 @@ public class XACML3HomeResource extends XACML3Resource {
      *
      * @return - Base XACML URL yields "schema://serverName:LocalPort/contextPath/servletPath"
      */
-    public final static String getXACMLHome(HttpServletRequest httpServletRequest) {
+    public final static String getPDPHome(HttpServletRequest httpServletRequest) {
         StringBuilder sb = new StringBuilder();
         sb.append(httpServletRequest.getScheme());
         sb.append("://");

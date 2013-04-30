@@ -43,7 +43,7 @@ public abstract class XACML3Resource {
     /**
      * PDP End-Point.
      */
-    public static final String PDP_ENDPOINT = "/ws/xacml/pdp";
+    public static final String PDP_ENDPOINT = "/xacml/pdp";
 
     /**
      * Current Standards Schema Resource Name.
