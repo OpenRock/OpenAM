@@ -145,17 +145,16 @@ public class XACML3RequestHandler {
      */
     @GET
     @Consumes // Consume All and any Application or Media Types
-    @Produces({"application/xml", "application/json", "application/json-home"})
+    @Produces({"application/xml", "application/json"})
     @Path("/query")
-    public void getQuery(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
+    public String getQuery(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
                          @Context HttpServletResponse httpServletResponse,
                          @Context javax.ws.rs.core.SecurityContext securityContext) {
         // Obtain our Content Type we are dealing with...
         ContentType requestContentType = getContentType(httpServletRequest);
 
-        httpServletResponse.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
-
         // TODO ::
+        return "";
     }
 
     /**
