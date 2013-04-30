@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <book xml:id='admin-guide'
@@ -38,14 +38,24 @@
   </abstract>
   <copyright>
    <year>2011-2013</year>
-   <holder>ForgeRock AS</holder>
+   <holder>ForgeRock, Inc.</holder>
   </copyright>
   <authorgroup>
-   <author>
-    <personname>
-     <firstname>Mark</firstname><surname>Craig</surname>
-    </personname>
-   </author>
+      <author>
+          <personname>
+              <firstname>Mark</firstname><surname>Craig</surname>
+          </personname>
+      </author>
+      <author>
+          <personname>
+              <firstname>Vanessa</firstname><surname>Richie</surname>
+          </personname>
+      </author>
+      <author>
+          <personname>
+              <firstname>Mike</firstname><surname>Jang</surname>
+          </personname>
+      </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
@@ -64,7 +74,9 @@
  <xinclude:include href='chap-realms.xml' />
  <xinclude:include href='chap-agents.xml' />
  <xinclude:include href='chap-pwd-reset.xml' />
+ <xinclude:include href='chap-sso.xml' />
  <xinclude:include href='chap-cdsso.xml' />
+ <xinclude:include href='chap-dashboard.xml' />
  <xinclude:include href='chap-federation.xml' />
  <xinclude:include href='chap-oauth2.xml' />
  <xinclude:include href='chap-backup-restore.xml' />

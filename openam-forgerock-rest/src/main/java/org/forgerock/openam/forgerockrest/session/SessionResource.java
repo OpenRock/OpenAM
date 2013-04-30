@@ -17,24 +17,32 @@ package org.forgerock.openam.forgerockrest.session;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.sm.OrganizationConfigManager;
-import edu.emory.mathcs.backport.java.util.Arrays;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.service.AuthUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.forgerockrest.ReadOnlyResource;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.dashboard.ServerContextHelper;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +64,7 @@ import java.util.Map;
  *
  * @author robert.wapshott@forgerock.com
  */
-public class SessionResource extends ReadOnlyResource {
+public class SessionResource implements CollectionResourceProvider {
 
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
@@ -66,24 +74,19 @@ public class SessionResource extends ReadOnlyResource {
 
     private SessionQueryManager queryManager;
 
-    public SessionResource(SessionQueryManager queryManager) {
-        this.queryManager = queryManager;
+    /**
+     * Default constructor instantiates the SessionResource.
+     */
+    public SessionResource() {
+        this(new SessionQueryManager(new SessionQueryFactory()));
     }
 
     /**
-     * Applies the routing to the Router that this class supports.
-     *
-     * @param ocm Configuration required for organisation name.
-     * @param router Router to apply changes to.
+     * Dependency Injection constructor allowing the SessionResource dependency to be provided.
+     * @param sessionQueryManager No null.
      */
-    public static void applyRouting(OrganizationConfigManager ocm, Router router) {
-        String orgName = ocm.getOrganizationName();
-        if (!orgName.endsWith("/")) {
-            orgName += "/";
-        }
-
-        SessionQueryManager sessionQueryManager = new SessionQueryManager(new SessionQueryFactory());
-        router.addRoute(RoutingMode.STARTS_WITH, orgName + "sessions", new SessionResource(sessionQueryManager));
+    public SessionResource(SessionQueryManager sessionQueryManager) {
+        this.queryManager = sessionQueryManager;
     }
 
     /**
@@ -107,19 +110,86 @@ public class SessionResource extends ReadOnlyResource {
      * @param handler {@inheritDoc}
      */
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+
+        String id = request.getAction();
+
+        if ("logout".equalsIgnoreCase(id)) {
+
+            String tokenId = ServerContextHelper.getCookieFromServerContext(context);
+
+            if (tokenId == null) {
+                handler.handleError(new BadRequestException("iPlanetDirectoryCookie not set on request"));
+            }
+
+            try {
+                JsonValue jsonValue = logout(tokenId);
+                handler.handleResult(jsonValue);
+            } catch (InternalServerErrorException e) {
+                handler.handleError(e);
+            }
+            return;
+        }
+
         handler.handleError(new NotSupportedException("Not implemented for this Resource"));
     }
 
-
     /**
-     * Currently unimplemented.
+     * Logout action to handle the invalidating of Tokens.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Not implemented for this Resource"));
+    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
+            ResultHandler<JsonValue> handler) {
+
+        String id = request.getAction();
+
+        if ("logout".equalsIgnoreCase(id)) {
+            try {
+                JsonValue jsonValue = logout(resourceId);
+                handler.handleResult(jsonValue);
+            } catch (InternalServerErrorException e) {
+                handler.handleError(e);
+            }
+            return;
+        }
+
+        handler.handleError(new NotSupportedException(id + ", not implemented for this Resource"));
+    }
+
+    /**
+     * Logs out a user.
+     *
+     * @param tokenId The id of the Token to invalidate
+     * @throws InternalServerErrorException If the tokenId is invalid or could not be used to logout.
+     */
+    private JsonValue logout(String tokenId) throws InternalServerErrorException {
+
+        SSOToken ssoToken;
+        try {
+            if (tokenId == null) {
+                throw new InternalServerErrorException("Invalid Token Id");
+            }
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            ssoToken = mgr.createSSOToken(tokenId);
+        } catch (SSOException ex) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("result", "Token has expired");
+            return new JsonValue(map);
+        }
+
+        if (ssoToken != null) {
+            try {
+                AuthUtils.logout(ssoToken.getTokenID().toString(), null, null);
+            } catch (SSOException e) {
+                throw new InternalServerErrorException("Error logging out", e);
+            }
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", "Successfully logged out");
+        return new JsonValue(map);
     }
 
     /**
@@ -159,9 +229,9 @@ public class SessionResource extends ReadOnlyResource {
 
                 handler.handleResource(new Resource("Sessions", "0", new JsonValue(map)));
             }
-
-            handler.handleResult(new QueryResult());
         }
+
+        handler.handleResult(new QueryResult());
     }
 
     /**
@@ -210,5 +280,40 @@ public class SessionResource extends ReadOnlyResource {
         float seconds = Long.parseLong(timeleft);
         float mins = seconds / 60;
         return Math.round(mins);
+    }
+
+    private NotSupportedException generateException(String type) {
+        return new NotSupportedException(type + " are not supported for this Resource");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Creates"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
+            ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Deletes"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void patchInstance(ServerContext ctx, String resId, PatchRequest request,
+            ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Patches"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
+            ResultHandler<Resource> handler) {
+        handler.handleError(generateException("Updates"));
     }
 }

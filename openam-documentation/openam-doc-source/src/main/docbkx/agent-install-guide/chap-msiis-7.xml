@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-msiis-7'
@@ -57,8 +57,9 @@
   <literal>http://windows7.example.com:80/</literal>. Furthermore, you
   must reset IIS 7 after installing the policy agent.</para>
   
-  <para>Download the IIS 7 policy agent for 32 or 64-bit Windows from the
-  <link xlink:href="http://forgerock.org/openam.html">download page</link>.
+  <para>>Go to <link xlink:href="install-guide#download-openam-software"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
+  to determine which version of the agent to download and download the agent.
   Also verify the checksum of the file you download against the checksum
   posted on the download page.</para>
   
@@ -526,16 +527,16 @@ Key ==> sxVoaDRAN0o=</screen>
     <para>To set the encrypted password in the AUTH_PASSWORD header, in the
     OpenAM console under Access Control &gt;
     <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
-    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
-    Server, select Show Password in HTTP Header, and then Save your work.</para>
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Custom Properties, 
+    add <literal>com.sun.identity.agents.config.iis.password.header=true</literal>.</para>
    </step>
 
    <step>
     <para>To have the agent perform Windows logon (for user token
     impersonation), in the OpenAM console under Access Control &gt;
     <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
-    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
-    Server, select Logon and Impersonation, and then Save your work.</para>
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Custom Properties, 
+    add <literal>com.sun.identity.agents.config.iis.logonuser=true</literal>.</para>
    </step>
 
    <step>

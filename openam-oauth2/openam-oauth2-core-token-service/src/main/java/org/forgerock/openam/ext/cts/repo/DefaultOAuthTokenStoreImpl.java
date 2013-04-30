@@ -44,6 +44,7 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.forgerockrest.jwt.JwsAlgorithm;
 import org.forgerock.openam.oauth2.model.*;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
@@ -452,7 +453,41 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
         String jwt = null;
         try {
-            jwt = jwtToken.sign(pk).build();
+            jwt = jwtToken.sign(JwsAlgorithm.HS256, pk).build();
+        } catch(SignatureException e){
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create JWT token", e);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
+        }
+        return jwt;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String createEncryptedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce){
+        long timeInSeconds = System.currentTimeMillis()/1000;
+        getSettings(realm);
+        JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
+        String jwt = null;
+        try {
+            jwt = jwtToken.encrypt().build();
+        } catch(SignatureException e){
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create JWT token", e);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
+        }
+        return jwt;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String createSignedAndEncryptedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce){
+        long timeInSeconds = System.currentTimeMillis()/1000;
+        getSettings(realm);
+        JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
+        String jwt = null;
+        try {
+            jwt = jwtToken.sign(JwsAlgorithm.HS256, pk).encrypt().build();
         } catch(SignatureException e){
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create JWT token", e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());

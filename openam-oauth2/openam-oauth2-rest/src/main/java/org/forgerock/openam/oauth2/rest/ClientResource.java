@@ -25,7 +25,10 @@
 package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.sso.SSOException;
+import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
 import com.sun.identity.idm.*;
+import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 
@@ -74,8 +77,8 @@ public class ClientResource  implements CollectionResourceProvider {
         }
         //check for id
         String id = createRequest.getNewResourceId();
-        if (client.containsKey("client_id")){
-            ArrayList<String> idList = client.remove("client_id");
+        if (client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_ID)){
+            ArrayList<String> idList = client.remove(OAuth2Constants.OAuth2Client.CLIENT_ID);
             if (idList != null && !idList.isEmpty()){
                 id = (String) idList.iterator().next();
             }
@@ -87,16 +90,16 @@ public class ClientResource  implements CollectionResourceProvider {
         }
 
         //get realm
-        if (client.containsKey("realm")){
-            ArrayList<String> realmList = client.remove("realm");
+        if (client.containsKey(OAuth2Constants.OAuth2Client.REALM)){
+            ArrayList<String> realmList = client.remove(OAuth2Constants.OAuth2Client.REALM);
             if (realmList != null && !realmList.isEmpty()){
                 realm = (String) realmList.iterator().next();
             }
         }
 
         //check for required parameters
-        if (client.containsKey("userpassword")){
-            if (client.get("userpassword").iterator().next().isEmpty()){
+        if (client.containsKey(OAuth2Constants.OAuth2Client.USERPASSWORD)){
+            if (client.get(OAuth2Constants.OAuth2Client.USERPASSWORD).iterator().next().isEmpty()){
                 ResourceException e =
                         new PermanentException(ResourceException.BAD_REQUEST, "Missing userpassword", null);
                 handler.handleError(e);
@@ -106,8 +109,8 @@ public class ClientResource  implements CollectionResourceProvider {
                     new PermanentException(ResourceException.BAD_REQUEST, "Missing userpassword", null);
             handler.handleError(e);
         }
-        if (client.containsKey("com.forgerock.openam.oauth2provider.clientType")){
-            String type = client.get("com.forgerock.openam.oauth2provider.clientType").iterator().next();
+        if (client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_TYPE)){
+            String type = client.get(OAuth2Constants.OAuth2Client.CLIENT_TYPE).iterator().next();
             if (type.equals("Confidential") || type.equals("Public")){
                 //do nothing
             } else {
@@ -187,6 +190,20 @@ public class ClientResource  implements CollectionResourceProvider {
                 throw new PermanentException(401, "Unauthorized", null);
             }
             manager.deleteIdentity(resourceId);
+
+            //delete the tokens associated with that client_id
+            OAuth2TokenRepository tokens = CTSPersistentStore.getInstance();
+            StringBuilder sb = new StringBuilder();
+            sb.append("(").append(OAuth2Constants.CoreTokenParams.CLIENT_ID).append("=").append(resourceId).append(")");
+            try {
+                tokens.oauth2DeleteWithFilter(sb.toString());
+            } catch (Exception e){
+                if (OAuth2Utils.logStatus) {
+                    String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                    OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                }
+                handler.handleError(new InternalServerErrorException("Unable to delete client"));
+            }
             responseVal.put("success", "true");
 
             response = new JsonValue(responseVal);
@@ -203,21 +220,21 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client"));
+            handler.handleError(new InternalServerErrorException("Unable to delete client"));
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client"));
+            handler.handleError(new InternalServerErrorException("Unable to delete client"));
         } catch (InternalServerErrorException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client"));
+            handler.handleError(new InternalServerErrorException("Unable to delete client"));
         } catch (PermanentException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {

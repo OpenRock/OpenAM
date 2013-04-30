@@ -252,6 +252,20 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
     <listitem><para>The deployable .war file when you want to deploy OpenAM
     server without the OpenAM console</para></listitem>
    </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${clientSDKExamplesCliFile}?></filename></term>
+    <listitem>
+     <para>The .zip file containing the Java client SDK command-line examples,
+     and .jar files needed to run the examples.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${clientSDKExamplesWarFile}?></filename></term>
+    <listitem>
+     <para>The .war file containing Java client SDK examples in a web
+     application.</para>
+    </listitem>
+   </varlistentry>
   </variablelist>
  </section>
 
@@ -278,8 +292,8 @@ CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
 JAVA_HOME=/path/to/jdk1.6
 export JAVA_HOME
-JAVA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
-export JAVA_OPTS
+CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
+export CATALINA_OPTS
 
 case "${1}" in
 start)

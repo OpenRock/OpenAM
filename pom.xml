@@ -126,13 +126,13 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.4.6</opendj.server.version>
-        <opendj.sdk.version>3.0.0-OPENAMp3</opendj.sdk.version>
+        <opendj.sdk.version>3.0.0-SNAPSHOT</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <forgerock.json.version>2.0.0-Xpress2</forgerock.json.version>
+        <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
 
         <restlet.version>2.1-RC6</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -186,13 +186,14 @@
     <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
 
+        <module>openam-ldap-utils</module>
         <!-- OpenAM Locale - Common Module -->
         <module>openam-locale</module>
 
         <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
-        <!-- OpenAM Entitlement Module -->
+        <!-- OpenAM Entitlement Module (XACML 3)-->
         <module>openam-entitlements</module>
 
         <!-- OpenAM Authentication Modules -->
@@ -232,7 +233,7 @@
         <module>openam-common-auth-ui</module>
 
         <module>openam-server-auth-ui</module>
-        
+
         <module>openam-ui-ria</module>
 
         <module>openam-server-only</module>
@@ -255,8 +256,7 @@
         <!-- Final Packaging Distribution Kit -->
         <module>openam-dashboard</module>
 
-        <module>openam-xacml-resources</module>
-
+        <module>openam-examples</module>
     </modules>
 
     <!-- Developers -->
@@ -285,20 +285,6 @@
             <organizationUrl>http://www.forgerock.com</organizationUrl>
             <roles>
                 <role>VP Engineering</role>
-                <role>Support Staff</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>jeff.schenk</id>
-            <name>Jeff Schenk</name>
-            <email>jeff.schenk@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>Build Master</role>
-                <role>Senior Software Development Engineer</role>
                 <role>Support Staff</role>
             </roles>
         </developer>
@@ -543,8 +529,8 @@
     <scm>
         <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
-      <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
-  </scm>
+        <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
+    </scm>
 
     <!-- Dependency Management -->
     <dependencyManagement>
@@ -685,13 +671,41 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ldap-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-federation-library</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-idpdiscovery</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>OpenFM</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-idpdiscovery-war</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-example-clientsdk-cli</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-example-clientsdk-war</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -807,7 +821,7 @@
                 <artifactId>openam-doc-content</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
 
             <!-- Distribution dependencies -->
             <dependency>
@@ -1255,7 +1269,7 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
-                <scope>provided</scope> 
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet.jsp</groupId>
@@ -1293,12 +1307,12 @@
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.1</version>
-                 <exclusions>
-                     <exclusion>
-                         <groupId>xml-apis</groupId>
-                         <artifactId>xml-apis</artifactId>
-                     </exclusion>
-                 </exclusions>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1484,6 +1498,11 @@
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.servlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>

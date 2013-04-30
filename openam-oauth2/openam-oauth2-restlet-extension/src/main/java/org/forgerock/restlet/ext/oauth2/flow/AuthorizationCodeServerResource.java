@@ -85,7 +85,15 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         // Find code
         String code_p =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CODE, String.class);
-        CoreToken code = getTokenStore().readAuthorizationCode(code_p);
+        CoreToken code = null;
+
+        try{
+            code = getTokenStore().readAuthorizationCode(code_p);
+        }
+        catch (Exception e ){
+            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
+        }
 
         if (null == code) {
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
@@ -95,22 +103,12 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             invalidateTokens(code_p);
             getTokenStore().deleteAuthorizationCode(code_p);
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code has been used");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "Authorization code has been used.");
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
         } else {
             if (code.isExpired()) {
                 OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code expired.");
                 throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
                         "Authorization code expired.");
-            }
-
-            //get code sessionClient
-            String clientID = code.getClientID();
-            String redirectURI = code.getRedirectURI();
-            SessionClient sc = new SessionClientImpl(clientID, redirectURI);
-            if (!sc.equals(sessionClient)) {
-                // Throw redirect_uri mismatch
-                //throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(getRequest());
             }
 
             // Generate Token
@@ -214,7 +212,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                     }
                     deleteToken(type, entryID);
                 }
-            }
+             }
         }
     }
 

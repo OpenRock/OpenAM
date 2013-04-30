@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-web-agents'
@@ -37,46 +37,77 @@
  <section xml:id="what-new-web-agents">
   <title>New in Web Policy Agents <?eval ${webAgentsDocTargetVersion}?></title>
 
-  <important>
-   <para>OpenAM Web Policy Agents <?eval ${agentsDocTargetVersion}?> Xpress
-   is a milestone release from the main development branch of the product. The
-   Xpress release contains selected key features and all current fixed issues.
-   An Xpress release undergoes important functional testing but not the complete
-   testing cycle that is done for a full Enterprise release.</para>
-
-   <para>Xpress releases are supported through ForgeRock subscriptions and are
-   upgradeable to the Enterprise version, which has long term support.</para>
-
-   <para>The goal of an Xpress release is to enable you to start build phases
-   earlier, with the most recent features, instead of having to wait for the
-   Enterprise release date. Fixes to issues that are discovered in an Xpress
-   release are delivered as patches to ForgeRock customers, and are guaranteed
-   to be delivered in the Enterprise release that follows. Xpress releases are
-   supported for a grace period after the Enterprise version has been
-   released.</para>
-
-   <para>With the exception of these Release Notes, the official documentation
-   for this release is still in progress, and is accessible at
-   <link xlink:href="http://openam.forgerock.org/docs.html" xlink:show="new"
-   >http://openam.forgerock.org/docs.html</link>. The complete, validated
-   documentation set will be available with the Enterprise release.</para>
-  </important>
-
   <itemizedlist>
    <listitem>
-    <para>Web policy agents can perform URL validation during the bootstrap
-    phase when you set the
-    <literal>com.forgerock.agents.ext.url.validation.disable</literal> property
-    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
-    xlink:show="new">OPENAM-1270</link>).</para>
+    <para>A new web policy agent, Varnish, has been added. Varnish is a unique policy
+    agent that does not require the Java environment and it has a unique set of 
+    instructions for the agentadmin command. Varnish also uses a directory
+    called vmods. This is the location where you will need to handle any required
+    installation or Varnish updates, and it requires the user to have administrative 
+    rights to update this directory for changes to take effect.</para>
    </listitem>
-<!--
+
    <listitem>
-    <para>Web policy agents now support failover across multiple naming URLs
-    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
-    xlink:show="new">OPENAM-1258</link>).</para>
+    <para>All of the web policy agents have been updated to include support for Internet
+    Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
+    AME-1134 is closed This includes removing unused libraries.--></para>
+    <para>IPv6 replaces IPv4 to fix the problems of IPv4 address exhaustion. The new 
+    protocol version increases the number of available internet addresses by using 
+    128-bit addresses instead of 32-bit addresses of IPv4. IPv6 includes eight
+    groups of hexadecimal digits to increase the number of available addresses.</para>
    </listitem>
--->
+
+   <listitem>
+    <variablelist>
+     <para>Web policy agents can perform naming URL validation during the
+     bootstrap phase, and can fail over from one OpenAM service to another
+     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
+     xlink:show="new">OPENAM-1258</link>). Configure these capabilities by
+     using the following bootstrap properties.</para>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.default.url.set</literal></term>
+      <listitem>
+       <para>Indicates order of service URLs for failover</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.level</literal></term>
+      <listitem>
+       <para>Controls the extent of naming URL validation</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.interval</literal></term>
+      <listitem>
+       <para>Sets seconds between validation requests against the naming URL</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.miss.count</literal></term>
+      <listitem>
+       <para>Sets threshold of validation failures after which to fail over</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.ok.count</literal></term>
+      <listitem>
+       <para>Sets threshold of validation successes after which to fail back to
+       the first URL in the <literal>default.url.set</literal> list</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>See <link
+    xlink:href="agent-install-guide#web-bootstrap-configuration-properties"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Bootstrap
+    Configuration Properties</citetitle></link> for details.</para>
+   </listitem>
+
    <listitem>
     <para>Web policy agents now allow you to configure the naming of the URL
     validation net-connect timeout (<link
@@ -140,8 +171,15 @@
     <para>The IIS 7 web policy agents now has support for HTTP Basic
     authentication and password replay, thereby better supporting Microsoft
     OWA and SharePoint (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-773"
-    xlink:show="new">OPENAM-773</link>).</para>
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-773"
+     xlink:show="new">OPENAM-773</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now allow use of regular expressions in Not
+    Enforced URLs (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-772"
+    xlink:show="new">OPENAM-772</link>). In addition, regular expressions are
+    supported for logout URLs and for rejecting access to invalid URLs.</para>
    </listitem>
   </itemizedlist>
  </section>

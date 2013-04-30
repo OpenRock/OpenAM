@@ -49,6 +49,7 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.data.Reference;
+import org.restlet.data.MediaType;
 import org.restlet.routing.Router;
 import org.restlet.security.RoleAuthorizer;
 import org.restlet.security.Verifier;
@@ -59,6 +60,12 @@ import org.restlet.security.Verifier;
 public class OAuth2Application extends Application {
 
     private URI redirectURI = null;
+
+    public OAuth2Application(){
+        getMetadataService().setEnabled(true);
+        getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
+        setStatusService(new OAuth2StatusService());
+    }
 
     @Override
     public Restlet createInboundRoot() {

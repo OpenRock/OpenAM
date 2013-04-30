@@ -44,21 +44,69 @@
 
   <variablelist>
    <varlistentry>
-    <term><literal>com.forgerock.agents.ext.url.validation.disable</literal></term>
+    <term><literal>com.forgerock.agents.ext.url.validation.default.url.set</literal></term>
     <listitem>
-     <para>The bootstrap configuration property,
-     <literal>com.forgerock.agents.ext.url.validation.disable</literal>, lets
-     you configure naming URL validation during the initial bootstrap phase
-     when the policy agent reads its configuration. When URL validation is fully
-     disabled the policy agent does not need to connect to OpenAM during the
-     bootstrap phase.</para>
-     <para>If you leave URL validation disabled, make sure that the URLs in the
-     policy agent bootstrap configuration file are valid and correct. As the
-     policy agent performs no further validation after the bootstrap phase,
-     incorrect naming URLs can cause the agent to crash.</para>
+     <para>This property takes a comma-separated list of indexes for URL values
+     indicating the order in which to fail over, where the indexes are taken
+     from the values set for
+     <literal>com.sun.identity.agents.config.naming.url</literal>,
+     <literal>com.sun.identity.agents.config.login.url</literal>,
+     <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal>, and
+     <literal>com.sun.identity.agents.config.logout.url</literal>.</para>
+
+     <para>For example if
+     <literal>com.sun.identity.agents.config.naming.url</literal> is set as
+     follows:</para>
+
+     <literallayout class="monospaced"
+     >com.sun.identity.agents.config.naming.url=
+ http://zero.example.com:8080/openam/namingservice
+ http://one.example.com:8080/openam/namingservice</literallayout>
+
+     <para>Then the following setting means first use OpenAM on
+     <literal>zero.example.com</literal>, then fail over if necessary to OpenAM
+     on <literal>one.example.com</literal>, assuming
+     <literal>com.forgerock.agents.ext.url.validation.level</literal> is set
+     to enable validation.</para>
+
+     <literallayout class="monospaced"
+     >com.forgerock.agents.ext.url.validation.default.url.set=0,1</literallayout>
+
+     <para>When using this failover capability make sure you synchronize URL
+     settings in <literal>com.sun.identity.agents.config.naming.url</literal>,
+     <literal>com.sun.identity.agents.config.login.url</literal>,
+     <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal>, and
+     <literal>com.sun.identity.agents.config.logout.url</literal> such that
+     each service shares the same index across all properties. In other words,
+     in the example above each service under
+     <literal>http://zero.example.com:8080/openam</literal> would be the first
+     item (index: 0) for each property. This ensures the policy agent fails over
+     and fails back from one server to another in synchronized fashion for all
+     services.</para>
+
+     <para>This property has no default setting.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.ext.url.validation.level</literal></term>
+    <listitem>
+     <para>This bootstrap configuration property lets you configure naming URL
+     validation during the initial bootstrap phase when the policy agent reads
+     its configuration, and then thereafter if the policy agent is configured
+     fail over when a naming URL becomes invalid.</para>
+
+     <para>When URL validation is fully disabled the policy agent does not need
+     to connect to OpenAM during the bootstrap phase.</para>
+
+     <para>If you leave naming URL validation disabled, then make sure that the
+     URLs in the policy agent bootstrap configuration file are valid and
+     correct. As the policy agent performs no further validation after the
+     bootstrap phase, incorrect naming URLs can cause the agent to crash.</para>
+
      <para>To enable full URL validation, set the property as shown:</para>
      <literallayout class="monospaced"
-     >com.forgerock.agents.ext.url.validation.disable = 0</literallayout>
+     >com.forgerock.agents.ext.url.validation.level = 0</literallayout>
 
      <variablelist>
       <para>This property can take the following values.</para>
@@ -94,14 +142,6 @@
       properties.</para>
 
       <listitem>
-       <para><literal>com.forgerock.agents.ext.url.validation.poll.interval</literal></para>
-      </listitem>
-
-      <listitem>
-       <para><literal>com.forgerock.agents.ext.url.validation.scan.interval</literal></para>
-      </listitem>
-
-      <listitem>
        <para><literal>com.sun.identity.agents.config.connect.timeout</literal></para>
       </listitem>
 
@@ -113,27 +153,43 @@
    </varlistentry>
 
    <varlistentry>
-    <term><literal>com.forgerock.agents.ext.url.validation.poll.interval</literal></term>
+    <term><literal>com.forgerock.agents.ext.url.validation.ping.interval</literal></term>
     <listitem>
-     <para>Set this property to the number of seconds to wait before contacting
-     OpenAM to check that naming URLs are valid. This property should be set to
-     a larger value than
-     <literal>com.forgerock.agents.ext.url.validation.scan.interval</literal>.
-     For example,
-     <literal>com.forgerock.agents.ext.url.validation.poll.interval = 10</literal>.</para>
+     <para>Set this to the seconds between validation requests against the
+     current naming URL.</para>
+
+     <para>The sum of the values of
+     <literal>com.sun.identity.agents.config.connect.timeout</literal> and
+     <literal>com.sun.identity.agents.config.receive.timeout</literal> must not
+     exceed this value. Notice that the two timeout values are specified in
+     milliseconds, whereas this property's value is specified in seconds.</para>
+
+     <para>Default: 60 (seconds)</para>
     </listitem>
    </varlistentry>
 
+   <varlistentry>
+    <term><literal>com.forgerock.agents.ext.url.validation.ping.miss.count</literal></term>
+    <listitem>
+     <para>If validation requests against the current naming URL fail this
+     number of times in a row, the web policy agent fails over to the next
+     service in
+     <literal>com.forgerock.agents.ext.url.validation.default.url.set</literal>.</para>
+
+     <para>Default: 3</para>
+    </listitem>
+   </varlistentry>
 
    <varlistentry>
-    <term><literal>com.forgerock.agents.ext.url.validation.scan.interval</literal></term>
+    <term><literal>com.forgerock.agents.ext.url.validation.ping.ok.count</literal></term>
     <listitem>
-     <para>Set this property to the number of seconds to wait before rescanning
-     the list of valid naming URLs, and persisting the list to a temporary file.
-     This property should be set to a smaller value than
-     <literal>com.forgerock.agents.ext.url.validation.poll.interval</literal>.
-     For example,
-     <literal>com.forgerock.agents.ext.url.validation.scan.interval = 3</literal>.</para>
+     <para>After failover, if validation requests against the default naming URL
+     succeed this number of times in a row, the web policy agent fails back to
+     that service, the first URL in the
+     <literal>com.forgerock.agents.ext.url.validation.default.url.set</literal>
+     list.</para>
+
+     <para>Default: 3</para>
     </listitem>
    </varlistentry>
 
@@ -349,6 +405,41 @@
   the properties are set in OpenAM.</para>
 
   <variablelist>
+   <varlistentry>
+    <term><literal>com.forgerock.agents.agent.invalid.url.regex</literal></term>
+    <listitem>
+     <para>Set this property to a <link xlink:href="http://www.pcre.org/"
+     xlink:show="new">Perl-compatible regular expression</link> to filter out
+     invalid request URLs. The policy agent reject requests to invalid URLs
+     with HTTP 403 Forbidden status without further processing.</para>
+
+     <para>For example, to filter out URLs containing the symbols in the list
+     ./, /., /, ., ,\, %00-%1f, %7f-%ff, %25, %2B, %2C, %7E, .info, use the
+     following setting.</para>
+
+     <programlisting language="ini" width="84">com.forgerock.agents.agent.invalid.url.regex= \
+ ^((?!(|/\.|\./||*|\.info|%25|%2B|%2C|%[0-1][0-9a-fA-F]|%[7-9a-fA-F][0-9a-fA-F])).)$</programlisting>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.agent.logout.url.regex</literal></term>
+    <listitem>
+     <para>Set this property to a <link
+     xlink:href="http://www.pcre.org/pcre.txt" xlink:show="new">Perl-compatible
+     regular expression</link> that matches logout URLs.</para>
+
+     <para>For example, to match URLs with <literal>protectedA</literal> or
+     <literal>protectedB</literal> in the path and <literal>op=logout</literal>
+     in the query string, use the following setting.</para>
+
+     <programlisting language="ini">com.forgerock.agents.agent.logout.url.regex= \
+  .*(/protectedA\?|/protectedB\?/).*(\&amp;op=logout\&amp;)(.*|$)</programlisting>
+
+     <para>When you use this property, the agent ignores the settings for
+     <literal>com.sun.identity.agents.config.agent.logout.url</literal>.</para>
+    </listitem>
+   </varlistentry>
 
    <varlistentry>
     <term><literal>com.forgerock.agents.cache_control_header.enable</literal></term>
@@ -366,9 +457,10 @@
      302 redirect after the LARES POST. By default, the policy agent does an
      HTTP redirect after processing the LARES POST message. Default:
      <literal>false</literal>.</para>
-     <para>This property applies only to Apache HTTPD 2.2 and 2.4, Lotus Domino,
-     and Varnish Cache policy agents. Other policy agents do not redirect
-     after processing the LARES POST message.</para>
+
+     <para>This property applies only to Apache HTTPD 2.2 and 2.4 policy agents.
+     Other policy agents do not redirect after processing the LARES POST
+     message.</para>
     </listitem>
    </varlistentry>
 
@@ -397,6 +489,17 @@
      <literal>com.forgerock.agents.conditional.login.url[1]=
      login.example.com|http://openam3.example.com/openam/UI/Login,
      http://openam4.example.com/openam/UI/Login</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.config.logout.redirect.disable</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to prevent the policy
+     agent from redirecting to the logout URL when that logout URL matches one
+     of the logout URL settings. Instead of redirecting the user-agent, the
+     policy agent performs session logout in the background and then continues
+     processing access to the current URL.</para>
     </listitem>
    </varlistentry>
 
@@ -463,6 +566,17 @@
      <para>Next, use the prefix you set when you define load balancer URI
      rules. This ensures that clients end up being redirected to the policy
      agent that preserved the POST data.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.notenforced.url.regex.enable</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to enable use of regular
+     expressions in Not Enforced URL settings.</para>
+     <para>Not Enforced URL settings are configured using the property,
+     <literal>com.sun.identity.agents.config.notenforced.url</literal></para>
+     <para>Default: <literal>false</literal></para>
     </listitem>
    </varlistentry>
 
@@ -732,8 +846,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
     <term><literal>com.sun.identity.agents.config.debug.file.size</literal></term>
     <listitem>
      <para>Debug file size in bytes beyond which the log file is rotated. The
-     minimum is 3000 bytes, and lower values are reset to 3000 bytes. Default:
-     10 MB.</para>
+     minimum is 1048576 bytes (1 MB), and lower values are reset to 1 MB.
+     OpenAM console sets a default of 10 MB when it is used to configure the
+     agent.</para>
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Global &gt; Agent
@@ -950,6 +1065,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Not Enforced List check, and URL policy evaluation. This is designed
      to prevent a user from accessing a URI by appending the matching pattern
      in the policy or not enforced list.</para>
+
+     <note><para>This property is not supported by the Varnish Cache agent.</para></note>
+
      <para>For example, if the not enforced list includes
      <literal>http://host/*.gif</literal>, then stripping path info from the
      request URI prevents access to <literal>http://host/index.html</literal>
@@ -985,6 +1103,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
      from accessing <literal>http://host/index.html</literal> by requesting
      <literal>http://host/index.html/hack.gif</literal> when the not enforced
      list includes <literal>http://host/*.gif</literal>.</para>
+
+     <note><para>This property is not supported by the Varnish Cache agent.</para></note>
+
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Application &gt;
@@ -1181,8 +1302,10 @@ token=value;Domain=subdomain.domain.com</literal></para>
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.notenforced.url.attributes.enable</literal></term>
     <listitem>
-     <para>When enabled, the agent fetches profile attributes for not
-     enforced URLs by doing policy evaluation.</para>
+     <para>When set to <literal>true</literal>, the agent fetches profile,
+     response, and session attributes that are mapped by doing policy
+     evaluation, and forwards these attributes to non-protected URLs.</para>
+
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Application &gt;
@@ -1230,6 +1353,27 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Application &gt;
      Not Enforced URLs.</para>
+
+     <para>If you set
+     <literal>com.forgerock.agents.notenforced.url.regex.enable=true</literal>,
+     then you can use <link xlink:href="http://www.pcre.org/pcre.txt"
+     xlink:show="new">Perl-compatible regular expressions</link> to match
+     Not Enforced URLs instead. (Do not mix settings; use either the mechanism
+     described above or Perl-compatible regular expressions, but not both.)</para>
+
+     <para>The following example shows settings where no authentication is
+     required for URLs whose path ends <literal>/publicA</literal> or
+     <literal>/publicB</literal> (with or without query string parameters),
+     and no authentication is required to access .png, .jpg, .gif, .js, or .css
+     files under URLs that do not contain <literal>/protectedA/</literal>
+     or <literal>/protectedB/</literal>.</para>
+
+     <programlisting language="ini"
+     >com.forgerock.agents.notenforced.url.regex.enable=true
+com.sun.identity.agents.config.notenforced.url[0]= \
+ .*/(PublicServletA|PublicServletB)(\?.*|$)
+com.sun.identity.agents.config.notenforced.url[1]= \
+ ^(?!.*(/protectedA/|/protectedB/)).*\.(png|jpg|gif|js|css)(\?.*|$)</programlisting>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1501,6 +1645,17 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Password Key.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.repository.location</literal></term>
+    <listitem>
+     <para>Whether the agent's configuration is managed centrally through OpenAM
+     (<literal>centralized</literal>) or locally in the policy agent
+     configuration file (<literal>local</literal>).</para>
+     <para>Default: <literal>centralized</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.response.attribute.fetch.mode</literal></term>
     <listitem>
@@ -1597,7 +1752,7 @@ token=value;Domain=subdomain.domain.com</literal></para>
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.url.comparison.case.ignore</literal></term>
     <listitem>
-     <para>When enabled, enforce case sensitivity in both policy and
+     <para>When enabled, enforces case insensitivity in both policy and
      not enforced URL evaluation.</para>
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;

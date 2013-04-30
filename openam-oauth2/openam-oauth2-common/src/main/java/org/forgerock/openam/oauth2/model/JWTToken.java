@@ -24,10 +24,8 @@
 
 package org.forgerock.openam.oauth2.model;
 
-import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.JWTBuilder;
-import org.forgerock.openam.forgerockrest.authn.JWTBuilderFactory;
+import org.forgerock.openam.forgerockrest.jwt.*;
 
 import java.security.PrivateKey;
 import java.security.SignatureException;
@@ -36,8 +34,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class JWTToken extends CoreToken {
-    private JWTBuilderFactory factory = JWTBuilderFactory.getInstance();
-    public JWTBuilder builder = factory.getJWTBuilder();
+
+    private PlaintextJwt jwt = null;
+    private JwtBuilder jwtBuilder = new JwtBuilder();
     private static ResourceBundle rb = ResourceBundle.getBundle("OAuth2CoreToken");
 
     /**
@@ -62,15 +61,21 @@ public class JWTToken extends CoreToken {
         setAuthTime(ath);
         setRealm(realm);
         setNonce(nonce);
-        builder.addValuePairs(super.asMap());
+        jwt = jwtBuilder.jwt();
+        jwt.content(super.asMap());
+
     }
 
-    public JWTBuilder sign(PrivateKey pk) throws SignatureException{
-        return builder.sign(pk);
+    public SignedJwt sign(JwsAlgorithm alg, PrivateKey pk) throws SignatureException{
+        return jwt.sign(alg, pk);
+    }
+
+    public EncryptedJwt encrypt() throws SignatureException{
+        return jwt.encrypt();
     }
 
     public String build(){
-        return builder.build();
+        return jwt.build();
     }
 
     /**

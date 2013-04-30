@@ -703,6 +703,7 @@ public class OAuth2Constants {
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
         public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
         public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
+        public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
     }
 
     /**

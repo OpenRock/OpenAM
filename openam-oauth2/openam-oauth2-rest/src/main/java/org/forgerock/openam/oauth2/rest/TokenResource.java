@@ -128,7 +128,7 @@ public class TokenResource implements CollectionResourceProvider {
                     handler.handleError(ex);
                 }
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(e.getCode(), e.getReason(), null, e);
+                throw new ServiceUnavailableException(e.getMessage(),e);
             }
             Map< String, String> responseVal = new HashMap< String, String>();
             responseVal.put("success", "true");
@@ -167,7 +167,11 @@ public class TokenResource implements CollectionResourceProvider {
                 AMIdentity uid = null;
                 try {
                     uid = getUid(context);
-                    query.put(OAuth2Constants.CoreTokenParams.USERNAME, uid.getName());
+                    if (!uid.equals(adminUserId)){
+                        query.put(OAuth2Constants.CoreTokenParams.USERNAME, uid.getName());
+                    } else {
+                        query.put(OAuth2Constants.CoreTokenParams.USERNAME, "*");
+                    }
                 } catch (Exception e){
                     PermanentException ex = new PermanentException(401, "Unauthorized" ,e);
                     handler.handleError(ex);
@@ -178,13 +182,7 @@ public class TokenResource implements CollectionResourceProvider {
                 for (String q: queries){
                     String[] params = q.split("=");
                     if (params.length == 2){
-                        if (!params[0].equalsIgnoreCase(OAuth2Constants.CoreTokenParams.USERNAME)){
-                            query.put(params[0], params[1]);
-                        } else {
-                            if (uid != null && (uid.equals(adminUserId) || uid.getName().equalsIgnoreCase(params[1]))){
-                                query.put(params[0], params[1]);
-                            }
-                        }
+                        query.put(params[0], params[1]);
                     }
                 }
 
@@ -194,7 +192,7 @@ public class TokenResource implements CollectionResourceProvider {
                 }
                 response = accessor.query("1", queryFilter);
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't query CTS", null, e);
+                throw new ServiceUnavailableException(e.getMessage(),e);
             }
             resource = new Resource("result", "1", response);
             JsonValue value = resource.getContent();
@@ -239,7 +237,7 @@ public class TokenResource implements CollectionResourceProvider {
                 }
 
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
+                throw new ServiceUnavailableException(e.getMessage(),e);
             }
             if (uid.equals(adminUserId) || username.equalsIgnoreCase(uid.getName())){
                 resource = new Resource(OAuth2Constants.Params.ID, "1", response);
