@@ -27,6 +27,7 @@ package org.forgerock.openam.xacml.v3.rest;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import org.forgerock.openam.xacml.v3.resources.XACML3Resource;
 
 
 import javax.ws.rs.Produces;
@@ -45,7 +46,7 @@ public class XACML3ContextResolver implements ContextResolver<JAXBContext> {
     static {
         try {
             Map<String,String> nameSpace = new HashMap<String,String>();
-            nameSpace.put("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17","");
+            nameSpace.put(XACML3Resource.XACML3_NAMESPACE,"");
             context = new JSONJAXBContext( JSONConfiguration.mappedJettison()
                                                 .xml2JsonNs(nameSpace)
                                                 .build(), ENTITY_PACKAGE);

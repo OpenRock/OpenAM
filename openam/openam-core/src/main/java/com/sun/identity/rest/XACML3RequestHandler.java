@@ -113,7 +113,7 @@ public class XACML3RequestHandler {
         // Obtain our Content Type we are dealing with...
         ContentType requestContentType = getContentType(httpServletRequest);
         // Render the Proper HOME Document Resource.
-        return XACML3HomeResource.getHomeDocument(requestContentType);
+        return XACML3HomeResource.getHomeDocument(httpServletRequest, requestContentType);
     }
 
     /**
@@ -145,7 +145,7 @@ public class XACML3RequestHandler {
     @GET
     @Consumes // Consume All and any Application or Media Types
     @Produces({"application/xml", "application/json"})
-    @Path("/query")
+    @Path("/query/{resource}")
     public String getQuery(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
                          @Context HttpServletResponse httpServletResponse,
                          @Context javax.ws.rs.core.SecurityContext securityContext) {
@@ -188,6 +188,17 @@ public class XACML3RequestHandler {
     @Consumes({"application/json", "application/xacml+json"})
     @Produces({"application/json", "application/xacml+json"})
     @Path("/pdp")
+    public JAXBElement<Response> getJSONDecision( JAXBElement<Request> req   ) {
+
+        Request request = req.getValue();
+        Subject adminSubject = SubjectUtils.createSuperAdminSubject();
+
+        Response response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+        ObjectFactory objectFactory = new ObjectFactory();
+        return objectFactory.createResponse(response);
+    }
+
+    /**
     public Response getJSONDecision( String req   ) {
 
         Request request = XACML3PrivilegeUtils.parseJSON(req);
@@ -197,6 +208,7 @@ public class XACML3RequestHandler {
         return response;
 
     }
+    **/
 
     /**
      * POST

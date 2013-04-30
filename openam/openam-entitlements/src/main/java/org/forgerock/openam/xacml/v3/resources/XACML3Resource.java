@@ -36,6 +36,16 @@ package org.forgerock.openam.xacml.v3.resources;
 public abstract class XACML3Resource {
 
     /**
+     * Global Definitions
+     */
+    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+
+    /**
+     * PDP End-Point.
+     */
+    public static final String PDP_ENDPOINT = "/ws/xacml/pdp";
+
+    /**
      * Current Standards Schema Resource Name.
      */
     public static final String xacmlCoreSchemaResourceName =

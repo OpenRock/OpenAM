@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * XACML Resource for Home Documents
  * <p/>
@@ -16,15 +18,6 @@ import org.json.JSONObject;
  * X500Name
  */
 public class XACML3HomeResource extends XACML3Resource {
-    /**
-     * Global Definitions
-     */
-    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-
-    /**
-     * PDP End-Point.
-     */
-    public static final String PDP_ENDPOINT = "/ws/xacml/pdp";
 
     /**
      * Define our Static resource Bundle for our debugger.
@@ -42,13 +35,13 @@ public class XACML3HomeResource extends XACML3Resource {
      *
      * @return String -- Containing Response in requested ContentType.
      */
-    public static String getHomeDocument(ContentType requestContentType) {
+    public static String getHomeDocument(HttpServletRequest httpServletRequest, ContentType requestContentType) {
         // Determine Rendering to respond based upon Content Type.
         if (requestContentType.getCommonType().equals(CommonType.XML)) {
-            return getXMLHomeDocument();
+            return getXMLHomeDocument(httpServletRequest);
         } else {
             // Perform JSON rendering...
-            return getJSONHomeDocument();
+            return getJSONHomeDocument(httpServletRequest);
         }
     }
 
@@ -58,7 +51,7 @@ public class XACML3HomeResource extends XACML3Resource {
      *
      * @return
      */
-    private static String getXMLHomeDocument() {
+    private static String getXMLHomeDocument(HttpServletRequest httpServletRequest) {
         StringBuilder sb = new StringBuilder();
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
         sb.append(XML_HEADER);
@@ -71,14 +64,13 @@ public class XACML3HomeResource extends XACML3Resource {
         return sb.toString();
     }
 
-
     /**
      * Formulate our Home Document.
      *
      * @return JSONObject
      * @throws org.json.JSONException
      */
-    private static String getJSONHomeDocument() {
+    private static String getJSONHomeDocument(HttpServletRequest httpServletRequest) {
         JSONObject resources = new JSONObject();
         JSONArray resourceArray = new JSONArray();
         try {
@@ -86,16 +78,14 @@ public class XACML3HomeResource extends XACML3Resource {
             resource_1.append("href", PDP_ENDPOINT);
             JSONObject resource_1A = new JSONObject();
 
-            // TODO :: Fix
-            //resource_1A.append(xacmlRequestInformation.getXacmlHome(), resource_1);
+            resource_1A.append(getXACMLHome(httpServletRequest), resource_1);
 
             JSONObject resource_2 = new JSONObject();
-            resource_2.append("href-template", "/xacml/");
-            resource_2.append("hints", getHomeHints());
+            resource_2.append("href-template", "/ws/xacml/");
+            resource_2.append("hints", getHomeHints(httpServletRequest));
             JSONObject resource_2A = new JSONObject();
 
-            // TODO :: Fix
-            //resource_2A.append(xacmlRequestInformation.getXacmlHome(), resource_2);
+            resource_2A.append(getXACMLHome(httpServletRequest), resource_2);
 
             resourceArray.put(resource_1A);
             resourceArray.put(resource_2A);
@@ -115,7 +105,7 @@ public class XACML3HomeResource extends XACML3Resource {
      * @return JSONObject - Containing Hints for our Home Application.
      * @throws org.json.JSONException
      */
-    private static JSONObject getHomeHints() {
+    private static JSONObject getHomeHints(HttpServletRequest httpServletRequest) {
         JSONObject hints = new JSONObject();
         try {
             /**
@@ -166,5 +156,23 @@ public class XACML3HomeResource extends XACML3Resource {
          */
         return hints;
     }
+
+    /**
+     * Get our Server URL construct from our incoming Request.
+     *
+     * @return - Base XACML URL yields "schema://serverName:LocalPort/contextPath/servletPath"
+     */
+    public final static String getXACMLHome(HttpServletRequest httpServletRequest) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(httpServletRequest.getScheme());
+        sb.append("://");
+        sb.append(httpServletRequest.getServerName());
+        sb.append(":");
+        sb.append(httpServletRequest.getLocalPort());
+        sb.append(httpServletRequest.getContextPath());
+        sb.append(httpServletRequest.getServletPath());
+        return sb.toString();
+    }
+
 
 }

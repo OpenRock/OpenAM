@@ -157,12 +157,13 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
         </dependency>
 
-        <!-- Jersey To Be Removed in favor of RESTlet.  -->
+        <!-- JAX-RS Implementation using Jersey.  -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-bundle</artifactId>
@@ -230,7 +231,6 @@
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet.ext.jaxb</artifactId>
         </dependency>
-
 
         <!-- Joda Time API -->
         <dependency>
