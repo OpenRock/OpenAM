@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Provider
-@Produces({"application/xml","application/json"})
+@Produces({"application/xml","application/json",})
 public class XACML3ContextResolver implements ContextResolver<JAXBContext> {
     private final static String ENTITY_PACKAGE = "com.sun.identity.entitlement.xacml3.core";
     private final static JAXBContext context;

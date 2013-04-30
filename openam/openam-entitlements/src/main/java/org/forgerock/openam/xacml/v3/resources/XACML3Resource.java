@@ -49,11 +49,5 @@ public abstract class XACML3Resource {
      *  XACML 3 Default Namespace.
      */
     public static final String XACML3_NAMESPACE = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
-    /**
-     * Common Key Definitions
-     */
-    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-
-    public static final String PDP_ENDPOINT = "/xacml/pdp";
 
 }
