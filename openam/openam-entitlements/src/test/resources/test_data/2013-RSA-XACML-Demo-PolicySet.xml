@@ -1,0 +1,499 @@
+<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+           PolicySetId="2013-RSA-XACML-Demo-PolicySet"
+           Version="2.0"
+           PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-overrides">
+    <Description>Policy set for the 2013 RSA XACML demo</Description>
+    <Target/>
+    <Policy PolicyId="RSA-XACML-Demo-IP-Proprietary"
+            Version="1.0"
+            RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit">
+        <Description>Demo IP Proprietary Policy</Description>
+        <Target>
+            <AnyOf>
+                <AllOf>
+                    <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">true</AttributeValue>
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:proprietary"
+                                DataType="http://www.w3.org/2001/XMLSchema#boolean"
+                                MustBePresent="false"/>
+                    </Match>
+                    <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss</AttributeValue>
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:ip-owner"
+                                DataType="http://www.w3.org/2001/XMLSchema#string"
+                                MustBePresent="false"/>
+                    </Match>
+                </AllOf>
+            </AnyOf>
+        </Target>
+        <Rule RuleId="Curtiss-License-Check" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:organization"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition >
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:subject:subject-to-organization-relationship:employee</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:subject-to-organization-relationship"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior engines</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:work-effort"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use:manufacture</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                                 AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use"
+                                                 DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                                 MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="Spad-License-Check" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Spad</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:organization"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Match>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">true</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:valid-agreement-exists"
+                                    DataType="http://www.w3.org/2001/XMLSchema#boolean"
+                                    MustBePresent="false"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition >
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:subject:business-context:supplier</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:business-context"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">CR103</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:agreement-id"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Spad</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:ip-licensee"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-type:technical-data-grant</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-type"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ENG-1</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-id"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior engines</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:work-effort"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use:manufacture</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="Packard-License-Check" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Packard</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:organization"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Match>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">true</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:valid-agreement-exists"
+                                    DataType="http://www.w3.org/2001/XMLSchema#boolean"
+                                    MustBePresent="false"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition >
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:subject:business-context:supplier</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:business-context"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">LG-1</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-id"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Packard</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:ip-licensee"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-type:technical-data-grant</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-type"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">LG-1</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:agreement-id"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior landing gear</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:work-effort"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use:manufacture</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use"
+                                    DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <ObligationExpressions>
+            <ObligationExpression ObligationId="urn:oasis:names:tc:xacml:3.0:ipc:obligation:encrypt" FulfillOn="Permit">
+            </ObligationExpression>
+            <ObligationExpression ObligationId="urn:oasis:names:tc:xacml:3.0:ipc:obligation:marking" FulfillOn="Permit">
+                <AttributeAssignmentExpression AttributeId="urn:oasis:names:tc:xacml:3.0:example:attribute:text">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss Proprietary Information: Limited Distribution</AttributeValue>
+                </AttributeAssignmentExpression>
+            </ObligationExpression>
+        </ObligationExpressions>
+    </Policy>
+    <Policy PolicyId="RSA-XACM-DemoL-Export-EAR"
+            Version="1.0"
+            RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit">
+        <Description>Demo Export EAR Policy</Description>
+        <Target>
+            <AnyOf>
+                <AllOf>
+                    <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">EAR</AttributeValue>
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:jurisdiction"
+                                DataType="http://www.w3.org/2001/XMLSchema#string"
+                                MustBePresent="false"/>
+                    </Match>
+                    <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">^9A.*1</AttributeValue>
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:eccn"
+                                DataType="http://www.w3.org/2001/XMLSchema#string"
+                                MustBePresent="false"/>
+                    </Match>
+                </AllOf>
+            </AnyOf>
+        </Target>
+        <VariableDefinition VariableId="Check-If-Within-Effective-and-Expiration-Dates">
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-greater-than-or-equal">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-one-and-only">
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                                AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date"
+                                DataType="http://www.w3.org/2001/XMLSchema#date"
+                                MustBePresent="false"/>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-one-and-only">
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:effective-date"
+                                DataType="http://www.w3.org/2001/XMLSchema#date"
+                                MustBePresent="false"/>
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-less-than">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-one-and-only">
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                                AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date"
+                                DataType="http://www.w3.org/2001/XMLSchema#date"
+                                MustBePresent="false"/>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-one-and-only">
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:expiration-date"
+                                DataType="http://www.w3.org/2001/XMLSchema#date"
+                                MustBePresent="false"/>
+                    </Apply>
+                </Apply>
+            </Apply>
+        </VariableDefinition>
+        <Rule RuleId="EAR-1_Authority-to-Export" Effect="Permit">
+            <Description>EAR-1 Export Authority Check</Description>
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:organization"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Match>
+                    </AllOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Spad</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:organization"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition >
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">US</AttributeValue>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                                <AttributeDesignator
+                                        Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                        AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:current-nationality"
+                                        DataType="http://www.w3.org/2001/XMLSchema#string"
+                                        MustBePresent="false"/>
+                            </Apply>
+                        </Apply>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">FR</AttributeValue>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                                <AttributeDesignator
+                                        Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                        AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:current-nationality"
+                                        DataType="http://www.w3.org/2001/XMLSchema#string"
+                                        MustBePresent="false"/>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">US</AttributeValue>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                                <AttributeDesignator
+                                        Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                        AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:location"
+                                        DataType="http://www.w3.org/2001/XMLSchema#string"
+                                        MustBePresent="false"/>
+                            </Apply>
+                        </Apply>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">FR</AttributeValue>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                                <AttributeDesignator
+                                        Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                        AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:location"
+                                        DataType="http://www.w3.org/2001/XMLSchema#string"
+                                        MustBePresent="false"/>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior engines</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:work-effort"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <VariableReference VariableId="Check-If-Within-Effective-and-Expiration-Dates"/>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="EAR-2_Authority-to-Export" Effect="Permit">
+            <Description>EAR-2 Export Authority Check</Description>
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Packard</AttributeValue>
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:organization"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition >
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior landing gear</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:work-effort"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">GB</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:current-nationality"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-equal-ignore-case">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">GB</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:location"
+                                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">false</AttributeValue>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:boolean-one-and-only">
+                            <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                    AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:us-person"
+                                    DataType="http://www.w3.org/2001/XMLSchema#boolean"
+                                    MustBePresent="false"/>
+                        </Apply>
+                    </Apply>
+                    <VariableReference VariableId="Check-If-Within-Effective-and-Expiration-Dates"/>
+                </Apply>
+            </Condition>
+        </Rule>
+    </Policy>
+</PolicySet>
