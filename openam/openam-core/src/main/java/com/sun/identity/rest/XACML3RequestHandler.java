@@ -108,7 +108,6 @@ public class XACML3RequestHandler {
     @GET
     @Consumes // Consume any Application or Media Types
     @Produces({"application/xml", "application/json", "application/json-home"})
-    @Path("/")
     public String getDefaultHomeResource(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
                                   @Context javax.ws.rs.core.SecurityContext securityContext) {
         // Obtain our Content Type we are dealing with...
