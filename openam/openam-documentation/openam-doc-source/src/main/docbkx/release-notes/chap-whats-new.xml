@@ -41,13 +41,14 @@
    <para>The zero page login has been modified so that administrators can disable the
    functionality. The zero page login process is the ability of the user to login
    using only GET parameters, which presents a possible security issue. Zero page 
-   login is nowdisabled by default.</para>
+   login is now disabled by default.</para>
   </listitem>
 
   <listitem>
    <para>REST Authentication Service has been updated to handle Integrated Windows
-   Authentication. A new endpoint has been created, 
-   <filename>http://&lt;OpenAM Host&gt;:&lt;Port&gt;/&lt;deploy_uri&gt;/json/auth/1/authenticate</filename>.</para>
+   Authentication. IWA is now available through the REST interface by using the new endpoint, 
+   <filename>http://&lt;OpenAM Host&gt;:&lt;Port&gt;/&lt;deploy_uri&gt;/json/auth/1/authenticate</filename>.
+   The legacy REST authentication interface is still available.</para>
   </listitem>
 
   <listitem>

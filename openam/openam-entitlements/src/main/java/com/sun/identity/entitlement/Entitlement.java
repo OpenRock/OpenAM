@@ -829,6 +829,7 @@ public class Entitlement {
      */
     public Application getApplication(Subject adminSubject, String realm) 
         throws EntitlementException {
+
         if (application == null) {
             application = ApplicationManager.getApplication(
                 PrivilegeManager.superAdminSubject, realm, applicationName);

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -344,21 +344,22 @@ public class CTSPersistentStore extends GeneralTaskRunnable
 
         //create OAuth2 attribute Lined Sets
         returnAttrs_OAuth2 = new LinkedHashSet<String>();
-        returnAttrs_OAuth2.add(OAuth2Constants.StoredToken.EXPIRYTIME);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.SCOPE);
-        returnAttrs_OAuth2.add(OAuth2Constants.StoredToken.PARENT);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.USERNAME);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.REDIRECTURI);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.REFRESHTOKEN);
-        returnAttrs_OAuth2.add(OAuth2Constants.StoredToken.ISSUED);
-        returnAttrs_OAuth2.add(OAuth2Constants.StoredToken.TYPE);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.REALM);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.ID);
-        returnAttrs_OAuth2.add(OAuth2Constants.Params.CLIENTID);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.SCOPE);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.PARENT);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.USERNAME);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.ISSUED);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.REALM);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.ID);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.CLIENT_ID);
+        returnAttrs_OAuth2.add(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
         returnAttrs_OAuth2_ARRAY = returnAttrs_OAuth2.toArray(new String[returnAttrs_OAuth2.size()]);
 
         returnAttrs_ID_ONLY = new LinkedHashSet<String>();
-        returnAttrs_ID_ONLY.add(OAuth2Constants.Params.ID);
+        returnAttrs_ID_ONLY.add(OAuth2Constants.CoreTokenParams.ID);
         returnAttrs_ID_ONLY_ARRAY = returnAttrs_ID_ONLY.toArray(new String[returnAttrs_ID_ONLY.size()]);
 
         // Set Up Our Expired Search Limit
@@ -1025,13 +1026,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws Exception if there is any problem with accessing the session
      *                   repository.
      */
-    public Map<String, String> getSessionsByUUID(String uuid) throws SessionException {
+    public Map<String, Long> getSessionsByUUID(String uuid) throws SessionException {
         try {
-            AMRecord amRecord = (AMRecord) this.read(uuid);
-            if ((amRecord != null) && (amRecord.getExtraStringAttributes() != null)) {
-                return amRecord.getExtraStringAttributes();
-            }
-            return null;
+            return getRecordCount(uuid);
         } catch (Exception e) {
             throw new SessionException(e);
         }
@@ -1864,7 +1861,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
         // Establish our DN
-        String dn = request.get("id").required().asString();
+        String dn = request.get(OAuth2Constants.CoreTokenParams.ID).required().asString();
         String baseDN = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, dn);
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
@@ -1890,7 +1887,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             // Log Action
             logAMRootEntity(dataEntry.getAMRecord(), messageTag + "\nBaseDN:[" + baseDN + "] ");
             // Return UnMarshaled Object
-            addUnderScoresToParams(results);
             return new JsonValue(results);
         } catch (LDAPException ldapException) {
             lastLDAPException = ldapException;
@@ -1929,7 +1925,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
 
-        String id = request.get("id").required().asString();
+        String id = request.get(OAuth2Constants.CoreTokenParams.ID).required().asString();
         String dn = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, id);
 
         String messageTag = "CTSPersistenceStore.oauth2Delete: ";
@@ -2019,7 +2015,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 }
                 Map<String, Set<String>> results =
                         EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(ldapEntry.getAttributeSet());
-                addUnderScoresToParams(results);
                 tokens.add(results);
             } // End of while loop.
         } catch (LDAPException ldapException) {
@@ -2181,27 +2176,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             }
         }
         return;
-    }
-
-    /**
-     * Private helper method to Add Underscores to named elements whose name have spaces.
-     *
-     * @param results<String, Set<String>>
-     */
-    private void addUnderScoresToParams(Map<String, Set<String>> results) {
-        //need to add the _ back into expiry_time, client_id, redirect_uri
-        //and remove objectClass(by product of LDAP)
-        for (String key : results.keySet()) {
-            if (key.equalsIgnoreCase("expirytime")) {
-                results.put(OAuth2Constants.StoredToken.EXPIRY_TIME, results.remove(key));
-            } else if (key.equalsIgnoreCase("clientid")) {
-                results.put(OAuth2Constants.Params.CLIENT_ID, results.remove(key));
-            } else if (key.equalsIgnoreCase("redirecturi")) {
-                results.put(OAuth2Constants.Params.REDIRECT_URI, results.remove(key));
-            } else if (key.equalsIgnoreCase("objectClass")) {
-                results.remove(key);
-            }
-        }
     }
 
     // ***********************************************
