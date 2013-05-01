@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xacml-ctx:request returnpolicyidlist="true" combineddecision="false" xmlns:xacml-ctx="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17">
     <xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
     </xacml-ctx:attributes>

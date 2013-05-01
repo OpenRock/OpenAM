@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xacml3:policy xmlns:xacml3="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" policyid="access-document" rulecombiningalgid="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit" version="1">
     <xacml3:description>This Policy controls access to documents and makes sure only those managers at Axiomatics with the right level of clearance can view them.</xacml3:description>
     <xacml3:policydefaults><xacml3:xpathversion>http://www.w3.org/TR/1999/REC-xpath-19991116 </xacml3:xpathversion></xacml3:policydefaults>

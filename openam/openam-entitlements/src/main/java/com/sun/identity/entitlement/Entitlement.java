@@ -846,10 +846,14 @@ public class Entitlement {
             realm).getResourceComparator();
     }
 
-    void validateResourceNames(Subject adminSubject, String realm
-    ) throws EntitlementException {
+    void validateResourceNames(Subject adminSubject, String realm) throws EntitlementException {
         if ((resourceNames != null) && !resourceNames.isEmpty()) {
             Application app = getApplication(adminSubject, realm);
+            if (app == null)
+            {
+                // TODO :: Should we return an Entitlement Exception?
+                return;
+            }
             for (String r : resourceNames) {
                 ValidateResourceResult result = app.validateResourceName(r);
                 if (!result.isValid()) {

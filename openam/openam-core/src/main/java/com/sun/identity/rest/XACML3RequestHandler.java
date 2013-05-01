@@ -35,10 +35,7 @@ import javax.xml.bind.JAXBElement;
 import com.sun.identity.entitlement.xacml3.core.*;
 import com.sun.identity.shared.debug.Debug;
 
-import org.forgerock.openam.xacml.v3.model.CommonType;
-import org.forgerock.openam.xacml.v3.model.ContentType;
-import org.forgerock.openam.xacml.v3.model.XACML3PrivilegeUtils;
-import org.forgerock.openam.xacml.v3.model.XACMLEvalContext;
+import org.forgerock.openam.xacml.v3.model.*;
 
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 
@@ -83,9 +80,7 @@ import org.forgerock.openam.xacml.v3.resources.XACML3HomeResource;
  * </td><td><ul><li>&#47;openam&#47;xacml&#47;pap&#47;export&#47</li></ul></td><td><em>PAP Export Policy</em></td></tr>
  * </table>
  *
- *
  * @author allan.foster@forgerock.com
- *
  */
 @Path("/xacml")
 public class XACML3RequestHandler {
@@ -100,14 +95,14 @@ public class XACML3RequestHandler {
      * Provides the [HomeDocument] per OASIS Specification.
      *
      * @param httpServletRequest --  HttpServletRequest
-     * @param securityContext -- SecurityContext
+     * @param securityContext    -- SecurityContext
      * @return String - rendered content.
      */
     @GET
     @Consumes // Consume any Application or Media Types
     @Produces({"application/xml", "application/json", "application/json-home"})
     public String getDefaultHomeResource(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
-                                  @Context javax.ws.rs.core.SecurityContext securityContext) {
+                                         @Context javax.ws.rs.core.SecurityContext securityContext) {
         // Obtain our Content Type we are dealing with...
         ContentType requestContentType = getContentType(httpServletRequest);
         // Render the Proper HOME Document Resource.
@@ -119,7 +114,7 @@ public class XACML3RequestHandler {
      * Provides the [HomeDocument] per OASIS Specification.
      *
      * @param httpServletRequest --  HttpServletRequest
-     * @param securityContext -- SecurityContext
+     * @param securityContext    -- SecurityContext
      * @return String - rendered content.
      */
     @GET
@@ -128,7 +123,7 @@ public class XACML3RequestHandler {
     @Path("/home")
     public String getHomeResource(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
                                   @Context javax.ws.rs.core.SecurityContext securityContext) {
-        return getDefaultHomeResource(httpServletRequest,securityContext);
+        return getDefaultHomeResource(httpServletRequest, securityContext);
     }
 
     /**
@@ -136,7 +131,7 @@ public class XACML3RequestHandler {
      * Provides the [HomeDocument] per OASIS Specification.
      *
      * @param httpServletRequest --  HttpServletRequest
-     * @param securityContext -- SecurityContext
+     * @param securityContext    -- SecurityContext
      * @return String - rendered content.
      */
     @GET
@@ -144,8 +139,8 @@ public class XACML3RequestHandler {
     @Produces({"application/xml", "application/json", "application/json-home"})
     @Path("/pdp")
     public String getPDPHomeResource(@Context javax.servlet.http.HttpServletRequest httpServletRequest,
-                                  @Context javax.ws.rs.core.SecurityContext securityContext) {
-        return getDefaultHomeResource(httpServletRequest,securityContext);
+                                     @Context javax.ws.rs.core.SecurityContext securityContext) {
+        return getDefaultHomeResource(httpServletRequest, securityContext);
     }
 
     /**
@@ -156,15 +151,37 @@ public class XACML3RequestHandler {
      * @return JAXBElement<Response>
      */
     @POST
-    @Consumes({"application/xml","application/xacml+xml"})
-    @Produces({"application/xml","application/xacml+xml"})
+    @Consumes({"application/xml", "application/xacml+xml"})
+    @Produces({"application/xml", "application/xacml+xml"})
     @Path("/pdp")
-    public JAXBElement<Response> getXMLDecision( JAXBElement<Request> req   ) {
-
-        Request request = req.getValue();
-        Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-
-        Response response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+    public JAXBElement<Response> getXMLDecision(JAXBElement<Request> req) {
+        final String methodName = "XACML3RequestHandler.getXMLDecision: ";
+        Response response = null;
+        try {
+            Request request = req.getValue();
+            Subject adminSubject = SubjectUtils.createSuperAdminSubject();
+            // TODO :: I do not see a correct Request UnMarshal Functions Appearing in Stack?
+            // TODO :: Nothing is available to evaluate.
+            response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+        } catch (Exception exception) {
+            if (exception instanceof XACML3EntitlementException) {
+                DEBUG.error(methodName + "Entitlement Exception Occurred: " + exception.getMessage(), exception);
+                if (exception instanceof NotApplicableException) {
+                    response = new XACML3NotApplicableResponse();
+                } else {
+                    response = new XACML3IndeterminateResponse();
+                }
+            } else {
+                DEBUG.error(methodName + "Exception Occurred: " + exception.getMessage() + ", Returning Indeterminate.",
+                        exception);
+                response = new XACML3IndeterminateResponse();
+            }
+        }
+        // If we have a unknown Response, indicate that the response is Indeterminate
+        if ((response == null) || (response.getResult() == null) || (response.getResult().size() <= 0)) {
+            response = new XACML3IndeterminateResponse();
+        }
+        // Marshal Response.
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createResponse(response);
     }
@@ -180,27 +197,49 @@ public class XACML3RequestHandler {
     @Consumes({"application/json", "application/xacml+json"})
     @Produces({"application/json", "application/xacml+json"})
     @Path("/pdp")
-    public JAXBElement<Response> getJSONDecision( JAXBElement<Request> req   ) {
-
-        Request request = req.getValue();
-        Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-
-        Response response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+    public JAXBElement<Response> getJSONDecision(JAXBElement<Request> req) {
+        final String methodName = "XACML3RequestHandler.getJSONDecision: ";
+        Response response = null;
+        try {
+            Request request = req.getValue();
+            Subject adminSubject = SubjectUtils.createSuperAdminSubject();
+            // TODO :: I do not see a correct Request UnMarshal Functions Appearing in Stack?
+            // TODO :: Nothing is available to evaluate.
+            response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+        } catch (Exception exception) {
+            if (exception instanceof XACML3EntitlementException) {
+                DEBUG.error(methodName + "Entitlement Exception Occurred: " + exception.getMessage(), exception);
+                if (exception instanceof NotApplicableException) {
+                    response = new XACML3NotApplicableResponse();
+                } else {
+                    response = new XACML3IndeterminateResponse();
+                }
+            } else {
+                DEBUG.error(methodName + "Exception Occurred: " + exception.getMessage() + ", Returning Indeterminate.",
+                        exception);
+                response = new XACML3IndeterminateResponse();
+            }
+        }
+        // If we have a unknown Response, indicate that the response is Indeterminate
+        if ((response == null) || (response.getResult() == null) || (response.getResult().size() <= 0)) {
+            response = new XACML3IndeterminateResponse();
+        }
+        // Marshal Response.
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createResponse(response);
     }
 
     /**
-    public Response getJSONDecision( String req   ) {
+     public Response getJSONDecision( String req   ) {
 
-        Request request = XACML3PrivilegeUtils.parseJSON(req);
-        Subject adminSubject = SubjectUtils.createSuperAdminSubject();
+     Request request = XACML3PrivilegeUtils.parseJSON(req);
+     Subject adminSubject = SubjectUtils.createSuperAdminSubject();
 
-        Response response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
-        return response;
+     Response response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+     return response;
 
-    }
-    **/
+     }
+     **/
 
     /**
      * POST
@@ -211,17 +250,17 @@ public class XACML3RequestHandler {
      */
     @POST
     @Consumes // Consume All and any Application or Media Types
-    @Produces({"application/xml","application/xacml+xml", "application/json","application/xacml+json"})
-    public JAXBElement<Response> getDecision( JAXBElement<Request> req,
-                                              @Context javax.servlet.http.HttpServletRequest httpServletRequest,
-                                              @Context javax.ws.rs.core.SecurityContext securityContext) {
+    @Produces({"application/xml", "application/xacml+xml", "application/json", "application/xacml+json"})
+    public JAXBElement<Response> getDecision(JAXBElement<Request> req,
+                                             @Context javax.servlet.http.HttpServletRequest httpServletRequest,
+                                             @Context javax.ws.rs.core.SecurityContext securityContext) {
         // Obtain our Content Type we are dealing with...
         ContentType requestContentType = getContentType(httpServletRequest);
-
+        // Perform Appropriate Decision Method by Content Type.
         if (requestContentType.getCommonType().equals(CommonType.XML)) {
-             return getXMLDecision(req);
+            return getXMLDecision(req);
         } else {
-             return getJSONDecision(req);
+            return getJSONDecision(req);
         }
     }
 
@@ -235,9 +274,9 @@ public class XACML3RequestHandler {
      */
     @POST
     @Consumes // Consume All and any Application or Media Types
-    @Produces({"application/xml","application/xacml+xml", "application/json","application/xacml+json"})
+    @Produces({"application/xml", "application/xacml+xml", "application/json", "application/xacml+json"})
     @Path("/dumprequest")
-    public JAXBElement<Request> getDumpRequest( JAXBElement<Request> req   ) {
+    public JAXBElement<Request> getDumpRequest(JAXBElement<Request> req) {
         Request request = req.getValue();
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createRequest(request);
@@ -248,7 +287,6 @@ public class XACML3RequestHandler {
      *
      * @param request HttpServletRequest
      * @return ContentType -- Enum Content Type Value for easy upstream comparisons.
-     *
      */
     private static ContentType getContentType(HttpServletRequest request) {
         return ((request.getContentType() == null) ? ContentType.XML :
