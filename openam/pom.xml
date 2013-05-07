@@ -1535,7 +1535,24 @@
                 <version>${restlet.version}</version>
             </dependency>
 
-            <!-- RESTlet JAVA SE Components -->
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.freemarker</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet</artifactId>
@@ -1549,18 +1566,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.restlet.osgi</groupId>
-                <artifactId>org.restlet.ext.freemarker</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.jackson</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.simple</artifactId>
                 <version>${restlet.version}</version>
@@ -1568,43 +1573,7 @@
 
             <dependency>
                 <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.crypto</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.httpclient</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.atom</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.jaxrs</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.json</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.xml</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.jaxb</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
 
