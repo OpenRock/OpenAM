@@ -204,19 +204,6 @@
             <artifactId>mockito-all</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.test</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.restlet.jse</groupId>
-                    <artifactId>org.restlet.example</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-
     </dependencies>
 
 </project>
