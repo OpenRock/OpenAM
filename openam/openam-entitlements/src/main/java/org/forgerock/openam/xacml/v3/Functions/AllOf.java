@@ -62,7 +62,6 @@ import java.util.List;
 public class AllOf extends XACMLFunction {
 
     public FunctionArgument evaluate(XACMLEvalContext pip) throws XACML3EntitlementException {
-        FunctionArgument retVal = FunctionArgument.trueObject;
 
         int args = getArgCount();
         if (args < 3) {
@@ -80,21 +79,17 @@ public class AllOf extends XACMLFunction {
         for (int i = 1; i < args - 1; i++) {
             FunctionArgument res = getArg(i).evaluate(pip);
             List<DataValue> bagVals = (List<DataValue>) bag.getValue(pip);
-            boolean oneIsTrue = false;
 
             for (DataValue dv : bagVals) {
                 func.clearArguments();
                 func.addArgument(res).addArgument(dv);
                 FunctionArgument result = func.evaluate(pip);
-                if (result.isTrue()) {
-                    oneIsTrue = true;
+                if (result.isFalse()) {
+                    return FunctionArgument.falseObject;
                 }
             }
-            if (!oneIsTrue) {
-                retVal = FunctionArgument.falseObject;
-            }
         }
-        return retVal;
+        return FunctionArgument.trueObject;
     }
 
     public String toXML(String type) {
