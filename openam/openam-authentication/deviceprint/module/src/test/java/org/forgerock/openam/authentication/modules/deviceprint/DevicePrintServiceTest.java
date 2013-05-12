@@ -146,7 +146,6 @@ public class DevicePrintServiceTest {
         DevicePrint userProfileTwoDevicePrint = mock(DevicePrint.class);
         DevicePrint userProfileThreeDevicePrint = mock(DevicePrint.class);
         ComparisonResult userProfileOneResult = new ComparisonResult(30L);
-        ComparisonResult userProfileTwoResult = new ComparisonResult(10L);
         ComparisonResult userProfileThreeResult = new ComparisonResult(20L);
 
         userProfiles.add(userProfileOne);
@@ -156,7 +155,7 @@ public class DevicePrintServiceTest {
 
         given(userProfileOne.getLastSelectedDate()).willReturn(getDate(10));
         given(userProfileTwo.getLastSelectedDate()).willReturn(getDate(31));
-        given(userProfileThree.getLastSelectedDate()).willReturn(getDate(30));
+        given(userProfileThree.getLastSelectedDate()).willReturn(getDate(29));
 
         given(userProfileOne.getDevicePrint()).willReturn(userProfileOneDevicePrint);
         given(userProfileTwo.getDevicePrint()).willReturn(userProfileTwoDevicePrint);
@@ -164,16 +163,17 @@ public class DevicePrintServiceTest {
 
         given(devicePrintComparator.compare(devicePrint, userProfileOneDevicePrint,
                 devicePrintAuthenticationConfig)).willReturn(userProfileOneResult);
-//        given(devicePrintComparator.compare(devicePrint, userProfileTwoDevicePrint,
-//                devicePrintAuthenticationConfig)).willReturn(userProfileTwoResult);
         given(devicePrintComparator.compare(devicePrint, userProfileThreeDevicePrint,
                 devicePrintAuthenticationConfig)).willReturn(userProfileThreeResult);
+
+        given(devicePrintAuthenticationConfig.getLong(
+                DevicePrintAuthenticationConfig.MAX_TOLERATED_PENALTY_POINTS)).willReturn(50L);
 
         //When
         UserProfile selectedUserProfile = devicePrintService.getBestMatchingUserProfile(devicePrint);
 
         //Then
-        assertEquals(selectedUserProfile, userProfileOne);
+        assertEquals(selectedUserProfile, userProfileThree);
     }
 
     private Date getDate(int daysAgo) {
