@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 package com.sun.identity.authentication.modules.cert;
 
 import java.io.ByteArrayInputStream;
@@ -78,6 +82,7 @@ import com.sun.identity.security.cert.AMCRLStore;
 import com.sun.identity.security.cert.AMCertStore;
 import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.security.cert.AMCertPath;
+import java.util.Arrays;
 
 public class Cert extends AMLoginModule {
 
@@ -116,6 +121,9 @@ public class Cert extends AMLoginModule {
     private String amAuthCert_validateCA;        
     // attr to use in search for user cert in CRL in LDAP
     private String amAuthCert_chkAttrCRL = null;
+    // attributes to use in searchfilter to find crlDistributionPoint entry in LDAP
+    // content of searchfilter is described in AMCRLStore to avoid duplication
+    private String[] amAuthCert_chkAttributesCRL = null;
     // params to use in accessing CRL DP
     private String amAuthCert_uriParamsCRL = null;
     // check user cert with cert in LDAP.
@@ -145,6 +153,14 @@ public class Cert extends AMLoginModule {
 
     static String UPNOID = "1.3.6.1.4.1.311.20.2.3";
     static boolean usingJSSHandler = false;
+    
+    private String amAuthCert_cacheCRL;
+    private boolean doCRLCaching = true;
+    
+    //attribute and flag to check whether CRLs should be updated from CRL distribution point
+    private String amAuthCert_updateCRL;
+    private boolean doCRLUpdate = true;
+    
     
     static {
         String handler = SystemProperties.get(Constants.PROTOCOL_HANDLER,
@@ -222,7 +238,20 @@ public class Cert extends AMLoginModule {
                 if (amAuthCert_chkAttrCRL == null || 
                     amAuthCert_chkAttrCRL.equals("")) {
                     throw new AuthLoginException(amAuthCert, "noCRLAttr", null);
+                } else {
+                    amAuthCert_chkAttributesCRL = trimItems(amAuthCert_chkAttrCRL.split(","));
                 }
+                amAuthCert_cacheCRL = CollectionHelper.getMapAttr(
+                        options, "openam-am-auth-cert-attr-cache-crl","true");
+                if (amAuthCert_cacheCRL.equalsIgnoreCase("false")) {
+                    doCRLCaching = false;
+                }
+                amAuthCert_updateCRL = CollectionHelper.getMapAttr(
+                        options, "openam-am-auth-cert-update-crl", "true");
+                if (amAuthCert_updateCRL.equalsIgnoreCase("false")) {
+                    doCRLUpdate = false;
+                }               
+                
                 crlEnabled = true;
             }
             amAuthCert_validateCA = CollectionHelper.getMapAttr(
@@ -347,6 +376,9 @@ public class Cert extends AMLoginModule {
                         amAuthCert_altUserProfileMapper +
                     "\n\tchkCRL=" + amAuthCert_chkCRL +
                     "\n\tchkAttrCRL=" + amAuthCert_chkAttrCRL +
+                    "\n\tchkAttributesCRL=" + Arrays.toString(amAuthCert_chkAttributesCRL) +
+                    "\n\tcacheCRL=" + doCRLCaching +
+                    "\n\tupdateCRLs=" + doCRLUpdate +
                     "\n\tchkCertInLDAP=" + amAuthCert_chkCertInLDAP +
                     "\n\tchkAttrCertInLDAP=" + amAuthCert_chkAttrCertInLDAP +
                     "\n\temailAddr=" + amAuthCert_emailAddrTag +
@@ -488,7 +520,7 @@ public class Cert extends AMLoginModule {
         X509CRL crl = null;
         
         if (crlEnabled) {
-            crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttrCRL);
+            crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
         
             if ((crl != null) && (!crl.isRevoked(cert))) {
                 ret = ISAuthConstants.LOGIN_SUCCEED;
@@ -529,8 +561,7 @@ public class Cert extends AMLoginModule {
 		
     	try {
             Vector crls = new Vector();
-            X509CRL crl = 
-               AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttrCRL);
+            X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
 
             if (crl != null) {
                 crls.add(crl);
@@ -578,6 +609,10 @@ public class Cert extends AMLoginModule {
                 ldapParam.setSecureSocketFactory
                     (SSLSocketFactoryManager.getSSLSocketFactory());
             }
+            
+            ldapParam.setDoCRLCaching(doCRLCaching);
+            ldapParam.setDoCRLUpdate(doCRLUpdate);
+            
         } catch (Exception e) {
             debug.error("validate.SSLSocketFactory", e);
             setFailureID(userTokenId);
@@ -916,10 +951,20 @@ public class Cert extends AMLoginModule {
         amAuthCert_altUserProfileMapper = null;
         amAuthCert_chkCRL = null;
         amAuthCert_chkAttrCRL = null;
+        amAuthCert_chkAttributesCRL = null;
         amAuthCert_uriParamsCRL = null;
         amAuthCert_chkCertInLDAP = null;
         amAuthCert_chkAttrCertInLDAP = null;
         amAuthCert_emailAddrTag = null;
         portalGateways = null;
+        amAuthCert_updateCRL = null;
     }
+    
+    private String[] trimItems(String[] items) {
+        String[] trimmedItems = new String[items.length];
+        for (int i = 0; i < items.length; i++) {
+            trimmedItems[i] = items[i].trim();
+        }
+        return trimmedItems;
+    }    
 }
