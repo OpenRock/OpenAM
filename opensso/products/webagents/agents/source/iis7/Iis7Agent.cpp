@@ -1755,30 +1755,31 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
     //Set the cookie in the request header
     //similar to what set_header_attr_as_cookie is supposed to do
     if (!isCdssoEnabled && !isRequest && tmpCookieString.length() > 0) {
-        PCSTR pszCookie;
-        PCSTR newCookie;
-        USHORT cchCookie;
-
-        pszCookie = pHttpRequest->GetHeader("Cookie", &cchCookie);
-        pszCookie = (PCSTR) pHttpContext->AllocateRequestMemory(cchCookie + 1);
-
-        if (pszCookie == NULL) {
-            return AM_FAILURE;
-        }
+        PCSTR pszCookie = NULL, newCookie = NULL;
+        USHORT cchCookie = 0;
 
         if (tmpCookieString[tmpCookieString.length() - 1] != ';') {
             tmpCookieString.append(";");
         }
 
         pszCookie = pHttpRequest->GetHeader("Cookie", &cchCookie);
-        newCookie = (PCSTR) pHttpContext->
-                AllocateRequestMemory(cchCookie +
+        if (pszCookie == NULL) {
+            pszCookie = "";
+            cchCookie = 1;
+        }
+        
+        newCookie = (PCSTR) pHttpContext->AllocateRequestMemory(cchCookie +
                 (DWORD) (tmpCookieString.length()) + 1);
+        if (newCookie == NULL) {
+            return AM_FAILURE;
+        }
+        
         strcpy((char*) newCookie, (char*) pszCookie);
         strcat((char*) newCookie, tmpCookieString.c_str());
         strcat((char*) newCookie, "\0");
 
         pHttpRequest->SetHeader("Cookie", newCookie, (USHORT) strlen(newCookie), TRUE);
+        am_web_log_debug("%s: Cookie Header: %s", thisfunc, newCookie);
     }
 
     return status;
