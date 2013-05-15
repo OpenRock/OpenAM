@@ -832,10 +832,10 @@ public class Entitlement {
 
         if (application == null) {
             application = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, realm, applicationName);
+                    adminSubject, realm, applicationName);
         }
         if (application == null) {
-            PrivilegeManager.debug.error("Entitlement.getApplication null" +
+            PrivilegeManager.debug.error("Entitlement.getApplication is null, " +
                 "realm=" + realm + " applicationname=" + applicationName,null);
         }
         return application;
@@ -843,8 +843,12 @@ public class Entitlement {
 
     ResourceName getResourceComparator(Subject adminSubject, String realm) 
         throws EntitlementException {
-        return getApplication(PrivilegeManager.superAdminSubject,
-            realm).getResourceComparator();
+        Application application = getApplication(adminSubject, realm);
+        if (application == null) {
+           Object[] args = {adminSubject, realm};
+           throw new EntitlementException(700, args);
+        }
+        return application.getResourceComparator();
     }
 
     void validateResourceNames(Subject adminSubject, String realm) throws EntitlementException {
