@@ -37,7 +37,9 @@
     <tstamp>
         <format property="build.date" pattern="MMM dd yyyy HH:mm:ss"/>
     </tstamp>
-    <property name="AGENT_VER" value="3.1.0-Xpress"/>
+    <!-- agent version number appended to end of agent zip file name -->
+    <property name="agentversion" value="3.2.0-SNAPSHOT"/>
+    <property name="AGENT_VER" value="${agentversion}"/>
     <property name="AGENT_ER_VER" value=""/>
     <property name="AGENT_FVB_MARKER" value=""/>
     <property name="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
@@ -118,10 +120,7 @@
             <isset property="target.jdk"/>
         </not>
     </condition>
-
-    <!-- agent version number appended to end of agent zip file name -->
-    <property name="agentversion" value="3.1.0-Xpress"/>
-
+    
     <target name="preparebuild">
         <mkdir dir="${webagents.built.dir}"/>
         <mkdir dir="${webagents.dist.dir}"/>
@@ -333,11 +332,22 @@
     <target name="arch_sdk">
         <echo message="Dispatch to archive OpenAM C-SDK"/>
         <delete verbose="true" includeemptydirs="false">
-            <fileset dir="${webagents.dist.dir}" includes="agent-csdk-windows-*.zip" />
+            <fileset dir="${webagents.dist.dir}" includes="agent_csdk_windows_*.zip" />
         </delete>
-        <zip file="${webagents.dist.dir}/agent-csdk-windows-${build.type}.zip">  
+        <zip file="${webagents.dist.dir}/agent_csdk_windows_${build.type}.zip">  
             <zipfileset prefix="bin" dir="${webagents.basedir}/am/source/" includes="cryptit.exe"/>
-            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="**/am*.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_auth.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_log.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_map.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_notify.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_policy.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_properties.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_sso.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_string_set.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_types.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_utils.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_web.h"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.dll"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.lib"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.dll"/>
@@ -353,7 +363,9 @@
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="README.TXT"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile"/>
             <zipfileset dir="${webagents.basedir}/agents/source/common" includes="THIRD_PARTY_LICENSE.TXT"/>
-        </zip>  
+        </zip>
+        <delete file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js" quiet="true"/>
+        <echo file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js">var agent_csdk_windows_${build.type}_build_date = "${BUILD_DATE}";</echo>  
     </target>
 
     <target name="jsFiles">

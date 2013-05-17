@@ -120,7 +120,7 @@
     </condition>
 
     <!-- agent version number appended to end of agent zip file name -->
-    <property name="agentversion" value="3.1.0-Xpress"/>
+    <property name="agentversion" value="3.2.0-SNAPSHOT"/>
 
     <target name="preparebuild">
         <mkdir dir="${webagents.built.dir}"/>

@@ -73,21 +73,25 @@ ifeq ($(OS_ARCH), Linux)
 	# DSAME_DROP_FILE_NAME instead of just DSAME_DROP_FILE for Linux. 
 	cd $(DEST_PACKAGE_SCRATCH_DIR)/common; \
 	$(TAR) cvf ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar *; \
-	gzip -f ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar
+	gzip -f ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar; \
+	$(ECHO) 'var $(DSAME_DROP_FILE_NAME)_build_date = "${BUILD_DATE}";' > ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME)_build_date.js
 else
 ifeq ($(OS_ARCH), HP-UX)
 	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
 	$(TAR) cvf ../../../../$@.tar *; \
-	gzip -f ../../../../$@.tar
+	gzip -f ../../../../$@.tar; \
+	$(ECHO) 'var $(DSAME_DROP_FILE)_build_date = "${BUILD_DATE}";' > ../../../../$@_build_date.js
 else
 ifeq ($(OS_ARCH), AIX)
 	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
-	zip -r ../../../../$@.zip *
+	zip -r ../../../../$@.zip * ;\
+	$(ECHO) 'var $(DSAME_DROP_FILE)_build_date = "${BUILD_DATE}";' > ../../../../$@_build_date.js
 else
 
 	cd $(DEST_PACKAGE_SCRATCH_DIR); \
 	$(TAR) cvf ../../../$@.tar is_csdk; \
-	gzip -f ../../../$@.tar
+	gzip -f ../../../$@.tar; \
+	$(ECHO) 'var $(DSAME_DROP_FILE)_build_date = "${BUILD_DATE}";' > ../../../$@_build_date.js
 endif
 endif
 endif
