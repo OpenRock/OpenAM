@@ -31,6 +31,8 @@ override BUILD_MODULE := USERX_ROOT
 USERX_ROOT := .
 include $(USERX_ROOT)/arch/components.mk
 
+BUILD_DATE_JS := $(shell date +%Y%m%d)
+	
 #
 # Make sure that the local copies of the components are populated before
 # doing the main part of the build.
@@ -74,24 +76,24 @@ ifeq ($(OS_ARCH), Linux)
 	cd $(DEST_PACKAGE_SCRATCH_DIR)/common; \
 	$(TAR) cvf ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar *; \
 	gzip -f ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar; \
-	$(ECHO) 'var $(DSAME_DROP_FILE_NAME)_build_date = "${BUILD_DATE}";' > ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME)_build_date.js
+	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME)_build_date.js
 else
 ifeq ($(OS_ARCH), HP-UX)
 	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
 	$(TAR) cvf ../../../../$@.tar *; \
 	gzip -f ../../../../$@.tar; \
-	$(ECHO) 'var $(DSAME_DROP_FILE)_build_date = "${BUILD_DATE}";' > ../../../../$@_build_date.js
+	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../../$@_build_date.js
 else
 ifeq ($(OS_ARCH), AIX)
 	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
 	zip -r ../../../../$@.zip * ;\
-	$(ECHO) 'var $(DSAME_DROP_FILE)_build_date = "${BUILD_DATE}";' > ../../../../$@_build_date.js
+	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../../$@_build_date.js
 else
 
 	cd $(DEST_PACKAGE_SCRATCH_DIR); \
 	$(TAR) cvf ../../../$@.tar is_csdk; \
 	gzip -f ../../../$@.tar; \
-	$(ECHO) 'var $(DSAME_DROP_FILE)_build_date = "${BUILD_DATE}";' > ../../../$@_build_date.js
+	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../$@_build_date.js
 endif
 endif
 endif

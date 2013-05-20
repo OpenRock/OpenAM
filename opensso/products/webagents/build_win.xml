@@ -365,7 +365,7 @@
             <zipfileset dir="${webagents.basedir}/agents/source/common" includes="THIRD_PARTY_LICENSE.TXT"/>
         </zip>
         <delete file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js" quiet="true"/>
-        <echo file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js">var agent_csdk_windows_${build.type}_build_date = "${BUILD_DATE}";</echo>  
+        <echo file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js">document.write("${nightly.date}");</echo>  
     </target>
 
     <target name="jsFiles">
