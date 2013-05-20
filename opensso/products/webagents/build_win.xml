@@ -53,7 +53,7 @@
     <import file="webagents.xml" />
 
     <tstamp>
-        <format property="nightly.date" pattern="yyyyMMdd" offset="-1" unit="day"/>
+        <format property="nightly.date" pattern="yyyyMMdd" />
     </tstamp>
     
     <condition property="build.debug32">
