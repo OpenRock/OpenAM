@@ -26,7 +26,7 @@
 #
 #
 
-# Portions Copyrighted 2010-2012 ForgeRock Inc
+# Portions Copyrighted 2010-2013 ForgeRock Inc
 
 #
 # This makefile defines a number of standard symbols used in by the
@@ -42,9 +42,9 @@ DEFINES_INCLUDED := true
 ###############
 
 AGENT_MAJOR_VER := 3
-AGENT_MINOR_VER := 1
+AGENT_MINOR_VER := 2
 AGENT_MICRO_VER := 0
-AGENT_RELEASE_NAME := Xpress
+AGENT_RELEASE_NAME := SNAPSHOT
 AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER).$(AGENT_MICRO_VER)-$(AGENT_RELEASE_NAME)
 
 # Set RELEASE_TYPE to one of the following:
