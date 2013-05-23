@@ -496,7 +496,7 @@ BaseService::doRequest(const ServiceInfo& service,
                         }
                     }
                 } catch (const NSPRException& exc) {
-                    Log::log(logModule, Log::LOG_DEBUG,
+                    Log::log(logModule, Log::LOG_ERROR,
                             "BaseService::doRequest() caught %s: %s called by %s "
                             "returned %s", exc.what(), exc.getNsprMethod(),
                             exc.getThrowingMethod(),
@@ -506,7 +506,7 @@ BaseService::doRequest(const ServiceInfo& service,
                         status = AM_NSPR_ERROR;
                         continue;
                     } else {
-                        Log::log(logModule, Log::LOG_DEBUG,
+                        Log::log(logModule, Log::LOG_ERROR,
                                 "BaseService::doRequest() Invoking markSeverDown");
                         svrInfo.markServerDown(poll_primary_server);
                         status = AM_NSPR_ERROR;
