@@ -496,6 +496,10 @@ am_status_t AgentProfileService::getAgentAttributes(
     urlParams.append("&admin=" );
     urlParams.append(encodedAgentToken);
 
+    Log::log(logModule, Log::LOG_DEBUG,
+            "AgentProfileService::getAgentAttributes(): sending request to: %s%s",
+            mRestURL.c_str(), urlParams.c_str());
+    
     try {
         setRestSvcInfo(mRestURL);
     } catch (InternalException &iex) {
