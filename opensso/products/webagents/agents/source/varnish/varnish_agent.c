@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 #include <stdarg.h>
 #include <unistd.h>
 
@@ -613,10 +614,15 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     int ret = OK;
     void *args[] = {NULL, (void*) &ret};
     char client_ip[INET6_ADDRSTRLEN];
-    char client_host[NI_MAXHOST];
     am_web_req_method_t method;
     am_web_request_params_t req_params;
     am_web_request_func_t req_func;
+    const char *clientIP_hdr_name = NULL;
+    char *clientIP_hdr = NULL;
+    char *clientIP = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    char *clientHostname_hdr = NULL;
+    char *clientHostname = NULL;
 
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
@@ -712,35 +718,61 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     }
 
     if (status == AM_SUCCESS) {
-        socklen_t slen;
-        int err;
-        if (cip->ss_family == AF_INET) {
-            slen = sizeof (struct sockaddr_in);
-        } else {
-            slen = sizeof (struct sockaddr_in6);
+        /* get the client IP address header set by the proxy, if there is one */
+        clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            clientIP_hdr = (char *) get_req_header(r, clientIP_hdr_name);
         }
-        err = getnameinfo((struct sockaddr *) cip, slen, client_ip, sizeof (client_ip), 0, 0, NI_NUMERICHOST);
-        if (err == 0) {
-            am_web_log_debug("%s: client host ip: %s", thisfunc, client_ip);
-            req_params.client_ip = client_ip;
+        /* get the client host name header set by the proxy, if there is one */
+        clientHostname_hdr_name =
+                am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            clientHostname_hdr = (char *) get_req_header(r, clientHostname_hdr_name);
         }
-        if ((req_params.client_ip == NULL) || (strlen(req_params.client_ip) == 0)) {
-            am_web_log_error("%s: Could not get the remote host ip (error: %d)", thisfunc, err);
-            status = AM_FAILURE;
-        }
-        if (status == AM_SUCCESS) {
-            err = getnameinfo((struct sockaddr *) cip, slen, client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
-            if (err == 0) {
-                am_web_log_debug("%s: client host name: %s", thisfunc, client_host);
-                req_params.client_hostname = client_host;
-            }
-            if ((req_params.client_hostname == NULL) || (strlen(req_params.client_hostname) == 0)) {
-                am_web_log_warning("%s: Could not get the remote host name (error: %d)", thisfunc, err);
-            }
+        /* if the client IP and host name headers contain more than one
+         * value, take the first value */
+        if ((clientIP_hdr != NULL && strlen(clientIP_hdr) > 0) ||
+                (clientHostname_hdr != NULL && strlen(clientHostname_hdr) > 0)) {
+            status = am_web_get_client_ip_host(clientIP_hdr, clientHostname_hdr,
+                    &clientIP, &clientHostname);
         }
     }
 
     if (status == AM_SUCCESS) {
+        if (clientIP == NULL) {
+            if (cip != NULL && cip->ss_family == AF_INET) {
+                struct sockaddr_in *sai = (struct sockaddr_in *) cip;
+                if (inet_ntop(AF_INET, &sai->sin_addr, client_ip, sizeof (client_ip)) == NULL) {
+                    am_web_log_error("%s: Could not get the remote host IPv4 (error: %d)", thisfunc, errno);
+                    status = AM_FAILURE;
+                } else {
+                    am_web_log_debug("%s: client host IPv4: %s", thisfunc, client_ip);
+                    req_params.client_ip = client_ip;
+                }
+            } else if (cip != NULL && cip->ss_family == AF_INET6) {
+                struct sockaddr_in6 *sai = (struct sockaddr_in6 *) cip;
+                if (inet_ntop(AF_INET6, &sai->sin6_addr, client_ip, sizeof (client_ip)) == NULL) {
+                    am_web_log_error("%s: Could not get the remote host IPv6 (error: %d)", thisfunc, errno);
+                    status = AM_FAILURE;
+                } else {
+                    am_web_log_debug("%s: client host IPv6: %s", thisfunc, client_ip);
+                    req_params.client_ip = client_ip;
+                }
+            } else {
+                am_web_log_error("%s: Could not get the remote host IP (invalid address family)", thisfunc);
+                status = AM_FAILURE;
+            }
+        } else {
+            req_params.client_ip = clientIP;
+        }
+        if ((req_params.client_ip == NULL) || (strlen(req_params.client_ip) == 0)) {
+            am_web_log_error("%s: Could not get the remote host IP", thisfunc);
+            status = AM_FAILURE;
+        }
+    }
+
+    if (status == AM_SUCCESS) {
+        req_params.client_hostname = clientHostname;
         req_params.url = url;
         req_params.query = get_query_string(url, r->pool);
         req_params.method = method;
@@ -771,6 +803,13 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
         if (status != AM_SUCCESS) {
             am_web_log_error("%s: error from am_web_process_request: %s", thisfunc, am_status_to_string(status));
         }
+    }
+
+    if (clientIP != NULL) {
+        am_web_free_memory(clientIP);
+    }
+    if (clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
     }
 
     am_web_delete_agent_configuration(agent_config);
