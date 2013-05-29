@@ -62,7 +62,7 @@ The sample application is supported for Policy Agent 3.0.
 
 Configure the OpenSSO server
 ----------------------------------------------
-This agent sample application requires that the OpenSSO server is configured 
+This agent sample application requires that the OpenSSO server is configured
 with the subjects and policies required by the sample application.
 
 On OpenSSO admin console, do the following configuration.
@@ -160,7 +160,7 @@ Configure the agent properties
 
 
    If the agent configuration is local, then edit the local agent configuration
-   file OpenSSOAgentConfiguration.properties located at the directory 
+   file OpenSSOAgentConfiguration.properties located at the directory
    <agent_install_root>/Agent_<instance_number>/config with following changes: 
 
     * Not enforced List:
@@ -235,7 +235,7 @@ To rebuild the entire application from scratch, follow these steps:
       and rebuild the WAR file.
 
       The build target creates a built and dist directory with the WAR file.
-      By default, the deployment descriptors assume that the OpenSSO 
+      By default, the deployment descriptors assume that the OpenSSO
       product was installed under default Org/Realm "dc=opensso,dc=java,dc=net". If the 
       Org/Realm for the deployment scenario is different from the default root 
       suffix, the Universal Id(uuid) for the role/principal mappings should be changed 

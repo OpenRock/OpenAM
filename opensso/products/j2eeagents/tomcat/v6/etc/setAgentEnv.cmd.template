@@ -25,10 +25,10 @@
 \\@rem 
 \\@rem $Id: setAgentEnv.cmd.template,v 1.3 2009/03/11 00:01:01 subbae Exp $
 \\@rem
-\\@rem
+\\@rem Portions Copyrighted 2013 ForgeRock Inc.
 \\@rem
 \\@rem *************************************************************************
-\\@rem This script is used to set up your environment for OpenSSO 
+\\@rem This script is used to set up your environment for OpenAM
 \\@rem Tomcat 6.0 policy agent. 
 
 \\@rem Append AGENT_CLASSPATH to the Tomcat system classpath

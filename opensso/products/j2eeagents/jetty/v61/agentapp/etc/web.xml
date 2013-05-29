@@ -28,7 +28,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011 ForgeRock Inc.
 -->
 
 <web-app  xmlns="http://java.sun.com/xml/ns/javaee"
@@ -38,7 +38,7 @@
     <display-name>agentapp</display-name>
 
     <filter>
-        <description>OpenSSO Policy Agent</description>
+        <description>OpenAM Policy Agent</description>
         <display-name>Agent</display-name>
         <filter-name>Agent</filter-name>
         <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>

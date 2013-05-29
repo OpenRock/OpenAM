@@ -24,10 +24,11 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 # $Id: setAgentEnv.sh.template,v 1.1 2008/12/11 14:43:28 naghaon Exp $
-#
+
+# Portions Copyrighted 2013 ForgeRock Inc.
 
 # *************************************************************************
-# This script is used to set up your environment for OpenSSO
+# This script is used to set up your environment for OpenAM
 # JBoss policy agent. 
 # *************************************************************************
 

@@ -26,11 +26,13 @@
 
 -->
 
+<!-- Portions Copyrighted 2013 ForgeRock Inc. -->
+
 <html>
     <head>
-        <title>OpenSSO Policy Agent </title>
+        <title>OpenAM Policy Agent </title>
     </head>
     <body>
-        OpenSSO Policy Agent. 
+        OpenAM Policy Agent.
     </body>
 </html>

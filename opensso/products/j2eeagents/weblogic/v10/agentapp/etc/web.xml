@@ -28,14 +28,14 @@
 
 -->
 <!--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2013 ForgeRock Inc.
 -->
 
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>agentapp</display-name>
 
     <filter>
-        <description>OpenSSO Policy Agent</description>
+        <description>OpenAM Policy Agent</description>
         <display-name>Agent</display-name>
         <filter-name>Agent</filter-name>
         <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>

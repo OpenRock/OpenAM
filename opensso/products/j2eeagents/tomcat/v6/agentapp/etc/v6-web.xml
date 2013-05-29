@@ -27,6 +27,9 @@
    $Id: v6-web.xml,v 1.2 2008/11/28 12:25:18 saueree Exp $
 
 -->
+<!--
+Portions Copyrighted 2013 ForgeRock Inc.
+-->
 
 <web-app  xmlns="http://java.sun.com/xml/ns/javaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -37,7 +40,7 @@
     <filter>
         <filter-name>Agent</filter-name>
         <display-name>Agent</display-name>
-        <description>OpenSSO Policy Agent</description>
+        <description>OpenAM Policy Agent</description>
         <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
     </filter>
     <filter-mapping>

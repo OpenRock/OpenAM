@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc.
  */
 
 package com.sun.identity.agents.arch;
@@ -629,7 +629,7 @@ public class AgentConfiguration implements
             } catch (SSOException se) {
                 if (isLogMessageEnabled()) {
                     logMessage("AgentConfiguration.getAppSSOToken: " +
-                       "The app SSO token is invalid, indicating opensso " +
+                       "The app SSO token is invalid, indicating openam " +
                        "server may have restarted, so need to " + 
                        "reauthenticate to get a new app SSO token");
                 }
@@ -1192,7 +1192,7 @@ public class AgentConfiguration implements
         if (isLogMessageEnabled()) {
             logMessage("AgentConfiguration.logServerVersion() - \n\n" +
                     "------------------------------------------------\n" +
-                    "OpenSSO Server Version:" + version + "\n" +
+                    "OpenAM Server Version:" + version + "\n" +
                     "------------------------------------------------\n");
         }
     }

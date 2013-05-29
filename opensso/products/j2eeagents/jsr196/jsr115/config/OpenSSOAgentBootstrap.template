@@ -22,12 +22,12 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-# Portions Copyrighted [2010] [ForgeRock AS]
+# Portions Copyrighted 2010-2013 ForgeRock Inc.
 #
 #------------------------------------------------------------------------------
 # J2EE Agents Bootstrap File
 #
-# OpenSSO Policy Agent for:
+# OpenAM Policy Agent for:
 # GlassFish 2.1
 #
 # Version: 3.0
@@ -140,7 +140,7 @@ com.sun.identity.agents.config.profilename = @AGENT_PROFILE_NAME@
 #
 # OPENAM DEPLOYMENT URI
 #   This property controls the URI under which OpenAM has been deployed. If this
-#   parameter is not supplied then the default value is /opensso.
+#   parameter is not supplied then the default value is /openam.
 # Hot-Swap Enabled: No
 #
 com.iplanet.am.services.deploymentDescriptor=@AM_SERVICES_DEPLOY_URI@

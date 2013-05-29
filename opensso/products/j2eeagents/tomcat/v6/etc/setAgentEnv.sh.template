@@ -24,9 +24,11 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 # $Id: setAgentEnv.sh.template,v 1.2 2008/11/28 12:26:58 saueree Exp $
+
+# Portions Copyrighted 2013 ForgeRock Inc.
 #
 # *************************************************************************
-# This script is used to set up your environment for OpenSSO  
+# This script is used to set up your environment for OpenAM
 # Tomcat 6.0 policy agent. 
 # *************************************************************************
 

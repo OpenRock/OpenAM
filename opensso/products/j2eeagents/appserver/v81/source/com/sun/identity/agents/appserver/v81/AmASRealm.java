@@ -23,7 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AmASRealm.java,v 1.6 2008/08/19 19:14:14 veiming Exp $
- *
+ */
+
+/*
+ *  Portions Copyrighted 2013 ForgeRock Inc.
  */
 
 package com.sun.identity.agents.appserver.v81;
@@ -137,7 +140,7 @@ public class AmASRealm extends IASRealm {
 
     
     public static final String AUTH_TYPE = 
-        "OpenSSO Policy Agent Realm";        
+        "OpenAM Policy Agent Realm";
     public static final String ANYONE_ROLE = "ANYONE";
 
     private Properties _realmProperties = null;
