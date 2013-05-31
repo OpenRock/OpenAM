@@ -27,8 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc 
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 Open Source Solution Technology Corporation
  */
 package com.sun.identity.console.policy;
 

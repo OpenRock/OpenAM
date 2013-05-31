@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 package com.sun.identity.policy;
 
@@ -523,7 +523,7 @@ public final class PolicyManager {
                 answer.setIsXacml3();  // dont let this be saved
             } else {
                 answer = new Policy(this, rootNode);
-            };
+            }
 
             // Return the policy object
             Map policyConfig = getPolicyConfig();
