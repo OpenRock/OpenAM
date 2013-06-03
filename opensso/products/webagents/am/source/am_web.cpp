@@ -1902,10 +1902,10 @@ is_url_not_enforced(const char *url, const char *client_ip, std::string pInfo,
             status = AM_FAILURE;
         }
     }
-    // check if it's the logout URL
+    // check if its the agent logout URL
     if (status == AM_SUCCESS) {
-        if ((*agentConfigPtr)->logout_url_list.size > 0 &&
-            am_web_is_logout_url(url, agent_config) == B_TRUE) {
+        if ((*agentConfigPtr)->agent_logout_url_list.size > 0 &&
+            am_web_is_agent_logout_url(url, agent_config) == B_TRUE) {
             isLogoutURL = AM_TRUE;
         }
     }

@@ -779,11 +779,6 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     //  Check for status and proceed accordingly
     switch (status) {
         case AM_SUCCESS:
-            if (am_web_is_logout_url(requestURL.c_str(), agent_config)
-                    == B_TRUE) {
-                (void) am_web_logout_cookies_reset(reset_cookie, args,
-                        agent_config);
-            }
             status = am_web_result_attr_map_set(&OphResources.result,
                     set_header, set_cookie_in_response,
                     set_header_attr_as_cookie,
@@ -942,6 +937,12 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
             break;
 
         case AM_REDIRECT_LOGOUT:
+            if (am_web_is_agent_logout_url(requestURL.c_str(), agent_config)) {
+                am_web_logout_cookies_reset(reset_cookie, args, agent_config);
+                if (set_cookies_list != NULL) {
+                    set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
+                }
+            }
             status = am_web_get_logout_url(&logout_url, agent_config);
             if (status == AM_SUCCESS) {
                 if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {

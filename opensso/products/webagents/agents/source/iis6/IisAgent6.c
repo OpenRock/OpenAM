@@ -2059,9 +2059,6 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 
     switch(status) {
         case AM_SUCCESS:
-              if (am_web_is_logout_url(requestURL,agent_config) == B_TRUE) {
-                 (void)am_web_logout_cookies_reset(set_cookie, args, agent_config);
-            }
             // set user attributes to http header/cookies
             status_tmp = am_web_result_attr_map_set(&OphResources.result,
                                         set_header, set_cookie,
@@ -2216,6 +2213,12 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
         case AM_INVALID_ARGUMENT:
         case AM_NO_MEMORY:
         case AM_REDIRECT_LOGOUT:
+            if (am_web_is_agent_logout_url(requestURL, agent_config)) {
+                am_web_logout_cookies_reset(set_cookie, args, agent_config);
+                if (set_cookies_list != NULL) {
+                    set_request_headers(pECB, args, FALSE);
+                }
+            }
             status = am_web_get_logout_url(&logout_url, agent_config);
             if(status == AM_SUCCESS) {
                 returnValue = redirect_to_request_url(pECB, 
