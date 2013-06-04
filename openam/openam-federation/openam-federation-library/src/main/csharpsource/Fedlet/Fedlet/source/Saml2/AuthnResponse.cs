@@ -25,7 +25,7 @@
  * $Id: AuthnResponse.cs,v 1.5 2009/11/11 18:13:39 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock Inc.
  */
 
 using System;

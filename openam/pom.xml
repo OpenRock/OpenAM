@@ -1330,7 +1330,7 @@
             </dependency>
 
             <dependency>
-                <groupId>net.java.dev.msv.datatype.xsd</groupId>
+                <groupId>com.sun.msv.datatype.xsd</groupId>
                 <artifactId>xsdlib</artifactId>
                 <version>20060615</version>
                 <!-- Originally ? -->
@@ -1508,11 +1508,6 @@
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.json</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.freemarker</artifactId>
                 <version>${restlet.version}</version>
@@ -1564,6 +1559,11 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-fluent</artifactId>
                 <version>${commons.json-fluent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-web-token</artifactId>
+                <version>${forgerock.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>

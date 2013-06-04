@@ -457,12 +457,18 @@
     <varlistentry>
      <term>IP Range</term>
      <listitem>
-      <para>Specifies a list of IP ranges either in CIDR-style notation
+      <para>For IPv4, specifies a list of IP ranges either in CIDR-style notation
       (<literal><replaceable>x.x.x.x</replaceable>/<replaceable>YY</replaceable></literal>)
       or as a range from one address to another
-      (<literal><replaceable>x.x.x.x</replaceable>:<replaceable>y.y.y.y</replaceable></literal>,
+      (<literal><replaceable>x.x.x.x</replaceable>-<replaceable>y.y.y.y</replaceable></literal>,
       meaning from <replaceable>x.x.x.x</replaceable> to
-      <replaceable>y.y.y.y</replaceable>). Currently supports only IPv4.</para>
+      <replaceable>y.y.y.y</replaceable>).</para>
+      <para>For IPv6, specifies a list of IP ranges either in CIDR-style notation
+      (<literal><replaceable>X:X:X:X:X:X:X:X</replaceable>/<replaceable>YY</replaceable></literal>)
+      or as a range from one address to another
+      (<literal><replaceable>X:X:X:X:X:X:X:X</replaceable>-<replaceable>Y:Y:Y:Y:Y:Y:Y:Y</replaceable></literal>,
+      meaning from <replaceable>X:X:X:X:X:X:X:X</replaceable> to
+      <replaceable>Y:Y:Y:Y:Y:Y:Y:Y</replaceable>).</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-range-range</literal></para>
      </listitem>
@@ -1781,6 +1787,10 @@
      <listitem>
       <para>Provides the name of the carrier that will send the text
       message.</para>
+      <para>Every carrier has their own attribute name ending, for example Verizon
+      uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their 
+      attribute name is. If you will be sending international texts, ask your carrier 
+      if a country code is a required.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openamSMSCarrierAttribute</literal></para>
      </listitem>
@@ -2221,7 +2231,7 @@
      <listitem>
       <para>Specifies a list of IP addresses of trusted clients that can access
       MSIDSN modules. Either restrict the clients allowed to access the MSISDN
-      module by add each IPv4 address here, or leave the list empty to allow
+      module by add each IPv4 or IPv6 address here, or leave the list empty to allow
       all clients to access the module. If you specify the value
       <literal>none</literal>, no clients are allowed access.</para>
       <para><command>ssoadm</command> attribute:
@@ -2352,7 +2362,7 @@
    <title>Hints For the OATH Module</title>
    <para>The Open Authentication (OATH) module provides a more secure method for users to 
       access their accounts with the help of a device, such as their mobile phone or 
-      Yubikey. Users can log into OpenAm and update their information more securely from
+      Yubikey. Users can log into OpenAM and update their information more securely from
       a one-time password (OTP) displayed on their device. The OATH module includes the
       <link xlink:show="new" xlink:href="http://www.openauthentication.org/about/"
       >OATH standard protocols</link> (<link xlink:show="new"

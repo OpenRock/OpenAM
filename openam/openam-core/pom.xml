@@ -148,6 +148,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ldap-utils</artifactId>
+        </dependency>
+
         <!-- LDAP APIs -->
         <dependency>
                 <groupId>org.forgerock.opendj</groupId>
@@ -477,7 +482,7 @@
         </dependency>
 
         <dependency>
-            <groupId>net.java.dev.msv.datatype.xsd</groupId>
+            <groupId>com.sun.msv.datatype.xsd</groupId>
             <artifactId>xsdlib</artifactId>
         </dependency>
 
@@ -541,6 +546,14 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>org.forgerock.json.resource</artifactId>
             <version>1.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
         </dependency>
     </dependencies>
 
