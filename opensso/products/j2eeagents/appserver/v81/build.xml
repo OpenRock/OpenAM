@@ -26,10 +26,10 @@
 
 -->
 
-<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+<!-- Portions Copyrighted 2010-2013 ForgeRock Inc. -->
 
 <project name="open-source-j2ee-agents-appserver-v81" default="build">
-    <description>OpenSSO Policy Agent for Sun Appserver 8.1</description>
+    <description>OpenAM Policy Agent for Sun Appserver 8.1</description>
 
     <fail message="*** jdk target is not set ***">
         <condition>

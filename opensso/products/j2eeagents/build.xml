@@ -26,7 +26,7 @@
 
 -->
 
-<!-- Portions Copyrighted 2010-2012 ForgeRock, Inc. -->
+<!-- Portions Copyrighted 2010-2013 ForgeRock, Inc. -->
 
 <project name="open-source-j2ee-agents" default="usage">
                 
@@ -40,7 +40,7 @@
     <property name="j2eeagents.src.dir" location="${j2eeagents.basedir}/agentsdk/source"/>
    
      <!-- agent version number appended to end of agent zip file name -->   
-    <property name="agentversion" value="3.1.0-Xpress"/>
+    <property name="agentversion" value="${j2eeagents.version}"/>
     
     <!-- overridable properties -->
     <property name="build.debug" value="on"/>

@@ -23,11 +23,11 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-#
+# Portions Copyrighted 2013 ForgeRock Inc.
 #
 
 # *************************************************************************
-# This script is used to set up your environment for OpenSSO 
+# This script is used to set up your environment for OpenAM
 # Policy Agent 3.0 for WebLogic 10.0.
 # Copy the server startup script to a server specific script. 
 # e.g startWeblogic.sh

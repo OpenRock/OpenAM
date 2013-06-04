@@ -25,12 +25,15 @@
    $Id: legacy_support_uri.jsp,v 1.1 2009/01/21 18:27:34 kanduls Exp $
 
 -->
+
+<!-- Portions Copyrighted 2013 ForgeRock Inc. -->
+
 <html>
 <head>
-  <title>OpenSSO Policy Agent </title>
+  <title>OpenAM Policy Agent </title>
 </head>
   <body>
-      OpenSSO Policy Agent.
+      OpenAM Policy Agent.
 </body>
 </html>
 

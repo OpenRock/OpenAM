@@ -28,6 +28,8 @@
 
 -->
 
+<!-- Portions Copyrighted 2010-2013 ForgeRock Inc. -->
+
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
@@ -36,7 +38,7 @@
     <filter>
         <filter-name>Agent</filter-name>
         <display-name>Agent</display-name>
-        <description>OpenSSO Policy Agent</description>
+        <description>OpenAM Policy Agent</description>
         <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
     </filter>
     <filter-mapping>

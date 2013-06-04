@@ -24,6 +24,8 @@
 
    $Id: readme.txt,v 1.3 2008/06/25 05:52:15 qcheng Exp $
 
+   Portions Copyrighted [2013] [ForgeRock AS]
+
 -->
 
 need to use JAVA_HOME JDK1.5 or above.

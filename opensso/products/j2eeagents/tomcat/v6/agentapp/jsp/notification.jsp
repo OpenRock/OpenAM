@@ -25,11 +25,14 @@
    $Id: notification.jsp,v 1.2 2008/11/28 12:25:39 saueree Exp $
 
 -->
+
+<!--Portions Copyrighted 2013 ForgeRock Inc.-->
+
 <html>
 <head>
-  <title>OpenSSO Policy Agent </title>
+  <title>OpenAM Policy Agent </title>
 </head>
   <body>
-      OpenSSO Policy Agent. 
+        OpenAM Policy Agent.
 </body>
 </html>
