@@ -41,13 +41,13 @@
         <module>jee-agents-agentapp</module>
         <module>jee-agents-tomcat</module>
         <module>jee-agents-jboss</module>
+        <module>jee-agents-jetty</module>
         <module>jee-agents-distribution</module>
 
         <!-- Activate as required -->
         <!--
         <module>jee-agents-jsr196</module>
         <module>jee-agents-appserver</module>
-        <module>jee-agents-jetty</module>
         <module>jee-agents-websphere</module>
         <module>jee-agents-weblogic</module>
         <module>jee-agents-sampleapp</module>
