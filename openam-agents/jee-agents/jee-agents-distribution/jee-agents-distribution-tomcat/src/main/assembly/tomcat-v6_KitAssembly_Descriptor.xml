@@ -96,14 +96,14 @@
         <!-- Create empty directories -->
         <fileSet>
             <outputDirectory>installer-logs</outputDirectory>
-            <directory>${project.basedir}/src/main/resources</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <outputDirectory>data</outputDirectory>
-            <directory>${project.basedir}/src/main/resources</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
