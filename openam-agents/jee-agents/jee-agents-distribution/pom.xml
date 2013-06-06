@@ -42,6 +42,16 @@
     <modules>
         <!-- Distribution Modules -->
         <module>jee-agents-distribution-tomcat</module>
+        <module>jee-agents-distribution-jboss</module>
+        <module>jee-agents-distribution-weblogic</module>
+        <module>jee-agents-distribution-websphere</module>
+
+        <!-- Activate as required
+        <module>jee-agents-distribution-appserver</module>
+        <module>jee-agents-distribution-jetty</module>
+        <module>jee-agents-distribution-jsr196</module>
+        -->
+
     </modules>
 
     <dependencies>
