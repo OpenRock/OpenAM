@@ -60,6 +60,13 @@
                 <include>org.forgerock.openam.agents:jee-agents-agentapp:war</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputFileNameMapping>agentsample.war</outputFileNameMapping>
+            <outputDirectory>sampleapp/dist</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam.agents:jee-agents-sampleapp-jetty:war</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
@@ -109,6 +116,10 @@
             <outputDirectory>config</outputDirectory>
             <source>${project.basedir}/src/main/assembly/v61/config/version</source>
             <filtered>true</filtered>
+        </file>
+        <file>
+            <outputDirectory>sampleapp</outputDirectory>
+            <source>${project.basedir}/src/main/assembly/v61/sampleapp/readme.txt</source>
         </file>
     </files>
 </assembly>

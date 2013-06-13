@@ -69,5 +69,11 @@
              <artifactId>jee-agents-jetty-v61</artifactId>
              <version>${project.version}</version>
          </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-sampleapp-jetty</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
     </dependencies>
 </project>
