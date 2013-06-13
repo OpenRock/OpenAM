@@ -36,7 +36,7 @@
         <openam.version>10.2.0-SNAPSHOT</openam.version>
     </properties>
     <modules>
-        <!-- OpenAM Agent JavaEE Modules -->
+        <!-- OpenAM JavaEE Policy Agent Modules -->
         <module>jee-agents-sdk</module>
         <module>jee-agents-agentapp</module>
         <module>jee-agents-tomcat</module>
@@ -46,12 +46,8 @@
         <module>jee-agents-weblogic</module>
         <module>jee-agents-websphere</module>
         <module>jee-agents-jsr196</module>
-        <module>jee-agents-distribution</module>
-
-        <!-- Activate as required -->
-        <!--
         <module>jee-agents-sampleapp</module>
-        -->
+        <module>jee-agents-distribution</module>
     </modules>
 
     <build>
@@ -112,22 +108,26 @@
          	<groupId>commons-io</groupId>
          	<artifactId>commons-io</artifactId>
          	<version>1.4</version>
+            <scope>provided</scope>
          </dependency>
          <!-- OpenAM project dependencies -->
          <dependency>
              <groupId>org.forgerock.openam</groupId>
              <artifactId>openam-clientsdk</artifactId>
              <version>${openam.version}</version>
+             <scope>provided</scope>
          </dependency>
          <dependency>
              <groupId>org.forgerock.openam</groupId>
              <artifactId>openam-installtools</artifactId>
              <version>${openam.version}</version>
+             <scope>provided</scope>
          </dependency>
          <dependency>
              <groupId>org.forgerock.openam</groupId>
              <artifactId>openam-installtools-launcher</artifactId>
              <version>${openam.version}</version>
+             <scope>provided</scope>
          </dependency>
      </dependencies>
 </project>
