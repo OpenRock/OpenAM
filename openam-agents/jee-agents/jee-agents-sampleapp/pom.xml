@@ -43,6 +43,7 @@
         <module>jee-agents-sampleapp-ejbservlet</module>
         <module>jee-agents-sampleapp-tomcat</module>
         <module>jee-agents-sampleapp-jetty</module>
+        <module>jee-agents-sampleapp-appserver</module>
         <module>jee-agents-sampleapp-jboss</module>
     </modules>
 </project>
