@@ -43,6 +43,7 @@
         <!-- Distribution Modules -->
         <module>jee-agents-distribution-tomcat</module>
         <module>jee-agents-distribution-jetty</module>
+        <module>jee-agents-distribution-appserver</module>
         <module>jee-agents-distribution-jboss</module>
         <module>jee-agents-distribution-weblogic</module>
         <module>jee-agents-distribution-websphere</module>
@@ -61,10 +62,31 @@
             <type>war</type>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
-             <groupId>org.forgerock.openam.agents</groupId>
-             <artifactId>jee-agents-sdk</artifactId>
-             <version>${project.version}</version>
-         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+                <artifactId>jee-agents-sdk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        <dependency>
+        	<groupId>commons-io</groupId>
+        	<artifactId>commons-io</artifactId>
+        	<version>1.4</version>
+        </dependency>
+        <!-- OpenAM project dependencies -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-clientsdk</artifactId>
+            <version>${openam.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-installtools</artifactId>
+            <version>${openam.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-installtools-launcher</artifactId>
+            <version>${openam.version}</version>
+        </dependency>
     </dependencies>
 </project>
