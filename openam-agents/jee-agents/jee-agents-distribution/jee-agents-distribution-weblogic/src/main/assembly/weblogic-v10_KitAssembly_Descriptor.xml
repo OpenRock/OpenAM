@@ -60,6 +60,13 @@
                 <include>org.forgerock.openam.agents:jee-agents-agentapp:war</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputFileNameMapping>agentsample.ear</outputFileNameMapping>
+            <outputDirectory>sampleapp/dist</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam.agents:jee-agents-sampleapp-weblogic-ear:ear</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
@@ -84,7 +91,7 @@
             <outputDirectory>etc</outputDirectory>
             <directory>${project.basedir}/src/main/assembly/v10/etc</directory>
         </fileSet>
-        <!-- The amauthprovider.jar is to do with MBeans and needs weblogic tools to regenerate -->
+        <!-- The amauthprovider.jar is to do with MBeans and needs Weblogic tools to regenerate -->
         <fileSet>
             <outputDirectory>lib</outputDirectory>
             <directory>${project.basedir}/src/main/assembly/v10/lib</directory>
@@ -118,6 +125,10 @@
             <outputDirectory>config</outputDirectory>
             <source>${project.basedir}/src/main/assembly/v10/config/version</source>
             <filtered>true</filtered>
+        </file>
+        <file>
+            <outputDirectory>sampleapp</outputDirectory>
+            <source>${project.basedir}/src/main/assembly/v10/sampleapp/readme.txt</source>
         </file>
     </files>
 </assembly>

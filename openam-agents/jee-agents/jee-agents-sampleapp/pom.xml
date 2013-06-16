@@ -45,5 +45,8 @@
         <module>jee-agents-sampleapp-jetty</module>
         <module>jee-agents-sampleapp-appserver</module>
         <module>jee-agents-sampleapp-jboss</module>
+        <module>jee-agents-sampleapp-jsr196</module>
+        <module>jee-agents-sampleapp-weblogic</module>
+        <module>jee-agents-sampleapp-websphere</module>
     </modules>
 </project>

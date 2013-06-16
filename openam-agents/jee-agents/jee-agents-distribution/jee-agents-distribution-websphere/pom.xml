@@ -69,5 +69,11 @@
              <artifactId>jee-agents-websphere-v61</artifactId>
              <version>${project.version}</version>
          </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-sampleapp-websphere-ear</artifactId>
+            <version>${project.version}</version>
+            <type>ear</type>
+        </dependency>
     </dependencies>
 </project>
