@@ -70,11 +70,6 @@
     </build>
 
     <dependencies>
-        <!-- OpenAM -->
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-forgerock-rest</artifactId>
-        </dependency>
 
         <!-- Restlet -->
         <dependency>

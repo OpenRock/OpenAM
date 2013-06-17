@@ -98,10 +98,7 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-rest</artifactId>
-        </dependency>
+
           <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>

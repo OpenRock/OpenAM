@@ -142,6 +142,33 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
         </dependency>
+        <!-- OAuth2 Dependencies -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-core-token-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-core</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-support</artifactId>
+            <version>1.5</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>

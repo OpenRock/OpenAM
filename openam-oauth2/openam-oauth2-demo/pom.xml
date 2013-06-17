@@ -69,11 +69,6 @@
             <artifactId>openam-shared</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-rest</artifactId>
-        </dependency>
-
         <!-- Restlet -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
