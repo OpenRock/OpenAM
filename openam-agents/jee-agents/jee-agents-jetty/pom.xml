@@ -39,6 +39,7 @@
     <modules>
         <!-- Jetty Modules -->
         <module>jee-agents-jetty-v61</module>
+        <module>jee-agents-jetty-v7</module>
     </modules>
 </project>
 
