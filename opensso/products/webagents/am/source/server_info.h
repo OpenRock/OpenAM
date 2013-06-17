@@ -29,13 +29,16 @@
  * Information needed to connect with a DSAME server.
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef SERVER_INFO_H
 #define SERVER_INFO_H
 
 #include <string>
-#include <prtime.h>
-#include <prprf.h>
+#include <time.h>
+#include <stdio.h>
 #include "internal_macros.h"
 
 BEGIN_PRIVATE_NAMESPACE
@@ -70,10 +73,11 @@ public:
     std::string toString() const;
     bool isHealthy(std::string poll_primary_server) const {
         if(!healthy) {
-            if(excludeTime < PR_Now()) {
+            time_t now = time(0);
+            if(excludeTime < now) {
                 int pollTime=0;
-                PR_sscanf(poll_primary_server.c_str(), "%d", &pollTime);
-                excludeTime = PR_Now() + (pollTime * 60 * 1000000);
+                sscanf(poll_primary_server.c_str(), "%d", &pollTime);
+                excludeTime = now + (pollTime * 60 * 1000000);
                 healthy = true;
             }
         }
@@ -83,8 +87,8 @@ public:
     void markServerDown(std::string poll_primary_server) const {
         int pollTime=0;
         healthy = false;
-        PR_sscanf(poll_primary_server.c_str(), "%d", &pollTime);
-        excludeTime = PR_Now() + (pollTime * 60 * 1000000);
+        sscanf(poll_primary_server.c_str(), "%d", &pollTime);
+        excludeTime = time(0) + (pollTime * 60 * 1000000);
     } 
 
 private:
@@ -98,7 +102,7 @@ private:
     bool use_ssl;
     std::string uri;
     mutable bool healthy;
-    mutable PRTime excludeTime;
+    mutable time_t excludeTime;
     std::string url;
 };
 

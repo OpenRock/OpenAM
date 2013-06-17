@@ -29,7 +29,9 @@
  * Post Cache functionality is maintained by this class
  * 
  */
-
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include "am_web.h"
 #include "am_policy.h"
@@ -49,7 +51,7 @@ namespace {
     const unsigned long DEFAULT_TIMEOUT = 10;
 
     // Default Max number of threads for thread pool
-    const PRUint32 DEFAULT_MAX_THREADS = 10;
+    const std::size_t DEFAULT_MAX_THREADS = 10;
 }
 
 /**

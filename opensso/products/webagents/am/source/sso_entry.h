@@ -25,6 +25,10 @@
  * $Id: sso_entry.h,v 1.4 2008/06/25 08:14:37 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __SSOENTRY_H__
 #define __SSOENTRY_H__
 #include <stdexcept>
@@ -34,7 +38,6 @@
 #include "mutex.h"
 #include "internal_exception.h"
 #include "tree.h"
-#include <nspr.h>
 #include "sso_token.h"
 #include "xml_tree.h"
 #include "xml_element.h"

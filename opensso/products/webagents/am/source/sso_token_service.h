@@ -25,6 +25,10 @@
  * $Id: sso_token_service.h,v 1.7 2008/09/13 01:11:53 robertis Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __SSO_TOKEN_SERVICE_H__
 #define __SSO_TOKEN_SERVICE_H__
 
@@ -85,7 +89,6 @@ private:
 
     Properties mServiceParams;    
     Log::ModuleId mLogID;
-    bool mAlwaysTrustServerCert;
 
     std::string mNamingServiceURL;
     ServiceInfo mNamingServiceInfo;
@@ -132,37 +135,17 @@ private:
                          Http::CookieList& cookieList, 
                          const SSOTokenEntryRefCntPtr& entry);
                          
-#if defined(_AMD64_)
     am_status_t callSSOTokenListeners(
 			const std::string& sessionID, 
 			const XMLElement& sessionElem, 
 			const am_sso_token_event_type_t event_type, 
-			const long long event_time);
+			const time_t event_time);
 
     am_status_t callSSOListeners(
 			const std::string& sessionID, 
 			const XMLElement& sessionElem, 
 			const am_sso_token_event_type_t event_type, 
-			const long long event_time);
-
-    am_status_t callTheListener(
-			SSOTokenListenerThreadFunc *listenerThrFunc,
-			const std::string& sessionID, 
-			const XMLElement& sessionElem, 
-			const am_sso_token_event_type_t event_type, 
-			const long long event_time);
-#else
-    am_status_t callSSOTokenListeners(
-			const std::string& sessionID, 
-			const XMLElement& sessionElem, 
-			const am_sso_token_event_type_t event_type, 
-			const long event_time);
-
-    am_status_t callSSOListeners(
-			const std::string& sessionID, 
-			const XMLElement& sessionElem, 
-			const am_sso_token_event_type_t event_type, 
-			const long event_time);
+			const time_t event_time);
 
 
     am_status_t callTheListener(
@@ -170,9 +153,7 @@ private:
 			const std::string& sessionID, 
 			const XMLElement& sessionElem, 
 			const am_sso_token_event_type_t event_type, 
-			const long event_time);
-#endif
-
+			const time_t event_time);
     
 public:
     /* 
@@ -239,7 +220,7 @@ public:
 
     am_status_t removeSSOListener(
 			const am_sso_token_listener_func_t listener);
-    inline void removeSSOTokenTableEntry(string ssoToken)
+    inline void removeSSOTokenTableEntry(std::string ssoToken)
     {
         mSSOTokenTable.remove(ssoToken);
     }

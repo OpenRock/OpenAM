@@ -25,7 +25,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 
 #include <windows.h>
@@ -34,7 +34,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "am_web.h"
-#include <nspr.h>
 #include <shlwapi.h>
 #include "IisAgent6.h"
 

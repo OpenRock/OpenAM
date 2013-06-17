@@ -29,11 +29,7 @@
  * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 
-#include <prlock.h>
-#include <prnetdb.h>
-#include <prmem.h>
-#include <prtime.h>
-#include <prprf.h>
+#include <sstream>
 #include "naming_service.h"
 #include "xml_tree.h"
 
@@ -98,12 +94,8 @@ const std::string NamingService::loadbalancerCookieAttribute("am_load_balancer_c
 const std::string NamingService::invalidSessionMsgPrefix("SessionID ---");
 const std::string NamingService::invalidSessionMsgSuffix("---is Invalid");
 
-NamingService::NamingService(const Properties& props,
-        const std::string &cert_passwd,
-        const std::string &cert_nick_name,
-        bool trustServerCert)
-: BaseService("NamingService", props, cert_passwd, cert_nick_name,
-trustServerCert),
+NamingService::NamingService(const Properties& props)
+: BaseService("NamingService", props),
 namingURL(props.get(AM_COMMON_NAMING_URL_PROPERTY)),
 ignorePreferredNamingURL(props.getBool(AM_COMMON_IGNORE_PREFERRED_NAMING_URL_PROPERTY, true)) {
 }
@@ -274,7 +266,7 @@ am_status_t NamingService::getProfile(const ServiceInfo& service,
 		    std::string protocol = (*iter).getProtocol();
 		    std::string hostname = (*iter).getHost();
 		    unsigned short portnumber = (*iter).getPort();
-		    status = check_server_alive(hostname, portnumber);
+		    status = check_server_alive((*iter).useSSL(), hostname, portnumber);
 		    if (status == AM_SUCCESS) {
 		        strcpy(preferredNamingURL,protocol.c_str());
 		        strcat(preferredNamingURL,"://");
@@ -299,7 +291,7 @@ am_status_t NamingService::getProfile(const ServiceInfo& service,
 
 	status = doHttpPost(service, std::string(), cookieList,
 			    bodyChunkList, response, 
-			    0, "", false, true, &serverInfo);
+			    false, true, &serverInfo);
 	if (AM_SUCCESS == status) {
 	    try {
 		std::vector<std::string> namingResponses;
@@ -332,7 +324,7 @@ am_status_t NamingService::getProfile(const ServiceInfo& service,
 			 "NamingService::getProfile() caught exception: %s",
 			 exc.getMessage().c_str());
 		status = AM_NAMING_FAILURE;
-	    }
+	    } 
 	}
     } 
 
@@ -347,8 +339,7 @@ void NamingService::addLoadBalancerCookie(NamingInfo& namingInfo,
 {    
     int i = 0; 
     int j = 0; 
-    int cookieLen = 0;
-    char *pch = NULL; 
+    std::size_t cookieLen = 0;
     char *cookieName = NULL;
     char *cookieValue = NULL;
     char *tmplbCookie = NULL;
@@ -401,52 +392,28 @@ void NamingService::addLoadBalancerCookie(NamingInfo& namingInfo,
     return;
 }
 
-am_status_t NamingService::check_server_alive(std::string hostname, unsigned short portnumber) {
+am_status_t NamingService::check_server_alive(bool ssl, std::string hostname, unsigned short portnumber) {
     am_status_t status = AM_FAILURE;
-    PRNetAddr address;
-    PRStatus prStatus;
-    void *enumptr = NULL;
-    PRFileDesc *tcpSocket = static_cast<PRFileDesc *> (NULL);
-    unsigned timeout = 2;
+
+    std::string empty;
 
     if (getUseProxy()) return AM_SUCCESS;
 
-    PRAddrInfo *addrinfo = PR_GetAddrInfoByName(hostname.c_str(), PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
-    if (addrinfo) {
-        while ((enumptr = PR_EnumerateAddrInfo(enumptr, addrinfo, portnumber, &address)) != NULL) {
-            if (address.raw.family == PR_AF_INET || address.raw.family == PR_AF_INET6) {
-                PR_InitializeNetAddr(PR_IpAddrNull, portnumber, &address);
-                tcpSocket = PR_OpenTCPSocket(address.raw.family);
-                break;
-            }
-        }
-        PR_FreeAddrInfo(addrinfo);
-    } else {
-        PRErrorCode error = PR_GetError();
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): PR_GetAddrInfoByName returned error: %s",
-                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-        return status;
-    }
+    std::ostringstream sstm;
+    sstm << (ssl ? "https://" : "http://") << hostname << ":" << portnumber << "/";
 
-    if (static_cast<PRFileDesc *> (NULL) != tcpSocket) {
-        prStatus = PR_Connect(tcpSocket, &address,
-                PR_SecondsToInterval(timeout));
-        if (PR_SUCCESS == prStatus) {
-            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "NamingService::check_server_alive(): returned success");
-            status = AM_SUCCESS;
-        } else {
-            PRErrorCode error = PR_GetError();
-            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): PR_Connect returned error: %s",
-                    PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-        }
-        PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
-        PR_Close(tcpSocket);
-    } else {
-        PRErrorCode error = PR_GetError();
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): PR_OpenTCPSocket returned error: %s",
-                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-    }
+    Connection::ConnHeaderMap emptyHdrs;
+    ServerInfo si(sstm.str());
+    Connection conn(si);
+    status = conn.sendRequest("HEAD", empty, emptyHdrs, empty);
+    int http_status = conn.httpStatusCode();
 
+    if (status == AM_SUCCESS) {
+        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "NamingService::check_server_alive(): returned success (HTTP %d)", http_status);
+    } else {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "NamingService::check_server_alive(): returned error (HTTP %d, status: %s)",
+                http_status, am_status_to_string(status));
+    }
     return status;
 }
 
@@ -463,11 +430,7 @@ am_status_t NamingService::doNamingRequest(const ServiceInfo& service,
 {
     am_status_t status = AM_FAILURE;
     const ServerInfo *serverInfo = NULL;
-    char portBuf[MAX_PORT_LENGTH + 1];
-
     const std::size_t NUM_EXTRA_CHUNKS = 3;
-    std::size_t url_length = 0;
-    char *preferredNamingURL = NULL;
     Request request(*this, prefixChunk, namingPrefixChunk,
                         NUM_EXTRA_CHUNKS);
     Http::Response response;
@@ -477,7 +440,7 @@ am_status_t NamingService::doNamingRequest(const ServiceInfo& service,
     
     status = doHttpPost(service, std::string(), cookieList,
                             bodyChunkList, response, 
-                            0, "", false, true, &serverInfo);
+                            false, true, &serverInfo);
     if (AM_SUCCESS == status) {
         try {
             std::vector<std::string> namingResponses;

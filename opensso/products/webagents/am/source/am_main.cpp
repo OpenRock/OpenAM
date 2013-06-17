@@ -30,9 +30,6 @@
  */
 
 #include <cstring>
-
-#include <prinit.h>
-
 #include "am.h"
 #include "connection.h"
 #include "log.h"
@@ -44,7 +41,6 @@
 #include "am_notify.h"
 #include "version.h"
 #include "mutex.h"
-#include <nss.h>
 
 
 using std::string;
@@ -103,7 +99,7 @@ void PRIVATE_NAMESPACE_NAME::base_init(const Properties &propertiesRef, boolean_
 
     ScopeLock myLock(initLock);
     if (!initialized) {
-        PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
+        
         try {
 
             // NOTE - The dependency here is
@@ -151,8 +147,8 @@ void PRIVATE_NAMESPACE_NAME::base_init(const Properties &propertiesRef, boolean_
 extern "C"
 am_status_t am_shutdown_nss(void)
 {
-    am_status_t status = NSS_IsInitialized() ? Connection::shutdown() : AM_SUCCESS;
-    return status;
+    //am_status_t status = NSS_IsInitialized() ? Connection::shutdown() : AM_SUCCESS;
+    return AM_SUCCESS;
 }
 
 extern "C"
@@ -174,6 +170,10 @@ am_status_t am_cleanup(void) {
             auth_cleanup();
 
             status = Connection::shutdown_in_child_process();
+            
+#if !defined(_MSC_VER) && !defined(__sun)
+            libiconv_close();
+#endif
 
             XMLTree::shutdown();
 

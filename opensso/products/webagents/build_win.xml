@@ -1,4 +1,4 @@
-﻿<!--
+<!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
    Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -51,7 +51,7 @@
 
     <import file="../products.xml" />
     <import file="webagents.xml" />
-
+    
     <tstamp>
         <format property="nightly.date" pattern="yyyyMMdd" />
     </tstamp>
@@ -152,6 +152,8 @@
             <fileset dir="am" includes="**/*.d"/>
             <fileset dir="am" includes="**/*.o"/>
             <fileset dir="am" includes="**/*.so"/>
+            <fileset dir="am" includes="**/*.tli"/>
+            <fileset dir="am" includes="**/*.tlh"/>
             <fileset dir="." includes="*.pdb"/>
             <fileset dir="." includes="*.idb"/>
             <fileset dir="." includes="svn.properties"/>
@@ -181,12 +183,14 @@
         <antcall target="iis6" />
         <antcall target="iis7" />
         <antcall target="domino" />
+        <antcall target="sdk" />
         <antcall target="jsFiles" />
     </target>
         
     <target name="all64" depends="get-arch" unless="is64bit">
         <antcall target="iis6" />
         <antcall target="iis7" />
+        <antcall target="sdk" />
         <antcall target="jsFiles64" />
     </target>
    
@@ -258,9 +262,10 @@
         <echo message="Dispatch to build OpenAM C-SDK"/>
         <property name="containername" value="sdk"/>
         <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="arch_sdk" inheritRefs="true"/>
     </target>
 
-    <target name="nmake" depends="fixVersion,nmake1,nmake2,nmake3,nmake4,arch_sdk"/>
+    <target name="nmake" depends="fixVersion,nmake1,nmake2,nmake3,nmake4"/>
 
     <target name="nmake1" if="build.debug32">
         <echo message="Dispatch to compile of agent c code"/>
@@ -350,19 +355,11 @@
             <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_web.h"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.dll"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.lib"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.dll"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nspr${winnt.lib.ext}/lib" includes="**/*.dll"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.chk"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/libxml2${winnt.lib.ext}/lib" includes="**/*.dll"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nspr${winnt.lib.ext}/lib" includes="**/*.lib"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.lib"/>
-            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/libxml2${winnt.lib.ext}/lib" includes="**/*.lib"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="README.TXT"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile"/>
-            <zipfileset dir="${webagents.basedir}/agents/source/common" includes="THIRD_PARTY_LICENSE.TXT"/>
         </zip>
         <delete file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js" quiet="true"/>
         <echo file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js">document.write("${nightly.date}");</echo>  

@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 #include "am.h"
 #include "session_service.h"
@@ -235,11 +235,8 @@ const SessionService::BodyChunk
 SessionService::trueChunk(trueValue, sizeof(trueValue) - 1);
 
 SessionService::SessionService(const std::string &name,
-        const Properties& props,
-        const std::string &cert_passwd,
-        const std::string &cert_nick_name,
-        bool doAlwaysTrustServerCert)
-: BaseService(name, props, cert_passwd, cert_nick_name, doAlwaysTrustServerCert) {
+        const Properties& props)
+: BaseService(name, props) {
 }
 
 SessionService::~SessionService() {

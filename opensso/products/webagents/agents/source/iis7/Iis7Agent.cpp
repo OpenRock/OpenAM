@@ -27,7 +27,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 - 2013 ForgeRock AS
+ * Portions Copyrighted 2012 - 2013 ForgeRock Inc
  */
 
 #include "agent_module.h"

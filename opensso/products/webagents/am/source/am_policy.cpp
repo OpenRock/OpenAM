@@ -25,11 +25,13 @@
  * $Id: am_policy.cpp,v 1.11 2009/10/28 21:56:20 subbae Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <cstring>
 #include <stdexcept>
 #include <string>
-#include <prinit.h>
 #include <am_policy.h>
 #include <am_sso.h>
 
@@ -52,12 +54,9 @@ END_PRIVATE_NAMESPACE
 USING_PRIVATE_NAMESPACE
 
 
-void PRIVATE_NAMESPACE_NAME::policy_cleanup()
-{
-    if (enginePtr != NULL) {
-	delete enginePtr;
-	enginePtr = NULL;
-    }
+void PRIVATE_NAMESPACE_NAME::policy_cleanup() {
+    delete enginePtr;
+    enginePtr = NULL;
     return;
 }
 
@@ -134,9 +133,8 @@ am_policy_service_init(const char *service_name,
     } catch(NSPRException &ne) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_init: NSPRException inside %s when calling "
-		 "NSPR method %s. Error code:%s",
-		 ne.getThrowingMethod(), ne.getNsprMethod(),
-		 PR_ErrorToString(ne.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "NSPR method %s.",
+		 ne.getThrowingMethod(), ne.getNsprMethod());
 	return AM_NSPR_ERROR;
     } catch(std::bad_alloc) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
@@ -175,9 +173,8 @@ am_status_t am_policy_destroy(am_policy_t policy_handle)
     } catch(NSPRException &ne) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_destroy: NSPRException inside %s when calling "
-		 "NSPR method %s. Error code:%s",
-		 ne.getThrowingMethod(), ne.getNsprMethod(),
-		 PR_ErrorToString(ne.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "NSPR method %s.",
+		 ne.getThrowingMethod(), ne.getNsprMethod());
 	retVal = AM_NSPR_ERROR;
     } catch(std::bad_alloc) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
@@ -301,9 +298,8 @@ am_policy_evaluate_ignore_url_notenforced(am_policy_t policy_handle,
     } catch(NSPRException &ne) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_evaluate: NSPRException inside %s when "
-		 "calling NSPR method %s. Error code:%s",
-		 ne.getThrowingMethod(), ne.getNsprMethod(),
-		 PR_ErrorToString(ne.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "calling NSPR method %s",
+		 ne.getThrowingMethod(), ne.getNsprMethod());
 	return AM_NSPR_ERROR;
     } catch(std::bad_alloc &ex) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
@@ -342,9 +338,8 @@ am_policy_is_notification_enabled(am_policy_t policy_handle) {
     } catch(NSPRException &ne) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_is_notification_enabled: NSPRException inside %s "
-		 "when calling NSPR method %s. Error code:%s",
-		 ne.getThrowingMethod(), ne.getNsprMethod(),
-		 PR_ErrorToString(ne.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "when calling NSPR method %s.",
+		 ne.getThrowingMethod(), ne.getNsprMethod());
     } catch(std::bad_alloc &ex) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 	 "am_policy_is_notification_enabled: Memory allocation problem.");
@@ -375,7 +370,7 @@ am_policy_notify(am_policy_t policy_handle,
     try {
 	enginePtr->policy_notify(policy_handle, notification_data,
 				 notification_data_len,
-                                 configChangeNotificationEnabled);
+                                 configChangeNotificationEnabled ? true : false);
     } catch(InternalException &ie) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_notify: InternalException in %s with error message:%s and code:%d",
@@ -384,9 +379,8 @@ am_policy_notify(am_policy_t policy_handle,
     } catch(NSPRException &ne) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_notify(): NSPRException inside %s "
-		 "when calling NSPR method %s. Error code:%s",
-		 ne.getThrowingMethod(), ne.getNsprMethod(),
-		 PR_ErrorToString(ne.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "when calling NSPR method %s.",
+		 ne.getThrowingMethod(), ne.getNsprMethod());
 	return AM_NSPR_ERROR;
     } catch(std::bad_alloc &ex) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
@@ -606,8 +600,7 @@ am_policy_invalidate_session(am_policy_t policy_handle,
     catch (NSPRException& ex) {
 	Log::log(logID, Log::LOG_ERROR,
 		 "am_policy_invalidate_session(): "
-		 "NSPR Exception encountered: Error code %s",
-                  PR_ErrorToString(ex.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "NSPR Exception encountered");
 	Log::log(logID, Log::LOG_ERROR, ex);
 	status = AM_NSPR_ERROR;
     }
@@ -648,8 +641,7 @@ am_policy_user_logout(am_policy_t policy_handle,
     catch (NSPRException& ex) {
 	Log::log(logID, Log::LOG_ERROR,
 		 "am_policy_user_logout(): "
-		 "NSPR Exception encountered: Error code %s",
-                  PR_ErrorToString(ex.getErrorCode(), PR_LANGUAGE_I_DEFAULT));
+		 "NSPR Exception encountered");
 	Log::log(logID, Log::LOG_ERROR, ex);
 	status = AM_NSPR_ERROR;
     }

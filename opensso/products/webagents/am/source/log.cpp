@@ -29,7 +29,7 @@
  * Portions Copyrighted 2013 ForgeRock Inc
  */
 
-#if (defined(WINNT) || defined(_AMD64_))
+#ifdef _MSC_VER
 #include <stdio.h>
 #include <stdlib.h>
 #include <process.h>
@@ -43,14 +43,10 @@
 #include <stdint.h>
 #include <cerrno>
 #include <sys/types.h>
+#include <time.h>
 #include <sys/stat.h>
 #include <cstdio>
 #include <stdexcept>
-
-#include <prthread.h>
-#include <prtime.h>
-#include <prprf.h>
-
 #include <am.h>
 #include <am_web.h>
 #include <am_types.h>
@@ -63,12 +59,16 @@
 #include "log_record.h"
 #include "service_info.h"
 #include "url.h"
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <string>
 
 #define REMOTE_LOG "RemoteLog"
 #define ALL_LOG "all"
 
 #ifdef _MSC_VER
-#define TEMP_SIZE 8192
+#define TEMP_SIZE 8192 * 3
 
 static void debug(const char *format, ...) {
     char tmp[TEMP_SIZE], *p = tmp;
@@ -110,8 +110,8 @@ static void rotate_log(HANDLE file, const char *fn, size_t ms) {
 
 USING_PRIVATE_NAMESPACE
 
-const Log::ModuleId Log::ALL_MODULES = 0;
-const Log::ModuleId Log::REMOTE_MODULE = Log::ALL_MODULES+1;
+        const Log::ModuleId Log::ALL_MODULES = 0;
+const Log::ModuleId Log::REMOTE_MODULE = Log::ALL_MODULES + 1;
 Mutex *Log::lockPtr = new Mutex();
 Mutex *Log::rmtLockPtr = new Mutex();
 std::vector<Log::Module> *Log::moduleList = NULL;
@@ -148,6 +148,7 @@ am_log_logger_func_t Log::loggerFunc = NULL;
 (x == Log::LOG_AUTH_REMOTE)?sizeof(levelLabels) - 2:(x == Log::LOG_AUTH_LOCAL)?sizeof(levelLabels) - 1:static_cast<std::size_t>(x)
 
 namespace {
+
 #ifndef _MSC_VER
     std::FILE *logFile = stderr;
     std::FILE *auditLogFile = stderr;
@@ -156,37 +157,36 @@ namespace {
     HANDLE auditLogFile = INVALID_HANDLE_VALUE;
 #endif
     const char *levelLabels[] = {
-      "None", "Error", "Warning", "Info", "Debug", "MaxDebug", "Always",
-	"Auth-Remote", "Auth-Local"
+        "None", "Error", "Warning", "Info", "Debug", "MaxDebug", "Always",
+        "Auth-Remote", "Auth-Local"
     };
-    const size_t numLabels = sizeof(levelLabels) / sizeof(levelLabels[0]);
-    
+    const size_t numLabels = sizeof (levelLabels) / sizeof (levelLabels[0]);
+
     static LogService* rmtLogSvc = NULL;
 }
 
 inline Log::Module::Module(const std::string& modName)
-    : name(modName), level(LOG_DEBUG)
-{
+: name(modName), level(LOG_DEBUG) {
 }
 
 // initialize module vector ONLY.
+
 am_status_t Log::initialize()
-    throw()
-{
+throw () {
     am_status_t status = AM_SUCCESS;
     ScopeLock scopeLock(*lockPtr);
     if (!initialized) {
-	try {
-	    moduleList = new std::vector<Module>;
-	    // init ALL MODULE
-	    moduleList->push_back(Module(ALL_LOG));
+        try {
+            moduleList = new std::vector<Module>;
+            // init ALL MODULE
+            moduleList->push_back(Module(ALL_LOG));
             allModule = ALL_MODULES;
-	    (*moduleList)[allModule].level = LOG_ERROR;
-	    // init REMOTE MODULE
-	    moduleList->push_back(Module(REMOTE_LOG));
-            remoteModule = allModule+1;
-	    (*moduleList)[remoteModule].level = 
-		static_cast<Level>(LOG_AUTH_REMOTE|LOG_AUTH_LOCAL);
+            (*moduleList)[allModule].level = LOG_ERROR;
+            // init REMOTE MODULE
+            moduleList->push_back(Module(REMOTE_LOG));
+            remoteModule = allModule + 1;
+            (*moduleList)[remoteModule].level =
+                    static_cast<Level> (LOG_AUTH_REMOTE | LOG_AUTH_LOCAL);
 
 #ifndef _MSC_VER
             LOG_LOCK_DESTROY(LOG_LOCK);
@@ -197,10 +197,8 @@ am_status_t Log::initialize()
                 initialized = true;
                 status = AM_SUCCESS;
             } else {
-                if (moduleList) {
-                    delete moduleList;
-                    moduleList = NULL;
-                }
+                delete moduleList;
+                moduleList = NULL;
                 initialized = false;
                 status = AM_FAILURE;
                 LOG_LOCK_DESTROY(LOG_LOCK);
@@ -219,10 +217,8 @@ am_status_t Log::initialize()
                 initialized = true;
                 status = AM_SUCCESS;
             } else {
-                if (moduleList) {
-                    delete moduleList;
-                    moduleList = NULL;
-                }
+                delete moduleList;
+                moduleList = NULL;
                 initialized = false;
                 status = AM_FAILURE;
                 if (logRtLock != NULL) {
@@ -235,25 +231,23 @@ am_status_t Log::initialize()
                 }
             }
 #endif
-            
-	} catch (std::exception&) {
-	    if (moduleList) {
-		delete moduleList;
-                moduleList = NULL;
-            }
-	    status = AM_FAILURE;
-	} catch (...) {
-	    status = AM_FAILURE;
-	}
+
+        } catch (std::exception&) {
+            delete moduleList;
+            moduleList = NULL;
+            status = AM_FAILURE;
+        } catch (...) {
+            status = AM_FAILURE;
+        }
     }
     return status;
 }
 
 // initialize module vector and log file, level and remote log service 
 // according to parameters in properties.
+
 am_status_t Log::initialize(const Properties& properties)
-    throw()
-{
+throw () {
     am_status_t status = AM_SUCCESS;
     // initialize module list.
     if (!initialized)
@@ -312,83 +306,70 @@ am_status_t Log::initialize(const Properties& properties)
 // ideally this is done in Log::initialize however due to 
 // the dependency of remote log on connection which depends on log 
 // (see base_init in am_main.cpp) this is done seperately.
-am_status_t Log::initializeRemoteLog(const Properties& propertiesRef) 
-    throw()
-{
+
+am_status_t Log::initializeRemoteLog(const Properties& propertiesRef)
+throw () {
     am_status_t status = AM_SUCCESS;
 
     // Create logging servcie URL from naming service since no
     // sso token is available to read the naming service.
 
     try {
-	const std::string namingservice("/namingservice");
-	const std::string loggingservice("/loggingservice");
-	const std::string namingURL(
-	    propertiesRef.get(AM_COMMON_NAMING_URL_PROPERTY, ""));
-	std::string logURL = namingURL;
-	std::size_t pos = 0;
+        const std::string namingservice("/namingservice");
+        const std::string loggingservice("/loggingservice");
+        const std::string namingURL(
+                propertiesRef.get(AM_COMMON_NAMING_URL_PROPERTY, ""));
+        std::string logURL = namingURL;
+        std::size_t pos = 0;
 
-	pos = logURL.find (namingservice, pos);
-	while (pos != std::string::npos) {
-	    logURL.replace(pos, namingservice.size(), loggingservice);
-	    pos = logURL.find (namingservice, pos + 1);
-	}
+        pos = logURL.find(namingservice, pos);
+        while (pos != std::string::npos) {
+            logURL.replace(pos, namingservice.size(), loggingservice);
+            pos = logURL.find(namingservice, pos + 1);
+        }
 
-	URL verifyURL(logURL);
-	LogService *newLogSvc = 
-	    new LogService(ServiceInfo(logURL),
-			   propertiesRef,
-			   propertiesRef.get(
-			       AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-			   propertiesRef.get(
-			       AM_AUTH_CERT_ALIAS_PROPERTY, ""),
-			   propertiesRef.getBool(
-			       AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, false),
-			   1);
-	Log::setRemoteInfo(newLogSvc);
-    }
-    catch (std::bad_alloc& exb) {
-	status = AM_NO_MEMORY;
-    }
-    catch (std::exception& exs) {
-	status = AM_INVALID_ARGUMENT;
-    }
-    catch (...) {
-	status = AM_FAILURE;
+        URL verifyURL(logURL);
+        LogService *newLogSvc =
+                new LogService(ServiceInfo(logURL),
+                propertiesRef, 1);
+        Log::setRemoteInfo(newLogSvc);
+    } catch (std::bad_alloc& exb) {
+        status = AM_NO_MEMORY;
+    } catch (std::exception& exs) {
+        status = AM_INVALID_ARGUMENT;
+    } catch (...) {
+        status = AM_FAILURE;
     }
     return status;
 }
 
-
-
 void Log::shutdown()
-    throw()
-{
+throw () {
     am_status_t status = AM_SUCCESS;
     if (initialized) {
-	log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, 
-            "Log::shutdown(): Log service being terminated.");
+        log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+                "Log::shutdown(): Log service being terminated.");
 
         // flush any outstanding remote log buffers.
-	status = Log::rmtflush();
-	if (status != AM_SUCCESS) {
-	    log(Log::ALL_MODULES, Log::LOG_ERROR, 
-                "Log::shutdown(): Error flushing remote log: %s.", 
-		am_status_to_string(status));
-	}
+        status = Log::rmtflush();
+        if (status != AM_SUCCESS) {
+            log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Log::shutdown(): Error flushing remote log: %s.",
+                    am_status_to_string(status));
+        }
 
         {
-        ScopeLock mylock(*lockPtr);
-        if (moduleList) {
-            initialized = false;
-            delete moduleList;
-            moduleList = NULL;
+            ScopeLock mylock(*lockPtr);
+            if (moduleList) {
+                initialized = false;
+                delete moduleList;
+                moduleList = NULL;
+            }
         }
-	}
         ScopeLock rmtLock(*rmtLockPtr);
         if (rmtLogSvc) {
             remoteInitialized = false;
-	    delete rmtLogSvc;
+            delete rmtLogSvc;
             rmtLogSvc = NULL;
         }
 
@@ -421,32 +402,26 @@ void Log::shutdown()
             alogRtLock = NULL;
         }
 #endif
-    } 
+    }
 }
 
-am_status_t Log::setRemoteInfo(LogService *newLogService) 
-    throw()
-{
+am_status_t Log::setRemoteInfo(LogService *newLogService)
+throw () {
     am_status_t status = AM_SUCCESS;
-    if(newLogService != NULL) {
-	ScopeLock myLock(*rmtLockPtr);
-	LogService *oldRemoteLogInfo = rmtLogSvc;
-	rmtLogSvc = newLogService;
-
-	if (oldRemoteLogInfo != NULL) {
-	    delete oldRemoteLogInfo;
-	}
-	remoteInitialized = true;
-    }
-    else {
-	status = AM_INVALID_ARGUMENT;
+    if (newLogService != NULL) {
+        ScopeLock myLock(*rmtLockPtr);
+        LogService *oldRemoteLogInfo = rmtLogSvc;
+        rmtLogSvc = newLogService;
+        delete oldRemoteLogInfo;
+        remoteInitialized = true;
+    } else {
+        status = AM_INVALID_ARGUMENT;
     }
     return status;
 }
 
 bool Log::setLogFile(const std::string& name)
-    throw()
-{
+throw () {
     return pSetLogFile(name);
 }
 
@@ -497,98 +472,92 @@ bool Log::setAuditLogFile(const std::string& name) throw () {
 }
 
 Log::ModuleId Log::addModule(const std::string& name)
-    throw()
-{
+throw () {
     Log::ModuleId module = 0;
     am_status_t status = AM_SUCCESS;
-    if (!initialized && 
-	(status = initialize()) != AM_SUCCESS) {
-	Log::log(Log::ALL_MODULES, Log::LOG_ERROR, 
-		 "Log::addModule(): Error initializing log.");
-    }
-    else {
-	ScopeLock myLock(*lockPtr);
-	module = pAddModule(name);
+    if (!initialized &&
+            (status = initialize()) != AM_SUCCESS) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                "Log::addModule(): Error initializing log.");
+    } else {
+        ScopeLock myLock(*lockPtr);
+        module = pAddModule(name);
     }
     return module;
 }
 
 // same as addModule but with no locking
+
 Log::ModuleId Log::pAddModule(const std::string& name)
-    throw()
-{
+throw () {
     ModuleId module = 0;
 
     try {
-	for (module = 0; module < moduleList->size(); ++module) {
-	    if ((*moduleList)[module].name == name) {
-		break;
-	    }
-	}
-	if (module == moduleList->size()) {
-	    moduleList->push_back(Module(name));
-	    // The initial level defaults to the current level for ALL_MODULES.
-	    (*moduleList)[module].level = (*moduleList)[ALL_MODULES].level;
-	}
-    }
-    catch (...) {
-	log(ALL_MODULES, LOG_ERROR,
-	    "Could not add module %s. Unknown exception caught.", name.c_str());
+        for (module = 0; module < moduleList->size(); ++module) {
+            if ((*moduleList)[module].name == name) {
+                break;
+            }
+        }
+        if (module == moduleList->size()) {
+            moduleList->push_back(Module(name));
+            // The initial level defaults to the current level for ALL_MODULES.
+            (*moduleList)[module].level = (*moduleList)[ALL_MODULES].level;
+        }
+    } catch (...) {
+        log(ALL_MODULES, LOG_ERROR,
+                "Could not add module %s. Unknown exception caught.", name.c_str());
     }
     return module;
 }
 
 Log::Level Log::setModuleLevel(ModuleId module, Level level)
-    throw()
-{
+throw () {
     Log::Level oldLevel = Log::LOG_NONE;
     am_status_t status = AM_SUCCESS;
 
-    if (!initialized && 
-	(status = initialize()) != AM_SUCCESS) {
-	Log::log(Log::ALL_MODULES, Log::LOG_ERROR, 
-		 "Log::setModuleLevel(): Cannot set module level. "
-		 "Log initialization failed with %s", 
-		 am_status_to_string(status));
-	oldLevel= Log::LOG_NONE;
-    }
-    else {
-	ScopeLock myLock(*lockPtr);
-	oldLevel = pSetModuleLevel(module, level);
+    if (!initialized &&
+            (status = initialize()) != AM_SUCCESS) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                "Log::setModuleLevel(): Cannot set module level. "
+                "Log initialization failed with %s",
+                am_status_to_string(status));
+        oldLevel = Log::LOG_NONE;
+    } else {
+        ScopeLock myLock(*lockPtr);
+        oldLevel = pSetModuleLevel(module, level);
     }
     return oldLevel;
 }
 
 // same as setModuleLevel but with no locking.
+
 Log::Level Log::pSetModuleLevel(ModuleId module, Level level)
-    throw()
-{
-    Level oldLevel = LOG_NONE; 
+throw () {
+    Level oldLevel = LOG_NONE;
 
     if (ALL_MODULES == module) {
-	oldLevel = (*moduleList)[ALL_MODULES].level;
-	for (unsigned int i = 0; i < moduleList->size(); i++) {
-	    /* if the level is to turn of everything, then turn off
-	     * remote logging too. Otherwise, don't change the remote
-	     * logging settings. */
-	    if(i != remoteModule || level == LOG_NONE)
-		(*moduleList)[i].level = level;
-	}
+        oldLevel = (*moduleList)[ALL_MODULES].level;
+        for (unsigned int i = 0; i < moduleList->size(); i++) {
+            /* if the level is to turn of everything, then turn off
+             * remote logging too. Otherwise, don't change the remote
+             * logging settings. */
+            if (i != remoteModule || level == LOG_NONE)
+                (*moduleList)[i].level = level;
+        }
     } else if (module < moduleList->size()) {
-	oldLevel = (*moduleList)[module].level;
+        oldLevel = (*moduleList)[module].level;
         if (level <= LOG_NONE)
-             level = LOG_NONE;
-	(*moduleList)[module].level = level;
+            level = LOG_NONE;
+        (*moduleList)[module].level = level;
     } else {
-	Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Invalid module %d", module);
-	oldLevel = LOG_NONE;
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Invalid module %d", module);
+        oldLevel = LOG_NONE;
     }
     return oldLevel;
 }
 
 am_status_t Log::setLevelsFromString(const std::string& logLevels)
-    throw()
-{
+throw () {
     am_status_t status = AM_SUCCESS;
     ScopeLock mylock(*lockPtr);
     status = pSetLevelsFromString(logLevels);
@@ -596,59 +565,57 @@ am_status_t Log::setLevelsFromString(const std::string& logLevels)
 }
 
 am_status_t Log::pSetLevelsFromString(const std::string& logLevels)
-    throw()
-{
+throw () {
     am_status_t status = AM_SUCCESS;
     std::size_t offset = 0;
 
     while (offset < logLevels.size()) {
-	offset = logLevels.find_first_not_of(' ', offset);
-	if (offset < logLevels.size()) {
-	    std::size_t end;
-	    std::size_t next;
-	    long level, oldLevel;
-	    ModuleId module;
+        offset = logLevels.find_first_not_of(' ', offset);
+        if (offset < logLevels.size()) {
+            std::size_t end;
+            std::size_t next;
+            long level, oldLevel;
+            ModuleId module;
 
-	    end = logLevels.find_first_of(':', offset);
-	    next = logLevels.find_first_of(',', offset);
-	    if (next < end) {
-		end = next;
-	    }
-	    module = pAddModule(std::string(logLevels, offset, end - offset));
-	    if (end != std::string::npos && ':' == logLevels[end++] &&
-		end < logLevels.size() &&
-		1 == std::sscanf(&logLevels.c_str()[end], "%ld", &level)) {
-		oldLevel = pSetModuleLevel(module, static_cast<Level>(level));
-		Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, 
-			 "Log::pSetLevelsFromString(): setting log level "
-			 "for module %d to %d, old level %d.",
-			 module, level, oldLevel);
-	    }
+            end = logLevels.find_first_of(':', offset);
+            next = logLevels.find_first_of(',', offset);
+            if (next < end) {
+                end = next;
+            }
+            module = pAddModule(std::string(logLevels, offset, end - offset));
+            if (end != std::string::npos && ':' == logLevels[end++] &&
+                    end < logLevels.size() &&
+                    1 == std::sscanf(&logLevels.c_str()[end], "%ld", &level)) {
+                oldLevel = pSetModuleLevel(module, static_cast<Level> (level));
+                Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                        "Log::pSetLevelsFromString(): setting log level "
+                        "for module %d to %d, old level %d.",
+                        module, level, oldLevel);
+            }
 
-	    if (next != std::string::npos) {
-		offset = next + 1;
-	    } else {
-		offset = next;
-	    }
-	}
+            if (next != std::string::npos) {
+                offset = next + 1;
+            } else {
+                offset = next;
+            }
+        }
     }
     return status;
 }
 
 bool Log::isLevelEnabled(ModuleId module, Level level)
-    throw()
-{
+throw () {
     bool enabled;
 
     if (initialized) {
 
         if (module >= moduleList->size()) {
-	    module = ALL_MODULES;
+            module = ALL_MODULES;
         }
 
         enabled = ((*moduleList)[module].level >= level);
     } else {
-	enabled = false;
+        enabled = false;
     }
 
     return enabled;
@@ -656,11 +623,11 @@ bool Log::isLevelEnabled(ModuleId module, Level level)
 
 // this should not throw exception since it is called often in a 
 // catch block to log an exception.
-void Log::log(ModuleId module, Level level, const std::exception &ex) 
-    throw()
-{
-    if(!isLevelEnabled(module, level))
-	return;
+
+void Log::log(ModuleId module, Level level, const std::exception &ex)
+throw () {
+    if (!isLevelEnabled(module, level))
+        return;
 
     // Print the exception information
     log(module, level, "Exception encountered: %s.", ex.what());
@@ -669,27 +636,27 @@ void Log::log(ModuleId module, Level level, const std::exception &ex)
 
 // this should not throw exception since it is called often in a 
 // catch block to log an error resulting from an exception.
-void Log::log(ModuleId module, Level level, const InternalException &ex) 
-    throw()
-{
-    if(!isLevelEnabled(module, level))
-	return;
+
+void Log::log(ModuleId module, Level level, const InternalException &ex)
+throw () {
+    if (!isLevelEnabled(module, level))
+        return;
 
     am_status_t statusCode = ex.getStatusCode();
     const char *status_desc = am_status_to_string(statusCode);
     // Print the exception information
     log(module, level, "Exception InternalException thrown "
-	"with message: \"%s\" and status message: %s", 
-	ex.getMessage(), status_desc);
+            "with message: \"%s\" and status message: %s",
+            ex.getMessage(), status_desc);
     return;
 }
 
 // this should not throw exception since it is called often in a 
 // catch block to log an error resulting from an exception.
+
 void Log::log(ModuleId module, Level level,
-	      const char *format, ...) 
-    throw()
-{
+        const char *format, ...)
+throw () {
     std::va_list args;
 
     va_start(args, format);
@@ -699,86 +666,108 @@ void Log::log(ModuleId module, Level level,
 
 // this should not throw exception since it is called often in a 
 // catch block to log an error resulting from an exception.
+
 void Log::vlog(ModuleId module, Level level, const char *format,
-	       std::va_list args) 
-    throw()
-{
+        std::va_list args) throw () {
     if (initialized) {
-	if (module >= moduleList->size()) {
-	    module = ALL_MODULES;
-	}
+        if (module >= moduleList->size()) {
+            module = ALL_MODULES;
+        }
 
-        char *logMsg = PR_vsmprintf(format, args);
-	// call user defined logger if any.
-	if (loggerFunc != NULL) {
-	    loggerFunc((*moduleList)[module].name.c_str(),  
-		       static_cast<am_log_level_t>(static_cast<int>(level)),
-		       logMsg);
-	}
+        char *logMsg = NULL;
+        Utils::am_vasprintf(&logMsg, format, args);
+        // call user defined logger if any.
+        if (loggerFunc != NULL) {
+            loggerFunc((*moduleList)[module].name.c_str(),
+                    static_cast<am_log_level_t> (static_cast<int> (level)),
+                    logMsg);
+        }
 
-	// do default log.
-	if ((*moduleList)[module].level >= level) {
+        // do default log.
+        if ((*moduleList)[module].level >= level) {
 
-	    // format: 
-	    // year-month-day hour:min:sec.usec level pid:thread module: msg
-	    // get level string		
-	    std::size_t levelLabelIndex = getLevelString(level);
-	    char levelStr[50]; 
-	    PRUint32 llen;
-	    if (levelLabelIndex < numLabels) {
-		llen = PR_snprintf(levelStr, sizeof(levelStr),
-				       "%s", levelLabels[levelLabelIndex]);
-	    } else {
-		llen = PR_snprintf(levelStr, sizeof(levelStr), "%d", level);
-	    }
+            // format: 
+            // year-month-day hour:min:sec.usec level pid:thread module: msg
+            // get level string		
+            std::size_t levelLabelIndex = getLevelString(level);
+            char levelStr[50];
+            int llen;
+            if (levelLabelIndex < numLabels) {
+                llen = snprintf(levelStr, sizeof (levelStr),
+                        "%s", levelLabels[levelLabelIndex]);
+            } else {
+                llen = snprintf(levelStr, sizeof (levelStr), "%d", level);
+            }
 
-	    if (llen > 0) { 
-		// get time.
-		PRExplodedTime now;
-		PR_ExplodeTime(PR_Now(), PR_LocalTimeParameters, &now);
-    
-		// format header and msg.
-		PRUint32 len;
-		char hdr[100];
-		len = PR_snprintf(hdr, sizeof(hdr), 
-				  "%d-%02d-%02d %02d:%02d:%02d.%03d"
-				  " %8s %u:%p %s: %%s\r\n",
-				  now.tm_year, now.tm_month+1, now.tm_mday,
-				  now.tm_hour, now.tm_min, now.tm_sec, 
-				  now.tm_usec / 1000,
-				  levelStr,
-				  getpid(), PR_GetCurrentThread(),
-				  (*moduleList)[module].name.c_str());
-		if (len > 0) {
+            if (llen > 0) {
+                // get time.
+                char hdr[100];
+                int len;
+
+#ifdef _MSC_VER
+
+                SYSTEMTIME lt;
+                GetLocalTime(&lt);
+
+                /* format header and message */
+                len = _snprintf(hdr, sizeof (hdr), "%d-%02d-%02d %02d:%02d:%02d.%03d"
+                        " %8s %u:%lu %s: %%s\r\n", lt.wYear, lt.wMonth, lt.wDay,
+                        lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds,
+                        levelStr,
+                        getpid(), GetCurrentThreadId(),
+                        (*moduleList)[module].name.c_str());
+
+#else
+
+                struct tm now;
+                struct timespec ts;
+                unsigned short msec = 0;
+                clock_gettime(CLOCK_REALTIME, &ts);
+                msec = ts.tv_nsec / 1000000;
+                localtime_r(&ts.tv_sec, &now);
+
+                /* format header and message */
+                len = snprintf(hdr, sizeof (hdr),
+                        "%d-%02d-%02d %02d:%02d:%02d.%03d"
+                        " %8s %u:%lu %s: %%s\r\n",
+                        now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
+                        now.tm_hour, now.tm_min, now.tm_sec,
+                        msec, levelStr,
+                        getpid(), (unsigned long) pthread_self(),
+                        (*moduleList)[module].name.c_str());
+                
+#endif
+
+                if (len > 0) {
                     writeLog(hdr, logMsg);
                 }
-	     }
-	}
+            }
+        }
 
-	// Remote Logging starts here.
-	if (module == remoteModule) {
-	    if (remoteInitialized) {
-		bool doLogRemotely = 
-		    ((*moduleList)[module].level >= Log::LOG_AUTH_REMOTE) &&
-		    ((*moduleList)[module].level & level);
+        // Remote Logging starts here.
+        if (module == remoteModule) {
+            if (remoteInitialized) {
+                bool doLogRemotely =
+                        ((*moduleList)[module].level >= Log::LOG_AUTH_REMOTE) &&
+                        ((*moduleList)[module].level & level);
 
-		if (doLogRemotely) {
-		    am_status_t status;
-		    status = rmtLogSvc->logMessage(logMsg);
-		    if(status != AM_SUCCESS) {
-			Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-			    "Log::vlog(): Error logging message [%s] "
-			    "to remote server. Error: %s.", 
-			    logMsg, am_status_to_string(status));
-		    }
-		}
-	    } else {
-		Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		    "Log::vlog(): Remote logging service not initialized. "
-		    "Cannot log message to remote server.");
-	    }
-	}
-	PR_smprintf_free(logMsg);
+                if (doLogRemotely) {
+                    am_status_t status;
+                    status = rmtLogSvc->logMessage(logMsg);
+                    if (status != AM_SUCCESS) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                                "Log::vlog(): Error logging message [%s] "
+                                "to remote server. Error: %s.",
+                                logMsg, am_status_to_string(status));
+                    }
+                }
+            } else {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                        "Log::vlog(): Remote logging service not initialized. "
+                        "Cannot log message to remote server.");
+            }
+        }
+        if (logMsg) free(logMsg);
     }
     return;
 }
@@ -790,23 +779,42 @@ void Log::vlog(ModuleId module, Level level, const char *format,
 void Log::doLocalAuditLog(ModuleId module, Level level, const char* auditLogMsg,
         bool localAuditLogRotate, long localAuditFileSize) throw () {
     if (initialized) {
-
-        // get time.
-        PRExplodedTime now;
-        PR_ExplodeTime(PR_Now(), PR_LocalTimeParameters, &now);
-
-        // format header and msg.
-        PRUint32 len;
         char hdr[100];
-        len = PR_snprintf(hdr, sizeof (hdr),
-                "%d-%02d-%02d %02d:%02d:%02d.%03d"
-                " %8s %u:%p %s: %%s\r\n",
-                now.tm_year, now.tm_month + 1, now.tm_mday,
-                now.tm_hour, now.tm_min, now.tm_sec,
-                now.tm_usec / 1000,
+        int len;
+
+#ifdef _MSC_VER
+
+        SYSTEMTIME lt;
+        GetLocalTime(&lt);
+
+        /* format header and message */
+        len = _snprintf(hdr, sizeof (hdr), "%d-%02d-%02d %02d:%02d:%02d.%03d"
+                " %8s %u:%lu %s: %%s\r\n", lt.wYear, lt.wMonth, lt.wDay,
+                lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds,
                 "Info",
-                getpid(), PR_GetCurrentThread(),
+                getpid(), GetCurrentThreadId(),
                 "LocalAuditLog");
+
+#else
+
+        struct tm now;
+        struct timespec ts;
+        unsigned short msec = 0;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        msec = ts.tv_nsec / 1000000;
+        localtime_r(&ts.tv_sec, &now);
+
+        /* format header and message */
+        len = snprintf(hdr, sizeof (hdr),
+                "%d-%02d-%02d %02d:%02d:%02d.%03d"
+                " %8s %u:%lu %s: %%s\r\n",
+                now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
+                now.tm_hour, now.tm_min, now.tm_sec,
+                msec, "Info",
+                getpid(), (unsigned long) pthread_self(),
+                "LocalAuditLog");
+
+#endif
         if (len > 0) {
             writeAuditLog(hdr, auditLogMsg);
         }
@@ -829,13 +837,13 @@ Log::rlog(ModuleId module, int remote_log_level,
     } else {
         std::va_list args;
         va_start(args, format);
-        logMsg = PR_vsmprintf(format, args);
-        logMessage = logMsg;
+        Utils::am_vasprintf(&logMsg, format, args);
+        va_end(args);
         if (logMsg != NULL) {
+            logMessage = logMsg;
             if (logMsg[0] == '\0') {
                 Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Log Record Message is empty");
-                if (logMsg != NULL) PR_smprintf_free(logMsg);
-                va_end(args);
+                free(logMsg);
                 return status;
             }
             try {
@@ -852,45 +860,41 @@ Log::rlog(ModuleId module, int remote_log_level,
             } catch (...) {
                 status = AM_FAILURE;
             }
-            PR_smprintf_free(logMsg);
+            free(logMsg);
         }
-        va_end(args);
     }
     return status;
 }
 
 am_status_t Log::rlog(const std::string& logName,
-		      const LogRecord& record,
-		      const std::string& loggedByTokenID) 
-    throw()
-{
+        const LogRecord& record,
+        const std::string& loggedByTokenID)
+throw () {
     am_status_t status = AM_FAILURE;
     bool cookieEncoded = true;
 
-    if (rmtLogSvc != NULL && remoteInitialized ) {
-	try {
-	    std::string loggedByID = loggedByTokenID;
-	    cookieEncoded = loggedByID.find('%') != std::string::npos;
-	    if (cookieEncoded) {
-		loggedByID = Http::decode(loggedByTokenID);
-	    }
-	    status = rmtLogSvc->sendLog(logName,
-					record,
-					loggedByID);
-	}
-	catch (std::exception& exs) {
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		    "Log::rlog(): exception encountered %s.", exs.what());
-	    status = AM_INVALID_ARGUMENT;
-	}
-	catch (...) {
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		    "Log::rlog(): unknown exception encountered.");
-	    status = AM_INVALID_ARGUMENT;
-	}
+    if (rmtLogSvc != NULL && remoteInitialized) {
+        try {
+            std::string loggedByID = loggedByTokenID;
+            cookieEncoded = loggedByID.find('%') != std::string::npos;
+            if (cookieEncoded) {
+                loggedByID = Http::decode(loggedByTokenID);
+            }
+            status = rmtLogSvc->sendLog(logName,
+                    record,
+                    loggedByID);
+        } catch (std::exception& exs) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Log::rlog(): exception encountered %s.", exs.what());
+            status = AM_INVALID_ARGUMENT;
+        } catch (...) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Log::rlog(): unknown exception encountered.");
+            status = AM_INVALID_ARGUMENT;
+        }
     } else {
-	Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		"Log::rlog(): Remote logging not initialized.");
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                "Log::rlog(): Remote logging not initialized.");
         status = AM_REMOTE_LOG_NOT_INITIALIZED;
     }
     return status;
@@ -900,42 +904,38 @@ am_status_t Log::rlog(const std::string& logName,
  * Log url access audit message to remote audit log file.
  *
  */
-am_status_t 
-Log::doRemoteAuditLog(ModuleId module, 
-        int remote_log_level, 
-        const char *user_sso_token, 
-        const char *logMsg)
-{
+am_status_t
+Log::doRemoteAuditLog(ModuleId module,
+        int remote_log_level,
+        const char *user_sso_token,
+        const char *logMsg) {
     am_status_t status = AM_SUCCESS;
     std::string logMessage;
     bool cookieEncoded = false;
 
-    if (rmtLogSvc == NULL || !remoteInitialized) { 
-	status = AM_SERVICE_NOT_INITIALIZED;
-    }
-    else {
-	if (logMsg != NULL) {
+    if (rmtLogSvc == NULL || !remoteInitialized) {
+        status = AM_SERVICE_NOT_INITIALIZED;
+    } else {
+        if (logMsg != NULL) {
             logMessage = logMsg;
-	    try {
-		LogRecord logRecord(
-			    static_cast<LogRecord::Level>(remote_log_level), 
-			    logMessage);
-	        std::string userSSOToken = user_sso_token;
-		cookieEncoded = userSSOToken.find('%') != std::string::npos;
-	        if (cookieEncoded) {
-		    userSSOToken = Http::decode(std::string(user_sso_token));
-	        }
-		logRecord.populateTokenDetails(userSSOToken);
-		status = rmtLogSvc->sendLog("", logRecord, "");	
-	    }
-	    catch (std::exception& exs) {
-		status = AM_FAILURE;
-	    }
-	    catch (...) {
-		status = AM_FAILURE;
-	    }
-	    
-	}
+            try {
+                LogRecord logRecord(
+                        static_cast<LogRecord::Level> (remote_log_level),
+                        logMessage);
+                std::string userSSOToken = user_sso_token;
+                cookieEncoded = userSSOToken.find('%') != std::string::npos;
+                if (cookieEncoded) {
+                    userSSOToken = Http::decode(std::string(user_sso_token));
+                }
+                logRecord.populateTokenDetails(userSSOToken);
+                status = rmtLogSvc->sendLog("", logRecord, "");
+            } catch (std::exception& exs) {
+                status = AM_FAILURE;
+            } catch (...) {
+                status = AM_FAILURE;
+            }
+
+        }
     }
     return status;
 }
@@ -945,16 +945,15 @@ Log::doRemoteAuditLog(ModuleId module,
  * or doRemoteAuditLog() or both methods based on 
  * log.disposition property value.
  */
-am_status_t 
+am_status_t
 Log::auditLog(const char* auditDisposition,
         bool localAuditLogRotate,
         long localAuditFileSize,
-        ModuleId module, 
-        int remoteLogLevel, 
-        const char *userSSOToken, 
-        const char *format, 
-        ...)
-{
+        ModuleId module,
+        int remoteLogLevel,
+        const char *userSSOToken,
+        const char *format,
+        ...) {
     am_status_t status = AM_SUCCESS;
 
     int size = MSG_MAX_LEN;
@@ -969,26 +968,26 @@ Log::auditLog(const char* auditDisposition,
         needed = vsnprintf(&logMsg[0], logMsg.size(), format, args);
         va_end(args);
     }
-    if(&logMsg[0] != NULL) {
+    if (&logMsg[0] != NULL) {
         if ((strcasecmp(auditDisposition, AUDIT_DISPOSITION_REMOTE) == 0) ||
-            (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
+                (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
             status = doRemoteAuditLog(module,
-                remoteLogLevel,
-                userSSOToken,
-                &logMsg[0]
-                );
+                    remoteLogLevel,
+                    userSSOToken,
+                    &logMsg[0]
+                    );
         }
         if (status != AM_SUCCESS ||
-            (strcasecmp(auditDisposition, AUDIT_DISPOSITION_LOCAL) == 0) ||
-            (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
+                (strcasecmp(auditDisposition, AUDIT_DISPOSITION_LOCAL) == 0) ||
+                (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
             try {
                 doLocalAuditLog(module,
-                    Log::LOG_INFO,
-                    &logMsg[0],
-                    localAuditLogRotate,
-                    localAuditFileSize);
-            } catch(...) {
-                status = AM_FAILURE;    
+                        Log::LOG_INFO,
+                        &logMsg[0],
+                        localAuditLogRotate,
+                        localAuditFileSize);
+            } catch (...) {
+                status = AM_FAILURE;
             }
         }
     }
@@ -999,31 +998,28 @@ Log::auditLog(const char* auditDisposition,
     return status;
 }
 
-am_status_t Log::rmtflush() 
-    throw()
-{
+am_status_t Log::rmtflush()
+throw () {
     am_status_t status = AM_FAILURE;
 
-    if (rmtLogSvc != NULL && remoteInitialized ) {
+    if (rmtLogSvc != NULL && remoteInitialized) {
 
         status = rmtLogSvc->flushBuffer();
-        if(status != AM_SUCCESS) {
-	    log(ALL_MODULES, LOG_ERROR,
-		"Log::rmtflush(): Error flushing buffer to remote server: %s",
-		am_status_to_string(status));
+        if (status != AM_SUCCESS) {
+            log(ALL_MODULES, LOG_ERROR,
+                    "Log::rmtflush(): Error flushing buffer to remote server: %s",
+                    am_status_to_string(status));
         }
     } else {
-	log(ALL_MODULES, LOG_ERROR,
-	    "Log::rmtflush(): Error flushing buffer to remote server: "
-	    "remote log service not initialized.");
+        log(ALL_MODULES, LOG_ERROR,
+                "Log::rmtflush(): Error flushing buffer to remote server: "
+                "remote log service not initialized.");
     }
     return status;
 }
 
-
-am_log_logger_func_t 
-Log::setLogger(am_log_logger_func_t logger_func) 
-{
+am_log_logger_func_t
+Log::setLogger(am_log_logger_func_t logger_func) {
     am_log_logger_func_t oldLogger = NULL;
     if (initialized) {
         oldLogger = loggerFunc;
@@ -1032,8 +1028,7 @@ Log::setLogger(am_log_logger_func_t logger_func)
     return oldLogger;
 }
 
-am_status_t Log::setDebugFileSize(const long debugFileSize)
-{
+am_status_t Log::setDebugFileSize(const long debugFileSize) {
     am_status_t status = AM_SUCCESS;
     ScopeLock mylock(*lockPtr);
     maxLogFileSize = debugFileSize;
@@ -1043,8 +1038,7 @@ am_status_t Log::setDebugFileSize(const long debugFileSize)
     return status;
 }
 
-am_status_t Log::setDebugFileRotate(bool debugFileRotate)
-{
+am_status_t Log::setDebugFileRotate(bool debugFileRotate) {
     am_status_t status = AM_SUCCESS;
     ScopeLock mylock(*lockPtr);
     logRotation = debugFileRotate;

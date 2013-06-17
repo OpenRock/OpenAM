@@ -29,6 +29,9 @@
  * Service interface class for the DSAME "Session" service.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef SESSION_SERVICE_H
 #define SESSION_SERVICE_H
@@ -47,10 +50,7 @@ public:
      * All functions throw XMLTree::ParseException on XML parse error 
      */
     SessionService(const std::string &name,
-                const Properties& props,
-                const std::string &cert_passwd,
-                const std::string &cert_nick_name,
-                bool alwaysTrustServerCert);
+                const Properties& props);
     virtual ~SessionService();
 
     am_status_t validateSession(const ServiceInfo& service,

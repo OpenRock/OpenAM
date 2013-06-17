@@ -42,10 +42,6 @@
 #include <am_properties.h>
 #include <am_map.h>
 
-#if defined(_AMD64_)
-#include <windows.h>
-#endif
-
 AM_BEGIN_EXTERN_C
 
 typedef struct am_policy_result {
@@ -101,11 +97,8 @@ typedef struct am_resource_traits {
 /*
  * Opaque handle for a policy evaluation object.
  */
-#if defined(_AMD64_)
-typedef DWORD64 am_policy_t;
-#else
 typedef unsigned int am_policy_t;
-#endif
+
 
 /**
  * Destroy am_policy_result internal structures.

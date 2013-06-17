@@ -31,7 +31,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 
 #ifndef LOG_SERVICE_H
@@ -50,16 +50,10 @@ class LogService : public BaseService {
 public:
     explicit LogService(const ServiceInfo &, const SSOToken &,
             const Http::CookieList &, const std::string &,
-            const Properties &,
-            const std::string &cert_passwd,
-            const std::string &cert_nick_name,
-            bool alwaysTrustServerCert);
+            const Properties &);
 
     explicit LogService(const ServiceInfo &,
             const Properties &,
-            const std::string &cert_passwd,
-            const std::string &cert_nick_name,
-            bool alwaysTrustServerCert,
             unsigned int bufferSize);
 
     virtual ~LogService();

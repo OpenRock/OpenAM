@@ -29,32 +29,55 @@
  * Minor utilities used by the XML parsing classes.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef XML_UTILITIES_H
 #define XML_UTILITIES_H
 
 #include <string>
-
-#if	defined(SOLARIS) || defined(LINUX)
+#include <assert.h>
+#ifdef _MSC_VER
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <objbase.h>
+#include <oleauto.h>
+#import <msxml6.dll> named_guids
+#include <msxml6.h>
+#else
 #include <strings.h>
-#elif	(defined(WINNT) || defined(_AMD64_))
+#include <libxml/tree.h>
 #endif
 
 #include "internal_macros.h"
+#include "log.h"
 
 BEGIN_PRIVATE_NAMESPACE
 
-inline bool matchesXMLString(const std::string& str1, const xmlChar *str2)
-{
-#if	defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(AIX)
+#if defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(AIX)
+inline bool matchesXMLString(const std::string& str1, const xmlChar *str2) {
     return (0 == strcasecmp(str1.c_str(),
-			    reinterpret_cast<const char *>(str2)));
-#elif	(defined(WINNT) || defined(_AMD64_))
-    return (0 == _stricmp(str1.c_str(), reinterpret_cast<const char *>(str2)));
-#else
-#error "don't know how to do case-insensitve comparison on this platform "
-#endif
+            reinterpret_cast<const char *> (str2)));
 }
+#elif defined(_MSC_VER)
+
+inline std::string bstrToString(const BSTR bstr, int cp = CP_UTF8) {
+    if (!bstr) return "";
+    int len = WideCharToMultiByte(cp, 0, bstr, -1, NULL, 0, NULL, NULL);
+    std::string r(len, '\0');
+    WideCharToMultiByte(cp, 0, bstr, -1, &r[0], len, NULL, NULL);
+    return r;
+}
+
+inline bool matchesXMLString(const std::string& str1, const BSTR bstr) {
+    std::string tmp = bstrToString(bstr);
+    return (0 == _stricmp(str1.c_str(), tmp.c_str()));
+}
+
+#else
+#error "don't know how to do case-insensitive comparison on this platform "
+#endif
 
 END_PRIVATE_NAMESPACE
 

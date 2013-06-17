@@ -26,652 +26,894 @@
  *
  */
 /*
-* Portions Copyrighted [2011] [ForgeRock AS]
-*/
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
+ */
 #include <stdexcept>
-#include <prinit.h>
-#include <plstr.h>
-#include <nss.h>
-extern "C" {
-    // The header files included by this header file do not correctly wrap
-    // all of their declarations with extern "C".  In particular, the
-    // typedef in secmodt.h for the function argument to
-    // PK11_SetPasswordFunc is not protected.
-#   include <pk11func.h>
-}
-#include <prnetdb.h>
-#include <ssl.h>
-#include <sslproto.h>
-#include <string>
-#include <secmod.h>
-#include <secerr.h>
-
+#include <errno.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <fcntl.h>
+#include <dlfcn.h>
+#include <netinet/tcp.h>
+#include <time.h>
+#ifdef __sun
+#include <sys/filio.h>
+#endif
+#ifdef linux
+#include <sys/ioctl.h>
+#endif
+#include <iostream>
+#include <sstream>
 #include "am.h"
-
 #include "connection.h"
 #include "log.h"
-#include "nspr_exception.h"
 #include "string_util.h"
+#include "version.h"
 
 USING_PRIVATE_NAMESPACE
 
-namespace {
-    enum {
-	MAX_READ_WRITE_LEN = 0x7fffffff, // 2^31 - 1, max signed 32-bit integer
-	MIN_BYTES_TO_READ = 512,
-	DEFAULT_BUFFER_LEN = 1024,
-	INCREMENT_LEN = 8192
-    };
+#define SSL_VERIFY_NONE                 0
+#define SSL_VERIFY_FAIL_IF_NO_PEER_CERT 0x02
+#define SSL_VERIFY_PEER                 0x01
+#define SSL_MODE_AUTO_RETRY             0x4
+#define SSL_ERROR_SYSCALL               5
+#define SSL_ERROR_WANT_READ             2
+#define SSL_ERROR_WANT_WRITE            3
+#define SSL_OP_NO_SSLv2                 0x01000000L
+#define	MAX_RETRY_COUNT                 5
+#define WAIT                            300000 //microseconds
 
-    extern "C" SECStatus acceptAnyCert(void *, PRFileDesc *, PRBool, PRBool)
-    {
-	return SECSuccess;
+        static pthread_mutex_t *ssl_mutexes = NULL;
+static void *crypto_lib_h = NULL;
+static void *ssl_lib_h = NULL;
+
+struct ssl_func {
+    const char *name;
+    void (*ptr)(void);
+};
+
+static struct ssl_func ssl_sw[] = {
+    {"SSL_library_init", NULL},
+    {"SSL_CTX_new", NULL},
+    {"SSL_new", NULL},
+    {"SSL_set_fd", NULL},
+    {"SSL_get_fd", NULL},
+    {"SSL_connect", NULL},
+    {"SSLv23_client_method", NULL},
+    {"SSL_read", NULL},
+    {"SSL_write", NULL},
+    {"SSL_CTX_free", NULL},
+    {"SSL_free", NULL},
+    {"SSL_shutdown", NULL},
+    {"SSL_CTX_use_certificate", NULL},
+    {"SSL_CTX_use_PrivateKey", NULL},
+    {"SSL_CTX_check_private_key", NULL},
+    {"SSL_CTX_get_cert_store", NULL},
+    {"SSL_CTX_add_client_CA", NULL},
+    {"SSL_get_verify_result", NULL},
+    {"SSL_CTX_ctrl", NULL},
+    {"SSL_get_error", NULL},
+    {"SSL_get_peer_certificate", NULL},
+    {"SSL_get_peer_cert_chain", NULL},
+    {"SSL_CTX_load_verify_locations", NULL},
+    {"SSL_CTX_set_verify", NULL},
+    {"SSL_CTX_set_cipher_list", NULL},
+    {"SSL_load_client_CA_file", NULL},
+    {"SSL_CTX_set_client_CA_list", NULL},
+    {"SSL_CTX_use_certificate_file", NULL},
+    {"SSL_CTX_use_PrivateKey_file", NULL},
+    {"SSL_set_client_CA_list", NULL},
+    {"SSL_CTX_use_certificate_chain_file", NULL},
+    {NULL, NULL}
+};
+
+static struct ssl_func crypto_sw[] = {
+    {"CRYPTO_num_locks", NULL},
+    {"CRYPTO_set_locking_callback", NULL},
+    {"CRYPTO_set_id_callback", NULL},
+    {"PKCS12_parse", NULL},
+    {"X509_STORE_add_cert", NULL},
+    {"d2i_PKCS12_fp", NULL},
+    {"PKCS12_free", NULL},
+    {"sk_num", NULL},
+    {"sk_value", NULL},
+    {"EVP_PKEY_free", NULL},
+    {"CRYPTO_set_mem_functions", NULL},
+    {"X509_free", NULL},
+    {"OPENSSL_add_all_algorithms_noconf", NULL},
+    {"sk_free", NULL},
+    {"X509_get_subject_name", NULL},
+    {"X509_get_issuer_name", NULL},
+    {"X509_NAME_oneline", NULL},
+    {NULL, NULL}
+};
+
+typedef struct ssl_st SSL;
+typedef struct ssl_ctx_st SSL_CTX;
+typedef struct ssl_method_st SSL_METHOD;
+typedef struct pkcs12_st PKCS12;
+typedef struct x509_store_st X509_STORE;
+typedef struct x509_store_ctx_st X509_STORE_CTX;
+typedef struct x509_st X509;
+typedef struct stack_st STACK;
+#define STACK_OF(type) STACK
+typedef struct evp_pkey_st EVP_PKEY;
+typedef struct X509_name_st X509_NAME;
+
+#define SSL_library_init (* (int (*)(void)) ssl_sw[0].ptr)
+#define SSL_CTX_new (* (SSL_CTX * (*)(SSL_METHOD *)) ssl_sw[1].ptr)
+#define SSL_new (* (SSL * (*)(SSL_CTX *)) ssl_sw[2].ptr)
+#define SSL_set_fd (* (int (*)(SSL *, int)) ssl_sw[3].ptr)
+#define SSL_get_fd (* (int (*)(SSL *)) ssl_sw[4].ptr)
+#define SSL_connect (* (int (*)(SSL *)) ssl_sw[5].ptr)
+#define SSLv23_client_method (* (SSL_METHOD * (*)(void)) ssl_sw[6].ptr)
+#define SSL_read (* (int (*)(SSL *, void *, int)) ssl_sw[7].ptr)
+#define SSL_write (* (int (*)(SSL *, const void *,int)) ssl_sw[8].ptr)
+#define SSL_CTX_free (* (void (*)(SSL_CTX *)) ssl_sw[9].ptr)
+#define SSL_free (* (void (*)(SSL *)) ssl_sw[10].ptr)
+#define SSL_shutdown (* (void (*)(SSL *)) ssl_sw[11].ptr)
+#define SSL_CTX_use_certificate (* (int (*)(SSL_CTX *, X509 *)) ssl_sw[12].ptr)
+#define SSL_CTX_use_PrivateKey (* (int (*)(SSL_CTX *, EVP_PKEY *)) ssl_sw[13].ptr)
+#define SSL_CTX_check_private_key (* (int (*)(const SSL_CTX *)) ssl_sw[14].ptr)
+#define SSL_CTX_get_cert_store (* (X509_STORE * (*)(const SSL_CTX *)) ssl_sw[15].ptr)
+#define SSL_CTX_add_client_CA (* (int (*)(SSL_CTX *,X509 *)) ssl_sw[16].ptr)
+#define SSL_get_verify_result (* (int (*)(const SSL *)) ssl_sw[17].ptr)
+#define SSL_CTX_ctrl (* (long (*)(SSL_CTX *, int, long, void *)) ssl_sw[18].ptr)
+#define SSL_get_error (* (int (*)(SSL *, int)) ssl_sw[19].ptr)
+#define SSL_get_peer_certificate (* (X509 * (*)(const SSL *)) ssl_sw[20].ptr)
+#define SSL_get_peer_cert_chain (* (STACK_OF(X509) * (*)(const SSL *)) ssl_sw[21].ptr)
+#define SSL_CTX_load_verify_locations (* (int (*)(SSL_CTX *, const char *, const char *)) ssl_sw[22].ptr)
+#define SSL_CTX_set_verify (* (void (*)(SSL_CTX *, int, int (*verify_callback)(int, X509_STORE_CTX *))) ssl_sw[23].ptr)
+#define SSL_CTX_set_cipher_list (* (int (*)(SSL_CTX *,const char *)) ssl_sw[24].ptr)
+#define SSL_load_client_CA_file (* (STACK_OF(X509_NAME) * (*)(const char *)) ssl_sw[25].ptr)
+#define SSL_CTX_set_client_CA_list (* (void (*)(SSL_CTX *, STACK_OF(X509_NAME) *)) ssl_sw[26].ptr)
+#define SSL_CTX_use_certificate_file (* (int (*)(SSL_CTX *, const char *, int)) ssl_sw[27].ptr)
+#define SSL_CTX_use_PrivateKey_file (* (int (*)(SSL_CTX *, const char *, int)) ssl_sw[28].ptr)
+#define SSL_set_client_CA_list (* (void (*)(SSL *, STACK_OF(X509_NAME) *)) ssl_sw[29].ptr)
+#define SSL_CTX_use_certificate_chain_file (* (int (*)(SSL_CTX *, const char *)) ssl_sw[30].ptr)
+
+#define CRYPTO_num_locks (* (int (*)(void)) crypto_sw[0].ptr)
+#define CRYPTO_set_locking_callback \
+	(* (void (*)(void (*)(int, int, const char *, int))) crypto_sw[1].ptr)
+#define CRYPTO_set_id_callback \
+	(* (void (*)(unsigned long (*)(void))) crypto_sw[2].ptr)
+#define PKCS12_parse (* (int (*)(PKCS12 *, const char *, EVP_PKEY **, X509 **, STACK_OF(X509) **)) crypto_sw[3].ptr)
+#define X509_STORE_add_cert (* (int (*)(X509_STORE *, X509 *)) crypto_sw[4].ptr)
+#define d2i_PKCS12_fp (* (PKCS12 * (*)(FILE *, PKCS12 **)) crypto_sw[5].ptr)
+#define PKCS12_free (* (void (*)(PKCS12 *)) crypto_sw[6].ptr)
+#define sk_num (* (int (*)(const STACK *)) crypto_sw[7].ptr)
+#define sk_value (* (void * (*)(const STACK *, int)) crypto_sw[8].ptr)
+#define EVP_PKEY_free (* (void (*)(EVP_PKEY *)) crypto_sw[9].ptr)
+#define CRYPTO_set_mem_functions (* (int (*)(void *(*m)(size_t),void *(*r)(void *,size_t), void (*f)(void *))) crypto_sw[10].ptr)
+#define X509_free (* (void (*)(X509 *)) crypto_sw[11].ptr)
+#define OPENSSL_add_all_algorithms_noconf (* (void (*)(void)) crypto_sw[12].ptr)
+#define sk_free (* (void (*)(STACK *)) crypto_sw[13].ptr)
+#define X509_get_subject_name (* (X509_NAME * (*)(X509 *)) crypto_sw[14].ptr)
+#define X509_get_issuer_name (* (X509_NAME * (*)(X509 *)) crypto_sw[15].ptr)
+#define X509_NAME_oneline (* (char * (*)(X509_NAME *,char *,int)) crypto_sw[16].ptr)
+
+typedef struct _tls tls_t;
+
+struct _tls {
+    int sock;
+    SSL *sslh;
+    SSL_CTX *sslc;
+};
+
+extern "C" void ssl_locking_callback(int mode, int mutex_num, const char *file, int line) {
+    if (mode & 1) {
+        pthread_mutex_lock(&ssl_mutexes[mutex_num]);
+    } else {
+        pthread_mutex_unlock(&ssl_mutexes[mutex_num]);
     }
-
-    extern "C" char *getPasswordFromArg(PK11SlotInfo *, PRBool retry,
-			     void *arg) {
-	char *password = NULL;
-	if (static_cast<void *>(NULL) != arg && ! retry) {
-	    password = PL_strdup(static_cast<char *>(arg));
-
-	    if (static_cast<char *>(NULL) == password) {
-		Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-			 "unable to copy password in SSL callback");
-	    }
-	}
-
-	return password;
-    }
-
-    SECStatus finishedHandshakeHandler(PRFileDesc *socket,
-						  void *arg) {
-	Log::log(Log::ALL_MODULES, Log::LOG_INFO,
-		 "Successfully completed SSL handshake.");
-	return SECSuccess;
-    }
-
 }
 
-bool Connection::initialized;
-PRIntervalTime receive_timeout;
-PRIntervalTime connect_timeout;
-bool tcp_nodelay_is_enabled = false;
+extern "C" unsigned long ssl_id_callback(void) {
+    return (unsigned long) pthread_self();
+}
 
-std::string defaultHostName(" ");
+static void *load_library(const char *so_name, struct ssl_func *sw, int flags) {
+    void *lib_handle = NULL;
+    struct ssl_func *fp, *fpd;
 
-am_status_t Connection::initialize(const Properties& properties)
-{
-    am_status_t status = AM_SUCCESS;
-    SECStatus secStatus;
+    union {
+        void *p;
+        void (*fp)(void);
+    } u;
 
-    if (! initialized) {
-	const char *nssMethodName = "NSS_Initialize";
-	std::string certDir = properties.get(AM_COMMON_SSL_CERT_DIR_PROPERTY, 
-					     "");
-	std::string dbPrefix = properties.get(AM_COMMON_CERT_DB_PREFIX_PROPERTY,
-					      "");
+    if ((lib_handle = dlopen(so_name, flags)) == NULL) {
+        return NULL;
+    }
 
-	unsigned long timeout = properties.getUnsigned(AM_COMMON_RECEIVE_TIMEOUT_PROPERTY, 0);
-	if (timeout > 0) {
-	    receive_timeout = PR_MillisecondsToInterval(static_cast<PRInt32>(timeout));
-    } else {
-	    receive_timeout = PR_INTERVAL_NO_TIMEOUT;
-	}
-
-	unsigned long socket_timeout = properties.getUnsigned(AM_COMMON_CONNECT_TIMEOUT_PROPERTY, 0);
-	if (socket_timeout > 0) {
-	    connect_timeout = PR_MillisecondsToInterval(static_cast<PRInt32>(socket_timeout));
-	} else {
-	    connect_timeout = PR_INTERVAL_NO_TIMEOUT;
-	}
-
-	tcp_nodelay_is_enabled = properties.getBool(AM_COMMON_TCP_NODELAY_ENABLE_PROPERTY, false);
-		
-	//
-	// Initialize the NSS libraries and enable use of all of the
-	// cipher suites.  According to the NSS 3.3 API documentation
-	// NSS_SetDomesticPolicy enables all of the cipher suites except
-	// two: SSL_RSA_WITH_NULL_MD5 and SSL_FORTEZZA_DMS_WITH_NULL_SHA.
-	// (It does not explain why those two are not enabled.)  The SSL
-	// code in Agent Pack 1.0 explicitly enabled the first of the
-	// disabled cipher suites.
-	// We do not enable them here since null or no encryption is a 
-	// potential security risk.
-	//
-	Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		 "Connection timeout when receiving data = %i milliseconds",timeout);
-	if (tcp_nodelay_is_enabled) {
-		Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		   "Socket option TCP_NODELAY is enabled");
-	}
-        
-        PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
-
-        if (certDir.length() != 0) {
-            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		 "calling NSS_Initialize() with directory = \"%s\" and "
-		 "prefix = \"%s\"", certDir.c_str(), dbPrefix.c_str());
-	    nssMethodName = "NSS_Initialize";
-            secStatus = NSS_Initialize(certDir.c_str(), dbPrefix.c_str(),
-				   dbPrefix.c_str(), "secmod.db",
-				   NSS_INIT_READONLY|NSS_INIT_FORCEOPEN);
+    fpd = sw;
+    for (fp = sw; fp->name != NULL; fp++) {
+        u.p = dlsym(lib_handle, fp->name);
+        if (u.fp == NULL) {
+            for (; fpd->name != NULL; fpd++) {
+                fpd->ptr = NULL;
+            }
+            dlclose(lib_handle);
+            return NULL;
         } else {
-            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		 "CertDir and dbPrefix EMPTY -- Calling NSS_NoDB_Init");
-	    nssMethodName = "NSS_NoDB_Init";
-            secStatus = NSS_NoDB_Init(NULL);
+            fp->ptr = u.fp;
+        }
+    }
+    return lib_handle;
+}
+
+extern "C" void ssl_load() {
+    int i, size;
+    if (!(crypto_lib_h = load_library("libcrypto.so", crypto_sw, RTLD_LAZY | RTLD_GLOBAL))
+            || !(ssl_lib_h = load_library("libssl.so", ssl_sw, RTLD_LAZY))) {
+        Log::log(Log::ALL_MODULES, Log::LOG_WARNING,
+                "Connection::initialize() SSL support is not available");
+        if (ssl_lib_h) dlclose(ssl_lib_h);
+        if (crypto_lib_h) dlclose(crypto_lib_h);
+    } else if (CRYPTO_set_mem_functions && SSL_library_init && CRYPTO_num_locks &&
+            CRYPTO_set_id_callback && CRYPTO_set_locking_callback && OPENSSL_add_all_algorithms_noconf) {
+        CRYPTO_set_mem_functions(malloc, realloc, free);
+        SSL_library_init();
+        size = sizeof (pthread_mutex_t) * CRYPTO_num_locks();
+        ssl_mutexes = (pthread_mutex_t *) malloc(size);
+        for (i = 0; i < CRYPTO_num_locks(); i++) {
+            pthread_mutex_init(&ssl_mutexes[i], NULL);
+        }
+        CRYPTO_set_id_callback(ssl_id_callback);
+        CRYPTO_set_locking_callback(ssl_locking_callback);
+        OPENSSL_add_all_algorithms_noconf();
+        Log::log(Log::ALL_MODULES, Log::LOG_INFO,
+                "Connection::initialize() SSL support is available");
+    } else {
+        Log::log(Log::ALL_MODULES, Log::LOG_WARNING,
+                "Connection::initialize() SSL support is not available (not all required symbols are visible)");
+    }
+}
+
+void ssl_crypto_init() {
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once(&once, ssl_load);
+}
+
+void ssl_crypto_shutdown() {
+    int i;
+    if (CRYPTO_set_locking_callback && CRYPTO_set_id_callback && CRYPTO_num_locks) {
+        CRYPTO_set_locking_callback(NULL);
+        CRYPTO_set_id_callback(NULL);
+        for (i = 0; i < CRYPTO_num_locks(); i++) {
+            pthread_mutex_destroy(&ssl_mutexes[i]);
+        }
+    }
+    if (ssl_mutexes != NULL) {
+        free(ssl_mutexes);
+    }
+    if (ssl_lib_h || crypto_lib_h) {
+        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                "Connection::shutdown() unloading SSL libraries");
+    }
+    if (ssl_lib_h) {
+        dlclose(ssl_lib_h);
+        ssl_lib_h = NULL;
+    }
+    if (crypto_lib_h) {
+        dlclose(crypto_lib_h);
+        crypto_lib_h = NULL;
+    }
+}
+
+void show_server_cert(const SSL* s) {
+    X509 *cert;
+    char *line;
+    if (SSL_get_peer_certificate) {
+        cert = SSL_get_peer_certificate(s);
+        if (cert != NULL) {
+            line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
+            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                    "Connection::Connection() server certificate subject: %s", line);
+            free(line);
+            line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
+            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                    "Connection::Connection() server certificate issuer: %s", line);
+            free(line);
+            X509_free(cert);
+        }
+    }
+}
+
+int wait_for_io(int sock, int timeout, int for_read) {
+    struct timeval tv, *tvptr;
+    fd_set fdset;
+    int srv;
+    do {
+        FD_ZERO(&fdset);
+        FD_SET(sock, &fdset);
+        if (timeout < 0) {
+            tvptr = NULL;
+        } else {
+            tv.tv_sec = 0;
+            tv.tv_usec = timeout;
+            tvptr = &tv;
+        }
+        srv = select(sock + 1, for_read ? &fdset : NULL, for_read ? NULL : &fdset, NULL, tvptr);
+    } while (srv == -1 && errno == EINTR);
+    if (srv == 0) {
+        return -1;
+    } else if (srv < 0) {
+        return errno;
+    }
+    return FD_ISSET(sock, &fdset) ? 0 : -2;
+}
+
+void tls_free(tls_t * s) {
+    if (!s) return;
+    if (s->sslh) {
+        SSL_shutdown(s->sslh);
+        SSL_free(s->sslh);
+    }
+    if (s->sslc)
+        SSL_CTX_free(s->sslc);
+    free(s);
+    s = NULL;
+}
+
+tls_t * tls_initialize(int sock, int verifycert, const char *keyfile, const char *keypass,
+        const char *certfile, const char *cafile, const char *ciphers) {
+    tls_t *ssl = NULL;
+    int status, retry_count = 0;
+    const char *cl = ciphers != NULL ? ciphers : "HIGH:MEDIUM";
+
+    if (sock) {
+        ssl = (tls_t *) malloc(sizeof (tls_t));
+        ssl->sslh = NULL;
+        ssl->sslc = NULL;
+        ssl->sock = sock;
+
+        ssl->sslc = SSL_CTX_new && SSLv23_client_method && SSL_new && SSL_set_fd
+                && SSL_get_fd && SSL_connect && SSL_CTX_set_cipher_list && SSL_CTX_set_verify
+                && SSL_CTX_load_verify_locations && SSL_CTX_use_certificate_file && SSL_CTX_use_PrivateKey_file ?
+                SSL_CTX_new(SSLv23_client_method()) : NULL;
+        if (ssl->sslc == NULL) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Connection::Connection() SSL context is not available");
+            tls_free(ssl);
+            return NULL;
         }
 
-	if (SECSuccess == secStatus) {
-	    nssMethodName = "NSS_SetDomesticPolicy";
-	    secStatus = NSS_SetDomesticPolicy();
-	}
-        
-        PK11_ConfigurePKCS11(NULL, NULL, NULL, "internal                         ", NULL, NULL, NULL, NULL, 8, 1);
-        SSL_ShutdownServerSessionIDCache();
+        SSL_CTX_ctrl(ssl->sslc, 32, SSL_MODE_AUTO_RETRY, NULL);
+        /*SSL_CTX_ctrl(ssl->sslc, 32, SSL_OP_NO_SSLv2, NULL);*/
 
-        SSL_ConfigMPServerSIDCache(NULL, 100, 86400L, NULL);
-        SSL_ConfigServerSessionIDCache(NULL, 100, 86400L, NULL);
-        SSL_ClearSessionCache();
-        
-	if (SECSuccess == secStatus) {
-	    nssMethodName = "PK11_SetPasswordFunc";
-	    PK11_SetPasswordFunc(getPasswordFromArg);
-
-	    initialized = true;
-	}
-        if (secStatus != SECSuccess) {
+        if (SSL_CTX_set_cipher_list(ssl->sslc, cl) != 1) {
             Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-                     "Connection::initialize() unable to initialize SSL "
-                     "libraries: %s returned %d", nssMethodName,
-                     PR_GetError());
-            status = AM_NSPR_ERROR;
+                    "Connection::Connection() SSL cipher list \"%s\" is not available", cl);
+            tls_free(ssl);
+            return NULL;
+        }
+
+        SSL_CTX_set_verify(ssl->sslc, SSL_VERIFY_NONE, NULL);
+
+        if (cafile) {
+            if (!SSL_CTX_load_verify_locations(ssl->sslc, cafile, NULL)) {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                        "Connection::Connection() SSL failed to load trusted CA certificates file \"%s\"", cafile);
+            }
+        }
+
+        if (certfile) {
+            if (!SSL_CTX_use_certificate_file(ssl->sslc, certfile, 1)) {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                        "Connection::Connection() SSL failed to load client certificate file \"%s\"", certfile);
+            }
+        }
+
+        if (keyfile) {
+            if (!SSL_CTX_use_PrivateKey_file(ssl->sslc, keyfile, 1)) {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                        "Connection::Connection() SSL failed to load private key file \"%s\"", keyfile);
+            }
+        }
+
+        ssl->sslh = SSL_new(ssl->sslc);
+        if (ssl->sslh == NULL) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Connection::Connection() SSL handle is not available");
+            tls_free(ssl);
+            return NULL;
+        }
+        if (!SSL_set_fd(ssl->sslh, ssl->sock)) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Connection::Connection() SSL socket set failed");
+            tls_free(ssl);
+            return NULL;
+        }
+
+        /* do SSL handshake */
+        do {
+            status = SSL_connect(ssl->sslh);
+            if (status < 0) {
+                switch (SSL_get_error(ssl->sslh, status)) {
+                    case SSL_ERROR_WANT_READ:
+                        if (wait_for_io(SSL_get_fd(ssl->sslh), WAIT, 1) == 0) {
+                            retry_count++;
+                            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                                    "Connection::Connection() SSL socket available, retrying (%d)", retry_count);
+                            continue;
+                        }
+                    case SSL_ERROR_WANT_WRITE:
+                        if (wait_for_io(SSL_get_fd(ssl->sslh), WAIT, 0) == 0) {
+                            retry_count++;
+                            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                                    "Connection::Connection() SSL socket available, retrying (%d)", retry_count);
+                            continue;
+                        }
+                    case SSL_ERROR_SYSCALL:
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                                "Connection::Connection() SSL connect error (%d)", errno);
+                        tls_free(ssl);
+                        return NULL;
+                }
+            } else if (status == 1) break;
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Connection::Connection() SSL connect failed");
+            tls_free(ssl);
+            return NULL;
+        } while (retry_count < MAX_RETRY_COUNT);
+
+        if (retry_count >= MAX_RETRY_COUNT) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Connection::Connection() SSL handshake max %d retries exhausted", MAX_RETRY_COUNT);
+            tls_free(ssl);
+            return NULL;
+        }
+
+        if (verifycert) {
+            if (SSL_get_verify_result(ssl->sslh) != 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                        "Connection::Connection() SSL server certificate validation failed");
+                show_server_cert(ssl->sslh);
+                tls_free(ssl);
+                return NULL;
+            } else {
+                Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                        "Connection::Connection() SSL server certificate validation succeeded");
+                show_server_cert(ssl->sslh);
+            }
+        }
+    }
+    return ssl;
+}
+
+unsigned long Connection::timeout = NETWORK_TIMEOUT;
+std::string Connection::proxyHost = "";
+std::string Connection::proxyUser = "";
+std::string Connection::proxyPassword = "";
+std::string Connection::proxyPort = "";
+std::string Connection::cipherList = "";
+bool Connection::trustServerCerts = true;
+std::string Connection::keyFile = "";
+std::string Connection::caFile = "";
+std::string Connection::certFile = "";
+std::string Connection::keyPassword = "";
+
+Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLength(-1), server(srv), ssl(NULL) {
+    struct in6_addr serveraddr;
+    char service[6];
+    struct addrinfo *res, hints;
+    int err, saveflags, on = 1;
+    struct timeval tva;
+    const char *host = server.getHost().c_str();
+    unsigned int port = server.getPort();
+
+    snprintf(service, 6, "%u", port);
+
+#ifndef AI_NUMERICSERV
+#define AI_NUMERICSERV 0
+#endif
+
+    memset(&hints, 0, sizeof (struct addrinfo));
+    hints.ai_flags = AI_NUMERICSERV;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    err = inet_pton(AF_INET, host, &serveraddr);
+    if (err == 1) {
+        hints.ai_family = AF_INET;
+        hints.ai_flags |= AI_NUMERICHOST;
+    } else {
+        err = inet_pton(AF_INET6, host, &serveraddr);
+        if (err == 1) {
+            hints.ai_family = AF_INET6;
+            hints.ai_flags |= AI_NUMERICHOST;
         }
     }
 
-    return status;
+    if ((err = getaddrinfo(host, service, &hints, &res)) != 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() cannot resolve address %s:%d, error %d",
+                host, port, err);
+        return;
+    }
+
+
+    if ((sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() cannot create socket, error %d", errno);
+        net_error(errno);
+        freeaddrinfo(res);
+        return;
+    }
+
+    if (timeout != 0) {
+        memset(&tva, 0, sizeof (tva));
+        tva.tv_sec = timeout;
+        tva.tv_usec = 0;
+        if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *) &tva, sizeof (tva)) < 0) {
+            Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set read timeout");
+            net_error(errno);
+        }
+        if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *) &tva, sizeof (tva)) < 0) {
+            Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set write timeout");
+            net_error(errno);
+        }
+    }
+    if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *) &on, sizeof (on)) < 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  TCP_NODELAY error");
+        net_error(errno);
+    }
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &on, sizeof (on)) < 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  SO_REUSEADDR error");
+        net_error(errno);
+    }
+
+    saveflags = fcntl(sock, F_GETFL, 0);
+    fcntl(sock, F_SETFL, saveflags | O_NONBLOCK);
+    err = connect(sock, res->ai_addr, res->ai_addrlen);
+
+    if (err == 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d", host, port);
+    } else if (err < 0) {
+        int ern = errno;
+        if (ern != EWOULDBLOCK && ern != EINPROGRESS) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() connect error %d", ern);
+            net_error(ern);
+        }
+        if (ern == EWOULDBLOCK || ern == EINPROGRESS) {
+            fd_set fds, eds;
+            struct timeval tv;
+            memset(&tv, 0, sizeof (tv));
+            tv.tv_sec = timeout == 0 ? NETWORK_TIMEOUT / 1000 : timeout / 1000;
+            tv.tv_usec = 0;
+            FD_ZERO(&fds);
+            FD_ZERO(&eds);
+            FD_SET(sock, &fds);
+            FD_SET(sock, &eds);
+            if (select(FD_SETSIZE, 0, &fds, &eds, &tv) == 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() timeout connecting to %s:%d", host, port);
+                http_close();
+            } else {
+                if (FD_ISSET(sock, &fds)) {
+                    int ret = 0;
+                    size_t rlen = sizeof (ret);
+                    if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &ret, (socklen_t *) & rlen) == 0) {
+                        if (ret == 0) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d", host, port);
+                        } else {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() getsockopt error %d", ret);
+                            net_error(ret);
+                            http_close();
+                        }
+                    } else {
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() getsockopt error %d", errno);
+                        net_error(errno);
+                        http_close();
+                    }
+                } else if (FD_ISSET(sock, &eds)) {
+                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() error %d", errno);
+                    net_error(errno);
+                    http_close();
+                }
+            }
+        } else {
+            http_close();
+        }
+    }
+
+    if (sock != -1) {
+        fcntl(sock, F_SETFL, saveflags);
+
+        if (server.useSSL()) {
+            ssl = tls_initialize(sock, trustServerCerts ? 0 : 1,
+                    keyFile.empty() ? NULL : keyFile.c_str(),
+                    keyPassword.empty() ? NULL : keyPassword.c_str(),
+                    certFile.empty() ? NULL : certFile.c_str(),
+                    caFile.empty() ? NULL : caFile.c_str(),
+                    cipherList.empty() ? NULL : cipherList.c_str());
+        }
+    }
+    freeaddrinfo(res);
+}
+
+void Connection::http_close() {
+    if (static_cast<tls_t *> (NULL) != ssl) {
+        tls_free(static_cast<tls_t *> (ssl));
+    }
+    if (sock > 0) {
+        close(sock);
+    }
+    sock = -1;
+}
+
+ssize_t Connection::response(char ** buff) {
+    ssize_t out_len = 0, len = 0;
+    u_long n = 0;
+    char *tmp = NULL;
+#define TEMP_SIZE 8192
+    if ((tmp = (char *) malloc(TEMP_SIZE))) {
+        if (server.useSSL()) {
+            if (static_cast<tls_t *> (NULL) != ssl) {
+                tls_t *ssd = static_cast<tls_t *> (ssl);
+                do {
+                    n = 0;
+                    memset((void *) tmp, 0, TEMP_SIZE);
+                    len = SSL_read(ssd->sslh, tmp, TEMP_SIZE);
+                    if (len > 0) {
+                        *buff = (char *) realloc(*buff, out_len + len + 1);
+                        if (*buff == NULL) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL memory allocation error");
+                            break;
+                        }
+                        memcpy((*buff) + out_len, tmp, len);
+                        out_len += len;
+                        if (ioctl(SSL_get_fd(ssd->sslh), FIONREAD, &n) < 0) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL ioctl failed, %d", errno);
+                            net_error(errno);
+                        }
+                        if (n > 0) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() SSL more data available (%ld), continue reading", n);
+                            len = n;
+                            continue;
+                        }
+                    } else if (len == 0) {
+                        break;
+                    } else {
+                        switch (SSL_get_error(ssd->sslh, len)) {
+                            case SSL_ERROR_WANT_READ:
+                                if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 1) == 0) {
+                                    continue;
+                                }
+                            case SSL_ERROR_WANT_WRITE:
+                                if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 0) == 0) {
+                                    continue;
+                                }
+                        }
+                        break;
+                    }
+                } while (len > 0);
+            } else {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL connection is not available");
+            }
+        } else {
+            do {
+                n = 0;
+                memset((void *) tmp, 0, TEMP_SIZE);
+                len = recv(sock, tmp, TEMP_SIZE, 0);
+                if (len > 0) {
+                    *buff = (char *) realloc(*buff, out_len + len + 1);
+                    if (*buff == NULL) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() memory allocation error");
+                        break;
+                    }
+                    memcpy((*buff) + out_len, tmp, len);
+                    out_len += len;
+                    if (ioctl(sock, FIONREAD, &n) < 0) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() ioctl failed, %d", errno);
+                        net_error(errno);
+                    }
+                    if (n > 0) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() more data available (%ld), continue reading", n);
+                        len = n;
+                        continue;
+                    }
+                    break;
+                } else if (len == 0) {
+                    break;
+                } else {
+                    net_error(errno);
+                    break;
+                }
+            } while (len > 0);
+        }
+    }
+
+    if (*buff != NULL) {
+        (*buff)[out_len] = 0;
+    } else out_len = 0;
+
+    return out_len;
+}
+
+ssize_t Connection::request(const char *buff, const size_t len) {
+    ssize_t wrtlen, ttllen = 0, reqlen;
+    if (server.useSSL()) {
+        if (static_cast<tls_t *> (NULL) != ssl) {
+            tls_t *ssd = static_cast<tls_t *> (ssl);
+            for (ttllen = 0, reqlen = len; reqlen > 0;) {
+                if (0 > (wrtlen = SSL_write(ssd->sslh, buff + ttllen, reqlen))) {
+                    int e = SSL_get_error(ssd->sslh, wrtlen);
+                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() SSL socket not available, error %X", e);
+                    switch (e) {
+                        case SSL_ERROR_WANT_READ:
+                        {
+                            if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 1) == 0) {
+                                continue;
+                            }
+                        }
+                            break;
+                        case SSL_ERROR_WANT_WRITE:
+                        {
+                            if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 0) == 0) {
+                                continue;
+                            }
+                        }
+                            break;
+                    }
+                    return -1;
+                }
+                Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::request() SSL writing %ld bytes", wrtlen);
+                ttllen += wrtlen;
+                reqlen -= wrtlen;
+            }
+        } else {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() SSL connection is not available");
+        }
+    } else {
+        for (ttllen = 0, reqlen = len; reqlen > 0;) {
+            if (0 > (wrtlen = send(sock, buff + ttllen, reqlen, 0))) {
+                int e = errno;
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() socket not available, error %X", e);
+                net_error(e);
+                switch (e) {
+                    case EINTR:
+                        continue;
+                    case ECONNRESET:
+                        return 0;
+                }
+                return -1;
+            }
+            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::request() writing %ld bytes", wrtlen);
+            ttllen += wrtlen;
+            reqlen -= wrtlen;
+        }
+    }
+    return ttllen;
+}
+
+Connection::~Connection() {
+    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+            "Connection::http_close(): cleaning up");
+    http_close();
+}
+
+am_status_t Connection::sendRequest(const char *type, std::string& uri, ConnHeaderMap& hdrs, std::string& data) {
+    bool status = false;
+    char *buffer = NULL;
+    if (sock > 0 && type) {
+        std::stringstream hs;
+        hs << type << (uri.empty() ? " /" : uri)
+                << " HTTP/1.0\r\n"
+                << "User-Agent: OpenAM Web Agent/" << Version::getAgentVersion() << "\r\n"
+                << "Connection: close\r\n";
+
+        /* add request headers */
+        ConnHeaderMap::iterator it = hdrs.begin();
+        ConnHeaderMap::iterator itEnd = hdrs.end();
+        for (; it != itEnd; ++it) {
+            hs << (*it).first << "\r\n";
+        }
+
+        if (strstr(type, "POST") != NULL) {
+            hs << "Content-Length: " << data.length() << "\r\n\r\n" << data;
+        } else {
+            hs << "\r\n";
+        }
+
+        Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+                "Connection::sendRequest():\n%s", hs.str().c_str());
+
+        ssize_t sz = request(hs.str().c_str(), hs.str().length());
+        if (sz > 0) {
+
+            sz = response(&buffer);
+            if (sz > 0 && buffer) {
+
+                dataBuffer.reserve(sz);
+                dataBuffer.append(buffer, sz);
+                dataBuffer.erase(0, dataBuffer.find("\r\n\r\n") + 4);
+                dataLength = dataBuffer.length();
+
+                std::string header(buffer);
+                header.erase(header.find("\r\n\r\n") + 4);
+                statusCode = strtol(&header[header.find(' ') + 1], NULL, 10);
+                header.erase(0, header.find("\r\n") + 2);
+
+                Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+                        "Connection::response(): HTTP %d", statusCode);
+
+                std::stringstream stringStream(header);
+                std::string line;
+                while (std::getline(stringStream, line)) {
+                    std::size_t prev = 0, pos;
+                    while ((pos = line.find_first_of("\r\n", prev)) != std::string::npos) {
+                        if (pos > prev) {
+                            std::string entry = line.substr(prev, pos - prev);
+                            std::string::size_type n = entry.find_first_of(':');
+                            if (n != std::string::npos) {
+                                headers.insert(ConnHeaderMapValue(entry.substr(0, n), entry.substr(n + 2)));
+                            }
+                            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+                                    "Connection::response(): Header: %s", entry.c_str());
+                        }
+                        prev = pos + 1;
+                    }
+                    if (prev < line.length()) {
+                        std::string entry = line.substr(prev, std::string::npos);
+                        std::string::size_type n = entry.find_first_of(':');
+                        if (n != std::string::npos) {
+                            headers.insert(ConnHeaderMapValue(entry.substr(0, n), entry.substr(n + 2)));
+                        }
+                        Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+                                "Connection::response(): Header: %s", entry.c_str());
+                    }
+                }
+
+                status = true;
+                free(buffer);
+            }
+        }
+    }
+    return status ? AM_SUCCESS : AM_HTTP_ERROR;
+}
+
+extern "C" int decrypt_base64(const char *, char *, const char*);
+
+am_status_t Connection::initialize(const Properties& properties) {
+    if (!ssl_lib_h || !crypto_lib_h) {
+        std::string decrypt_key = properties.get(AM_POLICY_KEY_PROPERTY, "");
+        keyPassword = properties.get(AM_COMMON_CERT_KEY_PASSWORD_PROPERTY, "");
+        if (!decrypt_key.empty() && !keyPassword.empty()) {
+            char decrypt_passwd[100] = "";
+            if (decrypt_base64(keyPassword.c_str(), decrypt_passwd, decrypt_key.c_str()) == 0) {
+                keyPassword.assign(decrypt_passwd);
+            } else {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                        "Connection::initialize(): failed to decrypt private key password");
+            }
+        }
+        timeout = properties.getUnsigned(AM_COMMON_CONNECT_TIMEOUT_PROPERTY, NETWORK_TIMEOUT);
+        proxyPort = properties.get(AM_COMMON_FORWARD_PROXY_PORT, "");
+        proxyHost = properties.get(AM_COMMON_FORWARD_PROXY_HOST, "");
+        proxyUser = properties.get(AM_COMMON_FORWARD_PROXY_USER, "");
+        proxyPassword = properties.get(AM_COMMON_FORWARD_PROXY_PASSWORD, "");
+        trustServerCerts = properties.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, true);
+        certFile = properties.get(AM_COMMON_CERT_FILE_PROPERTY, "");
+        keyFile = properties.get(AM_COMMON_CERT_KEY_PROPERTY, "");
+        caFile = properties.get(AM_COMMON_CERT_CA_FILE_PROPERTY, "");
+        cipherList = properties.get(AM_COMMON_CIPHERS_PROPERTY, "");
+    }
+    ssl_crypto_init();
+    return AM_SUCCESS;
 }
 
 am_status_t Connection::initialize_in_child_process(const Properties& properties) {
-    am_status_t status = AM_SUCCESS;
-    PRErrorCode errcode = 1;
-    SECStatus secStatus;
-
-    Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize_in_child_process() "
-            "Restarting PKCS #11 module");
-
-    SSL_InheritMPServerSIDCache(NULL);
-    
-    if (SECFailure == (secStatus = SECMOD_RestartModules(PR_FALSE))) {
-        errcode = PORT_GetError();
-        if (errcode != SEC_ERROR_NOT_INITIALIZED) {
-            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-                    "Could not restart TLS security modules: %d:%s",
-                    errcode, PR_ErrorToString(errcode, PR_LANGUAGE_I_DEFAULT));
-            status = AM_NSPR_ERROR;
-        }
-    }
-
-    std::string certDir = properties.get(AM_COMMON_SSL_CERT_DIR_PROPERTY, "");
-    std::string dbPrefix = properties.get(AM_COMMON_CERT_DB_PREFIX_PROPERTY, "");
-    unsigned long timeout = properties.getUnsigned(AM_COMMON_RECEIVE_TIMEOUT_PROPERTY, 0);
-    if (timeout > 0) {
-        receive_timeout = PR_MillisecondsToInterval(static_cast<PRInt32> (timeout));
-    }
-    unsigned long socket_timeout = properties.getUnsigned(AM_COMMON_CONNECT_TIMEOUT_PROPERTY, 0);
-    if (socket_timeout > 0) {
-        connect_timeout = PR_MillisecondsToInterval(static_cast<PRInt32> (socket_timeout));
-    } else {
-        connect_timeout = PR_INTERVAL_NO_TIMEOUT;
-    }
-    tcp_nodelay_is_enabled = properties.getBool(AM_COMMON_TCP_NODELAY_ENABLE_PROPERTY, false);
-
-    if (certDir.length() != 0) {
-        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize_in_child_process() "
-                "calling NSS_Initialize() with directory = \"%s\" and "
-                "prefix = \"%s\"", certDir.c_str(), dbPrefix.c_str());
-        secStatus = NSS_Initialize(certDir.c_str(), dbPrefix.c_str(),
-                dbPrefix.c_str(), "secmod.db",
-                NSS_INIT_READONLY | NSS_INIT_FORCEOPEN);
-    } else {
-        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize_in_child_process() "
-                "CertDir and dbPrefix EMPTY -- Calling NSS_NoDB_Init");
-        secStatus = NSS_NoDB_Init(NULL);
-    }
-
-    if (SECSuccess == secStatus) {
-        secStatus = NSS_SetDomesticPolicy();
-    }
-    
-    if (SECSuccess == secStatus) {
-        PK11_SetPasswordFunc(getPasswordFromArg);
-    }
-    if (secStatus != SECSuccess) {
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-                "Connection::initialize_in_child_process() unable to initialize SSL "
-                "libraries: %d", PR_GetError());
-        status = AM_NSPR_ERROR;
-    }
-    
-    return status;
-}
-
-am_status_t Connection::shutdown(void) {
-    SSL_ShutdownServerSessionIDCache();
-    NSS_Shutdown();
-    PR_Cleanup();
     return AM_SUCCESS;
 }
 
-am_status_t Connection::shutdown_in_child_process(void) {
-    SSL_ClearSessionCache();
-    NSS_Shutdown();
+am_status_t Connection::shutdown() {
+    ssl_crypto_shutdown();
     return AM_SUCCESS;
 }
 
-/**
- * Throws NSPRException upon NSPR error
- */
-PRFileDesc *Connection::createSocket(PRFileDesc *rawSocket, bool useSSL,
-        const std::string &certDBPasswd,
-        const std::string &certNickName,
-        bool alwaysTrustServerCert) {
-
-    PRSocketOptionData socket_opt;
-    PRStatus prStatus;
-    
-    if (static_cast<PRFileDesc *> (NULL) == rawSocket) {
-        throw NSPRException("Connection::createSocket", "PR_OpenTCPSocket");
-    }
-
-    if (tcp_nodelay_is_enabled) {
-        /* set the TCP_NODELAY option to disable Nagle algorithm */
-        socket_opt.option = PR_SockOpt_NoDelay;
-        socket_opt.value.no_delay = PR_TRUE;
-        prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
-        if (PR_SUCCESS != prStatus) {
-            throw NSPRException("Connection::createSocket", "PR_SetSocketOption");
-        }
-    }
-
-    /* turn off bind address checking, and allow port numbers to be reused */
-    socket_opt.option = PR_SockOpt_Reuseaddr;
-    socket_opt.value.reuse_addr = PR_TRUE;
-    prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
-    
-    socket_opt.option = PR_SockOpt_Nonblocking;
-    socket_opt.value.non_blocking = PR_FALSE;
-    prStatus = PR_SetSocketOption(rawSocket, &socket_opt);
-
-
-    PRFileDesc *sslSocket;
-    if (certDBPasswd.size() > 0) {
-        certdbpasswd = strdup(certDBPasswd.c_str());
-    }
-
-    if (useSSL) {
-        sslSocket = secureSocket(certDBPasswd, certNickName, alwaysTrustServerCert, rawSocket);
-    } else {
-        sslSocket = rawSocket;
-    }
-
-    return sslSocket;
-}
-
-/**
- * Performs SSL handshake on a TCP socket.
- */
-PRFileDesc *Connection::secureSocket(const std::string &certDBPasswd,
-	const std::string &certNickName,
-	bool alwaysTrustServerCert,
-	PRFileDesc *rawSocket) {
-	bool upgradeExisting = false;
-	// Use object's socket if none passed
-	if (rawSocket == static_cast<PRFileDesc *>(NULL)) {
-		rawSocket = socket;
-		upgradeExisting = true;
-	}
-	PRFileDesc *sslSocket = SSL_ImportFD(NULL, rawSocket);
-	if (static_cast<PRFileDesc *>(NULL) != sslSocket) {
-	    SECStatus secStatus = SECSuccess;
-	    const char *sslMethodName;
-	
-	    // In case there was any communication on the socket
-	    // before the upgrade we should call a reset
-	    if (upgradeExisting) {
-                sslMethodName = "SSL_ResetHandshake";
-                secStatus = SSL_ResetHandshake(sslSocket, false);
-	    }
-
-	    if (SECSuccess == secStatus) {
-                sslMethodName = "SSL_OptionSet";
-                {
-                    PRBool state;
-                    secStatus = SSL_OptionGet(sslSocket,SSL_SECURITY, &state);
-                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::secureSocket() " " SSL SSL_Security = %s",(state)?"true":"false");
-                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL3, &state);
-                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::secureSocket() " " SSL SSL_ENABLE_SSL3 = %s",(state)?"true":"false");
-                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL2, &state);
-                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::secureSocket() " " SSL SSL_ENABLE_SSL2 = %s",(state)?"true":"false");
-                }
-                secStatus = SSL_OptionSet(sslSocket, SSL_SECURITY, PR_TRUE);
-	    }
-
-	    if (SECSuccess == secStatus) {
-                secStatus = SSL_OptionSet(sslSocket,
-                                      SSL_HANDSHAKE_AS_CLIENT, PR_TRUE);
-                if (SECSuccess == secStatus && alwaysTrustServerCert) {
-                    sslMethodName = "SSL_AuthCertificateHook";
-                    secStatus = SSL_AuthCertificateHook(sslSocket, acceptAnyCert,
-                                                    NULL);
-                }
-
-                if (SECSuccess == secStatus && certDBPasswd.size() > 0) {
-                    sslMethodName = "SSL_SetPKCS11PinArg";
-                    secStatus = SSL_SetPKCS11PinArg(sslSocket, certdbpasswd);
-                }
-
-                if (SECSuccess == secStatus) {
-		    if (certNickName.size() > 0) {
-                        certnickname = strdup(certNickName.c_str());
-                    }
-                    sslMethodName = "SSL_GetClientAuthDataHook";
-                    secStatus = SSL_GetClientAuthDataHook(sslSocket,
-                                                   NSS_GetClientAuthData,
-                                                   static_cast<void *>(certnickname));
-                }
-
-                if (SECSuccess == secStatus) {
-                    sslMethodName = "SSL_HandshakeCallback";
-                    secStatus = SSL_HandshakeCallback(sslSocket,
-                                (SSLHandshakeCallback)finishedHandshakeHandler,
-                                 NULL);
-		}
-	    }
-
-	    if (SECSuccess != secStatus) {
-		PRErrorCode error = PR_GetError();
-
-		PR_Close(sslSocket);
-		throw NSPRException("Connection::secureSocket",
-				sslMethodName, error);
-	    }
-	} else {
-	    PRErrorCode error = PR_GetError();
-
-	    PR_Close(rawSocket);
-	    throw NSPRException("Connection::secureSocket", "SSL_ImportFD",
-				error);
-	}
-
-	socket = sslSocket;
-	return sslSocket;
-}
-
-/**
- * Throws NSPRException upon NSPR error
- */
-Connection::Connection(const ServerInfo& server,
-		       const std::string &certDBPasswd,
-		       const std::string &certNickName,
-		       bool alwaysTrustServerCert) 
-    : socket(NULL), certdbpasswd(NULL), certnickname(NULL)
-{
-    PRNetAddr address;
-    PRStatus	prStatus;
-    SECStatus	secStatus;
-    void *enumptr = NULL;
-    PRFileDesc *rawSocket = static_cast<PRFileDesc *> (NULL);
-
-    PRAddrInfo *addrinfo = PR_GetAddrInfoByName(server.getHost().c_str(), PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
-    if (addrinfo) {
-        while ((enumptr = PR_EnumerateAddrInfo(enumptr, addrinfo, server.getPort(), &address)) != NULL) {
-            if (address.raw.family == PR_AF_INET || address.raw.family == PR_AF_INET6) {
-                PR_InitializeNetAddr(PR_IpAddrNull, server.getPort(), &address);
-                rawSocket = PR_OpenTCPSocket(address.raw.family);
-                break;
-            }
-        }
-        PR_FreeAddrInfo(addrinfo);
-    } else {
-        PRErrorCode error = PR_GetError();
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "PR_GetAddrInfoByName() returned error: %s",
-                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-        throw NSPRException("Connection::Connection", "PR_GetAddrInfoByName", error);
-    }
-    
-    socket = createSocket(rawSocket, server.useSSL(),
-			  certDBPasswd,
-			  certNickName,
-			  alwaysTrustServerCert);
-
-    if (server.useSSL()) {
-	secStatus = SSL_SetURL(socket, server.getHost().c_str());
-	if (SECSuccess != secStatus) {
-	    PRErrorCode error = PR_GetError();
-
-	    PR_Shutdown(socket, PR_SHUTDOWN_BOTH);
-	    PR_Close(socket);
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		     "SSL_SetURL() returned error: %s",
-		     PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-	    throw NSPRException("Connection::Connection",
-				"SSL_SetURL", error);
-	}
-    }
-
-    prStatus = PR_Connect(socket, &address, connect_timeout);
-
-    if (prStatus != PR_SUCCESS) {
-	PRErrorCode error = PR_GetError();
-
-	PR_Shutdown(socket, PR_SHUTDOWN_BOTH);
-	PR_Close(socket);
-	throw NSPRException("Connection::Connection PR_Connect", "PR_Connect", error);
-    }
-}
-
-Connection::~Connection()
-{
-    if (static_cast<PRFileDesc *>(NULL) != socket) {
-	PR_Shutdown(socket, PR_SHUTDOWN_BOTH);
-	PRStatus prStatus = PR_Close(socket);
-	if(prStatus != PR_SUCCESS) {
-	    PRErrorCode error = PR_GetError();
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		     "Connection::~Connection(): NSPR Error "
-		     "while calling PR_Close(): %d.", error);
-	}
-	socket = static_cast<PRFileDesc *>(NULL);
-    }
-    if (NULL != certdbpasswd) {
-        free(certdbpasswd);
-        certdbpasswd = NULL;
-    }
-    if (NULL != certnickname) {
-        free(certnickname);
-        certnickname = NULL;
-    }
-}
-
-am_status_t Connection::sendData(const char *data, std::size_t len)
-{
-    am_status_t status = AM_SUCCESS;
-
-    if (static_cast<const char *>(NULL) != data) {
-	if (0 == len) {
-	    len = std::strlen(data);
-	}
-
-	// The NSPR code only allows passing a PRInt32 to specify the amount
-	// of data to be sent.  A std::size_t can specify more than that
-	// amount, especially on a 64-bit machine, so we put the
-	// PR_Write call into a loop.
-
-	PR_SetConcurrency(4);
-
-	while (len > 0) {
-	    PRInt32 bytesToWrite;
-	    PRInt32 bytesWritten;
-
-	    if (len > static_cast<std::size_t>(MAX_READ_WRITE_LEN)) {
-		bytesToWrite = MAX_READ_WRITE_LEN;
-	    } else {
-		bytesToWrite = static_cast<PRInt32>(len);
-	    }
-
-	    bytesWritten = PR_Write(socket, data, bytesToWrite);
-	    if (bytesWritten < 0) {
-		status = AM_NSPR_ERROR;
-		break;
-	    }
-	    data += bytesWritten;
-	    len -= static_cast<std::size_t>(bytesWritten);
-	}
-    } else {
-	status = AM_INVALID_ARGUMENT;
-    }
-
-    return status;
-}
-
-am_status_t Connection::receiveData(char *buffer, std::size_t& bufferLen)
-{
-    am_status_t status = AM_SUCCESS;
-
-    if (static_cast<const char *>(NULL) != buffer && bufferLen > 0) {
-	status = read(buffer, bufferLen);
-    } else {
-	status = AM_INVALID_ARGUMENT;
-    }
-
-    return status;
-}
-
-am_status_t Connection::waitForReply(char *&reply, std::size_t& receivedLen,
-					std::size_t bufferLen)
-{
-    reply = NULL;	// Make sure that this field is initialized.
-    return waitForReply(reply, 0, bufferLen, receivedLen);
-}
-
-am_status_t Connection::waitForReply(char *&buffer,
-					std::size_t bufferLen,
-					std::size_t totalBytesRead,
-					std::size_t& receivedLen)
-{
-    am_status_t status = AM_SUCCESS;
-
-    if (static_cast<char *>(NULL) == buffer || 0 == bufferLen) {
-	if (0 == bufferLen) {
-	    bufferLen = DEFAULT_BUFFER_LEN;
-	}
-	totalBytesRead = 0;	// Ignore any value that was passed in.
-	buffer = new (std::nothrow) char[bufferLen];
-    }
-
-    if (static_cast<char *>(NULL) != buffer) {
-	std::size_t bytesToRead = bufferLen - totalBytesRead;
-
-	status = read(&buffer[totalBytesRead], bytesToRead);
-	while (status == AM_SUCCESS && bytesToRead > 0) {
-	    totalBytesRead += bytesToRead;
-	    bytesToRead = bufferLen - totalBytesRead;
-	    if (bytesToRead <= MIN_BYTES_TO_READ) {
-		// If the new buffer size is smaller than the INCREMENT_LEN
-		// we grow the buffer by doubling the size.  If the current
-		// size is less than the INCREMENT_LEN, but the new size is
-		// greater than we use INCREMENT_LEN as the new buffer size,
-		// otherwise add INCREMENT_LEN.  The order of the tests is
-		// rearranged from the prose to reflect the expected
-		// probability of each situation occurring.
-		if ((2 * bufferLen) <= INCREMENT_LEN) {
-		    bufferLen *= 2;
-		} else if (bufferLen >= INCREMENT_LEN) {
-		    bufferLen += INCREMENT_LEN;
-		} else {
-		    bufferLen = INCREMENT_LEN;
-		}
-
-		buffer = growBuffer(buffer, totalBytesRead, bufferLen);
-		if (static_cast<char *>(NULL) == buffer) {
-		    status = AM_NO_MEMORY;
-		    break;
-		}
-
-		bytesToRead = bufferLen - totalBytesRead;
-	    }
-
-	    status = read(&buffer[totalBytesRead], bytesToRead);
-	}
-
-	if (AM_SUCCESS == status) {
-	    if (totalBytesRead == bufferLen) {
-		buffer = growBuffer(buffer, totalBytesRead,
-				    totalBytesRead + 1);
-		if (static_cast<char *>(NULL) == buffer) {
-		    status = AM_NO_MEMORY;
-		}
-	    }
-
-	    if (AM_SUCCESS == status) {
-		buffer[totalBytesRead] = '\0';
-		receivedLen = totalBytesRead;
-	    }
-	} 
-    } else {
-	status = AM_NO_MEMORY;
-    }
-
-    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
-	     "Connection::waitForReply(): returns with status %s.",
-	     am_status_to_string(status));
-
-    return status;
-}
-
-char *Connection::growBuffer(char *oldBuffer, std::size_t oldBufferLen,
-			     std::size_t newBufferLen)
-{
-    char *newBuffer = new (std::nothrow) char[newBufferLen];
-
-    if (static_cast<char *>(NULL) != newBuffer) {
-	std::memcpy(newBuffer, oldBuffer, oldBufferLen);
-    }
-    delete[] oldBuffer;
-
-    return newBuffer;
-}
-
-am_status_t Connection::read(char *buffer, std::size_t& bufferLen)
-{
-    am_status_t status = AM_SUCCESS;
-    PRInt32 bytesRead;
-    PRInt32 bytesToRead;
-
-    if (bufferLen > static_cast<std::size_t>(MAX_READ_WRITE_LEN)) {
-	bytesToRead = MAX_READ_WRITE_LEN;
-    } else {
-	bytesToRead = static_cast<PRInt32>(bufferLen);
-    }
-
-    bytesRead = PR_Recv(socket, buffer, bytesToRead, 0, receive_timeout);
-    if (bytesRead < 0) {
-	status = AM_NSPR_ERROR;
-	PRErrorCode error = PR_GetError();
-	Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		 "Connection::read(): NSPR Error while reading data:%d", 
-		 PR_GetError());
-	if (error == PR_IO_TIMEOUT_ERROR || error == PR_CONNECT_RESET_ERROR ||
-	    error == PR_CONNECT_REFUSED_ERROR ||
-            error == PR_NETWORK_DOWN_ERROR ||
-            error == PR_NETWORK_UNREACHABLE_ERROR || 
-            error == PR_HOST_UNREACHABLE_ERROR) {
-                throw NSPRException("Connection::read()", "PR_Recv");
-	}
-    } else {
-	bufferLen = static_cast<std::size_t>(bytesRead);
-    }
-
-    return status;
+am_status_t Connection::shutdown_in_child_process() {
+    return AM_SUCCESS;
 }

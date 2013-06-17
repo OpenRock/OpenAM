@@ -25,11 +25,13 @@
  * $Id: policy_entry.h,v 1.4 2008/06/25 08:14:34 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef __POLICY_ENTRY_H__
 #define __POLICY_ENTRY_H__
 #include <stdexcept>
-#include <nspr.h>
 #include <am_map.h>
 #include <am_policy.h>
 #include "mutex.h"

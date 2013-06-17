@@ -32,7 +32,7 @@
 #ifndef AM_WEB_H
 #define AM_WEB_H
 
-#if (defined(WINNT) || defined(_AMD64_))
+#ifdef _MSC_VER
 #if defined(AM_BUILDING_LIB)
 #define AM_WEB_EXPORT __declspec(dllexport)
 #else
@@ -970,8 +970,7 @@ AM_WEB_EXPORT boolean_t am_web_is_max_debug_on();
 
 AM_WEB_EXPORT void am_web_log_always(const char *fmt, ...);
 AM_WEB_EXPORT boolean_t am_web_log_auth(am_web_access_t access_type, 
-                                        const char *fmt, 
-                                        void* agent_config, ...);
+                                        void* agent_config, const char *fmt, ...);
 AM_WEB_EXPORT void am_web_log_error(const char *fmt, ...);
 AM_WEB_EXPORT void am_web_log_warning(const char *fmt, ...);
 AM_WEB_EXPORT void am_web_log_info(const char *fmt, ...);

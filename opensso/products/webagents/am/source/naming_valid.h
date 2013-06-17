@@ -69,10 +69,7 @@ private:
 public:
 
     NamingValidateHttp(const char *url, const Properties &props) : BaseService("NamingValidateHttp",
-    props,
-    props.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, ""),
-    props.get(AM_AUTH_CERT_ALIAS_PROPERTY, ""),
-    props.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, true)),
+    props),
     service(url), properties(props) {
     }
 
@@ -82,7 +79,7 @@ public:
     am_status_t validate_url(int *hsts) {
         am_status_t status = AM_FAILURE;
         Http::Response response;
-        status = doHttpGet(service, "", Http::CookieList(), response, 1024, properties.get(AM_AUTH_CERT_ALIAS_PROPERTY, ""));
+        status = doHttpGet(service, "", Http::CookieList(), response);
         *hsts = response.getStatus();
         return status;
     }
@@ -96,15 +93,11 @@ private:
     std::string passwd;
     std::string org;
     std::string module;
-    std::string certalias;
 
 public:
 
     NamingValidateHttpLogin(const char *url, const Properties &props) : BaseService("NamingValidateHttpLogin",
-    props,
-    props.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, ""),
-    props.get(AM_AUTH_CERT_ALIAS_PROPERTY, ""),
-    props.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, true)),
+    props),
     service(url), properties(props) {
         const std::string namingservice("/namingservice");
         const std::string authservice("/authservice");
@@ -121,7 +114,6 @@ public:
         passwd = properties.get(AM_POLICY_PASSWORD_PROPERTY, "");
         org = properties.get(AM_POLICY_ORG_NAME_PROPERTY, "/");
         module = properties.get(AM_POLICY_MODULE_NAME_PROPERTY, "Application");
-        certalias = properties.get(AM_AUTH_CERT_ALIAS_PROPERTY, "");
     }
 
     virtual ~NamingValidateHttpLogin() {
@@ -138,7 +130,7 @@ public:
         snprintf(req, sizeof (req), req_one, org.c_str());
         /* post for NewAuthContext */
         bodyChunkList.push_back(BodyChunk(std::string(req)));
-        status = doHttpPost(service, "", Http::CookieList(), bodyChunkList, response, 8192, certalias);
+        status = doHttpPost(service, "", Http::CookieList(), bodyChunkList, response);
         if (AM_SUCCESS == status && Http::OK == response.getStatus()) {
             tmp.assign(response.getBodyPtr());
             pos = tmp.find("authIdentifier=\"", pos);
@@ -152,7 +144,7 @@ public:
                 memset(req, 0, sizeof (req));
                 snprintf(req, sizeof (req), req_two, authIdentifier.c_str(), module.c_str());
                 bodyChunkList.push_back(BodyChunk(std::string(req)));
-                status = doHttpPost(service, "", Http::CookieList(), bodyChunkList, response, 8192, certalias);
+                status = doHttpPost(service, "", Http::CookieList(), bodyChunkList, response);
                 if (AM_SUCCESS == status && Http::OK == response.getStatus()) {
                     tmp.assign(response.getBodyPtr());
                     if (tmp.find("Callbacks length=\"2\"") != std::string::npos) {
@@ -161,7 +153,7 @@ public:
                         memset(req, 0, sizeof (req));
                         snprintf(req, sizeof (req), req_three, authIdentifier.c_str(), uid.c_str(), passwd.c_str());
                         bodyChunkList.push_back(BodyChunk(std::string(req)));
-                        status = doHttpPost(service, "", Http::CookieList(), bodyChunkList, response, 8192, certalias);
+                        status = doHttpPost(service, "", Http::CookieList(), bodyChunkList, response);
                         if (AM_SUCCESS == status && Http::OK == response.getStatus()) {
                             tmp.assign(response.getBodyPtr());
                             if (tmp.find("LoginStatus status=\"success\"") != std::string::npos) {
@@ -170,7 +162,7 @@ public:
                                 memset(req, 0, sizeof (req));
                                 snprintf(req, sizeof (req), req_logout, authIdentifier.c_str());
                                 bodyChunkList.push_back(BodyChunk(std::string(req)));
-                                doHttpPost(service, "", Http::CookieList(), bodyChunkList, response, 8192, certalias);
+                                doHttpPost(service, "", Http::CookieList(), bodyChunkList, response);
                             } else {
                                 status = AM_AUTH_FAILURE;
                                 am_web_log_always("NamingValidateHttpLogin() response:\n%s", response.getBodyPtr());

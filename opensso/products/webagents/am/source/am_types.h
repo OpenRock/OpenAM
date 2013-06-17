@@ -37,7 +37,7 @@
 #ifndef AM_TYPES_H
 #define AM_TYPES_H
 
-#if (defined(WINNT) || defined(_AMD64_))
+#if defined(_MSC_VER)
 #if defined(AM_BUILDING_LIB)
 #define	AM_EXPORT __declspec(dllexport)
 #else
@@ -63,19 +63,19 @@
 
 AM_BEGIN_EXTERN_C
 
-#if defined(WINNT) || defined(_AMD64_) || defined(LINUX) || defined(HPUX)
+#if defined(_MSC_VER) || defined(LINUX) || defined(HPUX)
 #include <sys/stat.h>     /* for time_t */
 typedef enum { 
-    B_FALSE, 
+    B_FALSE = 0, 
     B_TRUE 
 } boolean_t;
 #else 
 #include <sys/types.h>   /* for time_t and boolean_t */
-#endif /* WINNT */
+#endif
 
 #if defined(AIX)
 typedef enum {
-    B_FALSE=0,
+    B_FALSE = 0,
     B_TRUE
 } booleant;
 #endif

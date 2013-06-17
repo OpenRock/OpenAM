@@ -1,3 +1,28 @@
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,7 +35,6 @@
 #include <in6addr.h>
 #include <ws2tcpip.h>
 #define strtok_r strtok_s
-#pragma comment(lib, "ws2_32.lib")
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -25,6 +49,7 @@ static uint8_t one6[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 static uint8_t one4[16] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 #ifdef _MSC_VER
+
 int inet_pton(int af, const char *src, void *dst) {
     struct sockaddr_storage ss;
     int size = sizeof (ss);
@@ -91,7 +116,7 @@ static void shiftlr(uint8_t *r, uint8_t *o, size_t size) {
 
 static void shiftr(uint8_t *o, size_t size) {
     int index;
-    int re = size - 1;
+    int re = (int) size - 1;
     for (index = re; index >= 0; index--) {
         uint8_t carryFlag = (o[index] & 0x01) > 0 ? 1 : 0;
         if (index < re) if (carryFlag == 1) o[index + 1] = (o[index + 1] | 0x80);

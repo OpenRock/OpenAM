@@ -66,7 +66,7 @@ namespace {
     const unsigned long DEFAULT_AGENT_CONFIG_POLLING_INTERVAL = 60;
     const unsigned long DEFAULT_AGENT_CONFIG_CLEANUP_INTERVAL = 30;
     const unsigned long DEFAULT_AUDIT_LOG_POLLING_INTERVAL = 5;
-    const PRUint32 DEFAULT_MAX_THREADS = 10;
+    const std::size_t DEFAULT_MAX_THREADS = 10;
     const char *DEFAULT_SESSION_USER_ID_PARAM = "UserToken";
     const char *DEFAULT_LDAP_USER_ID_PARAM = "entrydn";
 }
@@ -177,15 +177,9 @@ Service::Service(const char *svcName,
       auditLog(NULL),
       lock(),
       namingSvcInfo(svcParams.get(AM_COMMON_NAMING_URL_PROPERTY)),
-		    alwaysTrustServerCert(
-                        svcParams.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY,
-					  false)),
       authSvc(svcParams),
       authCtx(),
-      namingSvc(svcParams,
-                svcParams.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-                svcParams.get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-                alwaysTrustServerCert),
+      namingSvc(svcParams),
       policySvc(NULL),
       mSSOTokenSvc(*(get_sso_token_service())) {
 
@@ -398,10 +392,7 @@ Service::initialize() {
 
     policySvc = new PolicyService(
 		    mPolicyEntry->getSSOToken(),
-		    svcParams,
-		    svcParams.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-                    svcParams.get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-		    alwaysTrustServerCert);
+		    svcParams);
 
 	policySvc->sendNotificationMsg(false,
 			mPolicyEntry->namingInfo.getPolicySvcInfo(),
@@ -439,10 +430,7 @@ Service::initialize() {
             new LogService(mPolicyEntry->namingInfo.getLoggingSvcInfo(),
             mPolicyEntry->getSSOToken(),
             mPolicyEntry->cookies, remoteLogName,
-            svcParams,
-                          svcParams.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-                          svcParams.get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-            alwaysTrustServerCert);
+            svcParams);
 
 
     Log::setRemoteInfo(newLogSvc);
@@ -490,7 +478,7 @@ Service::initialize() {
     initialized = true;
     isLocalRepo = false;
     Log::log(logID, Log::LOG_MAX_DEBUG,
-	     "Service communication with finished successfully.");
+	     "Service communication with server finished successfully.");
     return;
 }
 
@@ -531,7 +519,7 @@ Service::do_agent_auth_login(SSOToken& ssoToken)
 
 
     std::vector<am_auth_callback_t>& callbacks = authC.getRequirements();
-    int nCallbacks = callbacks.size();
+    int nCallbacks = (int) callbacks.size();
     if (nCallbacks > 0) {
 	bool userNameIsSet = false;
 	bool passwdIsSet = false;
@@ -935,12 +923,12 @@ Service::setRemUserAndAttrs(am_policy_result_t *policy_res,
                          char dataStr[50];
                          if (!strcmp(sessionKey.c_str(),"maxtime")) {
                              retVal = (time_t)(sessionInfo.getMaxSessionTime());
-                             PR_snprintf(dataStr, 50, "%ld", retVal);
+                             snprintf(dataStr, sizeof(dataStr), "%ld", retVal);
                              std::string tmpStr(dataStr);
                              sessionValue = tmpStr;
                         } else if (!strcmp(sessionKey.c_str(),"maxidle")) {
                             retVal = (time_t)(sessionInfo.getMaxIdleTime());
-                            PR_snprintf(dataStr, 50, "%ld", retVal);
+                            snprintf(dataStr, sizeof(dataStr), "%ld", retVal);
                             std::string tmpStr(dataStr);
                             sessionValue = tmpStr;
                         } else {
@@ -1120,8 +1108,7 @@ Service::setRemUserAndAttrs(am_policy_result_t *policy_res,
                                         }
                                 }
                             }
-                            if ((!tmpValue.empty() > 0) && 
-                                (!responseValue.empty() > 0)) {
+                            if (!tmpValue.empty() && !responseValue.empty()) {
 				// Clear the old value so that we replace
 				// it with the new values
                                 response_attributes_map.erase(responseAttr);
@@ -1209,13 +1196,9 @@ Service::getPolicyResult(const char *userSSOToken,
 	throw InternalException(func,
 		"rsrcTraits.canonicalize(...) did not suceeed.", AM_FAILURE);
     } else {
-	resName = c_res;
-#if (defined (_AMD64_))
-    free(c_res);
-#else
-	rsrcTraits.str_free(c_res);
-#endif
-	c_res = NULL;
+        resName = c_res;
+        free(c_res);
+        c_res = NULL;
     }
 
     string agent_logout_url="";
@@ -1940,7 +1923,11 @@ Service::reinitialize() {
         Log::log(logID, Log::LOG_WARNING,
                 "This thread waiting for initialization to complete.");
         while (initialized == false && ++counter < 6) {
-            PR_Sleep(PR_TicksPerSecond());
+#ifdef _MSC_VER
+            SleepEx(1000, FALSE);
+#else
+            sleep(1);
+#endif
         }
     }
 }

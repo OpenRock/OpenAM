@@ -251,12 +251,9 @@ am_properties_get_with_default(am_properties_t properties,
  * boolean values, then AM_INVALID_VALUE will be returned.
  */
 AM_EXPORT am_status_t
-am_properties_get_boolean(am_properties_t properties, const char *key,
-			     int *value_ptr);
-AM_EXPORT am_status_t
 am_properties_get_boolean_with_default(am_properties_t properties,
-					  const char *key, int default_value,
-					  int *value_ptr);
+					  const char *key, am_bool_t default_value,
+					  am_bool_t *value_ptr);
 
 /*
  * Value stored in value_ptr:

@@ -192,13 +192,10 @@ Portions Copyrighted 2010 - 2013 ForgeRock Inc
     <target name="varnish" depends="preparebuild, scratch">
         <zip file="${webagents.dist.dir}/${containername}_v303_${build.os}${build.type.suffix}_agent_${agentversion}.zip" whenempty="create">  
             <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/bin/" includes="agentadmin"/>
-            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/extlib/${build.os.ext}/nss${build.type.suffix}/bin/" includes="certutil"/>
             <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
             <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
-            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/lib/" includes="**/*.so*"/>
-            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/lib/" includes="**/*.chk"/>
-            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.built.dir}/${build.os.ext}/lib/" includes="libamsdk.so.3"/>
-            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.built.dir}/${build.os.ext}/lib/" includes="libvmod_am.so"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/lib/" includes="**/libapr*.so*"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
             <zipfileset prefix="web_agents/varnish" dir="${webagents.basedir}/legal/" includes="license.txt"/>
         </zip>
         <checksum file="${webagents.dist.dir}/${containername}_v303_${build.os}${build.type.suffix}_agent_${agentversion}.zip"

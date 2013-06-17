@@ -108,18 +108,13 @@ protected:
     };
 
     BaseService(const std::string& name,
-            const Properties& props,
-            const std::string &cert_passwd,
-            const std::string &cert_nick_name,
-            bool alwaysTrustServerCert);
+            const Properties& props);
     virtual ~BaseService() = 0;
 
     am_status_t doHttpGet(const ServiceInfo& service,
 			  const std::string& uriParameters,
 			  const Http::CookieList& cookieList,
 			  Http::Response& response,
-			  std::size_t initialBufferLen = 0,
-			  const std::string &cert_name_name = "", 
 			  const ServerInfo** serverInfo = NULL) const;
 
     am_status_t doHttpPost(const ServiceInfo& service,
@@ -127,8 +122,6 @@ protected:
 			   const Http::CookieList& cookieList,
 			   const BodyChunkList& bodyChunks,
 			   Http::Response& response,
-			   std::size_t initialBufferLen = 0,
-			   const std::string &cert_nick_name = "",
 			   bool doFormPost = false,
 			   bool checkHTTPRetCode = true,
 			   const ServerInfo** serverInfo = NULL) const;
@@ -150,17 +143,7 @@ private:
 
     static IdType getNextGlobalRequestId();
     IdType getNextServiceRequestId();
-
-    am_status_t sendChunk(Connection& conn, const BodyChunk& chunk) const
-    {
-	am_status_t retVal = AM_SUCCESS;
-	
-	if (chunk.data.size() > 0) {
-	    retVal = conn.sendData(chunk.data.c_str(), chunk.data.size());
-	}
-	return retVal;
-    }
-
+    
     am_status_t sendRequest(Connection& conn,
 			    const BodyChunk& headerPrefix,
 			    const std::string& uri,
@@ -178,8 +161,6 @@ private:
 			  const BodyChunk& headerSuffix,
 			  const BodyChunkList& bodyChunkList,
 			  Http::Response& response,
-			  std::size_t initialBufferLen,
-			  const std::string &cert_nick_name,
 			  const ServerInfo** serverInfo) const;
 
     static Mutex classLock;
@@ -187,10 +168,7 @@ private:
 
     Mutex objLock;
     IdType serviceRequestId;
-    std::string certDBPasswd;
-    std::string certNickName;
     std::string poll_primary_server;
-    bool alwaysTrustServerCert;
     
     /* proxy parameters */
     bool useProxy;

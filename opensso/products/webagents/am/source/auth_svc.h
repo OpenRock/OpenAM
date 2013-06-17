@@ -27,7 +27,7 @@
  */ 
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #ifndef __AUTH_SVC_H__
@@ -97,7 +97,6 @@ class AuthService: public BaseService {
  private:
     friend void PRIVATE_NAMESPACE_NAME::auth_cleanup(); 
     Log::ModuleId logID;
-    std::string cdbPasswd; // read from properties
     std::string orgName; // read from properties
     std::string namingURL; // read from properties
     Http::CookieList cookieList; // read from auth context requests

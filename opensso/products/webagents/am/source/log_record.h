@@ -25,13 +25,16 @@
  * $Id: log_record.h,v 1.4 2008/08/04 19:22:12 huacui Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef LOG_RECORD_H
 #define LOG_RECORD_H
 
 #include <string>
 #include <iostream>
 #include <map>
-#include <prprf.h>
 #include "internal_macros.h"
 #include "properties.h"
 #include "sso_token.h"

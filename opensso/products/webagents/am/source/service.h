@@ -105,7 +105,6 @@ class Service {
 
     Mutex lock;
     ServiceInfo namingSvcInfo;
-    bool alwaysTrustServerCert;
     AuthService authSvc;
     AuthContext authCtx;               // Agent's auth context
     NamingService namingSvc;
@@ -142,8 +141,8 @@ class Service {
                        const std::list<std::string> &,
                        Properties &);
 
-    bool do_update_policy(const SSOToken &ssoTok, const string &resName,
-		       const string &actionName,
+    bool do_update_policy(const SSOToken &ssoTok, const std::string &resName,
+		       const std::string &actionName,
 		       const KeyValueMap &env,
                        SessionInfo &sessionInfo,
 		       policy_fetch_scope_t scope,
@@ -173,7 +172,7 @@ class Service {
     public:
 	PolicyHandler(Service &svc,
 		      const std::string &rName,
-		      NotificationType type):resName(rName),
+		      NotificationType type): ThreadFunction("PolicyHandler"), resName(rName),
 					     nType(type),
 					     service(svc){}
 

@@ -25,6 +25,10 @@
  * $Id: crypt_util.c,v 1.7 2008/06/25 08:14:31 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -312,7 +316,7 @@ decode_base64(const char *c, char *p) {
     unsigned char in_arr[4] = {0, 0, 0, 0};
     unsigned short numeq = 0;
 
-    len = strlen(c);
+    len = (int) strlen(c);
     i = len;
     px = -1;
     loop = len;
@@ -424,7 +428,7 @@ int encrypt_base64(const char *password, char *enc_passwd,
 
     char buffer[7] = "";
     rc5_ctx c;
-    int passwordlen = 0;
+    size_t passwordlen = 0;
     int outlen = 0;
     
     buffer[0] = key[0];
@@ -444,7 +448,7 @@ int encrypt_base64(const char *password, char *enc_passwd,
         rc5_init(&c, 12);
         rc5_key(&c, (u_char *)buffer, 7);
 
-        outlen = rc5_encrypt(&c, (u_char *)password, passwordlen + 1);
+        outlen = rc5_encrypt(&c, (u_char *)password, (int) passwordlen + 1);
         encode_base64(password, outlen, enc_passwd);
 
         rc5_destroy(&c);

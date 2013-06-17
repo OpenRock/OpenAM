@@ -25,8 +25,9 @@
  * $Id: xml_attribute.cpp,v 1.3 2008/06/25 08:14:41 qcheng Exp $
  *
  */ 
-
-#include <libxml/tree.h>
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include "xml_attribute.h"
 #include "xml_utilities.h"

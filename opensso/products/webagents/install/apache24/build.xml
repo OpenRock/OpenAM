@@ -114,7 +114,9 @@
         </zip>
         <checksum file="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
             algorithm="SHA" fileext=".sha" />
-            
+        
+        <delete file="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" quiet="true"/>
+        <echo file="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js">document.write("${nightly.date}");</echo>
 
     </target>
 
@@ -132,8 +134,6 @@
                     <include name="libamapc24.so"/>
             </fileset>
         </copy>
-        <copy file="${webagents.am.src.dir}/libamsdk.so.3"
-            tofile="${container.web_agent.lib.dir}/libamsdk.so.3"/>
     </target>
 
     <target name="copy-SunOS_x86-library">
@@ -142,8 +142,6 @@
                     <include name="libamapc24.so"/>
             </fileset>
         </copy>
-        <copy file="${webagents.am.src.dir}/libamsdk.so.3"
-            tofile="${container.web_agent.lib.dir}/libamsdk.so.3"/>
     </target>
 
     <target name="copy-HP-UX-library">
@@ -191,8 +189,6 @@
                     <include name="libamapc24.so"/>
             </fileset>
         </copy>
-        <copy file="${webagents.am.src.dir}/libamsdk.so.3"
-            tofile="${container.web_agent.lib.dir}/libamsdk.so"/>
     </target>
 
 

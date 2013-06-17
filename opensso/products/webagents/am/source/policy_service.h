@@ -25,6 +25,10 @@
  * $Id: policy_service.h,v 1.4 2008/06/25 08:14:35 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef POLICY_SERVICE_H
 #define POLICY_SERVICE_H
 
@@ -52,10 +56,7 @@ class PolicyService: public BaseService {
 public:
     /* Throws std::invalid_argument if any argument is invalid */
     PolicyService(const SSOToken& agentToken, 
-                const Properties& props,
-                const std::string &cert_passwd,
-                const std::string &cert_nick_name,
-                bool alwaysTrustServerCert);
+                const Properties& props);
     virtual ~PolicyService();
 
     am_status_t getPolicyDecisions(const ServiceInfo& service,

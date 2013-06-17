@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+# Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -9,108 +9,113 @@
 # compliance with the License.
 #
 # You can obtain a copy of the License at
-# https://opensso.dev.java.net/public/CDDLv1.0.html or
-# opensso/legal/CDDLv1.0.txt
+# http://forgerock.org/license/CDDLv1.0.html
 # See the License for the specific language governing
 # permission and limitations under the License.
-# 
+#
 # When distributing Covered Code, include this CDDL
 # Header Notice in each file and include the License file
-# at opensso/legal/CDDLv1.0.txt.
+# at http://forgerock.org/license/CDDLv1.0.html
 # If applicable, add the following below the CDDL Header,
 # with the fields enclosed by brackets [] replaced by
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-#
-# Top level makefile for the Agent Pack.
-#
-#
 
-override BUILD_MODULE := USERX_ROOT
-USERX_ROOT := .
-include $(USERX_ROOT)/arch/components.mk
+# make options:
+#  64=1 builds 64bit binary
+#  DEBUG=1 builds debug version of binary
 
+AGENT_MAJOR_VER := 3
+AGENT_MINOR_VER := 2
+AGENT_MICRO_VER := 0
+AGENT_RELEASE_NAME := SNAPSHOT
+
+AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER).$(AGENT_MICRO_VER)-$(AGENT_RELEASE_NAME)
+OS_ARCH := $(shell uname -s)
+OS_MARCH = $(shell uname -m)
+BUILD_DATE := $(shell date)
+SVN_REVISION := $(shell svn info . | grep Revision:)
+BUILD_MACHINE := constable.internal.forgerock.com
 BUILD_DATE_JS := $(shell date +%Y%m%d)
-	
-#
-# Make sure that the local copies of the components are populated before
-# doing the main part of the build.
-#
 
-SUBDIRS := am/source agents/source
+CFLAGS = -g -Iam/source/
 
-ifeq ($(OS_ARCH), WINNT)
-   AM_LIB_PREFIX :=
-   NSS_LIB_PREFIX :=
-   NSS_EXE_SUFFIX := .exe
-   LIB_XML_SUFFIX :=
+ifdef 64
+ CFLAGS += -m64
+ LDFLAGS = 
+ ARCH = _64
 else
-   AM_LIB_PREFIX := lib
-   NSS_LIB_PREFIX := lib
-   NSS_EXE_SUFFIX :=
-   LIB_XML_SUFFIX := .2
+ CFLAGS += -m32 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+ LDFLAGS = 
+ ARCH = 
 endif
 
-all: all_subdirs $(DEST_DROP_DIR)/$(DSAME_DROP_FILE) 
-
-clean: clean_subdirs
-	$(RM) .version
-	$(RM) .copyReleaseNotes
-	$(RM) -r $(DEST_DIR)
-
-drop: $(DEST_DROP_DIR)/$(DSAME_DROP_FILE)
-
-$(DEST_DROP_DIR)/$(DSAME_DROP_FILE): $(DEST_PACKAGE_DIR) 
-	$(ECHO) Making Target $(DSAME_DROP_FILE)
-	$(MKDIR) $(DEST_DROP_DIR)
-ifeq ($(OS_ARCH), WINNT)
-	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
-	zip -r ../../../../$@.zip *
-else
 ifeq ($(OS_ARCH), Linux)
-	# DSAME_DROP_FILE on linux takes the form of rpms which makes 
-	# the name inconsistent with other platforms. 
-	# release wants consistent name for all platforms, so use 
-	# DSAME_DROP_FILE_NAME instead of just DSAME_DROP_FILE for Linux. 
-	cd $(DEST_PACKAGE_SCRATCH_DIR)/common; \
-	$(TAR) cvf ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar *; \
-	gzip -f ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar; \
-	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../../$(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME)_build_date.js
-else
-ifeq ($(OS_ARCH), HP-UX)
-	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
-	$(TAR) cvf ../../../../$@.tar *; \
-	gzip -f ../../../../$@.tar; \
-	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../../$@_build_date.js
-else
-ifeq ($(OS_ARCH), AIX)
-	cd $(DEST_PACKAGE_SCRATCH_DIR)/SUNWamcom; \
-	zip -r ../../../../$@.zip * ;\
-	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../../$@_build_date.js
-else
-
-	cd $(DEST_PACKAGE_SCRATCH_DIR); \
-	$(TAR) cvf ../../../$@.tar is_csdk; \
-	gzip -f ../../../$@.tar; \
-	$(ECHO) 'document.write("${BUILD_DATE_JS}");' > ../../../$@_build_date.js
-endif
-endif
-endif
+ OS_MARCH =
 endif
 
-make_zip:
-ifdef BUILD_SHIP
-ifeq ($(OS_ARCH), WINNT)
-	$(CP) $(DEST_DROP_DIR)/$(DSAME_DROP_FILE).zip $(BUILD_SHIP)
-else
+CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/libxml2$(ARCH)/include/libxml2 -Iextlib/$(OS_ARCH)$(OS_MARCH)/pcre$(ARCH)/include/
+EXT_LIBS = extlib/$(OS_ARCH)$(OS_MARCH)/pcre$(ARCH)/lib/libpcre.a
+
+WIN_SRC=am/source/connection_win.cpp am/source/xml_attribute_win.cpp am/source/xml_element_win.cpp am/source/xml_tree_win.cpp
+
+SDKSRCS=$(filter-out $(WIN_SRC), $(wildcard am/source/*.cpp))
+SDKOBJS=$(SDKSRCS:.cpp=.o)
+CSRCS=$(wildcard am/source/*.c)
+COBJS=$(CSRCS:.c=.o)
+APA20SRCS=$(wildcard agents/source/apache/*.c)
+APA20OBJS=$(APA20SRCS:.c=.o)
+APA22SRCS=$(wildcard agents/source/apache22/*.c)
+APA22OBJS=$(APA22SRCS:.c=.o)
+APA24SRCS=$(wildcard agents/source/apache24/*.c)
+APA24OBJS=$(APA24SRCS:.c=.o)
+OIWSSRCS=$(wildcard agents/source/sjsws/*.c)
+OIWSOBJS=$(OIWSSRCS:.c=.o)
+OPSSRCS=$(wildcard agents/source/proxy40/*.c)
+OPSOBJS=$(OPSSRCS:.c=.o)
+VRNSHSRCS=$(wildcard agents/source/varnish/*.c)
+VRNSHOBJS=$(VRNSHSRCS:.c=.o)
+
+$(APA20OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
+$(APA22OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache22/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
+$(APA24OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache24/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
+$(VRNSHOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/varnish$(ARCH)/include -Iagents/source/varnish -DVARNISH303
+$(OIWSOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/sjsws/include -DXP_UNIX
+$(OPSOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/proxy40/include -DXP_UNIX
+
 ifeq ($(OS_ARCH), Linux)
-	$(CP) $(DEST_DROP_DIR)/$(DSAME_DROP_FILE_NAME).tar.gz $(BUILD_SHIP)
+ include Makefile.linux.mk
 else
-	$(CP) $(DEST_DROP_DIR)/$(DSAME_DROP_FILE).tar.gz $(BUILD_SHIP)
-endif
-endif
-	$(CP) $(DEST_PACKAGE_DIR)/agent_$(OS_ARCH)* $(BUILD_SHIP)
+ include Makefile.solaris.mk
 endif
 
-include $(USERX_ROOT)/arch/rules.mk
+%.o: %.cpp
+	@echo "[*** Compiling "$<" ***]"
+	$(CXX) -c $(CFLAGS) $< -o $@
+
+%.o: %.c
+	@echo "[*** Compiling "$<" ***]"
+	$(CC) -c $(CFLAGS)  $< -o $@
+
+
+version:
+	@echo "[***** Updating version.h *****]"
+	sed -e 's%BUILD_DATE%$(DATE)%g' \
+	   -e 's%BUILD_MACHINE%$(BUILD_MACHINE)%g' \
+	   -e 's%SVN_REVISION%$(SVN_REVISION)%g' \
+	   -e 's%AGENT_VER%$(AGENT_VER)%g' \
+	   -e 's%AGENT_ER_VER%%g' \
+           -e 's%AGENT_FVB_MARKER%%g' < am/source/version.template > am/source/version.h
+
+all: version libamsdk_static libamsdk apache20i apache22i apache24i varnishi oiwsi oipsi
+
+apache: version libamsdk_static libamsdk apache20i
+apache22: version libamsdk_static libamsdk apache22i
+apache24: version libamsdk_static libamsdk apache24i
+sjsws: version libamsdk_static libamsdk oiwsi
+proxy40: version libamsdk_static libamsdk oipsi
+varnish: version libamsdk_static libamsdk varnishi
+
+clean:
+	rm -fr built am/source/version.h am/source/*.o agents/source/apache22/*.o agents/source/apache/*.o agents/source/proxy40/*.o agents/source/sjsws/*.o agents/source/apache24/*.o agents/source/apache/*.so agents/source/apache22/*.so agents/source/apache24/*.so agents/source/varnish/*.so agents/source/varnish/*.o am/source/*.so am/source/*.so.3 am/source/*.a am/source/crypt_util

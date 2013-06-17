@@ -39,11 +39,6 @@
 #include <algorithm>
 #include <list>
 #include <stdexcept>
-
-#include <prtime.h>
-#include <prinrval.h>
-#include <prtypes.h>
-
 #include "internal_macros.h"
 #include "ref_cnt_ptr.h"
 #include "scope_lock.h"
@@ -70,8 +65,8 @@ class HashTable {
 public:
     typedef RefCntPtr<Element> ElementType;
 
-    HashTable(PRUint32 numBuckets,
-	      PRUint32 entryLifeTimeInMins);
+    HashTable(unsigned int numBuckets,
+	      unsigned long entryLifeTimeInMins);
 
     ~HashTable();
 
@@ -110,7 +105,7 @@ private:
     class Entry: public RefCntObj {
     public:
 	Entry(const std::string& str, const ElementType &entry,
-	      PRTime lifeTime) : expirationTime(lifeTime),
+	      time_t lifeTime) : expirationTime(lifeTime),
 				 key(str), value(entry)
 	{
 	}
@@ -133,7 +128,7 @@ private:
 	    return *this;
 	}
 
-	PRTime getExpirationTime() const
+	time_t getExpirationTime() const
 	{
 	    return expirationTime;
 	}
@@ -153,7 +148,7 @@ private:
 	    return value;
 	}
 
-	void setExpirationTime(PRTime newExpirationTime)
+	void setExpirationTime(time_t newExpirationTime)
 	{
 	    expirationTime = newExpirationTime;
 	}
@@ -164,7 +159,7 @@ private:
 	}
 
     private:
-	PRTime expirationTime;
+	time_t expirationTime;
 	std::string key;
 	ElementType value;
     };
@@ -182,8 +177,8 @@ private:
 
 	void cleanup() {
 	    ScopeLock myLock(lock);
-	    PRTime now = PR_Now();
-	    PRTime ticks = PR_TicksPerSecond() * FUDGE_FACTOR;
+	    time_t now = time(0);
+	    time_t ticks = 1000 * FUDGE_FACTOR;
 	    typename std::list<EntryType>::iterator iter;
 	    for(iter = elements.begin(); iter != elements.end();) {
 		if((*iter)->getExpirationTime() + ticks < now) {
@@ -284,7 +279,7 @@ private:
 	std::list<EntryType> elements;
     };
 
-    typedef PRUint32 HashValueType;
+    typedef unsigned long HashValueType;
 
     HashTable(const HashTable& rhs); // not implemented
     HashTable& operator=(const HashTable& rhs);	// not implemented
@@ -293,16 +288,16 @@ private:
     EntryType findEntry(const std::string& key);
     EntryType findEntry_cac(const std::string& key);
 
-    const PRUint32 numBuckets;
-    PRTime entryLifeTime;
+    const unsigned int numBuckets;
+    time_t entryLifeTime;
     Bucket *buckets;
 };
 
 template<class Element>
-HashTable<Element>::HashTable(PRUint32 numberOfBuckets,
-			      PRUint32 entryLifeTimeInMins)
+HashTable<Element>::HashTable(unsigned int numberOfBuckets,
+			      unsigned long entryLifeTimeInMins)
     : numBuckets(Utils::get_prime(numberOfBuckets)),
-      entryLifeTime(entryLifeTimeInMins * PR_USEC_PER_SEC * 60),
+      entryLifeTime(entryLifeTimeInMins * 1000 * 60),//PR_USEC_PER_SEC
       buckets(NULL)
 {
     if (numBuckets == 0) {
@@ -346,7 +341,7 @@ HashTable<Element>::findEntry(const std::string& key)
     HashValueType bucketNumber = computeHash(key);
     const EntryType &entry = buckets[bucketNumber].find(key);
 
-    if (entry && entry->getExpirationTime() < PR_Now()) {
+    if (entry && entry->getExpirationTime() < time(0)) {
         #if defined(LINUX) 
 	return (typename HashTable<Element>::EntryType)NULL;
         #else
@@ -414,10 +409,10 @@ HashTable<Element>::insert(const std::string& key,
     if (entry) {
 	oldValue = entry->getValue();
 	entry->setValue(newValue);
-	entry->setExpirationTime(PR_Now() + entryLifeTime);
+	entry->setExpirationTime(time(0) + entryLifeTime);
     } else {
 	buckets[bucketNumber].insert(EntryType(new Entry(key, newValue,
-							 PR_Now() +
+							 time(0) +
 							 entryLifeTime)));
     }
 

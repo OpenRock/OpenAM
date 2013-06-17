@@ -24,14 +24,15 @@
  *
  * $Id: nspr_exception.h,v 1.3 2008/06/25 08:14:33 qcheng Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef NSPR_EXCEPTION_H
 #define NSPR_EXCEPTION_H
 
 #include <exception>
-
-#include <prerror.h>
-
 #include "internal_macros.h"
 
 BEGIN_PRIVATE_NAMESPACE
@@ -39,7 +40,7 @@ BEGIN_PRIVATE_NAMESPACE
 class NSPRException: public std::exception {
 public:
     NSPRException(const char *method, const char *nsprOperation,
-		  PRErrorCode errorCode = PR_GetError()) throw()
+		  int errorCode = 0) throw()
 	: std::exception(), throwingMethod(method), nsprMethod(nsprOperation),
 	  nsprError(errorCode)
     { }
@@ -57,12 +58,12 @@ public:
 
     const char *getNsprMethod() const { return nsprMethod; }
 
-    PRErrorCode getErrorCode() const { return nsprError; }
+    int getErrorCode() const { return nsprError; }
 
 private:
     const char *throwingMethod;
     const char *nsprMethod;
-    PRErrorCode nsprError;
+    int nsprError;
 };
 
 END_PRIVATE_NAMESPACE

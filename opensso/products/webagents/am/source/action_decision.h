@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: action_decision.h,v 1.3 2008/06/25 08:14:22 qcheng Exp $
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __ACTION_DECISION_H__
 #define __ACTION_DECISION_H__
 #include <list>
 #include <string>
-#include <prtime.h>
-
 #include "ref_cnt_ptr.h"
 #include "key_value_map.h"
 #include "utils.h"
@@ -39,7 +41,7 @@ BEGIN_PRIVATE_NAMESPACE
 class ActionDecision:public RefCntObj {
  private:
     std::string actionName;
-    PRTime timeToLive;
+    time_t timeToLive;
     std::list<std::string> values;
     KeyValueMap advices;
     ActionDecision();
@@ -55,12 +57,12 @@ class ActionDecision:public RefCntObj {
 	return advices;
     }
 
-    ActionDecision(std::string &, PRTime);
+    ActionDecision(std::string &, time_t);
     virtual ~ActionDecision();
 
     bool addActionValues(XMLElement &);
 
-    inline PRTime getTimeStamp() const { return timeToLive; }
+    inline time_t getTimeStamp() const { return timeToLive; }
 
     inline void addAdvice(XMLElement &avp) {
 	advices.insert(avp);

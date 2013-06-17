@@ -215,11 +215,7 @@ extern "C" am_status_t am_log_set_remote_info(const char *rem_log_url,
 	    LogService *newLogSvc =
 		new LogService(ServiceInfo(rem_log_url),
 			ssoToken,
-			Http::CookieList(), rem_log_name, *prop,
-                        (*prop).get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-			(*prop).get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-			(*prop).getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY,
-					false));
+			Http::CookieList(), rem_log_name, *prop);
 	    Log::setRemoteInfo(newLogSvc);
 	}
 	catch (InternalException& ex) {

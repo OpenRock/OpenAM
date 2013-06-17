@@ -25,9 +25,8 @@
  * $Id: agent_profile_service.cpp,v 1.23 2009/08/07 21:08:24 subbae Exp $
  *
  */
-
 /*
- * Portions Copyrighted 2010 - 2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 /*
@@ -38,11 +37,7 @@
 * 4. Agent logout
 */
 
-#include <prlock.h>
-#include <prnetdb.h>
-#include <prmem.h>
-#include <prtime.h>
-#include <prprf.h>
+#include <string>
 #include "agent_profile_service.h"
 #include "xml_tree.h"
 #include "http.h"
@@ -56,7 +51,6 @@
 
 
 USING_PRIVATE_NAMESPACE
-#define READ_INIT_BUF_LEN 1024
 #define EXCEPTION "exception"
 
 
@@ -78,18 +72,11 @@ extern smi::SSOTokenService *get_sso_token_service();
 
 AgentProfileService::AgentProfileService(const Properties& config, 
                                          Utils::boot_info_t boot_info_prop)
-    : BaseService("Agent Profile Service",
-                config,
-                config.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, ""),
-                config.get(AM_AUTH_CERT_ALIAS_PROPERTY, ""),
-                config.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, false)),
+    : BaseService("Agent Profile Service", config),
       agentAuthnd(false),
       mNamingServiceURL(config.get(AM_COMMON_NAMING_URL_PROPERTY, "")),
       mNamingServiceInfo(mNamingServiceURL),
-      mNamingService(config,
-                config.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-                config.get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-                config.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, false))
+      mNamingService(config)
 {
     /*
       * Instantiate AgentConfigCache 
@@ -340,14 +327,11 @@ am_status_t AgentProfileService::fetchAndUpdateAgentConfigCacheInternal
     const char *thisfunc = "fetchAndUpdateAgentConfigCache()";
     am_properties_t properties;
     am_status_t status;
-//    am_status_t authStatus = AM_FAILURE;
     std::string userName(boot_info.agent_name);
     std::string passwd(boot_info.agent_passwd);
     std::string sharedAgentProfileName(boot_info.shared_agent_profile_name);
     std::string realmName(boot_info.realm_name);
     const char* agentConfigFile = boot_info.agent_config_file;
-//    const Properties& propPtr =
-//        *reinterpret_cast<Properties *>(boot_info.properties);
 
     if (getRepoType() == LOCAL_CONFIG) {
         am_properties_create(&properties);
@@ -479,7 +463,6 @@ am_status_t AgentProfileService::getAgentAttributes(
 {
     am_status_t status = AM_FAILURE;
     Http::Response response;
-    std::string certName;
     std::string::size_type pos;
 
     std::string encodedAgentToken = Http::encode(appSSOToken);
@@ -507,8 +490,7 @@ am_status_t AgentProfileService::getAgentAttributes(
     }
     
     status =  doHttpGet(mRestSvcInfo, urlParams, Http::CookieList(),
-                        response, READ_INIT_BUF_LEN,
-                        certName);
+                        response);
     if(status == AM_SUCCESS) {
         std::string xmlResponse(response.getBodyPtr());
         pos = xmlResponse.find(EXCEPTION,0);
@@ -831,7 +813,7 @@ am_status_t AgentProfileService::agentLogin()
         authSvc.login(authC, AM_AUTH_INDEX_MODULE_INSTANCE, moduleName);
 
         std::vector<am_auth_callback_t>& callbacks = authC.getRequirements();
-        int nCallbacks = callbacks.size();
+        int nCallbacks = (int) callbacks.size();
         if (nCallbacks > 0) {
             bool userNameIsSet = false;
             bool passwdIsSet = false;
@@ -1092,7 +1074,7 @@ bool AgentProfileService::isListMapProperty(const char* propName) {
 */
 void AgentProfileService::setEncodedAgentSSOToken(std::string appSSOToken) {
     char* encodedAppSSOTokenString = NULL;
-    string tmpTokenString = "token:";
+    std::string tmpTokenString = "token:";
     tmpTokenString.append(appSSOToken);
     encodedAppSSOTokenString = (char *)
         malloc(((tmpTokenString.size() * 4/3 + 1)/4 + 1)*4 + 4);
@@ -1155,8 +1137,9 @@ am_status_t AgentProfileService::validateAgentSSOToken() {
                  "%s: Unknown exception encountered.");
         sts = AM_FAILURE;
     }
-    if(sessionInfo != NULL) {
-        delete sessionInfo;
-    }
+
+    delete sessionInfo;
+    sessionInfo = NULL;
+    
     return sts;
 }

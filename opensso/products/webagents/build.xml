@@ -236,7 +236,7 @@
         <property name="containername" value="iis6"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
-              target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
     </target>
 
     <target name="iis7" depends="preparebuild" if="iis.build.ok">
@@ -244,15 +244,74 @@
         <property name="containername" value="iis7"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
-              target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
     </target>
 
-    <target name="gmake">
+    <condition property="build.debug32">
+        <and>
+            <equals arg1="${build.debug}" arg2="full"/> 
+            <not> 
+                <equals arg1="${build.type}" arg2="64"/>
+            </not> 
+        </and>
+    </condition>
+
+    <condition property="build.debug64">
+        <and>
+            <equals arg1="${build.debug}" arg2="full"/> 
+            <equals arg1="${build.type}" arg2="64"/> 
+        </and>
+    </condition>
+
+    <condition property="build.nondebug32">
+        <and>
+            <not>
+                <equals arg1="${build.debug}" arg2="full"/> 
+            </not>
+            <not> 
+                <equals arg1="${build.type}" arg2="64"/>
+            </not> 
+        </and>
+    </condition>
+
+    <condition property="build.nondebug64">
+        <and>
+            <not>
+                <equals arg1="${build.debug}" arg2="full"/> 
+            </not>
+            <equals arg1="${build.type}" arg2="64"/>
+        </and>
+    </condition>
+    
+    <target name="gmake" depends="gmake1,gmake2,gmake3,gmake4">
         <echo message="Dispatch to compile of agent c code"/>
+    </target>
+    
+    <target name="gmake1" if="build.debug32">
         <exec executable="gmake" failonerror="true">
-            <arg value="BUILD_DEBUG=${build.debug}" />
-            <arg value="BUILD_AGENT=${containername}" />
-            <arg value="BUILD_TYPE=${build.type}" />
+            <arg value="DEBUG=1" />
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <target name="gmake2" if="build.debug64">
+        <exec executable="gmake" failonerror="true">
+            <arg value="64=1" />
+            <arg value="DEBUG=1" />
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <target name="gmake3" if="build.nondebug32">
+        <exec executable="gmake" failonerror="true">
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <target name="gmake4" if="build.nondebug64">
+        <exec executable="gmake" failonerror="true">
+            <arg value="64=1" />
+            <arg value="${containername}" />
         </exec>
     </target>
 
@@ -267,7 +326,7 @@
         <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
               tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
-                  tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
               tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
@@ -279,10 +338,6 @@
         <copy file="${webagents.basedir}/agents/source/varnish/build_date.js.template"
               tofile="${webagents.dist.dir}/varnish_v303_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <antcall target="all" inheritRefs="true"/>
-<!--
-        <copy file="${webagents.docs.dir}/nightly.html" 
-              tofile="${webagents.dist.dir}/index.html" filtering="true" />
--->
         <antcall target="postnightly" inheritRefs="true"/>
     </target>
 

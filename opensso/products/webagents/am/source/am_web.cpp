@@ -29,24 +29,21 @@
 /*
  * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
-
+#ifdef _MSC_VER
+#include <ws2tcpip.h>
+#endif
+#include <sstream>
 #include <ctype.h>
 #include <stdio.h>
-#if (!defined(WINNT) && !defined(_AMD64_))
-#include <iconv.h>
+#ifndef _MSC_VER
 #include <langinfo.h>
+#include <dlfcn.h>
 #endif
 #include <string.h>
 #include <string>
 #include <set>
 #include <errno.h>
-
-#include <prlock.h>
-#include <prnetdb.h>
-#include <prmem.h>
-#include <prtime.h>
 #include <time.h>
-
 #include "http.h"
 #include "am_web.h"
 #include "am_policy.h"
@@ -68,52 +65,23 @@
 
 #include <locale.h>
 
-#if	(defined(WINNT) || defined(_AMD64_))
-#if(!defined(_AMD64_))
-#define _X86_
-#endif
-#include <windef.h>
-#include <winbase.h>
-#include <winuser.h>
-#include <winnls.h>
+#ifdef _MSC_VER
 #include <windows.h>
-#if	!defined(strncasecmp)
-#if defined(_AMD64_)
-#define stricmp _stricmp
-#define strnicmp _strnicmp
-#endif
-#define	strncasecmp	strnicmp
-#define	strcasecmp	stricmp
-#endif
-
-#if     !defined(snprintf)
-#define snprintf        _snprintf
-#endif
-#else /* WINNT */
+#include <winsock.h>
+#include <intrin.h>
+#else 
 #include <unistd.h>
-#endif /* WINNT */
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
 
 #if	!defined(FALSE)
 #define FALSE	0
 #endif
 #if	!defined(TRUE)
 #define TRUE	1
-#endif
-
-#if defined _MSC_VER
-#include <winsock.h>
-#include <intrin.h>
-#if !defined(snprintf)
-#define snprintf _snprintf
-#endif
-#if !defined(strtok_r)
-#define strtok_r strtok_s
-#endif
-typedef unsigned __int32 uint32_t;
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #endif
 
 #include "agent_configuration.h"
@@ -297,8 +265,8 @@ static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string>
             al[als] = strdup(str.c_str());
             als++;
         }
-        int r = ip_match(ip, (const char **) al, list->size(), am_web_log_info);
-        release_char_list(al, list->size());
+        int r = ip_match(ip, (const char **) al, (unsigned int) list->size(), am_web_log_info);
+        release_char_list(al, (unsigned int) list->size());
         return r > 0 ? B_TRUE : B_FALSE;
     }
     return B_FALSE;
@@ -336,10 +304,10 @@ void populate_am_resource_traits(am_resource_traits_t &rsrcTraits,
 
 void encode_url( const char *orig_url, char *dest_url)
 {
-    int i, ucnt;
+    int ucnt;
     char p_enc = '%';
     char buffer[4];
-    for(i=0; i < strlen(orig_url); i++) {
+    for(size_t i=0; i < strlen(orig_url); i++) {
 	ucnt = orig_url[i];
 	if (( ucnt >  32) && ( ucnt < 127))  {
 	   strncat(dest_url, &orig_url[i], 1);
@@ -354,111 +322,135 @@ void encode_url( const char *orig_url, char *dest_url)
     strncat(dest_url, buffer, strlen(buffer));
 }
 
-void getFullQualifiedHostName(const am_map_t env_parameter_map,
-			      PRNetAddr *address,
-			      PRHostEnt *hostEntry)
-{
-    char* hostName;
-    int i = 0;
-    PRUint16 port = 0;
-    char* alias;
-    PRIntn hostIndex = PR_EnumerateHostEnt(0, hostEntry, port, address);
+#if defined(_MSC_VER)
 
-    if (hostIndex >= 0) {
-	hostName = hostEntry->h_name;
+void mbyte_to_wchar(const char * orig_str,char *new_str, int dest_len) {
+    size_t orgStrLen = strlen(orig_str);
 
-	if (hostName) {
-	    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-		"getFullQualifiedHostName: map_insert: "
-		"hostname=%s", hostName);
-	    am_map_insert(env_parameter_map, 
-                requestDnsName,
-		hostName, 
-                AM_FALSE);
-	}
-
-	alias = hostEntry->h_aliases[i++];
-	while (alias) {
-	    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-		"getFullQualifiedHostName: map_insert: "
-		"alias=%s", alias);
-	    am_map_insert(env_parameter_map, 
-                requestDnsName,
-		alias, 
-                AM_FALSE);
-	    alias = hostEntry->h_aliases[i++];
-	}
+    WCHAR * wszNew_Value = (WCHAR *) calloc(1, (orgStrLen + 2) * sizeof (WCHAR));
+    if (wszNew_Value != NULL) {
+        size_t uniSize = orgStrLen + 2;
+        MultiByteToWideChar(CP_UTF8, 0, orig_str, -1, wszNew_Value, (int) uniSize);
     }
-}
-
-#if (defined(WINNT) || defined(_AMD64_))
-void mbyte_to_wchar(const char * orig_str,char *new_str, int dest_len)
-{
-    int orgStrLen = strlen (orig_str);
-
-    WCHAR * wszNew_Value = (WCHAR *) malloc ((orgStrLen+2)*sizeof (WCHAR) );
-    if (wszNew_Value != NULL ){
-	int uniSize = orgStrLen+2;
-	/* Initialize this array to zero so that we can treat as NULL
-	 * terminated String of wide char and use it in WideCharToMultiByte
-         */
-	for (int i=0; i<uniSize; i++) {
-	    wszNew_Value[i]=0;
-	}
-	(void)MultiByteToWideChar(CP_UTF8,0,orig_str,-1,wszNew_Value,uniSize);
-    }
-    (void)WideCharToMultiByte(CP_ACP, 0, wszNew_Value, -1, new_str, dest_len,
-			      NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, wszNew_Value, -1, new_str, dest_len,
+            NULL, NULL);
     free(wszNew_Value);
 }
-#else
-void mbyte_to_wchar(const char * orig_str,char *dest_str,int dest_len)
-{
-#if defined(LINUX) || defined(HPUX) || defined(AIX)
-    char *origstr = const_cast<char *>(orig_str);
-#else
-    const char *origstr = orig_str;
-#endif
-#if defined(HPUX) || defined(AIX) || defined(SOLARIS_64)
-    unsigned long len = strlen(origstr);
-    unsigned long size=0 ;
-#else
-    unsigned int len = strlen(origstr);
-    unsigned int size=0 ;
-#endif
+
+#elif defined(LINUX) && !defined(__sun)
+
+typedef void *iconv_t;
+static iconv_t(* am_iconv_open) (const char *tocode, const char *fromcode);
+static size_t(* am_iconv) (iconv_t cd, const char **inbuf, size_t *inbytesleft,
+        char **outbuf, size_t *outbytesleft);
+static int (* am_iconv_close) (iconv_t cd);
+static void *iconv_lib;
+
+static void load_libiconv() {
+    iconv_lib = dlopen("libiconv.so", RTLD_LAZY | RTLD_GLOBAL);
+    if (iconv_lib) {
+        am_iconv_open = (void*(*)(const char*, const char*))dlsym(iconv_lib, "iconv_open");
+        if (am_iconv_open) {
+            am_iconv = (size_t(*)(void*, const char**, size_t*, char**, size_t*))dlsym(iconv_lib, "iconv");
+        }
+        if (am_iconv) {
+            am_iconv_close = (int(*)(void*))dlsym(iconv_lib, "iconv_close");
+        }
+    }
+    if (!iconv_lib || !am_iconv_open || !am_iconv || !am_iconv_close) {
+        am_iconv_open = NULL;
+        am_iconv = NULL;
+        am_iconv_close = NULL;
+        if (iconv_lib) {
+            dlclose(iconv_lib);
+        }
+    }
+}
+
+extern "C" void libiconv_close() {
+    if (iconv_lib) {
+        dlclose(iconv_lib);
+    }
+}
+
+void mbyte_to_wchar(const char * orig_str, char *dest_str, int dest_len) {
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    char *origstr = const_cast<char *> (orig_str);
+    size_t len = strlen(origstr);
+    size_t size = 0;
 
     size = dest_len;
     memset(dest_str, 0, dest_len);
     char * native_encoding = nl_langinfo(CODESET);
     Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
-	"i18n using native encoding %s.", native_encoding);
-    iconv_t encoder = iconv_open(native_encoding,  "UTF-8" );
-    if (encoder == (iconv_t)-1) {
-	 /*
-	  * iconv_open failed
-	  */
-	 Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
-		  "iconv_open failed");
-	 strcpy(dest_str, origstr);
-     } else {
-	/* Perform iconv conversion */
-	Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
-		 "i18n b4 convlen = %d  size = %d", len, size);
-#if defined(LINUX_64) || defined(LINUX)
-	int ret = iconv(encoder, &origstr, (size_t*)&len, &dest_str, (size_t*)&size);
-#else
-	int ret = iconv(encoder, &origstr, &len, &dest_str, &size);
-#endif
-	Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
-		 "i18n len = %d  size = %d", len, size);
-	if (ret < 0) {
-	    Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
-		     "iconv conversion failed" );
-	    strcpy(dest_str, origstr);
-	}
-	iconv_close(encoder);
+            "i18n using native encoding %s.", native_encoding);
+    pthread_once(&once, load_libiconv);
+    if (!am_iconv_open || !am_iconv || !am_iconv_close) {
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG, "mbyte_to_wchar(): failed to load iconv library");
+        strcpy(dest_str, origstr);
+        return;
+    }
+    iconv_t encoder = am_iconv_open(native_encoding, "UTF-8");
+    if (encoder == (iconv_t) - 1) {
+        /*
+         * iconv_open failed
+         */
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "mbyte_to_wchar(): iconv_open failed");
+        strcpy(dest_str, origstr);
+    } else {
+        /* Perform iconv conversion */
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "i18n b4 convlen = %d  size = %d", len, size);
+        const char **s = (const char **) &origstr;
+        int ret = am_iconv(encoder, s, (size_t*) & len, &dest_str, (size_t*) & size);
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "i18n len = %d  size = %d", len, size);
+        if (ret < 0) {
+            Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                    "iconv conversion failed");
+            strcpy(dest_str, origstr);
+        }
+        am_iconv_close(encoder);
     }
 }
+#else
+
+#include <iconv.h>
+
+void mbyte_to_wchar(const char * orig_str, char *dest_str, int dest_len) {
+    char *origstr = const_cast<char *> (orig_str);
+    size_t len = strlen(origstr);
+    size_t size = dest_len;
+    memset(dest_str, 0, dest_len);
+    char * native_encoding = nl_langinfo(CODESET);
+    Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+            "i18n using native encoding %s.", native_encoding);
+    iconv_t encoder = iconv_open(native_encoding, "UTF-8");
+    if (encoder == (iconv_t) - 1) {
+        /*
+         * iconv_open failed
+         */
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "mbyte_to_wchar(): iconv_open failed");
+        strcpy(dest_str, origstr);
+    } else {
+        /* Perform iconv conversion */
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "i18n b4 convlen = %d  size = %d", len, size);
+        const char **s = (const char **) &origstr;
+        int ret = iconv(encoder, s, &len, &dest_str, &size);
+        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                "i18n len = %d  size = %d", len, size);
+        if (ret < 0) {
+            Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
+                    "iconv conversion failed");
+            strcpy(dest_str, origstr);
+        }
+        iconv_close(encoder);
+    }
+}
+
 #endif
 
 /**
@@ -471,49 +463,23 @@ static am_bool_t is_server_alive(const Utils::url_info_t *info_ptr,
             (AgentConfigurationRefCntPtr*) agent_config;
 
     am_bool_t status = AM_FALSE;
-    PRNetAddr address;
-    PRStatus prStatus;
 
-    void *enumptr = NULL;
-    PRFileDesc *tcpSocket = static_cast<PRFileDesc *> (NULL);
-    unsigned timeout = 2;
+    std::string empty;
+    std::ostringstream sstm;
+    sstm << info_ptr->protocol << "://" << info_ptr->host << ":" << info_ptr->port << "/";
 
-    PRAddrInfo *addrinfo = PR_GetAddrInfoByName(info_ptr->host, PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
-    if (addrinfo) {
-        while ((enumptr = PR_EnumerateAddrInfo(enumptr, addrinfo, info_ptr->port, &address)) != NULL) {
-            if (address.raw.family == PR_AF_INET || address.raw.family == PR_AF_INET6) {
-                PR_InitializeNetAddr(PR_IpAddrNull, info_ptr->port, &address);
-                tcpSocket = PR_OpenTCPSocket(address.raw.family);
-                break;
-            }
-        }
-        PR_FreeAddrInfo(addrinfo);
+    Connection::ConnHeaderMap emptyHdrs;
+    ServerInfo si(sstm.str());
+    Connection conn(si);
+    am_status_t stat = conn.sendRequest("HEAD", empty, emptyHdrs, empty);
+    int http_status = conn.httpStatusCode();
+
+    if (stat == AM_SUCCESS) {
+        status = AM_TRUE;
+        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "is_server_alive(): returned success (HTTP %d)", http_status);
     } else {
-        PRErrorCode error = PR_GetError();
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "is_server_alive(): PR_GetAddrInfoByName returned error: %s",
-                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-        return status;
-    }
-
-    if (static_cast<PRFileDesc *> (NULL) != tcpSocket) {
-        timeout = (unsigned) ((*agentConfigPtr)->connection_timeout) > 0 ? (unsigned) ((*agentConfigPtr)->connection_timeout) : timeout;
-        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
-                "is_server_alive(): connection timeout set to %d", timeout);
-        prStatus = PR_Connect(tcpSocket, &address, PR_SecondsToInterval(timeout));
-        if (PR_SUCCESS == prStatus) {
-            Log::log(boot_info.log_module, Log::LOG_DEBUG, "is_server_alive(): returned success");
-            status = AM_TRUE;
-        } else {
-            PRErrorCode error = PR_GetError();
-            Log::log(boot_info.log_module, Log::LOG_ERROR, "is_server_alive(): PR_Connect returned error: %s",
-                    PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
-        }
-        PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
-        PR_Close(tcpSocket);
-    } else {
-        PRErrorCode error = PR_GetError();
-        Log::log(boot_info.log_module, Log::LOG_ERROR, "is_server_alive(): PR_OpenTCPSocket returned error: %s",
-                PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "is_server_alive(): returned error (HTTP %d, status: %s)",
+                http_status, am_status_to_string(stat));
     }
 
     return status;
@@ -561,7 +527,7 @@ static Utils::url_info_t *find_active_login_server(const char *request_url, void
     Utils::url_info_list_t *url_list = NULL;
 
     if (initialized == AM_TRUE) {
-        PR_Lock((*agentConfigPtr)->lock);
+        (*agentConfigPtr)->lock->lock();
 
         if ((*agentConfigPtr)->cdsso_enable) {
             url_list = &(*agentConfigPtr)->cdsso_server_url_list;
@@ -613,7 +579,7 @@ static Utils::url_info_t *find_active_login_server(const char *request_url, void
             }
         } 
 
-        PR_Unlock((*agentConfigPtr)->lock);
+        (*agentConfigPtr)->lock->unlock();
     } else {
         am_web_log_error("find_active_login_server(): "
                 "Library not initialized.");
@@ -634,7 +600,7 @@ static Utils::url_info_t *find_active_logout_server(void* agent_config)
     Utils::url_info_list_t *url_list = NULL;
 
     if(initialized == AM_TRUE) {
-	PR_Lock((*agentConfigPtr)->lock);
+	(*agentConfigPtr)->lock->lock();
 
     url_list = &(*agentConfigPtr)->logout_url_list;
 
@@ -651,7 +617,7 @@ static Utils::url_info_t *find_active_logout_server(void* agent_config)
 	    result = &url_list->list[i];
 	}
 
-	PR_Unlock((*agentConfigPtr)->lock);
+	(*agentConfigPtr)->lock->unlock();
     } else {
 	am_web_log_error("find_active_logout_server(): "
 			 "Library not initialized.");
@@ -810,7 +776,7 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
     return status;
 }
 
-#if defined(WINNT)
+#ifdef _MSC_VER
 extern "C" AM_WEB_EXPORT DWORD
 am_web_get_iis_filter_priority(void* agent_config) {
 
@@ -913,8 +879,8 @@ am_agent_init(boolean_t* pAgentInitialized)
     SSOToken ssoToken;
     AgentConfigurationRefCntPtr* agentConfigPtr;
     void* agent_config;
-    string userName(boot_info.agent_name);
-    string passwd(boot_info.agent_passwd);
+    std::string userName(boot_info.agent_name);
+    std::string passwd(boot_info.agent_passwd);
     const Properties& propPtr =
         *reinterpret_cast<Properties *>(boot_info.properties);
 
@@ -1085,7 +1051,7 @@ am_web_init(const char *agent_bootstrap_file,
                         nvld = NULL;
                         return AM_FAILURE;
                     }
-                    for (int i = 0; i < boot_info.naming_url_list.size; i++) {
+                    for (unsigned int i = 0; i < boot_info.naming_url_list.size; i++) {
                         /* default.url.set contains fail-over order;
                          * will keep internal value list ordered 
                          **/
@@ -1156,7 +1122,7 @@ static int match(const char *subject, const char *pattern) {
     if (subject == NULL || pattern == NULL) return 0;
     x = pcre_compile(pattern, 0, &error, &erroroffset, NULL);
     if (x != NULL) {
-        rc = pcre_exec(x, NULL, subject, strlen(subject),
+        rc = pcre_exec(x, NULL, subject, (int) strlen(subject),
                 0, 0, offsets, 3);
         if (rc < 0) {
             am_web_log_debug("match(): result code: %d %s", rc, (rc == -1 ? "(no match)" : ""));
@@ -1343,43 +1309,34 @@ am_bool_t in_not_enforced_list(URL &urlObj,
 }
 
 void set_host_ip_in_env_map(const char *client_ip,
-			    const am_map_t env_parameter_map,
-                            void* agent_config)
-{
+        const am_map_t env_parameter_map, void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
+    
+    struct addrinfo hints, *res = NULL;
+    char client_host[NI_MAXHOST];
+    socklen_t slen;
 
-
-    PRStatus prStatus;
-    PRNetAddr address;
-    PRHostEnt hostEntry;
-    char buffer[PR_NETDB_BUF_SIZE];
-
-    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-	     "set_host_ip_in_env_map: map_insert: "
-	     "client_ip=%s", client_ip);
     am_map_insert(env_parameter_map, requestIp, client_ip, AM_TRUE);
 
-    if ((*agentConfigPtr)->getClientHostname) {
-	prStatus = PR_StringToNetAddr(client_ip, &address);
-	if (PR_SUCCESS == prStatus) {
-	    prStatus = PR_GetHostByAddr(
-		&address, buffer, sizeof(buffer), &hostEntry);
+    memset(&hints, 0, sizeof (hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
 
-	    if (PR_SUCCESS == prStatus) {
-		// this function will log info about the client's hostnames
-		// so no need to do it here.
-		getFullQualifiedHostName(
-		    env_parameter_map, &address, &hostEntry);
-	    }
-	}
-	else {
-	    am_web_log_warning("set_host_ip_in_env_map: map_insert: "
-			       "could not get client's hostname for policy. "
-			       "Error %s.",
-			       PR_ErrorToString(PR_GetError(),
-					        PR_LANGUAGE_I_DEFAULT));
-	}
+    if ((*agentConfigPtr)->getClientHostname && client_ip != NULL) {
+        int errcode = getaddrinfo(client_ip, NULL, &hints, &res);
+        if (errcode == 0) {
+            while (res) {
+                slen = res->ai_family == AF_INET ? sizeof (struct sockaddr_in) : sizeof (struct sockaddr_in6);
+                errcode = getnameinfo((struct sockaddr *) res->ai_addr, slen,
+                        client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
+                if (errcode == 0) {
+                    am_map_insert(env_parameter_map, requestDnsName, client_host, AM_FALSE);
+                }
+                res = res->ai_next;
+            }
+            freeaddrinfo(res);
+        }
     }
 }
 
@@ -1455,7 +1412,7 @@ am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_
     if (dec_assertion != NULL) tmp1 = strchr(dec_assertion, '=');
     if ((tmp1 != NULL) && !(strncmp(dec_assertion, LARES_PARAM, strlen(LARES_PARAM)))) {
         tmp2 = tmp1 + 1;
-        if (*tmp2 == NULL) {
+        if (!tmp2 || tmp2[0] == '\0') {
             am_web_log_error("Empty LARES parameter received");
             status = AM_NO_MEMORY;
             if (dec_assertion != NULL) {
@@ -1466,7 +1423,7 @@ am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_
         }
         decode_base64(tmp2, tmp1);
         am_web_log_debug("Received Authn Response = %s", tmp1);
-        if (*tmp1 == NULL) {
+        if (!tmp1 || tmp1[0] == '\0') {
             am_web_log_error("Improper LARES parameter received");
             status = AM_FAILURE;
             if (dec_assertion != NULL) {
@@ -1498,7 +1455,7 @@ am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_
                                     "lib:IDPProvidedNameIdentifier found");
                             if (subElem.getValue(elemValue)) {
                                 am_web_log_debug("Value found(elemVal)=%s", elemValue.c_str());
-                                if (((*agentConfigPtr)->cdsso_cookie_urlencode) == B_FALSE) {
+                                if (!((*agentConfigPtr)->cdsso_cookie_urlencode)) {
                                     am_http_cookie_decode(elemValue.c_str(), buf, 1024);
                                     *token = strdup(buf);
                                 } else {
@@ -1633,19 +1590,19 @@ am_web_remove_parameter_from_query(const char *inpString,
     const char *thisfunc = "am_web_remove_parameter_from_query()";
     am_status_t status = AM_FAILURE;
     try {
-	string inpStr = inpString;
-	string remStr = remove_str;
-	string outStr;
+	std::string inpStr = inpString;
+	std::string remStr = remove_str;
+	std::string outStr;
 	std::size_t i = 0, j = 0 ;
 
 	if((i = inpStr.find(remStr)) !=  std::string::npos){
 	    if(i != 0){
 		outStr.append(inpStr, 0 , i - 1 );
 	    }
-	    if((i = inpStr.find("&", i)) != string::npos) {
+	    if((i = inpStr.find("&", i)) != std::string::npos) {
 		if(outStr.length() > 0){
-		    if((j = outStr.find("?")) != string::npos ||
-			(j = outStr.find("=")) != string::npos) {
+		    if((j = outStr.find("?")) != std::string::npos ||
+			(j = outStr.find("=")) != std::string::npos) {
 			outStr.append("&");
 		    }else {
 			outStr.append("?");
@@ -1683,14 +1640,10 @@ am_web_get_parameter_value(const char* inpString,
 {
     const char *thisfunc = "am_web_get_parameter_value()";
     am_status_t status = AM_NOT_FOUND;
-    string inpStr = inpString;
-    string paramStr = param_name;
-    string outStr;
-#if defined(_AMD64_)
-    DWORD64 i = 0, end_param = 0;
-#else
-    int i = 0, end_param = 0;
-#endif
+    std::string inpStr = inpString;
+    std::string paramStr = param_name;
+    std::string outStr;
+    size_t i = 0, end_param = 0;
 
     *param_value = NULL;
     if (inpString == NULL || param_name == NULL && param_value == NULL) {
@@ -1738,10 +1691,10 @@ am_web_get_parameter_value(const char* inpString,
 
 
 /* Throws std::exception's from string methods */
-string
-create_authn_request_query_string(string requestID, string providerID,
-                                  string issueInstant, bool isSigned) {
-    string urlEncodedAuthnRequest;
+std::string
+create_authn_request_query_string(std::string requestID, std::string providerID,
+                                  std::string issueInstant, bool isSigned) {
+    std::string urlEncodedAuthnRequest;
     urlEncodedAuthnRequest.reserve(512);
     urlEncodedAuthnRequest.append("RequestID=").append(smi::Http::encode(requestID)).append("&");
     urlEncodedAuthnRequest.append("MajorVersion=").append(SAML_PROTOCOL_MAJOR_VERSION).append("&");
@@ -1818,7 +1771,7 @@ log_access(am_status_t access_status,
 	    memset(fmtStr, 0, sizeof(fmtStr));
             strncpy(fmtStr, key, sizeof(fmtStr));
             status = Log::auditLog((*agentConfigPtr)->auditLogDisposition,
-                    (*agentConfigPtr)->localAuditLogFileRotate,
+                    (*agentConfigPtr)->localAuditLogFileRotate ? true : false,
                     (*agentConfigPtr)->localAuditLogFileSize,
                     (*agentConfigPtr)->remote_LogID,
                     AM_LOG_LEVEL_INFORMATION, 
@@ -2014,11 +1967,7 @@ am_web_is_access_allowed(const char *sso_token,
     am_bool_t isAgentLogoutURL = AM_FALSE;
     am_status_t log_status = AM_SUCCESS;
     char * encodedUrl = NULL;
-#if defined(_AMD64_)
-    DWORD64 encodedUrlSize = 0;
-#else
-    unsigned int encodedUrlSize = 0;
-#endif
+    size_t encodedUrlSize = 0;
 
     std::string originalPathInfo("");
     std::string originalQuery("");
@@ -2187,7 +2136,7 @@ am_web_is_access_allowed(const char *sso_token,
                         if (encodedUrl != NULL) {
                             bool url_spl_flag = false;
                             memset(encodedUrl, 0, encodedUrlSize);
-                            for(int i = 0; i < strlen(url); i++) {
+                            for(size_t i = 0; i < strlen(url); i++) {
                                 if (( url[i] <  32) || ( url[i] > 127))  {
                                     url_spl_flag = true;
                                 }
@@ -2475,7 +2424,7 @@ am_web_handle_notification(const char *data,
 /* Throws std::exception's from string methods */
 am_status_t
 getValid_FQDN_URL(const char *goto_url, 
-                  string &result, 
+                  std::string &result, 
                   void* agent_config) {
 
     AgentConfigurationRefCntPtr* agentConfigPtr =
@@ -2801,27 +2750,40 @@ am_web_check_cookie_in_query(
 }
 
 /* now used by function add_cdsso_elements_to_redirect_url only */
-static char *prtime_2_str(char *buffer, 
-                          size_t buffer_len, 
-                          void* agent_config)
-{
+static char *time_2_str(char *buffer, size_t buffer_len,
+        void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
 
-
-    PRTime timestamp;
-    PRExplodedTime exploded_time;
     int n_written = 0;
+    
+#ifdef _MSC_VER
+    
+    SYSTEMTIME lt;
+    char *p = NULL;
+    (*agentConfigPtr)->lock->lock();
+    GetLocalTime(&lt);
+    (*agentConfigPtr)->lock->unlock();
+    n_written = _snprintf(buffer, buffer_len, "%d-%02d-%02dT%02d:%02d:%02dZ", lt.wYear, lt.wMonth, lt.wDay,
+            lt.wHour, lt.wMinute, lt.wSecond);
+    
+#else
+    
+    struct tm tm;
+    unsigned short msec = 0;
+    struct timespec ts;    
+    (*agentConfigPtr)->lock->lock();
+    clock_gettime(CLOCK_REALTIME, &ts);
+    msec = ts.tv_nsec / 1000000;
+    (*agentConfigPtr)->lock->unlock();
+    localtime_r(&ts.tv_sec, &tm);
 
-    PR_Lock((*agentConfigPtr)->lock);
-    timestamp = PR_Now();
-    PR_Unlock((*agentConfigPtr)->lock);
-
-    PR_ExplodeTime(timestamp, PR_LocalTimeParameters, &exploded_time);
     n_written = snprintf(buffer, buffer_len, "%d-%02d-%02dT%02d:%02d:%02dZ",
-                         exploded_time.tm_year, exploded_time.tm_month+1,
-			 exploded_time.tm_mday, exploded_time.tm_hour,
-			 exploded_time.tm_min, exploded_time.tm_sec);
+            tm.tm_year + 1900, tm.tm_mon + 1,
+            tm.tm_mday, tm.tm_hour,
+            tm.tm_min, tm.tm_sec);
+    
+#endif
     if (buffer_len > 0 && n_written < 1) {
         // This means the buffer wasn't big enough or an error occured.
         *buffer = '\0';
@@ -2831,13 +2793,13 @@ static char *prtime_2_str(char *buffer,
 }
 
 /* Throws std::exception's from string methods */
-string add_cdsso_elements_to_redirect_url(void* agent_config) {
+std::string add_cdsso_elements_to_redirect_url(void* agent_config) {
 
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
 
 
-    string providerId = (*agentConfigPtr)->agent_server_url.url;
+    std::string providerId = (*agentConfigPtr)->agent_server_url.url;
 
 	const char* orgName = NULL;
 	am_status_t status = am_properties_get( (*agentConfigPtr)->properties,
@@ -2857,18 +2819,18 @@ string add_cdsso_elements_to_redirect_url(void* agent_config) {
     char id[10];
     srand((unsigned)time(NULL));
     sprintf(id, "%ld", (long int)rand());
-    string requestID = id;
+    std::string requestID = id;
 
     // issue instant
     char *strtime = NULL;
     strtime = (char *) malloc ( AM_WEB_MAX_POST_KEY_LENGTH );
-    prtime_2_str(strtime,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
-    string strIssueInstant;
+    time_2_str(strtime,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
+    std::string strIssueInstant;
     if(strtime != NULL && strlen(strtime) > 0) {
             strIssueInstant = strtime;
     }
 
-    string authnRequest = create_authn_request_query_string(requestID,
+    std::string authnRequest = create_authn_request_query_string(requestID,
                                                             providerId,
                                                             strIssueInstant,
                                                             isSigned);
@@ -3033,11 +2995,11 @@ am_web_get_url_to_redirect(am_status_t status,
                         // url and the url_redirect_param set to a value other than "goto".
                         // In such a case the "?" character must be added before 
                         // url_redirect_param
-                        string temp_url = url_info_ptr->url;
-                        string temp_redirect_param = 
+                        std::string temp_url = url_info_ptr->url;
+                        std::string temp_redirect_param = 
                               (*agentConfigPtr)->url_redirect_param;
                         if (((*agentConfigPtr)->cdsso_enable == AM_TRUE) && 
-                                (temp_url.find("goto=") != string::npos) && 
+                                (temp_url.find("goto=") != std::string::npos) && 
                                 (temp_redirect_param.compare("goto") != 0)) {
                             retVal.append("?");
                         } else {
@@ -3127,7 +3089,7 @@ am_web_get_url_to_redirect(am_status_t status,
  * Note that the reset (callback) is called for each cookie.
  * If any cookie reset function fails the last failed status is returned.
  */
-am_status_t
+extern "C" am_status_t
 am_web_reset_cookies_list(const Utils::cookie_info_list_t *cookies_list,
                           am_status_t (*setFunc)(const char *, void **),
                           void **args)
@@ -3177,7 +3139,7 @@ am_web_reset_cookies_list(const Utils::cookie_info_list_t *cookies_list,
  * Note that the reset (callback) is called for each cookie.
  * If any cookie reset function fails the last failed status is returned.
  */
-am_status_t
+extern "C" am_status_t
 am_web_reset_ldap_attribute_cookies(
      am_status_t (*setFunc)(const char *, void **), 
      void **args, 
@@ -3578,7 +3540,7 @@ am_web_result_attr_map_set(
                                "%s: Calling container-specific header setter "
                                "function. ", thisfunc);
                       if (values.c_str() != NULL) {
-                         new_str_size = (strlen(values.c_str())+1)*4;
+                         new_str_size = (unsigned int) (strlen(values.c_str())+1)*4;
                          if (new_str_size  > 2048) {
                             new_str_free = 1;
                             new_str = (char *) malloc (new_str_size);
@@ -3918,8 +3880,7 @@ am_web_log_always(const char *fmt, ...)
 
 extern "C" AM_WEB_EXPORT boolean_t
 am_web_log_auth(am_web_access_t accessType, 
-                const char *fmt, 
-                void* agent_config, ...)
+                void* agent_config, const char *fmt, ...)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
@@ -4009,11 +3970,7 @@ extern "C" AM_WEB_EXPORT boolean_t
 am_web_is_postpreserve_enabled(void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
-
-
-
-    return static_cast<bool>(
-	    (*agentConfigPtr)->postdatapreserve_enable)==true?B_TRUE:B_FALSE;
+    return (*agentConfigPtr)->postdatapreserve_enable ? B_TRUE : B_FALSE;
 }
 
 /**
@@ -4116,32 +4073,44 @@ am_web_postcache_remove(const char *key,
     }
 }
 
-/**
-  * Method to convert PRTime to string
-*/
+/*
+ * Method to convert time to string
+ */
 
-static char *prtime_to_string(char *buffer, 
-                              size_t buffer_len, 
-                              void* agent_config)
-{
+static char *time_to_string(char *buffer,
+        size_t buffer_len, void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
 
-
-    PRTime timestamp;
-    PRExplodedTime exploded_time;
     int n_written = 0;
+    
+#ifdef _MSC_VER
+    
+    SYSTEMTIME lt;
+    char *p = NULL;
+    (*agentConfigPtr)->lock->lock();
+    GetLocalTime(&lt);
+    (*agentConfigPtr)->lock->unlock();
+    n_written = _snprintf(buffer, buffer_len, "%d-%02d-%02d.%02d-%02d-%02d.%03d", lt.wYear, lt.wMonth, lt.wDay,
+            lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
 
-    PR_Lock((*agentConfigPtr)->lock);
-    timestamp = PR_Now();
-    PR_Unlock((*agentConfigPtr)->lock);
+#else
+    
+    struct tm tm;
+    unsigned short msec = 0;
+    struct timespec ts;
+    (*agentConfigPtr)->lock->lock();
+    clock_gettime(CLOCK_REALTIME, &ts);
+    msec = ts.tv_nsec / 1000000;
+    (*agentConfigPtr)->lock->unlock();
+    localtime_r(&ts.tv_sec, &tm);
 
-    PR_ExplodeTime(timestamp, PR_LocalTimeParameters, &exploded_time);
     n_written = snprintf(buffer, buffer_len, "%d-%02d-%02d.%02d-%02d-%02d.%03d",
-                         exploded_time.tm_year, exploded_time.tm_month+1,
-			 exploded_time.tm_mday, exploded_time.tm_hour,
-			 exploded_time.tm_min, exploded_time.tm_sec,
-			 exploded_time.tm_usec / 1000);
+            tm.tm_year + 1900, tm.tm_mon + 1,
+            tm.tm_mday, tm.tm_hour,
+            tm.tm_min, tm.tm_sec, msec);
+    
+#endif
     if (buffer_len > 0 && n_written < 1) {
         // This means the buffer wasn't big enough or an error occured.
         *buffer = '\0';
@@ -4223,7 +4192,7 @@ am_web_create_post_preserve_urls(const char *request_url,
     if (status == AM_SUCCESS) {
         time_str = (char *) malloc (AM_WEB_MAX_POST_KEY_LENGTH);
         if (time_str != NULL) {
-            prtime_to_string(time_str,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
+            time_to_string(time_str,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
         } else {
             am_web_log_error("%s: Failed to allocate time_str.", thisfunc);
             status = AM_NO_MEMORY;
@@ -4325,12 +4294,7 @@ static char* escapeQuotationMark(char*& ptr)
     std::string valueStr(ptr);
 
     if(ptr && strchr(ptr,'"')) {
-#if defined(_AMD64_)
        size_t pos  = 0;
-#else
-       int pos  = 0;
-#endif
-
        while((pos = valueStr.find('"',pos)) != std::string::npos) {
           valueStr.erase(pos,1);
           valueStr.insert(pos,"&quot;");
@@ -4493,21 +4457,16 @@ am_web_is_cookie_present(const char *cookie, const char *value,
 		    new_cookie_val,
 		    req_cookie_value = value;
 
-	string::size_type eq_pos,
+	std::string::size_type eq_pos,
 			  sm_pos;
 
 	std::string original_cookie = cookie,
 		    prsnt_cookie_val; // value of cookie present in request.
 
-	string::size_type name_pos_in_cookie,
+	std::string::size_type name_pos_in_cookie,
 			  val_pos_in_cookie;
 
-#if defined(_AMD64_)
 	size_t _new_length = 0;
-#else
-	unsigned int _new_length = 0;
-#endif
-
 	char sep = '=',
 	     ln_sep = '\n',
 	     val_sep = ';';
@@ -4515,14 +4474,14 @@ am_web_is_cookie_present(const char *cookie, const char *value,
 	// getting the name and value from the new string
 	eq_pos = req_cookie_value.find(sep);
 	// check if seperator is present else error
-	if (eq_pos == string::npos)
+	if (eq_pos == std::string::npos)
 	{
 	    return AM_WEB_COOKIE_ERROR;
 	}
 
 	// if last cookie value may not contain ";"
 	sm_pos = req_cookie_value.find(val_sep,eq_pos);
-	if (sm_pos == string::npos)
+	if (sm_pos == std::string::npos)
 	{
 	    sm_pos = req_cookie_value.find(val_sep,ln_sep);
 	}
@@ -4537,12 +4496,12 @@ am_web_is_cookie_present(const char *cookie, const char *value,
 	// getting the name and value from the request
 	name_pos_in_cookie = original_cookie.find(new_cookie_name);
 
-	if (name_pos_in_cookie == string::npos)
+	if (name_pos_in_cookie == std::string::npos)
 	{
 	    // cookie name not present append it and send new string;
 	    name_pos_in_cookie = original_cookie.find(val_sep,
 					  original_cookie.length() - 1);
-	    if(name_pos_in_cookie == string::npos)
+	    if(name_pos_in_cookie == std::string::npos)
 	    {
 		original_cookie.append(";");
 	    }
@@ -4563,14 +4522,14 @@ am_web_is_cookie_present(const char *cookie, const char *value,
 							name_pos_in_cookie);
 	    am_web_log_debug("%s: val_pos_in_cookie %d",
 			     thisfunc, val_pos_in_cookie);
-	    if (val_pos_in_cookie == string::npos)
+	    if (val_pos_in_cookie == std::string::npos)
 	    {
 		// logic for if the value is modified
 		am_bool_t last_cookie = AM_FALSE;
 		am_web_log_debug("%s: value modified", thisfunc);
-		string::size_type _end_val = original_cookie.find(val_sep,
+		std::string::size_type _end_val = original_cookie.find(val_sep,
 						      name_pos_in_cookie);
-		if (_end_val == string::npos)
+		if (_end_val == std::string::npos)
 		{
 		    _end_val = original_cookie.find(ln_sep,
 					       name_pos_in_cookie);
@@ -4623,9 +4582,9 @@ am_web_is_cookie_present(const char *cookie, const char *value,
 		    // logic for modification
 		   am_bool_t last_cookie = AM_FALSE;
 		   am_web_log_debug("%s: value modified", thisfunc);
-		   string::size_type _end_val = original_cookie.find(val_sep,
+		   std::string::size_type _end_val = original_cookie.find(val_sep,
 						      name_pos_in_cookie);
-		   if (_end_val == string::npos)
+		   if (_end_val == std::string::npos)
 		   {
 		       _end_val = original_cookie.find(ln_sep,
 					       name_pos_in_cookie);
@@ -5036,11 +4995,7 @@ remove_cookie(const char *cookie_name, char *cookie_header_val)
 	// check if each cookie in cookie header
 	tok = strtok_r(cookie_header_val, ";", &last);
 	while (tok != NULL) {
-#if defined(_AMD64_)
 	    size_t cookie_name_len = strlen(cookie_name);
-#else
-	    unsigned int cookie_name_len = strlen(cookie_name);
-#endif
 	    bool match = false;
 	    char *equal_sign = strchr(tok, '=');
 	    // trim space before the cookie name in the cookie header.
@@ -5347,7 +5302,7 @@ set_cookie_in_request(Utils::cookie_info_t *cookie_info,
     return sts;
 }
 
-static am_status_t
+extern "C" am_status_t
 add_cookie_in_response(const char *set_cookie_header_val, void **args)
 {
     am_status_t sts = AM_SUCCESS;
@@ -5827,7 +5782,7 @@ process_access_success(char *url,
     const char *thisfunc = "process_access_success()";
     am_web_result_t result = AM_WEB_RESULT_OK;
     am_status_t sts = AM_SUCCESS;
-    PRBool setting_user = AM_TRUE;
+    am_bool_t setting_user = AM_TRUE;
     void *args[1];
 
     // set user - if fail, access is forbidden.
@@ -6081,7 +6036,7 @@ get_sso_token(am_web_request_params_t *req_params,
              (*sso_token == NULL || (*sso_token)[0] == '\0')) {
         sts = AM_NOT_FOUND;
     }
-    am_web_log_debug("%s: sso token %s, status - %s", thisfunc, *sso_token, am_status_to_string(sts));
+    am_web_log_debug("%s: sso token %s, status - %s", thisfunc, *sso_token != NULL ? *sso_token : "", am_status_to_string(sts));
 
     // If SSO token is not found and CDSSO mode is enabled
     // check for the request method.
@@ -6240,7 +6195,8 @@ process_request(am_web_request_params_t *req_params,
             case AM_INVALID_SESSION:
             case AM_ACCESS_DENIED:
                 args[0] = req_func;
-                am_web_log_debug("%s: %s, will redirect (post data: %s)", thisfunc, (sts==AM_INVALID_SESSION ? "AM_INVALID_SESSION" : "AM_ACCESS_DENIED"), post_data);
+                am_web_log_debug("%s: %s, will redirect", 
+                        thisfunc, (sts==AM_INVALID_SESSION ? "AM_INVALID_SESSION" : "AM_ACCESS_DENIED"));
                 if (sts == AM_INVALID_SESSION) {
                     // reset ldap cookies on invalid session
                     am_web_do_cookies_reset(add_cookie_in_response, args, agent_config);
@@ -6559,13 +6515,8 @@ am_web_set_cookie(char *cookie_header, const char *set_cookie_value,
 	    sts = AM_INVALID_ARGUMENT;
 	}
 	else {
-#if defined(_AMD64_)
 	    size_t cookie_name_len = equal_sign-set_cookie_value;
 	    size_t cookie_val_len = semi_sign-equal_sign-1;
-#else
-	    unsigned int cookie_name_len = equal_sign-set_cookie_value;
-	    unsigned int cookie_val_len = semi_sign-equal_sign-1;
-#endif
 	    char *cookie_name = (char *)malloc(cookie_name_len+1);
 	    char *cookie_val = NULL;
 	    if (cookie_name == NULL) {
@@ -6958,7 +6909,7 @@ am_web_get_logout_url(char** logout_url, void* agent_config)
         //Append the logout redirect url
         if ((*agentConfigPtr)->logout_redirect_url != NULL )
         {
-            if(retVal.find("?")!=string::npos){
+            if(retVal.find("?")!=std::string::npos){
                 retVal.append("&");
             }
             else{
@@ -7114,43 +7065,43 @@ am_web_set_host_ip_in_env_map(const char *client_ip,
     const char *thisfunc = "am_web_set_host_ip_in_env_map()";
     am_status_t status = AM_SUCCESS;
     AgentConfigurationRefCntPtr* agentConfigPtr =
-          (AgentConfigurationRefCntPtr*) agent_config;
-    PRStatus prStatus;
-    PRNetAddr address;
-    PRHostEnt hostEntry;
-    char buffer[PR_NETDB_BUF_SIZE];
+            (AgentConfigurationRefCntPtr*) agent_config;
 
-    if(client_ip != NULL && strlen(client_ip) > 0) {
+    if (client_ip != NULL && strlen(client_ip) > 0) {
         // Set the client IP in the environment map
         Log::log(boot_info.log_module, Log::LOG_DEBUG,
-             "%s: map_insert: client_ip=%s", thisfunc, client_ip);
+                "%s: map_insert: client_ip=%s", thisfunc, client_ip);
         am_map_insert(env_parameter_map, requestIp, client_ip, AM_TRUE);
-        if(client_hostname != NULL && strlen(client_hostname) > 0) {
+        if (client_hostname != NULL && strlen(client_hostname) > 0) {
             // Set the hostname in the environment map if it is not null
             Log::log(boot_info.log_module, Log::LOG_DEBUG,
-             "%s: map_insert: client_hostname=%s", thisfunc, client_hostname);
-            status = am_map_insert(env_parameter_map, 
-                                   requestDnsName,
-                                   client_hostname, 
-                                   AM_FALSE);
+                    "%s: map_insert: client_hostname=%s", thisfunc, client_hostname);
+            status = am_map_insert(env_parameter_map,
+                    requestDnsName,
+                    client_hostname,
+                    AM_FALSE);
         } else if ((*agentConfigPtr)->getClientHostname) {
-            prStatus = PR_StringToNetAddr(client_ip, &address);
-            if (PR_SUCCESS == prStatus) {
-                // Try to get the hostname through DNS reverse lookup
-                prStatus = PR_GetHostByAddr(&address, buffer,
-                                            sizeof(buffer), &hostEntry);
-                if (PR_SUCCESS == prStatus) {
-                    // this function will log info about the client's hostnames
-                    // so no need to do it here.
-                    getFullQualifiedHostName(env_parameter_map, 
-                                             &address, &hostEntry);
+
+            struct addrinfo hints, *res = NULL;
+            char client_host[NI_MAXHOST];
+            socklen_t slen;
+
+            memset(&hints, 0, sizeof (hints));
+            hints.ai_family = AF_UNSPEC;
+            hints.ai_socktype = SOCK_STREAM;
+
+            int errcode = getaddrinfo(client_ip, NULL, &hints, &res);
+            if (errcode == 0) {
+                while (res) {
+                    slen = res->ai_family == AF_INET ? sizeof (struct sockaddr_in) : sizeof (struct sockaddr_in6);
+                    errcode = getnameinfo((struct sockaddr *) res->ai_addr, slen,
+                            client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
+                    if (errcode == 0) {
+                        am_map_insert(env_parameter_map, requestDnsName, client_host, AM_FALSE);
+                    }
+                    res = res->ai_next;
                 }
-            } else {
-                Log::log(boot_info.log_module, Log::LOG_DEBUG,
-                         "%s: map_insert: could not get client's hostname for "
-                         "policy. Error %s.", thisfunc,
-                         PR_ErrorToString(PR_GetError(),
-                                          PR_LANGUAGE_I_DEFAULT));
+                freeaddrinfo(res);
             }
         }
     }

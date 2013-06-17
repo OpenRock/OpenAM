@@ -25,6 +25,10 @@
  * $Id: url.cpp,v 1.9 2009/12/01 21:52:54 subbae Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #include <iterator>
 #include "url.h"
 #include "internal_exception.h"
@@ -144,11 +148,7 @@ void URL::parseURLStrNew(const std::string &urlString,
     const char *url = urlString.c_str();
     const char *path_info_cstr = pathInfo.c_str();
     char *colon_ptr = NULL;
-#if defined(_AMD64_)
     size_t proto_len = 0;
-#else
-    unsigned proto_len = 0;
-#endif
     char *host_ptr = NULL;
     char *port_ptr = NULL;
     char *uri_ptr = NULL;
@@ -283,7 +283,7 @@ void URL::parseURLStrNew(const std::string &urlString,
                 // As there can be several "/" in the uri, if path info
                 // equal "/" we need to point at the last one before the
                 // query.
-                for (int i=0 ; i<strlen(uri_ptr) ; i++) {
+                for (size_t i=0 ; i<strlen(uri_ptr) ; i++) {
                     if (uri_ptr[i] == '?') {
                         break;
                     }
@@ -439,11 +439,7 @@ void URL::parseURLStrOld(const std::string &urlString,
 		port = defaultPort[protocol];
 		portStr = defaultPortStr[protocol];
 	    } else {
-#if defined(_AMD64_)
 	        size_t indx = portStr.find('*');
-#else
-	        int indx = portStr.find('*');
-#endif
 	  	if (indx < 0) {
 		    try {
 			port = Utils::getNumber(portStr);

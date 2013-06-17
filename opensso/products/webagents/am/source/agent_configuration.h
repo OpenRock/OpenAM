@@ -25,11 +25,9 @@
  * $Id: agent_configuration.h,v 1.17 2010/03/10 05:09:36 dknab Exp $
  *
  */
-
 /*
- * Portions Copyrighted 2010 - 2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
-
 
 #ifndef _AGENT_CONFIGURATION_H_
 #define _AGENT_CONFIGURATION_H_
@@ -43,25 +41,11 @@
 #include <stdio.h>
 #include "fqdn_handler.h"
 #include "p_cache.h"
+#include <mutex.h>
 
-#if	defined(WINNT)
-#define _X86_
-#include <windef.h>
-#include <winbase.h>
-#include <winuser.h>
-#include <winnls.h>
-#include <windows.h>
-#if	!defined(strncasecmp)
-#define	strncasecmp	strnicmp
-#define	strcasecmp	stricmp
-#endif
-
-#if     !defined(snprintf)
-#define snprintf        _snprintf
-#endif
-#else /* WINNT */
+#ifndef _MSC_VER
 #include <unistd.h>
-#endif /* WINNT */
+#endif
 BEGIN_PRIVATE_NAMESPACE
 #define AGENT_CONFIGURATION "AgentConfiguration"
 
@@ -100,28 +84,28 @@ public:
     am_properties_t properties;
     Utils::url_info_list_t not_enforced_list;
     std::set<std::string> *not_enforce_IPAddr;
-    PRBool reverse_the_meaning_of_not_enforced_list;
-    PRBool notenforced_url_attributes_enable;
-    PRBool do_sso_only;
+    am_bool_t reverse_the_meaning_of_not_enforced_list;
+    am_bool_t notenforced_url_attributes_enable;
+    am_bool_t do_sso_only;
     const char *instance_name;
     const char *cookie_name;
     size_t cookie_name_len;
-    PRBool is_cookie_secure;
-    PRBool is_cookie_httponly;
+    am_bool_t is_cookie_secure;
+    am_bool_t is_cookie_httponly;
     const char *access_denied_url;
     const char *logout_redirect_url;
-    PRLock *lock;
+    Mutex *lock;
     Utils::url_info_list_t login_url_list;
     Utils::url_info_list_t logout_url_list;
     Utils::url_info_list_t agent_logout_url_list;
     Utils::url_info_list_t cdsso_server_url_list;
-    PRBool notification_enable;
+    am_bool_t notification_enable;
     const char *notification_url;
     int nurl_local_alloc;
-    PRBool url_comparison_ignore_case;
+    am_bool_t url_comparison_ignore_case;
     PostCache *postcache_handle;
     unsigned long postcacheentry_life;
-    PRBool postdatapreserve_enable;
+    am_bool_t postdatapreserve_enable;
     const char *postdatapreserve_sticky_session_mode;
     const char *postdatapreserve_sticky_session_value;
     const char *url_redirect_param;
@@ -129,43 +113,43 @@ public:
     const char *authLogType_param;
     const char *locale;
     const char *unauthenticated_user;
-    PRBool anon_remote_user_enable;
-    PRBool check_client_ip;
+    am_bool_t anon_remote_user_enable;
+    am_bool_t check_client_ip;
     
-    PRBool fqdn_check_enable;
+    am_bool_t fqdn_check_enable;
     FqdnHandler *fqdn_handler;
     const char *fqdn_default;
     size_t fqdn_default_len;   
-    PRBool cookie_reset_enable;
+    am_bool_t cookie_reset_enable;
     std::set<std::string> *cookie_domain_list;
-    PRBool cdsso_enable;
+    am_bool_t cdsso_enable;
     Utils::cookie_info_list_t cookie_list;
     const char *cookie_reset_default_domain;
     Utils::url_info_t agent_server_url;
     Utils::cookie_info_list_t logout_cookie_reset_list;
-    PRBool getClientHostname;
+    am_bool_t getClientHostname;
     unsigned log_access_type;
-    PRBool convert_mbyte;
-    PRBool encode_url_special_chars;
-    PRBool override_protocol;	// whether to override protocol in request url
-    PRBool override_host;	// whether to override host in request url
-    PRBool override_port;	// whether to override port in request url
-    PRBool override_notification_url;	// whether to override the notification
+    am_bool_t convert_mbyte;
+    am_bool_t encode_url_special_chars;
+    am_bool_t override_protocol;	// whether to override protocol in request url
+    am_bool_t override_host;	// whether to override host in request url
+    am_bool_t override_port;	// whether to override port in request url
+    am_bool_t override_notification_url;	// whether to override the notification
     // url the same way as other rq urls
-    PRBool ignore_path_info;
-    PRBool ignore_path_info_for_not_enforced_list;
-    PRBool use_basic_auth;
+    am_bool_t ignore_path_info;
+    am_bool_t ignore_path_info_for_not_enforced_list;
+    am_bool_t use_basic_auth;
     unsigned long connection_timeout;   //connection timeout in sec to check if active login server alive
-    PRBool ignore_server_check;	// ignore server check before redirection
+    am_bool_t ignore_server_check;	// ignore server check before redirection
     const char *authtype;   //value of authtype in IIS6 agent
-    PRBool override_host_port;	// used by Proxy agent
+    am_bool_t override_host_port;	// used by Proxy agent
     const char *iis6_replaypasswd_key; // IIS6 replay passwd key
     const char *filter_priority; //IIS 5 filter priority
-    PRBool owa_enable;	// OWA enable in IIS6
-    PRBool owa_enable_change_protocol;	// OWA enable change protocol in IIS6
+    am_bool_t owa_enable;	// OWA enable in IIS6
+    am_bool_t owa_enable_change_protocol;	// OWA enable change protocol in IIS6
     const char *owa_enable_session_timeout_url; // OWA enable session timeout url 
-    PRBool check_name_database;    // IBM Lotus DOMINO check name database
-    PRBool ltpa_enable;            // IBM Lotus DOMINO enable ltpa token
+    am_bool_t check_name_database;    // IBM Lotus DOMINO check name database
+    am_bool_t ltpa_enable;            // IBM Lotus DOMINO enable ltpa token
     const char * ltpa_config_name; // IBM Lotus DOMINO ltpa config name
     const char * ltpa_org_name;    // IBM Lotus DOMINO ltpa organization name
     const char * ltpa_cookie_name; // IBM Lotus DOMINO ltpa cookie name
@@ -182,30 +166,30 @@ public:
     std::list<std::string> attrList;
     const char * attrMultiValueSeparator;
     unsigned long policy_clock_skew; // Policy Clock Skew
-    PRBool configChangeNotificationEnable;
+    am_bool_t configChangeNotificationEnable;
     const char * auditLogDisposition;
     unsigned long localAuditLogFileSize;
-    PRBool localAuditLogFileRotate;
+    am_bool_t localAuditLogFileRotate;
     unsigned long debugFileSize;
-    PRBool debugFileRotate;
-    PRBool doRemoteLog; //utility member to determine whether to remote log or not
+    am_bool_t debugFileRotate;
+    am_bool_t doRemoteLog; //utility member to determine whether to remote log or not
     const char * clientIPHeader;
     const char * clientHostnameHeader;
-    PRBool encodeCookieSpecialChars;
+    am_bool_t encodeCookieSpecialChars;
 
     const char *notenforcedIPmode;
-    PRBool use_redirect_for_advice;	// use redirect instead of POST for advice
-    PRBool cdsso_cookie_urlencode;	// encode cookie value extracted from LARES response
-    PRBool cdsso_disable_redirect_on_post;	// disable extra-302-redirect on (after) LARES post
-    PRBool cache_control_header_enable;	// enable cache-control/pragma/expires = no-cache headers for unauthenticated sessions
+    am_bool_t use_redirect_for_advice;	// use redirect instead of POST for advice
+    am_bool_t cdsso_cookie_urlencode;	// encode cookie value extracted from LARES response
+    am_bool_t cdsso_disable_redirect_on_post;	// disable extra-302-redirect on (after) LARES post
+    am_bool_t cache_control_header_enable;	// enable cache-control/pragma/expires = no-cache headers for unauthenticated sessions
     am_status_t error;
-    int password_header_enabled;
-    int iis_logonuser_enabled;
+    am_bool_t password_header_enabled;
+    am_bool_t iis_logonuser_enabled;
     const char *password_encr_key;
-    PRBool remote_user_header_disable;
-    int nfurl_regex_enabled;
+    am_bool_t remote_user_header_disable;
+    am_bool_t nfurl_regex_enabled;
     const char *alogout_regex;
-    int user_logout_redirect_disable;
+    am_bool_t user_logout_redirect_disable;
     const char *invalid_url_regex;
     
     smap_t cond_login_url;
@@ -234,11 +218,11 @@ public:
         this->is_cookie_httponly = AM_FALSE;
         this->access_denied_url = NULL;
         this->logout_redirect_url = NULL;
-        this->lock = (PRLock *) NULL;
+        this->lock = (Mutex *) NULL;
         this->notification_enable = AM_FALSE;
         this->notification_url = NULL;
         this->nurl_local_alloc = 0;
-        this->url_comparison_ignore_case = false;
+        this->url_comparison_ignore_case = AM_FALSE;
         this->postcacheentry_life = 0;
         this->postcache_handle = NULL;
         this->postdatapreserve_enable = AM_TRUE;
@@ -274,7 +258,7 @@ public:
         this->iis6_replaypasswd_key = NULL;
         this->filter_priority = IIS_FILTER_PRIORITY;
         this->owa_enable = AM_FALSE;
-        this->owa_enable_change_protocol = NULL;        
+        this->owa_enable_change_protocol = AM_FALSE;        
         this->check_name_database = AM_FALSE;
         this->ltpa_enable = AM_FALSE;
         this->ltpa_config_name = LTPA_DEFAULT_CONFIG_NAME;
@@ -308,13 +292,13 @@ public:
         this->cdsso_disable_redirect_on_post = AM_FALSE;
         this->dummyPostPrefixUri = NULL;
         this->error = AM_SUCCESS;
-        this->password_header_enabled = 0;
-        this->iis_logonuser_enabled = 0;
+        this->password_header_enabled = AM_FALSE;
+        this->iis_logonuser_enabled = AM_FALSE;
         this->password_encr_key = NULL;
         this->remote_user_header_disable = AM_FALSE;
-        this->nfurl_regex_enabled = 0;
+        this->nfurl_regex_enabled = AM_FALSE;
         this->alogout_regex = NULL;
-        this->user_logout_redirect_disable = 0;
+        this->user_logout_redirect_disable = AM_FALSE;
         this->invalid_url_regex = NULL;
 
     }

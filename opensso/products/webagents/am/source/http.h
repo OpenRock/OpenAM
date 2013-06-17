@@ -30,6 +30,9 @@
  * Collection of helper classes for handling HTTP requests and responses.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef HTTP_H
 #define HTTP_H
@@ -159,14 +162,10 @@ namespace Http {
     class Response {
     public:
 	Response();
-	Response(Log::ModuleId logModule, Connection& conn,
-		 std::size_t initialBufferLen);
+	Response(Log::ModuleId logModule, Connection& conn);
 	~Response();
 
-	am_status_t readAndParse(Log::ModuleId logModule, Connection& conn,
-				    std::size_t initialBufferLen);
-        void readAndIgnore(Log::ModuleId logModule, Connection& conn);
-
+	am_status_t readAndParse(Log::ModuleId logModule, Connection& conn);
 	Status getStatus() const { return httpStatus; }
 	const CookieList& getCookieList() const { return cookieList; }
 	const HeaderMap& getExtraHdrs() const { return extraHdrs; }

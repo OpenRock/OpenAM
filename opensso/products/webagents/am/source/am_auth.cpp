@@ -25,6 +25,9 @@
  * $Id: am_auth.cpp,v 1.5 2009/12/09 23:58:50 robertis Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <vector>
 #include <am_auth.h>
@@ -91,12 +94,9 @@ am_auth_init(const am_properties_t auth_config_params) {
     return retVal;
 }
 
-void PRIVATE_NAMESPACE_NAME::auth_cleanup()
-{
-    if (authSvc) {
-	delete (authSvc);
-	authSvc = NULL;
-    }
+void PRIVATE_NAMESPACE_NAME::auth_cleanup() {
+    delete authSvc;
+    authSvc = NULL;
     return;
 }
 
