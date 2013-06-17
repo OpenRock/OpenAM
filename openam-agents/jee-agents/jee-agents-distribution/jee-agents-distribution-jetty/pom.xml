@@ -58,6 +58,21 @@
                              </descriptors>
                          </configuration>
                      </execution>
+                     <execution>
+                         <id>jetty-v7-assembly</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <finalName>jetty_v7_agent_${project.version}</finalName>
+                             <appendAssemblyId>false</appendAssemblyId>
+                             <tarLongFileMode>gnu</tarLongFileMode>
+                             <descriptors>
+                                 <descriptor>src/main/assembly/jetty-v7_KitAssembly_Descriptor.xml</descriptor>
+                             </descriptors>
+                         </configuration>
+                     </execution>
                  </executions>
              </plugin>
         </plugins>
@@ -69,6 +84,11 @@
              <artifactId>jee-agents-jetty-v61</artifactId>
              <version>${project.version}</version>
          </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-jetty-v7</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sampleapp-jetty</artifactId>
