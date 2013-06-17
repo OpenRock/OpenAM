@@ -104,6 +104,7 @@ a:hover{text-decoration:underline}
           <tr>
             <td style="vertical-align: top;"> <a href="/agentsample/public/welcome.html">Welcome </a>
             <hr class="faint"><a href="/agentsample/public/declarativesecurity.html">J2EE Declarative Security</a>
+            <hr class="faint">J2EE Security API
             <hr class="faint"><a href="/agentsample/public/urlpolicy.html">URL Policy Enforcement</a>
             <hr class="faint"><a href="/agentsample/jsp/showHttpHeaders.jsp">Show HTTP Headers</a>
             <hr class="faint">
