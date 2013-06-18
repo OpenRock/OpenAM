@@ -47,10 +47,6 @@ Portions Copyrighted 2010 - 2013 ForgeRock Inc
               location="${webagents.basedir}/agents/source/apache22"/>
     <property name="webagents.apache24.src.dir" 
               location="${webagents.basedir}/agents/source/apache24"/>
-    <property name="webagents.iis6.src.dir"
-              location="${webagents.basedir}/agents/source/iis6"/>
-    <property name="webagents.iis7.src.dir"
-              location="${webagents.basedir}/agents/source/iis7"/>
     <property name="webagents.domino.src.dir"
               location="${webagents.basedir}/agents/source/domino"/>
 

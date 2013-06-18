@@ -122,4 +122,4 @@ varnish: version libamsdk_static libamsdk varnishi
 domino: version libamsdk_static libamsdk dominoi
 	
 clean:
-	rm -fr built am/source/version.h am/source/*.o agents/source/domino/*.so agents/source/domino/*.o agents/source/apache22/*.o agents/source/apache/*.o agents/source/proxy40/*.so agents/source/proxy40/*.o agents/source/sjsws/*.so agents/source/sjsws/*.o agents/source/apache24/*.o agents/source/apache/*.so agents/source/apache22/*.so agents/source/apache24/*.so agents/source/varnish/*.so agents/source/varnish/*.o am/source/*.so am/source/*.so.3 am/source/*.a am/source/crypt_util
+	rm -fr built/dist built/apache built/apache22 built/apache24 built/proxy40 built/sjsws built/varnish am/source/version.h am/source/*.o agents/source/domino/*.so agents/source/domino/*.o agents/source/apache22/*.o agents/source/apache/*.o agents/source/proxy40/*.so agents/source/proxy40/*.o agents/source/sjsws/*.so agents/source/sjsws/*.o agents/source/apache24/*.o agents/source/apache/*.so agents/source/apache22/*.so agents/source/apache24/*.so agents/source/varnish/*.so agents/source/varnish/*.o am/source/*.so am/source/*.so.3 am/source/*.a am/source/crypt_util

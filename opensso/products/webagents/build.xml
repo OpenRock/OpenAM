@@ -108,6 +108,10 @@
     <condition property="build.type.suffix" value="_64" else="">
         <equals arg1="${build.type}" arg2="64"/>
     </condition>
+    
+    <condition property="build.type.suffix.sdk" value="_64bit" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
 
     <condition property="target.jdk.set" value="${target.jdk}">
         <isset property="target.jdk"/>
@@ -124,6 +128,7 @@
     <target name="preparebuild">
         <mkdir dir="${webagents.built.dir}"/>
         <mkdir dir="${webagents.dist.dir}"/>
+        <mkdir dir="${webagents.drop.dir}"/>
     </target>
 
     <target name="clean">
@@ -139,9 +144,9 @@
         <antcall target="sjsws" /> 
         <antcall target="apache" />
         <antcall target="proxy40" /> 
-        <antcall target="iis6" />
         <antcall target="domino" /> 
         <antcall target="varnish" />
+        <antcall target="sdk" />
     </target>
 
     <target name="apache" depends="preparebuild">
@@ -231,22 +236,6 @@
              target="varnish" inheritRefs="true"/>
     </target>
 
-    <target name="iis6" depends="preparebuild" if="iis.build.ok">
-        <echo message="Dispatch to iis6"/>
-        <property name="containername" value="iis6"/>
-        <antcall target="gmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml"
-             target="all" inheritRefs="true"/>
-    </target>
-
-    <target name="iis7" depends="preparebuild" if="iis.build.ok">
-        <echo message="Dispatch to iis7"/>
-        <property name="containername" value="iis7"/>
-        <antcall target="gmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml"
-             target="all" inheritRefs="true"/>
-    </target>
-
     <condition property="build.debug32">
         <and>
             <equals arg1="${build.debug}" arg2="full"/> 
@@ -327,10 +316,6 @@
               tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
               tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
-        <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
-              tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
-        <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
-              tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/proxy40/build_date.js.template"
               tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
@@ -347,6 +332,33 @@
         </copy>
     </target>
 
+    <target name="sdk">
+        <echo message="Dispatch to archive OpenAM C-SDK"/>
+        <delete file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}.zip" quiet="true"/>
+        <zip file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}.zip">  
+            <zipfileset prefix="bin" dir="${webagents.basedir}/am/source/" includes="crypt_util"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_auth.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_log.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_map.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_notify.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_policy.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_properties.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_sso.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_string_set.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_types.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_utils.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_web.h"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="libamsdk.so.3"/>
+            <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
+            <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
+            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
+            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="README.TXT"/>
+            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile"/>
+        </zip>
+        <delete file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}_build_date.js" quiet="true"/>
+        <echo file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}_build_date.js">document.write("${nightly.date}");</echo>
+    </target>
 
     <target name="usage">
         <echo message=" "/>
@@ -360,8 +372,6 @@
         <echo message=" domino          : builds the Sun Java System IBM Lotus Domino Server 8.5 agent"/>
         <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
         <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
-        <echo message=" iis6            : builds the Microsoft Internet Information Services 6 agent"/>
-        <echo message=" iis7            : builds the Microsoft Internet Information Services 7 agent"/>
         <echo message=" varnish         : builds the Varnish Cache Server 3.0.3 agent"/>
         <echo message=" usage           : displays this usage message"/>
         <echo message=" "/>
