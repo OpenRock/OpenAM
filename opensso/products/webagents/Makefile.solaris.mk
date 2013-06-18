@@ -56,7 +56,7 @@ libamsdk: $(SDKOBJS) $(COBJS)
 
 libamsdk_static: $(SDKOBJS) $(COBJS)
 	@echo "[*** Creating "$@" static library ***]"
-	ar -rcuS am/source/libamsdk.a $(SDKOBJS) $(COBJS)
+	ar -rcu am/source/libamsdk.a $(SDKOBJS) $(COBJS)
 	ranlib am/source/libamsdk.a
 
 	@echo "[*** Creating crypt utility ***]"
@@ -91,5 +91,15 @@ oiwsi: $(OIWSOBJS)
 oipsi: $(OPSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} $(CFLAGS) -h libampxy4.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(OPSOBJS) -o agents/source/proxy40/libampxy4.so -M agents/source/proxy40/libampxy4.mapfile am/source/libamsdk.a $(EXT_LIBS)
+
+ifneq ($(OS_MARCH), i86pc)
+dominoi: $(DOMINOOBJS)
+	@echo "[*** Creating "$@" shared library ***]"
+	${CXX} $(CFLAGS) -h libamdomino.so $(LDFLAGS) -z muldefs -norunpath -library=Cstd -library=Crun -Wl,-C $(DOMINOOBJS) -o agents/source/domino/libamdomino.so am/source/libamsdk.a $(EXT_LIBS) extlib/$(OS_ARCH)$(OS_MARCH)/domino/lib/notes0.o extlib/$(OS_ARCH)$(OS_MARCH)/domino/lib/notesai0.o
+else
+dominoi:
+	@echo "[*** Creating "$@" shared library ***]"
+	@echo "Domino is not supported on Solaris x86"
+endif
 
 endif

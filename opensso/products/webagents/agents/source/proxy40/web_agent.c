@@ -643,7 +643,7 @@ char * get_post_assertion_data(Session *sn, Request *rq, char *url)
 	    cl_str = pblock_findval("content-length", rq->headers);
     if(cl_str == NULL)
 	    return body;
-    if(PR_sscanf(cl_str, "%ld", &cl) == 1) {
+    if(sscanf(cl_str, "%ld", &cl) == 1) {
         body =  (char *)malloc(cl + 1);
 	if(body != NULL){
 	    for (i = 0; i < cl; i++) {

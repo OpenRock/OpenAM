@@ -78,4 +78,8 @@ oipsi: $(OPSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libampxy4.so $(LDFLAGS) $(OPSOBJS) -o agents/source/sjsws/libampxy4.so am/source/libamsdk.a $(EXT_LIBS)
 
+dominoi: $(DOMINOOBJS)
+	@echo "[*** Creating "$@" shared library ***]"
+	${CXX} -shared -z muldefs -Wl,-export-dynamic -fPIC -Wl,-soname,libamdomino.so $(LDFLAGS) $(DOMINOOBJS) -o agents/source/domino/libamdomino.so am/source/libamsdk.a $(EXT_LIBS) extlib/$(OS_ARCH)$(OS_MARCH)/domino/lib/notes0.o extlib/$(OS_ARCH)$(OS_MARCH)/domino/lib/notesai0.o
+
 endif

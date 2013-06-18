@@ -76,14 +76,17 @@ OPSSRCS=$(wildcard agents/source/proxy40/*.c)
 OPSOBJS=$(OPSSRCS:.c=.o)
 VRNSHSRCS=$(wildcard agents/source/varnish/*.c)
 VRNSHOBJS=$(VRNSHSRCS:.c=.o)
-
+DOMINOSRCS=$(wildcard agents/source/domino/*.c)
+DOMINOOBJS=$(DOMINOSRCS:.c=.o)
+	
 $(APA20OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
 $(APA22OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache22/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
 $(APA24OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache24/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
 $(VRNSHOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/varnish$(ARCH)/include -Iagents/source/varnish -DVARNISH303
 $(OIWSOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/sjsws/include -DXP_UNIX
 $(OPSOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/proxy40/include -DXP_UNIX
-
+$(DOMINOOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/domino/include -DUNIX -D_REENTRANT -DUSE_THREADSAFE_INTERFACES
+	
 ifeq ($(OS_ARCH), Linux)
  include Makefile.linux.mk
 else
@@ -108,7 +111,7 @@ version:
 	   -e 's%AGENT_ER_VER%%g' \
            -e 's%AGENT_FVB_MARKER%%g' < am/source/version.template > am/source/version.h
 
-all: version libamsdk_static libamsdk apache20i apache22i apache24i varnishi oiwsi oipsi
+all: version libamsdk_static libamsdk apache20i apache22i apache24i varnishi oiwsi oipsi dominoi
 
 apache: version libamsdk_static libamsdk apache20i
 apache22: version libamsdk_static libamsdk apache22i
@@ -116,6 +119,7 @@ apache24: version libamsdk_static libamsdk apache24i
 sjsws: version libamsdk_static libamsdk oiwsi
 proxy40: version libamsdk_static libamsdk oipsi
 varnish: version libamsdk_static libamsdk varnishi
-
+domino: version libamsdk_static libamsdk dominoi
+	
 clean:
-	rm -fr built am/source/version.h am/source/*.o agents/source/apache22/*.o agents/source/apache/*.o agents/source/proxy40/*.o agents/source/sjsws/*.o agents/source/apache24/*.o agents/source/apache/*.so agents/source/apache22/*.so agents/source/apache24/*.so agents/source/varnish/*.so agents/source/varnish/*.o am/source/*.so am/source/*.so.3 am/source/*.a am/source/crypt_util
+	rm -fr built am/source/version.h am/source/*.o agents/source/domino/*.so agents/source/domino/*.o agents/source/apache22/*.o agents/source/apache/*.o agents/source/proxy40/*.so agents/source/proxy40/*.o agents/source/sjsws/*.so agents/source/sjsws/*.o agents/source/apache24/*.o agents/source/apache/*.so agents/source/apache22/*.so agents/source/apache24/*.so agents/source/varnish/*.so agents/source/varnish/*.o am/source/*.so am/source/*.so.3 am/source/*.a am/source/crypt_util
