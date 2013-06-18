@@ -92,6 +92,10 @@
         </and>
     </condition>
 
+    <condition property="build.type.suffix.sdk" value="_64bit" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
+    
     <condition property="build.os" value="WINNT">
         <os family="windows"/>
     </condition>
@@ -234,6 +238,10 @@
              target="all" inheritRefs="true"/>
     </target>
 
+    <property name="webagents.iis6.src.dir" location="${webagents.basedir}/agents/source/iis6"/>
+
+    <property name="webagents.iis7.src.dir" location="${webagents.basedir}/agents/source/iis7"/>
+
     <target name="iis6" depends="preparebuild">
         <echo message="Dispatch to iis6"/>
         <property name="containername" value="iis6"/>
@@ -336,10 +344,8 @@
     
     <target name="arch_sdk">
         <echo message="Dispatch to archive OpenAM C-SDK"/>
-        <delete verbose="true" includeemptydirs="false">
-            <fileset dir="${webagents.dist.dir}" includes="agent_csdk_windows_*.zip" />
-        </delete>
-        <zip file="${webagents.dist.dir}/agent_csdk_windows_${build.type}.zip">  
+        <delete file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}.zip" quiet="true"/>
+        <zip file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}.zip">  
             <zipfileset prefix="bin" dir="${webagents.basedir}/am/source/" includes="cryptit.exe"/>
             <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am.h"/>
             <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_auth.h"/>
@@ -355,14 +361,15 @@
             <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_web.h"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.dll"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.lib"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.pdb"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="README.TXT"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile"/>
         </zip>
-        <delete file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js" quiet="true"/>
-        <echo file="${webagents.dist.dir}/agent_csdk_windows_${build.type}_build_date.js">document.write("${nightly.date}");</echo>  
+        <delete file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}_build_date.js" quiet="true"/>
+        <echo file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}_build_date.js">document.write("${nightly.date}");</echo>  
     </target>
 
     <target name="jsFiles">
