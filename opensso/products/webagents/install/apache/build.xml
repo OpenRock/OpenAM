@@ -113,9 +113,6 @@
         <checksum file="${webagents.dist.dir}/${containername}_v20_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
             algorithm="SHA" fileext=".sha" />
         
-        <delete file="${webagents.dist.dir}/${containername}_v20_${build.os}${build.type.suffix}_build_date.js" quiet="true"/>
-        <echo file="${webagents.dist.dir}/${containername}_v20_${build.os}${build.type.suffix}_build_date.js">document.write("${nightly.date}");</echo>
-
     </target>
 
     <target name="copy-Linux-library">
