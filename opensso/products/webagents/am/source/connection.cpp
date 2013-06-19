@@ -66,7 +66,7 @@ USING_PRIVATE_NAMESPACE
 #define SSL_ERROR_WANT_WRITE            3
 #define SSL_OP_NO_SSLv2                 0x01000000L
 #define	MAX_RETRY_COUNT                 5
-#define WAIT                            300000 //microseconds
+#define SOCKET_IO_WAIT_TIME                            300000 //microseconds
 
         static pthread_mutex_t *ssl_mutexes = NULL;
 static void *crypto_lib_h = NULL;
@@ -436,14 +436,14 @@ tls_t * tls_initialize(int sock, int verifycert, const char *keyfile, const char
             if (status < 0) {
                 switch (SSL_get_error(ssl->sslh, status)) {
                     case SSL_ERROR_WANT_READ:
-                        if (wait_for_io(SSL_get_fd(ssl->sslh), WAIT, 1) == 0) {
+                        if (wait_for_io(SSL_get_fd(ssl->sslh), SOCKET_IO_WAIT_TIME, 1) == 0) {
                             retry_count++;
                             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
                                     "Connection::Connection() SSL socket available, retrying (%d)", retry_count);
                             continue;
                         }
                     case SSL_ERROR_WANT_WRITE:
-                        if (wait_for_io(SSL_get_fd(ssl->sslh), WAIT, 0) == 0) {
+                        if (wait_for_io(SSL_get_fd(ssl->sslh), SOCKET_IO_WAIT_TIME, 0) == 0) {
                             retry_count++;
                             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
                                     "Connection::Connection() SSL socket available, retrying (%d)", retry_count);
@@ -647,6 +647,7 @@ void Connection::http_close() {
 ssize_t Connection::response(char ** buff) {
     ssize_t out_len = 0, len = 0;
     u_long n = 0;
+    int err = 0;
     char *tmp = NULL;
 #define TEMP_SIZE 8192
     if ((tmp = (char *) malloc(TEMP_SIZE))) {
@@ -668,23 +669,22 @@ ssize_t Connection::response(char ** buff) {
                         if (ioctl(SSL_get_fd(ssd->sslh), FIONREAD, &n) < 0) {
                             Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL ioctl failed, %d", errno);
                             net_error(errno);
+                            break;
                         }
                         if (n > 0) {
                             Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() SSL more data available (%ld), continue reading", n);
-                            len = n;
-                            continue;
                         }
                     } else if (len == 0) {
                         break;
                     } else {
                         switch (SSL_get_error(ssd->sslh, len)) {
                             case SSL_ERROR_WANT_READ:
-                                if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 1) == 0) {
-                                    continue;
+                                if ((err = wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 1)) == 0) {
+                                    len = 1;
                                 }
                             case SSL_ERROR_WANT_WRITE:
-                                if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 0) == 0) {
-                                    continue;
+                                if ((err = wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 0)) == 0) {
+                                    len = 1;
                                 }
                         }
                         break;
@@ -709,13 +709,19 @@ ssize_t Connection::response(char ** buff) {
                     if (ioctl(sock, FIONREAD, &n) < 0) {
                         Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() ioctl failed, %d", errno);
                         net_error(errno);
+                        break;
                     }
                     if (n > 0) {
                         Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() more data available (%ld), continue reading", n);
-                        len = n;
-                        continue;
                     }
-                    break;
+                } else if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+                    Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::response() got %s error, retrying",
+                            errno == EAGAIN ? "EAGAIN" : "EWOULDBLOCK");
+                    if ((err = wait_for_io(sock, SOCKET_IO_WAIT_TIME, 1)) == 0) {
+                        len = 1;
+                    } else {
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() read retry failed, error: %d", err);
+                    }
                 } else if (len == 0) {
                     break;
                 } else {
@@ -745,14 +751,14 @@ ssize_t Connection::request(const char *buff, const size_t len) {
                     switch (e) {
                         case SSL_ERROR_WANT_READ:
                         {
-                            if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 1) == 0) {
+                            if (wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 1) == 0) {
                                 continue;
                             }
                         }
                             break;
                         case SSL_ERROR_WANT_WRITE:
                         {
-                            if (wait_for_io(SSL_get_fd(ssd->sslh), WAIT, 0) == 0) {
+                            if (wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 0) == 0) {
                                 continue;
                             }
                         }
