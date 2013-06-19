@@ -169,11 +169,7 @@ public:
         WakeAllConditionVariable(&v);
     }
 
-    void wait(Mutex &m) {
-        SleepConditionVariableCS(&v, &(m.m), INFINITE);
-    }
-
-    void wait(Mutex &m, long msec) {
+    void wait(Mutex &m, long msec = INFINITE) {
         SleepConditionVariableCS(&v, &(m.m), msec);
     }
 

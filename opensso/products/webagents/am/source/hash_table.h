@@ -178,10 +178,9 @@ private:
 	void cleanup() {
 	    ScopeLock myLock(lock);
 	    time_t now = time(0);
-	    time_t ticks = 1000 * FUDGE_FACTOR;
 	    typename std::list<EntryType>::iterator iter;
 	    for(iter = elements.begin(); iter != elements.end();) {
-		if((*iter)->getExpirationTime() + ticks < now) {
+		if((*iter)->getExpirationTime() + FUDGE_FACTOR < now) {
 		    iter = elements.erase(iter);
 		} else {
 		    ++iter;
@@ -297,7 +296,7 @@ template<class Element>
 HashTable<Element>::HashTable(unsigned int numberOfBuckets,
 			      unsigned long entryLifeTimeInMins)
     : numBuckets(Utils::get_prime(numberOfBuckets)),
-      entryLifeTime(entryLifeTimeInMins * 1000 * 60),//PR_USEC_PER_SEC
+      entryLifeTime(entryLifeTimeInMins * 60),
       buckets(NULL)
 {
     if (numBuckets == 0) {

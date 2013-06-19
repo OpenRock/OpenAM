@@ -103,7 +103,6 @@ const static string STAR("*");
 #else
 #error "no constant available for the maximum value of a 64-bit integer"
 #endif
-#define PRE_SCALE_MAX	(MAX_64_BIT_INT / 1000)//PR_USEC_PER_MSEC
 
 #define	HTTP_PREFIX	"http://"
 #define	HTTP_PREFIX_LEN (sizeof(HTTP_PREFIX) - 1)
