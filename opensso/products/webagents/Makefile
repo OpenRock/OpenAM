@@ -34,7 +34,7 @@ AGENT_RELEASE_NAME := SNAPSHOT
 AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER).$(AGENT_MICRO_VER)-$(AGENT_RELEASE_NAME)
 OS_ARCH := $(shell uname -s)
 OS_MARCH = $(shell uname -m)
-BUILD_DATE := $(shell date)
+BUILD_DATE := $(shell date +"%b %d %Y %T")
 SVN_REVISION := $(shell svn info . | grep Revision:)
 BUILD_MACHINE := constable.internal.forgerock.com
 BUILD_DATE_JS := $(shell date +%Y%m%d)
@@ -104,12 +104,20 @@ endif
 
 version:
 	@echo "[***** Updating version.h *****]"
-	sed -e 's%BUILD_DATE%$(DATE)%g' \
-	   -e 's%BUILD_MACHINE%$(BUILD_MACHINE)%g' \
+	rm -fr am/source/version.h
+	sed -e 's%BUILD_MACHINE%$(BUILD_MACHINE)%g' \
 	   -e 's%SVN_REVISION%$(SVN_REVISION)%g' \
 	   -e 's%AGENT_VER%$(AGENT_VER)%g' \
 	   -e 's%AGENT_ER_VER%%g' \
            -e 's%AGENT_FVB_MARKER%%g' < am/source/version.template > am/source/version.h
+	@echo "[***** Updating .version *****]"
+	rm -fr .version
+	sed -e 's%BUILD_DATE%$(BUILD_DATE)%g' \
+	   -e 's%BUILD_MACHINE%$(BUILD_MACHINE)%g' \
+	   -e 's%SVN_REVISION%$(SVN_REVISION)%g' \
+	   -e 's%AGENT_VER%$(AGENT_VER)%g' \
+	   -e 's%AGENT_ER_TEXT%%g' \
+           -e 's%AGENT_FVB_TEXT%%g' < version.template > .version
 
 all: version libamsdk_static libamsdk apache20i apache22i apache24i varnishi oiwsi oipsi dominoi
 
