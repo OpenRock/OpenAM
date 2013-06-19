@@ -75,6 +75,7 @@
         </fileSet>
         <fileSet>
             <outputDirectory>bin</outputDirectory>
+            <directoryMode>755</directoryMode>
             <fileMode>755</fileMode>
             <filtered>true</filtered>
             <directory>${project.basedir}/../src/main/assembly/scripts</directory>
