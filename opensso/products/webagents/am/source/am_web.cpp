@@ -4772,167 +4772,234 @@ am_web_is_agent_logout_url(const char *url,
     return found;
 }
 
-
 extern "C" AM_WEB_EXPORT const char *
-am_web_method_num_to_str(am_web_req_method_t method)
-{
+am_web_method_num_to_str(am_web_req_method_t method) {
     const char *methodName;
-    switch(method) {
-    case AM_WEB_REQUEST_GET:
-	methodName = REQUEST_METHOD_GET;
-	break;
-    case AM_WEB_REQUEST_POST:
-	methodName = REQUEST_METHOD_POST;
-	break;
-    case AM_WEB_REQUEST_HEAD:
-	methodName = REQUEST_METHOD_HEAD;
-	break;
-    case AM_WEB_REQUEST_PUT:
-	methodName = REQUEST_METHOD_PUT;
-	break;
-    case AM_WEB_REQUEST_DELETE:
-	methodName = REQUEST_METHOD_DELETE;
-	break;
-    case AM_WEB_REQUEST_TRACE:
-	methodName = REQUEST_METHOD_TRACE;
-	break;
-    case AM_WEB_REQUEST_OPTIONS:
-	methodName = REQUEST_METHOD_OPTIONS;
-	break;
-    case AM_WEB_REQUEST_CONNECT:
-	methodName = REQUEST_METHOD_CONNECT;
-	break;
-    case AM_WEB_REQUEST_COPY:
-	methodName = REQUEST_METHOD_COPY;
-	break;
-    case AM_WEB_REQUEST_INVALID:
-	methodName = REQUEST_METHOD_INVALID;
-	break;
-    case AM_WEB_REQUEST_LOCK:
-	methodName = REQUEST_METHOD_LOCK;
-	break;
-    case AM_WEB_REQUEST_UNLOCK:
-	methodName = REQUEST_METHOD_UNLOCK;
-	break;
-    case AM_WEB_REQUEST_MKCOL:
-	methodName = REQUEST_METHOD_MKCOL;
-	break;
-    case AM_WEB_REQUEST_MOVE:
-	methodName = REQUEST_METHOD_MOVE;
-	break;
-    case AM_WEB_REQUEST_PATCH:
-	methodName = REQUEST_METHOD_PATCH;
-	break;
-    case AM_WEB_REQUEST_PROPFIND:
-	methodName = REQUEST_METHOD_PROPFIND;
-	break;
-    case AM_WEB_REQUEST_PROPPATCH:
-	methodName = REQUEST_METHOD_PROPPATCH;
-	break;
-    case AM_WEB_REQUEST_VERSION_CONTROL:
-        methodName = REQUEST_METHOD_VERSION_CONTROL;
-        break;
-    case AM_WEB_REQUEST_CHECKOUT:
-        methodName = REQUEST_METHOD_CHECKOUT;
-        break;
-    case AM_WEB_REQUEST_UNCHECKOUT:
-        methodName = REQUEST_METHOD_UNCHECKOUT;
-        break;
-    case AM_WEB_REQUEST_CHECKIN:
-        methodName = REQUEST_METHOD_CHECKIN;
-        break;
-    case AM_WEB_REQUEST_UPDATE:
-        methodName = REQUEST_METHOD_UPDATE;
-        break;
-    case AM_WEB_REQUEST_LABEL:
-        methodName = REQUEST_METHOD_LABEL;
-        break;
-    case AM_WEB_REQUEST_REPORT:
-        methodName = REQUEST_METHOD_REPORT;
-        break;
-    case AM_WEB_REQUEST_MKWORKSPACE:
-        methodName = REQUEST_METHOD_MKWORKSPACE;
-        break;
-    case AM_WEB_REQUEST_MKACTIVITY:
-        methodName = REQUEST_METHOD_MKACTIVITY;
-        break;
-    case AM_WEB_REQUEST_BASELINE_CONTROL:
-        methodName = REQUEST_METHOD_BASELINE_CONTROL;
-        break;
-    case AM_WEB_REQUEST_MERGE:
-        methodName = REQUEST_METHOD_MERGE;
-        break;
-    case AM_WEB_REQUEST_UNKNOWN:
-    default:
-	methodName = REQUEST_METHOD_UNKNOWN;
-	break;
+    switch (method) {
+        case AM_WEB_REQUEST_GET:
+            methodName = REQUEST_METHOD_GET;
+            break;
+        case AM_WEB_REQUEST_POST:
+            methodName = REQUEST_METHOD_POST;
+            break;
+        case AM_WEB_REQUEST_HEAD:
+            methodName = REQUEST_METHOD_HEAD;
+            break;
+        case AM_WEB_REQUEST_PUT:
+            methodName = REQUEST_METHOD_PUT;
+            break;
+        case AM_WEB_REQUEST_DELETE:
+            methodName = REQUEST_METHOD_DELETE;
+            break;
+        case AM_WEB_REQUEST_TRACE:
+            methodName = REQUEST_METHOD_TRACE;
+            break;
+        case AM_WEB_REQUEST_OPTIONS:
+            methodName = REQUEST_METHOD_OPTIONS;
+            break;
+        case AM_WEB_REQUEST_CONNECT:
+            methodName = REQUEST_METHOD_CONNECT;
+            break;
+        case AM_WEB_REQUEST_COPY:
+            methodName = REQUEST_METHOD_COPY;
+            break;
+        case AM_WEB_REQUEST_INVALID:
+            methodName = REQUEST_METHOD_INVALID;
+            break;
+        case AM_WEB_REQUEST_LOCK:
+            methodName = REQUEST_METHOD_LOCK;
+            break;
+        case AM_WEB_REQUEST_UNLOCK:
+            methodName = REQUEST_METHOD_UNLOCK;
+            break;
+        case AM_WEB_REQUEST_MKCOL:
+            methodName = REQUEST_METHOD_MKCOL;
+            break;
+        case AM_WEB_REQUEST_MOVE:
+            methodName = REQUEST_METHOD_MOVE;
+            break;
+        case AM_WEB_REQUEST_PATCH:
+            methodName = REQUEST_METHOD_PATCH;
+            break;
+        case AM_WEB_REQUEST_PROPFIND:
+            methodName = REQUEST_METHOD_PROPFIND;
+            break;
+        case AM_WEB_REQUEST_PROPPATCH:
+            methodName = REQUEST_METHOD_PROPPATCH;
+            break;
+        case AM_WEB_REQUEST_VERSION_CONTROL:
+            methodName = REQUEST_METHOD_VERSION_CONTROL;
+            break;
+        case AM_WEB_REQUEST_CHECKOUT:
+            methodName = REQUEST_METHOD_CHECKOUT;
+            break;
+        case AM_WEB_REQUEST_UNCHECKOUT:
+            methodName = REQUEST_METHOD_UNCHECKOUT;
+            break;
+        case AM_WEB_REQUEST_CHECKIN:
+            methodName = REQUEST_METHOD_CHECKIN;
+            break;
+        case AM_WEB_REQUEST_UPDATE:
+            methodName = REQUEST_METHOD_UPDATE;
+            break;
+        case AM_WEB_REQUEST_LABEL:
+            methodName = REQUEST_METHOD_LABEL;
+            break;
+        case AM_WEB_REQUEST_REPORT:
+            methodName = REQUEST_METHOD_REPORT;
+            break;
+        case AM_WEB_REQUEST_MKWORKSPACE:
+            methodName = REQUEST_METHOD_MKWORKSPACE;
+            break;
+        case AM_WEB_REQUEST_MKACTIVITY:
+            methodName = REQUEST_METHOD_MKACTIVITY;
+            break;
+        case AM_WEB_REQUEST_BASELINE_CONTROL:
+            methodName = REQUEST_METHOD_BASELINE_CONTROL;
+            break;
+        case AM_WEB_REQUEST_MERGE:
+            methodName = REQUEST_METHOD_MERGE;
+            break;
+        case AM_WEB_REQUEST_CONFIG:
+            methodName = REQUEST_METHOD_CONFIG;
+            break;
+        case AM_WEB_REQUEST_ENABLE_APP:
+            methodName = REQUEST_METHOD_ENABLE_APP;
+            break;
+        case AM_WEB_REQUEST_DISABLE_APP:
+            methodName = REQUEST_METHOD_DISABLE_APP;
+            break;
+        case AM_WEB_REQUEST_STOP_APP:
+            methodName = REQUEST_METHOD_STOP_APP;
+            break;
+        case AM_WEB_REQUEST_STOP_APP_RSP:
+            methodName = REQUEST_METHOD_STOP_APP_RSP;
+            break;
+        case AM_WEB_REQUEST_REMOVE_APP:
+            methodName = REQUEST_METHOD_REMOVE_APP;
+            break;
+        case AM_WEB_REQUEST_STATUS:
+            methodName = REQUEST_METHOD_STATUS;
+            break;
+        case AM_WEB_REQUEST_STATUS_RSP:
+            methodName = REQUEST_METHOD_STATUS_RSP;
+            break;
+        case AM_WEB_REQUEST_INFO:
+            methodName = REQUEST_METHOD_INFO;
+            break;
+        case AM_WEB_REQUEST_INFO_RSP:
+            methodName = REQUEST_METHOD_INFO_RSP;
+            break;
+        case AM_WEB_REQUEST_DUMP:
+            methodName = REQUEST_METHOD_DUMP;
+            break;
+        case AM_WEB_REQUEST_DUMP_RSP:
+            methodName = REQUEST_METHOD_DUMP_RSP;
+            break;
+        case AM_WEB_REQUEST_PING:
+            methodName = REQUEST_METHOD_PING;
+            break;
+        case AM_WEB_REQUEST_PING_RSP:
+            methodName = REQUEST_METHOD_PING_RSP;
+            break;
+        case AM_WEB_REQUEST_UNKNOWN:
+        default:
+            methodName = REQUEST_METHOD_UNKNOWN;
+            break;
     }
     return methodName;
 }
 
 extern "C" AM_WEB_EXPORT am_web_req_method_t
-am_web_method_str_to_num(const char *method_str)
-{
+am_web_method_str_to_num(const char *method_str) {
     am_web_req_method_t method = AM_WEB_REQUEST_UNKNOWN;
     if (method_str != NULL) {
-	if (!strcmp(method_str, REQUEST_METHOD_GET))
-	    method = AM_WEB_REQUEST_GET;
-	else if (!strcmp(method_str, REQUEST_METHOD_POST))
-	    method = AM_WEB_REQUEST_POST;
-	else if (!strcmp(method_str, REQUEST_METHOD_HEAD))
-	    method = AM_WEB_REQUEST_HEAD;
-	else if (!strcmp(method_str, REQUEST_METHOD_PUT))
-	    method = AM_WEB_REQUEST_PUT;
-	else if (!strcmp(method_str, REQUEST_METHOD_DELETE))
-	    method = AM_WEB_REQUEST_DELETE;
-	else if (!strcmp(method_str, REQUEST_METHOD_TRACE))
-	    method = AM_WEB_REQUEST_TRACE;
-	else if (!strcmp(method_str, REQUEST_METHOD_OPTIONS))
-	    method = AM_WEB_REQUEST_OPTIONS;
-	else if (!strcmp(method_str, REQUEST_METHOD_CONNECT))
-	    method = AM_WEB_REQUEST_CONNECT;
-	else if (!strcmp(method_str, REQUEST_METHOD_COPY))
-	    method = AM_WEB_REQUEST_COPY;
-	else if (!strcmp(method_str, REQUEST_METHOD_INVALID))
-	    method = AM_WEB_REQUEST_INVALID;
-	else if (!strcmp(method_str, REQUEST_METHOD_LOCK))
-	    method = AM_WEB_REQUEST_LOCK;
-	else if (!strcmp(method_str, REQUEST_METHOD_UNLOCK))
-	    method = AM_WEB_REQUEST_UNLOCK;
-	else if (!strcmp(method_str, REQUEST_METHOD_MKCOL))
-	    method = AM_WEB_REQUEST_MKCOL;
-	else if (!strcmp(method_str, REQUEST_METHOD_MOVE))
-	    method = AM_WEB_REQUEST_MOVE;
-	else if (!strcmp(method_str, REQUEST_METHOD_PATCH))
-	    method = AM_WEB_REQUEST_PATCH;
-	else if (!strcmp(method_str, REQUEST_METHOD_PROPFIND))
-	    method = AM_WEB_REQUEST_PROPFIND;
-	else if (!strcmp(method_str, REQUEST_METHOD_PROPPATCH))
-	    method = AM_WEB_REQUEST_PROPPATCH;
-	else if (!strcmp(method_str, REQUEST_METHOD_VERSION_CONTROL))
-	    method = AM_WEB_REQUEST_VERSION_CONTROL;
-	else if (!strcmp(method_str, REQUEST_METHOD_CHECKOUT))
-	    method = AM_WEB_REQUEST_CHECKOUT;
-	else if (!strcmp(method_str, REQUEST_METHOD_UNCHECKOUT))
-	    method = AM_WEB_REQUEST_UNCHECKOUT;
-	else if (!strcmp(method_str, REQUEST_METHOD_CHECKIN))
-	    method = AM_WEB_REQUEST_CHECKIN;
-	else if (!strcmp(method_str, REQUEST_METHOD_UPDATE))
-	    method = AM_WEB_REQUEST_UPDATE;
-	else if (!strcmp(method_str, REQUEST_METHOD_LABEL))
-	    method = AM_WEB_REQUEST_LABEL;
-	else if (!strcmp(method_str, REQUEST_METHOD_REPORT))
-	    method = AM_WEB_REQUEST_REPORT;	   
-	else if (!strcmp(method_str, REQUEST_METHOD_MKWORKSPACE))
-	    method = AM_WEB_REQUEST_MKWORKSPACE;
-	else if (!strcmp(method_str, REQUEST_METHOD_MKACTIVITY))
-	    method = AM_WEB_REQUEST_MKACTIVITY;
-	else if (!strcmp(method_str, REQUEST_METHOD_BASELINE_CONTROL))
-	    method = AM_WEB_REQUEST_BASELINE_CONTROL;	    	    
-	else if (!strcmp(method_str, REQUEST_METHOD_MERGE))
-	    method = AM_WEB_REQUEST_MERGE;
-	else
-	    method = AM_WEB_REQUEST_UNKNOWN;
+        if (!strcmp(method_str, REQUEST_METHOD_GET))
+            method = AM_WEB_REQUEST_GET;
+        else if (!strcmp(method_str, REQUEST_METHOD_POST))
+            method = AM_WEB_REQUEST_POST;
+        else if (!strcmp(method_str, REQUEST_METHOD_HEAD))
+            method = AM_WEB_REQUEST_HEAD;
+        else if (!strcmp(method_str, REQUEST_METHOD_PUT))
+            method = AM_WEB_REQUEST_PUT;
+        else if (!strcmp(method_str, REQUEST_METHOD_DELETE))
+            method = AM_WEB_REQUEST_DELETE;
+        else if (!strcmp(method_str, REQUEST_METHOD_TRACE))
+            method = AM_WEB_REQUEST_TRACE;
+        else if (!strcmp(method_str, REQUEST_METHOD_OPTIONS))
+            method = AM_WEB_REQUEST_OPTIONS;
+        else if (!strcmp(method_str, REQUEST_METHOD_CONNECT))
+            method = AM_WEB_REQUEST_CONNECT;
+        else if (!strcmp(method_str, REQUEST_METHOD_COPY))
+            method = AM_WEB_REQUEST_COPY;
+        else if (!strcmp(method_str, REQUEST_METHOD_INVALID))
+            method = AM_WEB_REQUEST_INVALID;
+        else if (!strcmp(method_str, REQUEST_METHOD_LOCK))
+            method = AM_WEB_REQUEST_LOCK;
+        else if (!strcmp(method_str, REQUEST_METHOD_UNLOCK))
+            method = AM_WEB_REQUEST_UNLOCK;
+        else if (!strcmp(method_str, REQUEST_METHOD_MKCOL))
+            method = AM_WEB_REQUEST_MKCOL;
+        else if (!strcmp(method_str, REQUEST_METHOD_MOVE))
+            method = AM_WEB_REQUEST_MOVE;
+        else if (!strcmp(method_str, REQUEST_METHOD_PATCH))
+            method = AM_WEB_REQUEST_PATCH;
+        else if (!strcmp(method_str, REQUEST_METHOD_PROPFIND))
+            method = AM_WEB_REQUEST_PROPFIND;
+        else if (!strcmp(method_str, REQUEST_METHOD_PROPPATCH))
+            method = AM_WEB_REQUEST_PROPPATCH;
+        else if (!strcmp(method_str, REQUEST_METHOD_VERSION_CONTROL))
+            method = AM_WEB_REQUEST_VERSION_CONTROL;
+        else if (!strcmp(method_str, REQUEST_METHOD_CHECKOUT))
+            method = AM_WEB_REQUEST_CHECKOUT;
+        else if (!strcmp(method_str, REQUEST_METHOD_UNCHECKOUT))
+            method = AM_WEB_REQUEST_UNCHECKOUT;
+        else if (!strcmp(method_str, REQUEST_METHOD_CHECKIN))
+            method = AM_WEB_REQUEST_CHECKIN;
+        else if (!strcmp(method_str, REQUEST_METHOD_UPDATE))
+            method = AM_WEB_REQUEST_UPDATE;
+        else if (!strcmp(method_str, REQUEST_METHOD_LABEL))
+            method = AM_WEB_REQUEST_LABEL;
+        else if (!strcmp(method_str, REQUEST_METHOD_REPORT))
+            method = AM_WEB_REQUEST_REPORT;
+        else if (!strcmp(method_str, REQUEST_METHOD_MKWORKSPACE))
+            method = AM_WEB_REQUEST_MKWORKSPACE;
+        else if (!strcmp(method_str, REQUEST_METHOD_MKACTIVITY))
+            method = AM_WEB_REQUEST_MKACTIVITY;
+        else if (!strcmp(method_str, REQUEST_METHOD_BASELINE_CONTROL))
+            method = AM_WEB_REQUEST_BASELINE_CONTROL;
+        else if (!strcmp(method_str, REQUEST_METHOD_MERGE))
+            method = AM_WEB_REQUEST_MERGE;
+        else if (!strcmp(method_str, REQUEST_METHOD_CONFIG))
+            method = AM_WEB_REQUEST_CONFIG;
+        else if (!strcmp(method_str, REQUEST_METHOD_ENABLE_APP))
+            method = AM_WEB_REQUEST_ENABLE_APP;
+        else if (!strcmp(method_str, REQUEST_METHOD_DISABLE_APP))
+            method = AM_WEB_REQUEST_DISABLE_APP;
+        else if (!strcmp(method_str, REQUEST_METHOD_STOP_APP))
+            method = AM_WEB_REQUEST_STOP_APP;
+        else if (!strcmp(method_str, REQUEST_METHOD_STOP_APP_RSP))
+            method = AM_WEB_REQUEST_STOP_APP_RSP;
+        else if (!strcmp(method_str, REQUEST_METHOD_REMOVE_APP))
+            method = AM_WEB_REQUEST_REMOVE_APP;
+        else if (!strcmp(method_str, REQUEST_METHOD_STATUS))
+            method = AM_WEB_REQUEST_STATUS;
+        else if (!strcmp(method_str, REQUEST_METHOD_STATUS_RSP))
+            method = AM_WEB_REQUEST_STATUS_RSP;
+        else if (!strcmp(method_str, REQUEST_METHOD_INFO))
+            method = AM_WEB_REQUEST_INFO;
+        else if (!strcmp(method_str, REQUEST_METHOD_INFO_RSP))
+            method = AM_WEB_REQUEST_INFO_RSP;
+        else if (!strcmp(method_str, REQUEST_METHOD_DUMP))
+            method = AM_WEB_REQUEST_DUMP;
+        else if (!strcmp(method_str, REQUEST_METHOD_DUMP_RSP))
+            method = AM_WEB_REQUEST_DUMP_RSP;
+        else if (!strcmp(method_str, REQUEST_METHOD_PING))
+            method = AM_WEB_REQUEST_PING;
+        else if (!strcmp(method_str, REQUEST_METHOD_PING_RSP))
+            method = AM_WEB_REQUEST_PING_RSP;
+        else
+            method = AM_WEB_REQUEST_UNKNOWN;
     }
     return method;
 }
