@@ -94,6 +94,7 @@ public class PrivilegeUtils {
 
     private static Random random = new Random();
     private static ServiceTypeManager svcTypeManager;
+    public static final String POLICY_XML = "xmlpolicy";
 
     static {
         try {
@@ -1018,8 +1019,10 @@ public class PrivilegeUtils {
                     (com.sun.identity.entitlement.xacml3.core.Policy) policy;
             xmlString = com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils.toXML(
                     xacmlPolicy);
+            xmlString = xmlString.replaceAll("\n", " ");
         } else if (policy instanceof com.sun.identity.policy.Policy) {
-            xmlString = ((com.sun.identity.policy.Policy) policy).toXML();
+            xmlString =  ((com.sun.identity.policy.Policy) policy).toXML();
+            xmlString = xmlString.replaceAll("\n", " ");
         } else {
             String[] param = {policy.getClass().getName()};
             throw new EntitlementException(329, param);

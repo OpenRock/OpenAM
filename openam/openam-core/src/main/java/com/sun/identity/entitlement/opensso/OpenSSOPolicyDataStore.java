@@ -65,7 +65,7 @@ import org.w3c.dom.Node;
 /**
  */
 public class OpenSSOPolicyDataStore extends PolicyDataStore {
-    private static final String POLICY_XML = "xmlpolicy";
+
     private static final String REALM_DN_TEMPLATE =
          "ou=Policies,ou=default,ou=OrganizationConfig,ou=1.0,ou=" +
          PolicyManager.POLICY_SERVICE_NAME + ",ou=services,{0}";
@@ -113,10 +113,16 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
                 setObjectClass.add(SMSEntry.OC_TOP);
                 setObjectClass.add(SMSEntry.OC_SERVICE_COMP);
 
+                /* if this is a XACML3 policy,  add it as an ou */
+                if (policy instanceof com.sun.identity.entitlement.xacml3.core.Policy ) {
+                    Set<String> setValue = new HashSet<String>(2);
+                    map.put("ou", setValue);
+                    setValue.add("isxacml" );
+                }
+
                 Set<String> setValue = new HashSet<String>(2);
                 map.put(SMSEntry.ATTR_KEYVAL, setValue);
-                setValue.add(POLICY_XML + "=" +
-                    PrivilegeUtils.policyToXML(policy));
+                setValue.add("xmlpolicy="+PrivilegeUtils.policyToXML(policy) );
                 s.setAttributes(map);
 
                 String[] logParams = {DNMapper.orgNameToRealmName(realm),
@@ -207,10 +213,10 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             Map<String, Set<String>> map = s.getAttributes();
             Set<String> xml = map.get(SMSEntry.ATTR_KEYVAL);
             String strXML = xml.iterator().next();
-            if (strXML.startsWith(POLICY_XML)) {
-                strXML = strXML.substring(POLICY_XML.length() +1);
-            }
-            return createPolicy(adminToken, realm, strXML);
+
+            boolean isXacml = map.get("ou").contains("isxacml");
+
+            return createPolicy(adminToken, realm, strXML, isXacml);
         } catch (SSOException ex) {
             Object[] params = {name};
             throw new EntitlementException(204, params, ex);
@@ -248,11 +254,8 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             Map<String, Set<String>> map = s.getAttributes();
             Set<String> set = map.get(SMSEntry.ATTR_KEYVAL);
             String xml = set.iterator().next();
-            if (xml.startsWith(POLICY_XML)) {
-                xml = xml.substring(POLICY_XML.length() +1);
-            }
             Set<IPrivilege> privileges = PrivilegeUtils.policyToPrivileges(
-                createPolicy(adminToken, realm, xml));
+                createPolicy(adminToken, realm, xml, false));
             return (ReferralPrivilege)privileges.iterator().next();
         } catch (SSOException ex) {
             Object[] params = {name};
@@ -266,18 +269,18 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
         }
     }
 
-    private Object createPolicy(SSOToken adminToken, String realm, String xml)
+    private Object createPolicy(SSOToken adminToken, String realm, String xml, boolean isXACML)
         throws Exception, 
         SSOException, PolicyException {
         Object policy = null;
 
-        if (xml.startsWith("xmlpolicy=")) {
-            xml = xml.substring(10);
+        if (xml.startsWith(PrivilegeUtils.POLICY_XML)) {
+            xml = xml.substring(PrivilegeUtils.POLICY_XML.length()+1);
         }
 
         if (EntitlementConfiguration.getInstance(
                 SubjectUtils.createSubject(adminToken),
-                "/").xacmlPrivilegeEnabled()) {
+                "/").xacmlPrivilegeEnabled() && isXACML ) {
             //TODO: create xacml policy from xml document
             policy = XACMLPrivilegeUtils.streamToPolicy(new ByteArrayInputStream(xml.getBytes("UTF8")));
         } else {
@@ -397,7 +400,7 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             map.put(SMSEntry.ATTR_KEYVAL, setValue);
             Policy p = PrivilegeUtils.referralPrivilegeToPolicy(
                 realm, referral);
-            setValue.add(POLICY_XML + "=" +p.toXML());
+            setValue.add(PrivilegeUtils.POLICY_XML + "=" +p.toXML());
             s.setAttributes(map);
 
             String[] logParams = {DNMapper.orgNameToRealmName(realm), name};
