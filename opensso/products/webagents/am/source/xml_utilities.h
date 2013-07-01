@@ -72,6 +72,8 @@ inline std::string bstrToString(const BSTR bstr, int cp = CP_UTF8) {
 
 inline bool matchesXMLString(const std::string& str1, const BSTR bstr) {
     std::string tmp = bstrToString(bstr);
+    /* skip namespace prefix if any */
+    tmp.erase(0, tmp.find(":") + 1);
     return (0 == _stricmp(str1.c_str(), tmp.c_str()));
 }
 
