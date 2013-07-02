@@ -27,15 +27,19 @@ package org.forgerock.openam.extensions.crowd;
 
 import com.atlassian.confluence.user.ConfluenceAuthenticator;
 import com.atlassian.seraph.auth.AuthenticatorException;
+import static com.atlassian.seraph.auth.DefaultAuthenticator.LOGGED_IN_KEY;
+import static com.atlassian.seraph.auth.DefaultAuthenticator.LOGGED_OUT_KEY;
 import com.atlassian.seraph.config.SecurityConfigFactory;
-import com.atlassian.seraph.util.RedirectUtils;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.Principal;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.log4j.Category;
 
 /**
@@ -44,6 +48,10 @@ import org.apache.log4j.Category;
  */
 public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
     private static final Category log = Category.getInstance(OpenAMConfluenceAuthenticator.class);
+    private static final String OPENAM_URL = "https://idp.forgerock.org:443/openam/identity/";
+    private static final String TOKEN_VALID = "isTokenValid?tokenid=";
+    private static final String GET_ATTRS = "attributes?subjectid=";
+    private static final String COOKIE_NAME = "iPlanetDirectoryPro";
 
     @Override
     public Principal getUser(HttpServletRequest request, HttpServletResponse response) {
@@ -51,6 +59,35 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
 
         try {
             request.getSession(true);
+            
+            Object loop = request.getAttribute("loop");
+            
+            if (loop != null && loop.equals("true")) {
+                log.debug("token invalid; looping");
+                return null;
+            } 
+            
+            if (loop != null && loop.equals("nocookie")) {
+                log.debug("no cookie; looping");
+                return null;
+            } 
+            
+            String token = getToken(request);
+            log.info("token=" + token);
+            boolean tokenValid;
+            
+            if (token != null) {
+                tokenValid = isTokenValid(token);
+                
+                log.info("valid=" + tokenValid);
+            
+                if (!tokenValid) {
+                    request.setAttribute("loop", "true");
+                }
+            } else {
+                request.setAttribute("loop", "nocookie");
+            }
+            
             log.info("Trying seamless Single Sign-on...");
             String username = obtainUsername(request);
             log.info("Got username = " + username);
@@ -65,56 +102,103 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
                     request.getSession().setAttribute(LOGGED_OUT_KEY, null);
                 }
             } else {
-                String redirectUrl = RedirectUtils.getLoginUrl(request);
-                log.info("Username is null; redirecting to " + redirectUrl);
-                // user was not found, or not currently valid
-                // response.sendRedirect(redirectUrl);
+                log.info("Username is null");
+                
                 return null;
             }
         } catch (Exception ex) {
             log.warn("Exception: " + ex, ex);
         }
         
+        log.info("returning user is " + user);
         return user;
 
     }
-    private SSOToken getToken(HttpServletRequest request) {
-        SSOToken token = null;
-        
-        try {
-            SSOTokenManager manager = SSOTokenManager.getInstance();
-            token = manager.createSSOToken(request);
-        } catch (Exception ex) {
-            log.debug("Error creating SSOToken", ex);
+    
+    private String getToken(HttpServletRequest request) {
+        if (request == null) {
+            return null;
         }
         
-        return token;
+        Cookie[] cookies = request.getCookies();
+        
+        if (cookies == null) {
+            return null;
+        }
+        
+        for (int c = 0; c < cookies.length; c++) {
+            if (cookies[c].getName().equalsIgnoreCase(COOKIE_NAME)) {
+                return cookies[c].getValue();
+            }
+        }
+         
+        return null;
     }
-
-    private boolean isTokenValid(SSOToken token) {
+    
+    private boolean isTokenValid(String token) {
         boolean result = false;
         
         try {
-            SSOTokenManager manager = SSOTokenManager.getInstance();
-            result = manager.isValidToken(token);
+            URL url = new URL(OPENAM_URL + TOKEN_VALID + token);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            if (conn.getResponseCode() == 200) {
+                result = true;
+            }
+
+            conn.disconnect();
         } catch (Exception ex) {
-            log.debug("Error validating SSOToken", ex);
+            log.debug("Error validating token", ex);
         }
         
+        log.debug("is token valid: " + result);
         return result;
+    }
+    
+    private String getProperty(String token, String name) {
+        String result = null;
+        
+        try {
+            URL url = new URL(OPENAM_URL + GET_ATTRS + token + "&attributenames=" + name);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            
+            String input = null;
+            while ((input = br.readLine()) != null) {
+                if (input.contains("userdetails.attribute.value")) {
+                    result = input.substring(input.indexOf("=") + 1);
+                    log.debug("found property " + name + " value " + result);
+                }
+            }
+
+            conn.disconnect();
+        } catch (Exception ex) {
+            log.error("Error validating token", ex);
+        }
+        
+        return result;        
     }
 
     private String obtainUsername(HttpServletRequest request) {
         String result = null;
-        SSOToken token = getToken(request);
+        String token = getToken(request);
+        log.debug("found token from request " + token);
         
         if (token != null && isTokenValid(token)) {
             try {
-                result = token.getProperty("UserId");
-            } catch (SSOException ssoe) {
-                log.error("Error getting UserId from SSOToken", ssoe);
+                result = getProperty(token, "uid");
+            } catch (Exception ex) {
+                log.error("Error getting UserId from token", ex);
             }
         }
+        
         return result;
     }
 
