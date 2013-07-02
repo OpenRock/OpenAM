@@ -196,11 +196,17 @@
   <section xml:id="java-requirements-web-agents">
    <title>Web Agents Java Requirements</title>
 
-   <para>All web policy agents except Microsoft IIS web agents require Java for
-   installation. ForgeRock recommends the most recent release of Java 6 or later
-   to ensure you have the latest security fixes.</para>
+   <para> ForgeRock recommends the most recent update of the supported version of
+   Java to ensure you have the latest security fixes.</para>
 
-   <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+      <para>All web policy agents except those associated with Varnish Cache and Microsoft IIS
+          require Java for installation. If Java is required, you must install a supported version of the
+          Java runtime environment. Please review the <link xlink:show="new"
+          xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
+              <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
+              of Java and then set the <literal>JAVA_HOME</literal> environment variable accordingly.</para>
+
+      <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
   </section>
 
   <section xml:id="browser-requirements-web-agents">
@@ -222,19 +228,18 @@
     <para>Web policy agents support the following web servers.</para>
 
     <listitem>
-     <para>Apache HTTP Server 2.0, 2.2, 2.4</para>
+     <para><?eval ${agentApacheSupport}?></para>
     </listitem>
     <listitem>
-     <para>Microsoft IIS 6, 7</para>
+     <para><?eval ${agentIISSupport}?></para>
     </listitem>
  <!-- Pending doc and testing
     <listitem>
-     <para>Nginx 1.???</para>
+     <para><?eval ${agentNginxSupport}?></para>
     </listitem>
   -->
      <listitem>
-      <para>Oracle iPlanet Web Server 7.0 (also known as Sun Web Server)
-      <!-- (deprecated)--></para>
+      <para><?eval ${agentSunWebServerSupport}?></para>
 
       <para>In this release, this web policy agent is not at feature parity with
       the other web policy agents and is lacking some fixes. In particular,
@@ -252,7 +257,7 @@
       Solaris.</para>
      </listitem>
      <listitem>
-      <para>Sun Proxy Server 4.0 (deprecated)</para>
+      <para><?eval ${agentSunProxyServerSupport}?></para>
      </listitem>
     </itemizedlist>
    </section>

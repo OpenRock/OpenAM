@@ -66,7 +66,7 @@
    installation.</para>
 
    <listitem>
-    <para>A Java 6 runtime environment</para>
+    <para>A supported Java runtime environment</para>
 
     <para>Check the output of <command>java -version</command> to make
     sure your the version is supported according to the <citetitle>Release
@@ -171,16 +171,15 @@ esac
   </indexterm>
   <para>Download OpenAM releases from one of the following locations:</para>
   
+  
    <itemizedlist>
     <listitem>
-     <para><link xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     <para><link xlink:show="new" xlink:href="http://forgerock.com/download-stack/"
      ><citetitle>Enterprise Downloads</citetitle></link> has the latest stable version of OpenAM, including
      a <filename>.zip</filename> file with all of the OpenAM components, the
      <filename>.war</filename> file, OpenAM tools, the configurator, policy
-     agents, OpenIG, and documentation. Please review the <link xlink:show="new" 
-     xlink:href="http://forgerock.com/software-license-and-subscription-agreement/"
-     >Software License and Subscription Agreement</link> before using OpenAM in 
-     production.</para>
+     agents, OpenIG, and documentation. Make sure you review the Software License and 
+     Subscription Agreement presented before you download OpenAM files.</para>
     </listitem>
     <listitem>
      <para><link xlink:show="new" xlink:href="http://forgerock.org/openam.html"
@@ -290,7 +289,7 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
 # description: Manage Tomcat web application container
 CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
-JAVA_HOME=/path/to/jdk1.6
+JAVA_HOME=/path/to/jdk
 export JAVA_HOME
 CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
 export CATALINA_OPTS

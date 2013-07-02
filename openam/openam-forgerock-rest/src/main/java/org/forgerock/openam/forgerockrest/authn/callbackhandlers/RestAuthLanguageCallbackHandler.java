@@ -105,9 +105,9 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
                 .put("type", CALLBACK_NAME);
 
         if (locale != null) {
-                jsonObject.array("input")
-                        .add(createInputField(index, "Language", locale.getLanguage()))
-                        .addLast(createInputField(index, "Country", locale.getCountry()));
+            jsonObject.array("input")
+                    .add(createInputField(index, "Language", locale.getLanguage()))
+                    .addLast(createInputField(index, "Country", locale.getCountry()));
         }
 
         return jsonObject.build();

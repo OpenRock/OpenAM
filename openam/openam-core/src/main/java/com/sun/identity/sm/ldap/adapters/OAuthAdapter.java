@@ -15,6 +15,7 @@
  */
 package com.sun.identity.sm.ldap.adapters;
 
+import com.google.inject.Inject;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
 import com.sun.identity.sm.ldap.api.tokens.Token;
@@ -22,7 +23,11 @@ import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import org.forgerock.json.fluent.JsonValue;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * OAuth TokenAdapter provides conversion to and from OAuth JsonValue tokens.
@@ -38,28 +43,35 @@ import java.util.Map;
  * @author robert.wapshott@forgerock.com
  */
 public class OAuthAdapter implements TokenAdapter<JsonValue> {
-
-    /**
-     * Keyword used to store all OAuth specific values within the JsonValue map.
-     */
-    public static final String VALUE = "value";
-
+    // Injected
     private final TokenIdFactory tokenIdFactory;
     private final JSONSerialisation serialisation;
+    private final OAuthValues oAuthValues;
+
+    /**
+     * Keyword used to store all OAuth specific oAuthValues within the JsonValue map.
+     */
+    public static final String VALUE = "value";
 
     /**
      * Default constructor with dependencies exposed.
      *
      * @param tokenIdFactory Non null.
      * @param serialisation
+     * @param oAuthValues
      */
-    public OAuthAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation) {
+    @Inject
+    public OAuthAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation, OAuthValues oAuthValues) {
         this.tokenIdFactory = tokenIdFactory;
         this.serialisation = serialisation;
+        this.oAuthValues = oAuthValues;
     }
 
     /**
-     * Covert to Token.
+     * Convert a JsonValue to a Token.
+     *
+     * The conversion assumes that the JsonValue contains a map which has an attribute called
+     * 'value' which contains the OAuth Token values.
      *
      * The TokenIdFactory is responsible for resolving the primary Id of the Token.
      *
@@ -84,7 +96,27 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
             for (OAuthTokenField field : OAuthTokenField.values()) {
                 String key = field.getOAuthField();
                 if (values.containsKey(key)) {
+
                     Object value = values.get(key);
+                    /**
+                     * OAuthTokenField aware conversions.
+                     *
+                     * - Skip the ID as it is extracted by the TokenIdFactory.
+                     * - Dates are formatted as milliseconds from epoch, and stored in Collections.
+                     * - All other fields are stored in Collections which can be empty.
+                     * - (just in case) If a field is not in a collection, assume it is the right type.
+                     */
+                    if (OAuthTokenField.ID.getOAuthField().equals(key)) {
+                        continue;
+                    }
+                    if (OAuthTokenField.EXPIRY_TIME.getOAuthField().equals(key)) {
+                        if (!Collection.class.isAssignableFrom(value.getClass())) {
+                            throw new IllegalStateException("Date must be in a collection");
+                        }
+                        value = oAuthValues.getDateValue((Collection<String>) value);
+                    } else if (value instanceof Collection) {
+                        value = oAuthValues.getSingleValue((Collection<String>) value);
+                    }
                     token.setAttribute(field.getField(), value);
                 }
             }
@@ -112,12 +144,19 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      * was not an instance of a Map.
      */
     public JsonValue fromToken(Token token) {
-        String objectToDeserialise = new String(token.getBlob());
-
+        String data = new String(token.getBlob());
+        
         JsonValue r;
         try {
-            Object obj = serialisation.deserialise(objectToDeserialise, Map.class);
-            r = new JsonValue(obj);
+            r = new JsonValue(serialisation.deserialise(data, Map.class));
+            r = new JsonValue(r.get("value").asMap());
+            Set<String> keys = r.keys();
+            for (String key : keys){
+                List<String> x = r.get(key).asList(String.class);
+                Set<String> set = new HashSet<String>(x);
+                r.remove(key);
+                r.add(key, set);
+            }
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(
                     "The CTS usage of the JsonValue depends on the value being of " +

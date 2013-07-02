@@ -16,14 +16,13 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.google.inject.Singleton;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonArray;
-import org.forgerock.openam.utils.JsonObject;
-import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
@@ -37,6 +36,7 @@ import java.util.List;
 /**
  * Manages the converting of Callbacks to and from JSON representation.
  */
+@Singleton
 public class RestAuthCallbackHandlerManager {
 
     private static final Debug logger = Debug.getInstance("amIdentityServices");

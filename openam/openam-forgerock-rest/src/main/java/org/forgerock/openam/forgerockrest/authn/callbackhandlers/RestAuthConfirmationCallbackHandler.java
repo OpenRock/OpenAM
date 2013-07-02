@@ -87,13 +87,13 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .add(createOutputField("prompt", prompt))
-                    .add(createOutputField("messageType", messageType))
-                    .add(createOutputField("options", options))
-                    .add(createOutputField("optionType", optionType))
-                    .addLast(createOutputField("defaultOption", defaultOption))
+                .add(createOutputField("prompt", prompt))
+                .add(createOutputField("messageType", messageType))
+                .add(createOutputField("options", options))
+                .add(createOutputField("optionType", optionType))
+                .addLast(createOutputField("defaultOption", defaultOption))
                 .array("input")
-                    .addLast(createInputField(index, selectedIndex))
+                .addLast(createInputField(index, selectedIndex))
                 .build();
 
         return jsonValue;

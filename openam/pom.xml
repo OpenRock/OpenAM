@@ -104,10 +104,10 @@
 
         <!-- Java Properties -->
 
-        <java.source.version>1.5</java.source.version>
+        <java.source.version>1.6</java.source.version>
         <!-- Backed off from 1.6 -->
 
-        <java.target.version>1.5</java.target.version>
+        <java.target.version>1.6</java.target.version>
         <!-- Backed off from 1.6 -->
 
         <!-- Surefire Argument Line -->
@@ -126,16 +126,18 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.4.6</opendj.server.version>
-        <opendj.sdk.version>3.0.0-SNAPSHOT</opendj.sdk.version>
+        <opendj.sdk.version>2.5.0-SNAPSHOT</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
+        <commons.authnfilter.version>0.1.1-SNAPSHOT</commons.authnfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
+        <powermock.version>1.5</powermock.version>
 
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
@@ -187,6 +189,7 @@
     <modules>
 
         <module>openam-ldap-utils</module>
+        <module>openam-datastore</module>
         <!-- OpenAM Locale - Common Module -->
         <module>openam-locale</module>
 
@@ -217,6 +220,9 @@
 
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
+
+        <!-- OpenAM Commons Authentication Filter -->
+        <module>openam-authn-filter</module>
 
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
@@ -546,6 +552,16 @@
                 <artifactId>openam-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-modules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Include all Authentication Modules -->
             <dependency>
@@ -576,6 +592,16 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-datastore</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-persistentcookie</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -674,6 +700,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-dashboard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-datastore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1575,6 +1606,21 @@
                 <artifactId>forgerock-util</artifactId>
                 <version>${commons.forgerock-util.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-container</artifactId>
+                <version>${commons.authnfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
+                <version>${commons.authnfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.security.auth.message</artifactId>
+                <version>3.1</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -1636,27 +1682,37 @@
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-core</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-reflect</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng-common</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.12.1.GA</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1952,10 +2008,11 @@
                 </configuration>
             </plugin>
 
+            <!-- Run link test as part of the documentation build
             <plugin>
                 <groupId>org.forgerock.maven.plugins</groupId>
                 <artifactId>linktester-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <inherited>false</inherited>
                 <configuration>
                     <includes>
@@ -1975,6 +2032,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
 
         <pluginManagement>

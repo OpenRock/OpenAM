@@ -21,7 +21,7 @@ import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +42,11 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
 
     private final RedirectCallbackHandler redirectCallbackHandler;
 
+    /**
+     * Constructs an instance of the RestAuthRedirectCallbackHandler.
+     *
+     * @param redirectCallbackHandler An instance of the RedirectCallbackHandler.
+     */
     public RestAuthRedirectCallbackHandler(RedirectCallbackHandler redirectCallbackHandler) {
         this.redirectCallbackHandler = redirectCallbackHandler;
     }

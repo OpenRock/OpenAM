@@ -12,7 +12,10 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
- * Portions Copyright 2013 ForgeRock Inc.
+ */
+
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
  */
 
 package org.forgerock.openam.utils;
@@ -26,7 +29,6 @@ import com.sun.identity.shared.encode.Base64;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -281,6 +283,36 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
+     * Return the {@link java.security.PrivateKey} for the specified certAlias and encrypted private key password.
+     * @param certAlias Certificate alias name
+     * @param encryptedKeyPass The encrypted key password to use when getting the private certificate
+     * @return PrivateKey which matches the certAlias, return null if the private key could not be found.
+     */
+    public PrivateKey getPrivateKey (String certAlias, String encryptedKeyPass) {
+
+        PrivateKey key = null;
+
+        String keyPass = decodePassword(encryptedKeyPass);
+        if (keyPass != null) {
+            try {
+                key = (PrivateKey) ks.getKey(certAlias, keyPass.toCharArray());
+            } catch (KeyStoreException e) {
+                logger.error(e.getMessage());
+            } catch (NoSuchAlgorithmException e) {
+                logger.error(e.getMessage());
+            } catch (UnrecoverableKeyException e) {
+                logger.error(e.getMessage());
+            }
+        } else {
+            logger.error("AMKeyProvider.getPrivateKey: " +
+                    "null key password returned from decryption for certificate alias:" + certAlias +
+                    " The password maybe incorrect.");
+        }
+
+        return key;
+    }
+
+    /**
      * Get the alias name of the first keystore entry whose certificate matches
      * the given certificate.
      * @param cert Certificate
@@ -301,11 +333,38 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
+     * Gets the Keystore password.
+     *
+     * @return The Keystore password
+     */
+    public char[] getKeystorePass() {
+        return keystorePass.toCharArray();
+    }
+
+    /**
      * Get the private key password
      * @return the private key password
      */
     public String getPrivateKeyPass() {
         return privateKeyPass;
+    }
+
+    /**
+     * Gets the Keystore type.
+     *
+     * @return The Keystore type.
+     */
+    public String getKeystoreType() {
+        return keystoreType;
+    }
+
+    /**
+     * Gets the Keystore File path.
+     *
+     * @return The Keystore file path.
+     */
+    public String getKeystoreFilePath() {
+        return keystoreFile;
     }
 
     /**

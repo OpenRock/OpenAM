@@ -30,6 +30,8 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
+import org.forgerock.openam.oauth2.openid.OpenIDConnectConfiguration;
+import org.forgerock.openam.oauth2.openid.OpenIDConnectDiscovery;
 import org.forgerock.openam.oauth2.openid.UserInfo;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
@@ -42,7 +44,7 @@ import org.forgerock.restlet.ext.oauth2.consumer.TokenVerifier;
 import org.forgerock.restlet.ext.oauth2.internal.DefaultScopeEnroler;
 import org.forgerock.restlet.ext.oauth2.provider.*;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
-import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -116,22 +118,13 @@ public class OAuth2Application extends Application {
     public Restlet activate() {
         Context childContext = getContext().createChildContext();
         Router root = new Router(childContext);
-        
-        OpenAMParameters parameters = new OpenAMParameters();
-        OpenAMServletAuthenticator authenticator =
-                new OpenAMServletAuthenticator(childContext, parameters);
-        // This endpoint protected by OpenAM Filter
-        root.attach(OAuth2Utils.getAuthorizePath(childContext), authenticator);
-
-        OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
-        authenticator.setNext(authorizer);
 
         // Define Authorization Endpoint
         OAuth2FlowFinder finder =
                 new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
-        authorizer.setNext(finder);
+        root.attach(OAuth2Utils.getAuthorizePath(childContext), finder);
 
         //TODO client authentication needs to be done in the grant code
         ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);

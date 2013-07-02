@@ -89,11 +89,11 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .add(createOutputField("prompt", prompt))
-                    .add(createOutputField("choices", choices))
-                    .addLast(createOutputField("defaultChoice", defaultChoice))
+                .add(createOutputField("prompt", prompt))
+                .add(createOutputField("choices", choices))
+                .addLast(createOutputField("defaultChoice", defaultChoice))
                 .array("input")
-                    .addLast(createInputField(index, selectedIndex))
+                .addLast(createInputField(index, selectedIndex))
                 .build();
 
         return jsonValue;

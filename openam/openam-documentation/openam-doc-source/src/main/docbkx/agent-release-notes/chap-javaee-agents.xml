@@ -102,9 +102,12 @@
   <section xml:id="java-requirements-javaee-agents">
    <title>Java EE Agents Java Requirements</title>
 
-   <para>Java EE policy agents run in a container using Java 6 or later.
-   ForgeRock recommends the most recent release of Java 6 or later to ensure
-   you have the latest security fixes.</para>
+   <para>Java EE policy agents run in a Java EE Web container.
+       Please review the <link xlink:show="new"
+       xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
+           <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
+       of Java. ForgeRock recommends the most recent update of the installed version of Java
+       to ensure you have the latest security fixes.</para>
 
    <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
   </section>
@@ -129,23 +132,22 @@
     containers.</para>
 
     <listitem>
-     <para>Apache Tomcat 6, 7</para>
+     <para><?eval ${agentTomcatSupport}?></para>
     </listitem>
     <listitem>
-     <para>GlassFish v2, v3</para>
+     <para><?eval ${agentGlassFishSupport}?></para>
     </listitem>
     <listitem>
-     <para>IBM WebSphere Application Server <!-- 6.1, -->7, 8, 8.5</para>
+     <para><?eval ${agentWebSphereSupport}?></para>
     </listitem>
     <listitem>
-     <para>JBoss Enterprise Application Platform 5</para>
-     <!-- Pending OPENAM-1735: <para>JBoss Application Server 7.1</para>-->
+     <para><?eval ${agentJBossSupport}?></para>
     </listitem>
     <listitem>
-     <para>Jetty 7</para>
+     <para><?eval ${agentJettySupport}?></para>
     </listitem>
     <listitem>
-     <para>Oracle WebLogic Server 10g or later</para>
+     <para><?eval ${agentWebLogicSupport}?></para>
     </listitem>
    </itemizedlist>
   </section>

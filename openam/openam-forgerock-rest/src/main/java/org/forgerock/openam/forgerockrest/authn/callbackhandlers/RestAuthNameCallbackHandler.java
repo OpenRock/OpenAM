@@ -83,9 +83,9 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .addLast(createOutputField("prompt", prompt))
+                .addLast(createOutputField("prompt", prompt))
                 .array("input")
-                    .addLast(createInputField(index, name))
+                .addLast(createInputField(index, name))
                 .build();
 
         return jsonValue;

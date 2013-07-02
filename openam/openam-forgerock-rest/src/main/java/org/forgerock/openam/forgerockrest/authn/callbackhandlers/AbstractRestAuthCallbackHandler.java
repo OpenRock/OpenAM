@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonArray;
 import org.forgerock.openam.utils.JsonObject;
@@ -33,6 +33,8 @@ import java.text.MessageFormat;
 
 /**
  * This class contains common functionality for all of the RestAuthCallbackHandlers.
+ *
+ * @param <T> Callback type.
  */
 public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
 
