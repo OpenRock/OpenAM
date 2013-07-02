@@ -32,7 +32,7 @@
 #ifndef AM_WEB_H
 #define AM_WEB_H
 
-#if (defined(WINNT) || defined(_AMD64_))
+#ifdef _MSC_VER
 #if defined(AM_BUILDING_LIB)
 #define AM_WEB_EXPORT __declspec(dllexport)
 #else
@@ -110,6 +110,20 @@ AM_BEGIN_EXTERN_C
 #define REQUEST_METHOD_MKACTIVITY               "MKACTIVITY"
 #define REQUEST_METHOD_BASELINE_CONTROL         "BASELINE_CONTROL"
 #define REQUEST_METHOD_MERGE                    "MERGE"
+#define REQUEST_METHOD_CONFIG                   "CONFIG"
+#define REQUEST_METHOD_ENABLE_APP               "ENABLE-APP"
+#define REQUEST_METHOD_DISABLE_APP              "DISABLE-APP"
+#define REQUEST_METHOD_STOP_APP                 "STOP-APP"
+#define REQUEST_METHOD_STOP_APP_RSP             "STOP-APP-RSP"
+#define REQUEST_METHOD_REMOVE_APP               "REMOVE-APP"
+#define REQUEST_METHOD_STATUS                   "STATUS"
+#define REQUEST_METHOD_STATUS_RSP               "STATUS-RSP"
+#define REQUEST_METHOD_INFO                     "INFO"
+#define REQUEST_METHOD_INFO_RSP                 "INFO-RSP"
+#define REQUEST_METHOD_DUMP                     "DUMP"
+#define REQUEST_METHOD_DUMP_RSP                 "DUMP-RSP"
+#define REQUEST_METHOD_PING                     "PING"
+#define REQUEST_METHOD_PING_RSP                 "PING-RSP"
 #define REQUEST_METHOD_UNKNOWN                  "UNKNOWN"
 
 
@@ -342,7 +356,21 @@ typedef enum {
     AM_WEB_REQUEST_MKWORKSPACE,
     AM_WEB_REQUEST_MKACTIVITY,
     AM_WEB_REQUEST_BASELINE_CONTROL,
-    AM_WEB_REQUEST_MERGE
+    AM_WEB_REQUEST_MERGE,
+    AM_WEB_REQUEST_CONFIG,
+    AM_WEB_REQUEST_ENABLE_APP,
+    AM_WEB_REQUEST_DISABLE_APP,
+    AM_WEB_REQUEST_STOP_APP,
+    AM_WEB_REQUEST_STOP_APP_RSP,        
+    AM_WEB_REQUEST_REMOVE_APP,
+    AM_WEB_REQUEST_STATUS,
+    AM_WEB_REQUEST_STATUS_RSP,
+    AM_WEB_REQUEST_INFO,
+    AM_WEB_REQUEST_INFO_RSP,
+    AM_WEB_REQUEST_DUMP,
+    AM_WEB_REQUEST_DUMP_RSP,
+    AM_WEB_REQUEST_PING,
+    AM_WEB_REQUEST_PING_RSP
 } am_web_req_method_t;
 
 typedef enum {
@@ -970,8 +998,7 @@ AM_WEB_EXPORT boolean_t am_web_is_max_debug_on();
 
 AM_WEB_EXPORT void am_web_log_always(const char *fmt, ...);
 AM_WEB_EXPORT boolean_t am_web_log_auth(am_web_access_t access_type, 
-                                        const char *fmt, 
-                                        void* agent_config, ...);
+                                        void* agent_config, const char *fmt, ...);
 AM_WEB_EXPORT void am_web_log_error(const char *fmt, ...);
 AM_WEB_EXPORT void am_web_log_warning(const char *fmt, ...);
 AM_WEB_EXPORT void am_web_log_info(const char *fmt, ...);

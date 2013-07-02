@@ -307,26 +307,6 @@ static int handle_notification(Session *sn,
     return result;
 }
 
-/**
-  * Function Name: process_notification
-  *
-  * Processes both session and policy notifications coming from Access Manager.
-  * Implemented as a NSAPI SAF. Works together with Service directive.
-  * 
-  * Input:  As defined by a SAF
-  * Output: As defined by a SAF
-*/
-
-
-NSAPI_PUBLIC int process_notification(pblock *param, Session *sn, Request *rq)
-{
-    void* agent_config = NULL;
-    agent_config = am_web_get_agent_configuration();
-    process_new_notification(param,sn,rq,agent_config);
-    am_web_delete_agent_configuration(agent_config);
-    return REQ_PROCEED;
-}
-
 static int process_new_notification(pblock *param,
                                     Session *sn,
                                     Request *rq,
@@ -355,6 +335,26 @@ static int process_new_notification(pblock *param,
     if (IO_ERROR == net_write(sn->csd, "OK", 2)) {
         return REQ_EXIT;
     }
+    return REQ_PROCEED;
+}
+
+/**
+  * Function Name: process_notification
+  *
+  * Processes both session and policy notifications coming from Access Manager.
+  * Implemented as a NSAPI SAF. Works together with Service directive.
+  * 
+  * Input:  As defined by a SAF
+  * Output: As defined by a SAF
+*/
+
+
+NSAPI_PUBLIC int process_notification(pblock *param, Session *sn, Request *rq)
+{
+    void* agent_config = NULL;
+    agent_config = am_web_get_agent_configuration();
+    process_new_notification(param,sn,rq,agent_config);
+    am_web_delete_agent_configuration(agent_config);
     return REQ_PROCEED;
 }
 
@@ -643,7 +643,7 @@ char * get_post_assertion_data(Session *sn, Request *rq, char *url)
 	    cl_str = pblock_findval("content-length", rq->headers);
     if(cl_str == NULL)
 	    return body;
-    if(PR_sscanf(cl_str, "%ld", &cl) == 1) {
+    if(sscanf(cl_str, "%ld", &cl) == 1) {
         body =  (char *)malloc(cl + 1);
 	if(body != NULL){
 	    for (i = 0; i < cl; i++) {

@@ -29,13 +29,15 @@
  * Represents an element in an XML parse tree.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef XML_ELEMENT_H
 #define XML_ELEMENT_H
 
-#include <string>
-
 #include "internal_macros.h"
+#include "xml_utilities.h"
 #include "xml_attribute.h"
 
 BEGIN_PRIVATE_NAMESPACE
@@ -43,12 +45,13 @@ BEGIN_PRIVATE_NAMESPACE
 class XMLElement {
 public:
     // The different types of XML nodes.
+
     enum Type {
-	INVALID_NODE = 0,
-	ELEMENT_NODE = 1,
-	TEXT_NODE = 3,
-	CDATA_NODE = 4,
-	COMMENT_NODE = 8
+        INVALID_NODE = 0,
+        ELEMENT_NODE = 1,
+        TEXT_NODE = 3,
+        CDATA_NODE = 4,
+        COMMENT_NODE = 8
     };
 
     //
@@ -158,7 +161,7 @@ public:
     //   true	otherwise
     //
     bool getAttributeValue(const char *attributeName,
-			   std::string& attributeValue) const;
+            std::string& attributeValue) const;
 
     //
     // Determines if this node has a value for the specified attribute.
@@ -278,46 +281,68 @@ public:
 private:
     friend class XMLTree;
 
+#ifdef _MSC_VER
+    explicit XMLElement(MSXML2::IXMLDOMNodePtr pointer);
+
+    bool nameMatches(const std::string &targetNodeName) const {
+        bool found = false;
+        BSTR bstr;
+        if (nodePtr) {
+            if ((nodePtr->get_nodeName(&bstr)) == S_OK) {
+                found = matchesXMLString(targetNodeName, bstr);
+            }
+        }
+        return found;
+    }
+
+#else
     explicit XMLElement(struct _xmlNode *pointer);
+#endif
 
     static void walkTree(Log::ModuleId logModule, Log::Level level,
-			 unsigned int depth, XMLElement node);
+            unsigned int depth, XMLElement node);
 
     bool findSubElement(const std::string& name, XMLElement& subElement) const;
 
+#ifdef _MSC_VER
+    MSXML2::IXMLDOMNodePtr nodePtr;
+#else
     struct _xmlNode *nodePtr;
+#endif
 };
 
 inline XMLElement::XMLElement()
-    : nodePtr(NULL)
-{
+: nodePtr(NULL) {
 }
+
+#ifdef _MSC_VER
+
+inline XMLElement::XMLElement(MSXML2::IXMLDOMNodePtr nodePtrArg)
+: nodePtr(nodePtrArg) {
+}
+#else
 
 inline XMLElement::XMLElement(struct _xmlNode *nodePtrArg)
-    : nodePtr(nodePtrArg)
-{
+: nodePtr(nodePtrArg) {
 }
+#endif
 
 inline XMLElement::XMLElement(const XMLElement& rhs)
-    : nodePtr(rhs.nodePtr)
-{
+: nodePtr(rhs.nodePtr) {
 }
 
-inline XMLElement::~XMLElement()
-{
+inline XMLElement::~XMLElement() {
     nodePtr = NULL;
 }
 
-inline XMLElement& XMLElement::operator=(const XMLElement& rhs)
-{
+inline XMLElement& XMLElement::operator=(const XMLElement& rhs) {
     // Not worth checking for self-assignment, since this is safe to do anyway.
     nodePtr = rhs.nodePtr;
 
     return *this;
 }
 
-inline bool XMLElement::isValid() const
-{
+inline bool XMLElement::isValid() const {
     return nodePtr != NULL;
 }
 

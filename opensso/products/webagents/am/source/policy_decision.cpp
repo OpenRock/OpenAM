@@ -25,13 +25,17 @@
  * $Id: policy_decision.cpp,v 1.5 2008/06/25 08:14:34 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <string>
 #include <am_types.h>
+#include <time.h>
+#include <climits>
 #include "policy_resource.h"
 #include "xml_element.h"
 #include "utils.h"
-
 #include "policy_decision.h"
 #include "action_decision.h"
 #include "properties.h"
@@ -101,7 +105,7 @@ PolicyDecision::construct_policy_decision(const ResourceName &resName,
 	}
 
 	if(iter.isNamed(ACTION_DECISION)) {
-	    string actName;
+	    std::string actName;
 
 	    // Get the attribute value pairs
 	    XMLElement avp, attrNode;
@@ -114,7 +118,7 @@ PolicyDecision::construct_policy_decision(const ResourceName &resName,
 			// the action name and TTL.
 			ad = new ActionDecision(actName, 
                                        Utils::getTTL(iter,policy_clock_skew));
-
+                                       
 			// Add the action values.
 			XMLElement values;
 			if(avp.getSubElement(VALUE, values)) {
@@ -128,7 +132,7 @@ PolicyDecision::construct_policy_decision(const ResourceName &resName,
 
 		    } else {
 			// Log:ERROR
-			string msg("No attribute name value node "
+			std::string msg("No attribute name value node "
 				   "in Attribute node for while "
 				   "processing resource: ");
 			msg.append(resName.getString());
@@ -138,7 +142,7 @@ PolicyDecision::construct_policy_decision(const ResourceName &resName,
 		    }
 		} else {
 		    // Log:ERROR
-		    string msg("No Attribute node found under"
+		    std::string msg("No Attribute node found under"
 			       "AttributeValuePair while resource: ");
 		    msg.append(resName.getString());
 		    throw InternalException(
@@ -147,7 +151,7 @@ PolicyDecision::construct_policy_decision(const ResourceName &resName,
 		}
 	    } else {
 		// Log:ERROR
-		string msg("No AttributeValuePair node "
+		std::string msg("No AttributeValuePair node "
 			   "found while resource: ");
 		msg.append(resName.getString());
 		throw InternalException(
@@ -216,34 +220,34 @@ PolicyDecision::isStale(const std::string &actionName) {
     ActionDecision *ad = actionDecisions[actionName];
 
     // If there is action decision, use it, but if there is not,
-    // there is no point refetching the policy decision.
-    if(retVal != true && ad != NULL) {
-	PRTime expirationTime = ad->getTimeStamp();
-	const char *resName = resourceName.getString().c_str();
+    // there is no point re-fetching the policy decision.
+    if (retVal != true && ad != NULL) {
+        time_t now = time(0);
+        time_t expirationTime = ad->getTimeStamp();
+        const char *resName = resourceName.getString().c_str();
+        
+        if (Log::isLevelEnabled(Log::ALL_MODULES, Log::LOG_DEBUG)) {
+            char time_string[50];
+            struct tm tm;
+#ifdef _MSC_VER
+            localtime_s(&tm, &expirationTime);
+#else
+            localtime_r(&expirationTime, &tm);
+#endif
+            strftime(time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", &tm);
+            
+            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                    "Policy time stamp for resource %s is %s", resName,
+                    time_string);
+        }
+        if (difftime(now, expirationTime) > 0) {
+            Log::log(Log::ALL_MODULES, Log::LOG_INFO,
+                    "Policy node %s marked stale due to time out.",
+                    resName);
 
-	if(Log::isLevelEnabled(Log::ALL_MODULES, Log::LOG_DEBUG)) {
-	    PRExplodedTime explodedExpTime;
-
-	    PR_ExplodeTime(expirationTime, PR_LocalTimeParameters,
-			   &explodedExpTime);
-	    Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
-		     "Policy time stamp for resource %s is (%llu)"
-		     "%d-%02d-%02d %02d:%02d:%02d.%03d.", resName,
-		     expirationTime,
-		     explodedExpTime.tm_year,
-		     explodedExpTime.tm_month + 1,
-		     explodedExpTime.tm_mday, explodedExpTime.tm_hour,
-		     explodedExpTime.tm_min, explodedExpTime.tm_sec,
-		     explodedExpTime.tm_usec / 1000);
-	}
-	if(PR_Now() > expirationTime) {
-	    Log::log(Log::ALL_MODULES, Log::LOG_INFO,
-		     "Policy node %s marked stale due to time out.",
-		     resName);
-
-	    markStale();
-	    retVal = true;
-	}
+            markStale();
+            retVal = true;
+        }
     }
     return retVal;
 }

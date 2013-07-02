@@ -126,94 +126,23 @@ extern const char *SERVER_HANDLED_ADVICES;
 
 #define AM_COMMON_ORDINAL_NUMBER     AM_COMMON_PROPERTY_PREFIX "ordinal"
 
-/*
- * Windows does not support std::string.push_back(char) specified in
- * the IEC 44822 ANSI C++ Programming Language.  This is a hack around it.
- * In good compilers, we do not want to pay the extra cost of constructing
- * a string.
- */
-# if defined(WINNT) || defined(_AMD64_)
-#define PUSH_BACK_CHAR(str, c) str += c
-#else
-#define PUSH_BACK_CHAR(str, c) str.push_back(c);
-#endif
-
+#define PUSH_BACK_CHAR(str, c) str.push_back(c)
 #define MIN_URL_SIZE 8
+
 enum NotificationType {
     NOTIFICATION_ADD = 0,
     NOTIFICATION_DELETE,
     NOTIFICATION_MODIFY
 };
 
-#if	(defined(WINNT) || defined(_AMD64_)) && _MSC_VER >= 1200
-#define	BROKEN_MSVC
-#pragma warning(disable:4786)
-
-#if	defined(_SIZE_T_DEFINED)
-namespace std {
-    using ::size_t;
-}
-#endif	// defined(_SIZE_T_DEFINED)
-
-#if	defined(_VA_LIST_DEFINED)
-namespace std {
-    using ::va_list;
-}
-#endif	// defined(_VA_LIST_DEFINED)
-
-#if	defined(_INC_STDIO)
-namespace std {
-    using ::fflush;
-    using ::fprintf;
-    using ::sscanf;
-    using ::vfprintf;
-    using ::fopen;
-    using ::fclose;
-    using ::FILE;
-    using ::sqrt;
-}
-#endif	// defined(_INC_STDIO)
-
-#if	defined(_INC_STDLIB)
-namespace std {
-    using ::strtol;
-    using ::strtoul;
-}
-#endif	// defined(_INC_STDLIB)
-
-#if	defined(_INC_STRING)
-namespace std {
-    using ::memcpy;
-    using ::memset;
-    using ::memmove;
-    using ::strchr;
-    using ::strcmp;
-    using ::strcpy;
-    using ::strlen;
-}
-
-#endif	// defined(_INC_STRING)
-#endif // defined(WINNT) && _MSC_VER == 1200
-
-#if (defined(WINNT) || defined(_AMD64_))
-#if !defined(_INC_WINDOWS_CMPFUNCS)
-#define _INC_WINDOWS_CMPFUNCS
-#include <string.h>
-
-#if defined(_AMD64_)
+#ifdef _MSC_VER
 #define stricmp _stricmp
 #define strnicmp _strnicmp
-#endif
-
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
 #define snprintf _snprintf
-#endif
-
-#if defined(_AMD64_)
 #define strdup _strdup
-#endif
-
+#define strtok_r strtok_s
 #endif
 
 #define DEFINE_BASE_INIT  \

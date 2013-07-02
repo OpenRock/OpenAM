@@ -25,12 +25,14 @@
  * $Id: sso_token_listener_entry.h,v 1.4 2008/09/13 01:11:53 robertis Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __SSO_TOKEN_LISTENER_ENTRY_H__
 #define __SSO_TOKEN_LISTENER_ENTRY_H__
 #include <stdexcept>
-
 #include <am_sso.h>
-#include <nspr.h>
 #include "internal_exception.h"
 #include "sso_token.h"
 #include "ref_cnt_ptr.h"
@@ -38,10 +40,6 @@
 #include "scope_lock.h"
 #include "session_info.h"
 #include "sso_token_listener_thrfunc.h"
-
-#if defined(_AMD64_)
-#include <windows.h>
-#endif
 
 BEGIN_PRIVATE_NAMESPACE
 
@@ -105,13 +103,9 @@ public:
         
         return retVal;
     }
-
-#if defined(_AMD64_)
-    DWORD64 getNumListeners() {
-#else
+    
     int getNumListeners() {
-#endif
-        return mListeners.size();
+        return (int) mListeners.size();
     }
 
 };

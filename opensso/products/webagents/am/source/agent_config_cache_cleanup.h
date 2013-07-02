@@ -29,22 +29,17 @@
  * deleteOldAgentConfigInstances() to delete any old agent configuration
  * instances
  */
-
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #ifndef __AGENT_CONFIG_CACHE_CLEANUP_H__
 #define __AGENT_CONFIG_CACHE_CLEANUP_H__
 
 #include <stdexcept>
-#include <string>
-
-
 #include "hash_table.h"
 #include "http.h"
 #include "internal_exception.h"
-#include "nspr_exception.h"
 #include "internal_macros.h"
 #include "mutex.h"
 #include "thread_pool.h"
@@ -53,109 +48,80 @@
 #include "am_web.h"
 
 BEGIN_PRIVATE_NAMESPACE
-        
-using std::string;
 
-class AgentConfigCacheCleanup:public ThreadFunction {
+class AgentConfigCacheCleanup : public ThreadFunction {
 private:
     Log::ModuleId htcID;
     AgentProfileService *agentProfileService;
-    volatile PRTime sleepTime;
-    PRLock *lock;
-    PRCondVar *condVar;
+    volatile unsigned long sleepTime;
+    Mutex *mLock;
+    ConditionVariable *condVar;
     volatile bool stayAlive;
     mutable volatile bool doneExit;
     const char *message;
-    
+
 public:
-    /* Throws NSPRException upon NSPR error */
+
     AgentConfigCacheCleanup(AgentProfileService *agentProfileServiceParam,
-                     PRTime cleanupInterval, const char *messStr)
-            : htcID(Log::addModule("Polling")),
-              agentProfileService(agentProfileServiceParam),
-              sleepTime(cleanupInterval),
-              lock(NULL), condVar(NULL), stayAlive(true),
-              doneExit(false), message(messStr) {
-        
-        lock = PR_NewLock();
-        if (lock == NULL) {
-            throw NSPRException("AgentConfigCacheCleanup::AgentConfigCacheCleanup", 
-                    "PR_NewLock", PR_GetError());
-        } else {
-            condVar = PR_NewCondVar(lock);
-            if(condVar == NULL) {
-                throw NSPRException("AgentConfigCacheCleanup::AgentConfigCacheCleanup", 
-                        "PR_NewLock",
-                        PR_GetError());
-            }
+            unsigned long cleanupInterval, const char *messStr)
+    : ThreadFunction("AgentConfigCacheCleanup"), htcID(Log::addModule("Polling")),
+    agentProfileService(agentProfileServiceParam),
+    sleepTime(cleanupInterval), stayAlive(true),
+    doneExit(false), message(messStr) {
+        mLock = new Mutex();
+        condVar = new ConditionVariable();
+        if (!mLock || !condVar) {
+            throw std::bad_alloc();
         }
     }
+
     ~AgentConfigCacheCleanup() {
-        PR_DestroyCondVar(condVar);
+        delete mLock;
+        mLock = NULL;
+        delete condVar;
         condVar = NULL;
-        PR_DestroyLock(lock);
-        lock = NULL;
-        message = NULL;
     }
-    
+
     inline void stopCleaning() {
         stayAlive = false;
-        PR_Lock(lock);
-        PR_NotifyAllCondVar(condVar);
-        PR_Unlock(lock);
+        mLock->lock();
+        condVar->signalAll();
+        mLock->unlock();
     }
-       
+
     void operator()() const {
-        PRTime tps = PR_TicksPerSecond(), sleepCount = 0, rollover = 0;       
-        while(stayAlive) {           
-            /**
-             * NSPR documentation suggests that we
-             * don't give sleep timers that are more
-             * than 6 hours.  On some OS, the PRTime
-             * might roll over. Just to be safe we take
-             * five hour intervals.
-             * sleepCount is the # of 5 hour chunks
-             * rollover is the mins to sleep that is
-             * the remainder of time.
-             * NOTE: We calculate the timer value
-             * everytime bcoz, we can dynamically change
-             * it if needed using the set timer
-             */
-            sleepCount = sleepTime/300;
+        unsigned long tps = 1000, sleepCount = 0, rollover = 0;
+        while (stayAlive) {
+
+            sleepCount = sleepTime / 300;
             rollover = sleepTime % 300;
-            
-            /**
-             * First thing to do when we get in here.
-             * Take a good rest.  Long work ahead!.
-             */
-            PR_Lock(lock);           
+
+            mLock->lock();
             if (stayAlive)
-                for(PRTime counter = 0; counter < sleepCount; counter ++)
-                    if(stayAlive) PR_WaitCondVar(condVar, tps * 300 * 60);
-            
-            /* Wait for the reminder of the time */
-            if(stayAlive)
-                PR_WaitCondVar(condVar, tps * rollover * 60);
-            
-            PR_Unlock(lock);
-            
+                for (unsigned long counter = 0; counter < sleepCount; counter++)
+                    if (stayAlive) condVar->wait(*mLock, tps * 300 * 60);
+
+            if (stayAlive)
+                condVar->wait(*mLock, tps * rollover * 60);
+
+            mLock->unlock();
+
             if (stayAlive) {
                 Log::log(htcID, Log::LOG_INFO,
                         "Starting %s. Deleting old Agent Config "
                         "instances", message);
-                
+
                 agentProfileService->deleteOldAgentConfigInstances();
-                
+
                 Log::log(htcID, Log::LOG_INFO,
-                        "Finished %s. Deleting old Agent Config " 
+                        "Finished %s. Deleting old Agent Config "
                         "instances", message);
             }
         }
         doneExit = true;
-        return;
-    }       
+    }
 };
 
 END_PRIVATE_NAMESPACE
-        
+
 #endif	// not AGENT_CONFIG_FETCH_H

@@ -25,6 +25,9 @@
  * $Id: policy_service.cpp,v 1.5 2008/06/25 08:14:34 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <stdexcept>
 
@@ -272,12 +275,8 @@ PolicyService::subtreeChunk(subtreeValue, sizeof(subtreeValue) - 1);
 
 /* Throws std::invalid_argument if any argument is invalid */
 PolicyService::PolicyService(const SSOToken& agentTokenArg,
-                             const Properties& props,
-                             const std::string &cert_passwd,
-                             const std::string &cert_nick_name,
-			     bool trustServerCert)
-    : BaseService("PolicyService", props, cert_passwd, 
-		cert_nick_name, trustServerCert),
+                             const Properties& props)
+    : BaseService("PolicyService", props),
       agentToken(agentTokenArg)
 {
     if (! agentToken.isValid()) {

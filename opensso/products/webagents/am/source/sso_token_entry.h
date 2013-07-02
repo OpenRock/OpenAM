@@ -25,16 +25,18 @@
  * $Id: sso_token_entry.h,v 1.3 2008/06/25 08:14:38 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __SSO_TOKEN_ENTRY_H__
 #define __SSO_TOKEN_ENTRY_H__
 #include <stdexcept>
-
 #include <am_map.h>
 #include <am_policy.h>
 #include "mutex.h"
 #include "internal_exception.h"
 #include "tree.h"
-#include <nspr.h>
 #include "sso_token.h"
 #include "ref_cnt_ptr.h"
 #include "mutex.h"

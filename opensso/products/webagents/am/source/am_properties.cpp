@@ -25,6 +25,9 @@
  * $Id: am_properties.cpp,v 1.6 2008/06/25 08:14:28 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <stdexcept>
 
@@ -219,48 +222,16 @@ am_properties_get_with_default(am_properties_t properties,
 }
 
 extern "C" am_status_t
-am_properties_get_boolean(am_properties_t properties, const char *key,
-			     int *value_ptr)
-{
-    am_status_t status = AM_SUCCESS;
-    const Properties *propPtr = reinterpret_cast<Properties *>(properties);
-
-    if (propPtr && key && value_ptr) {
-
-	try {
-	    *value_ptr = propPtr->getBool(key);
-	} catch (const std::invalid_argument& ex) {
-	    status = AM_NOT_FOUND;
-	} catch (const std::domain_error &dex) {
-	    status = AM_INVALID_VALUE;
-	} catch (const std::range_error &raex) {
-	    status = AM_INVALID_VALUE;
-	} catch (const std::bad_alloc &bex) {
-	    status = AM_NO_MEMORY;
-	} catch (const std::exception &uex) {
-	    status = AM_FAILURE;
-	} catch(...) {
-            status = AM_FAILURE;
-        }
-
-    } else {
-	status = AM_INVALID_ARGUMENT;
-    }
-
-    return status;
-}
-
-extern "C" am_status_t
 am_properties_get_boolean_with_default(am_properties_t properties,
-					  const char *key, int default_value,
-					  int *value_ptr)
+					  const char *key, am_bool_t default_value,
+					  am_bool_t *value_ptr)
 {
     am_status_t status = AM_SUCCESS;
     const Properties *propPtr = reinterpret_cast<Properties *>(properties);
 
     if (propPtr && key && value_ptr) {
 	try {
-	    *value_ptr = propPtr->getBool(key, default_value);
+	    *value_ptr = propPtr->getBool(key, default_value > 0 ? true : false) ? AM_TRUE : AM_FALSE;
 	} catch (const std::domain_error &ex) {
 	    status = AM_INVALID_VALUE;
 	} catch (const std::range_error &ex) {

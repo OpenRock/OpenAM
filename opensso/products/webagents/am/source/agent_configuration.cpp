@@ -33,11 +33,7 @@
  * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
-#include <prlock.h>
-#include <prnetdb.h>
-#include <prmem.h>
-#include <prtime.h>
-#include <prprf.h>
+#include <string>
 #include "agent_configuration.h"
 #include "xml_tree.h"
 #include "http.h"
@@ -374,7 +370,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
     
     /* Get the CDSSO URL */
     if(AM_SUCCESS == status) {
-        int fetchCDSSOURL = AM_FALSE;
+        am_bool_t fetchCDSSOURL = AM_FALSE;
         const char *property_str = NULL;
         parameter = AM_WEB_CDSSO_ENABLED_PROPERTY;
         am_properties_get_boolean_with_default(this->properties,
@@ -464,16 +460,16 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_COMMON_NOTIFICATION_ENABLE_PROPERTY;
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *>(&this->notification_enable));
+                parameter, AM_FALSE,
+                &this->notification_enable);
     }
 
     /* Get the change.notification.enable */
     if (AM_SUCCESS == status) {
         parameter = AM_COMMON_CONFIG_CHANGE_NOTIFICATION_ENABLE_PROPERTY;
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *>(&this->configChangeNotificationEnable));
+                parameter, AM_FALSE,
+                &this->configChangeNotificationEnable);
     }
 
     /* Get the notification URL.*/
@@ -492,7 +488,8 @@ am_status_t AgentConfiguration::populateAgentProperties()
     /* Get notenforced_IP handler mode*/
     if (AM_SUCCESS == status) {
         status = am_properties_get_with_default(this->properties, "com.forgerock.agents.config.notenforced.ip.handler", NULL, &(this->notenforcedIPmode));
-        am_web_log_max_debug("Property [com.forgerock.agents.config.notenforced.ip.handler] value set to [%s]", this->notenforcedIPmode);
+        am_web_log_max_debug("Property [com.forgerock.agents.config.notenforced.ip.handler] value set to [%s]", 
+                this->notenforcedIPmode != NULL ? this->notenforcedIPmode : "");
     }
     
     /* Get post-data preservation URL prefix value */
@@ -502,15 +499,16 @@ am_status_t AgentConfiguration::populateAgentProperties()
         if (this->dummyPostPrefixUri != NULL && strlen(this->dummyPostPrefixUri) == 0) {
             this->dummyPostPrefixUri = NULL;
         }
-        am_web_log_max_debug("Property [com.forgerock.agents.config.pdpuri.prefix] value set to [%s]", this->dummyPostPrefixUri);
+        am_web_log_max_debug("Property [com.forgerock.agents.config.pdpuri.prefix] value set to [%s]", 
+                this->dummyPostPrefixUri != NULL ? this->dummyPostPrefixUri : "");
     }
 
     /* Get the redirect composite advice param */
     if (AM_SUCCESS == status) {
         parameter = "com.sun.am.use_redirect_for_advice";
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->use_redirect_for_advice));
+                parameter, AM_FALSE,
+                &this->use_redirect_for_advice);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->use_redirect_for_advice ? "TRUE" : "FALSE"));
     }
     
@@ -518,8 +516,8 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.cdsso.cookie.urlencode";
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->cdsso_cookie_urlencode));
+                parameter, AM_FALSE,
+                &this->cdsso_cookie_urlencode);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cdsso_cookie_urlencode ? "TRUE" : "FALSE"));
     }
     
@@ -527,78 +525,78 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.cdsso.disable.redirect.on_post";
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->cdsso_disable_redirect_on_post));
+                parameter, AM_FALSE,
+                &this->cdsso_disable_redirect_on_post);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cdsso_disable_redirect_on_post ? "TRUE" : "FALSE"));
     }
 
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.cache_control_header.enable";
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->cache_control_header_enable));
+                parameter, AM_FALSE,
+                &this->cache_control_header_enable);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cache_control_header_enable ? "TRUE" : "FALSE"));
     }
 
     if (AM_SUCCESS == status) {
         parameter = "com.sun.identity.agents.config.iis.password.header";
-        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->password_header_enabled));
+        am_properties_get_boolean_with_default(this->properties, parameter, AM_FALSE,
+                &this->password_header_enabled);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->password_header_enabled ? "TRUE" : "FALSE"));
     }
 
     if (AM_SUCCESS == status) {
         parameter = "com.sun.identity.agents.config.iis.logonuser";
-        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->iis_logonuser_enabled));
+        am_properties_get_boolean_with_default(this->properties, parameter, AM_FALSE,
+                &this->iis_logonuser_enabled);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->iis_logonuser_enabled ? "TRUE" : "FALSE"));
     }
 
     if (AM_SUCCESS == status) {
         parameter = "com.sun.identity.agents.config.replaypasswd.key";
         am_properties_get_with_default(this->properties, parameter, NULL, &(this->password_encr_key));
-        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->password_encr_key);
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->password_encr_key != NULL ? this->password_encr_key : "");
     }
     
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.remote_user_header.disable";
         status = am_properties_get_boolean_with_default(this->properties,
-                parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->remote_user_header_disable));
+                parameter, AM_FALSE,
+                &this->remote_user_header_disable);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->remote_user_header_disable ? "TRUE" : "FALSE"));
     }
     
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.notenforced.url.regex.enable";
-        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->nfurl_regex_enabled));
+        am_properties_get_boolean_with_default(this->properties, parameter, AM_FALSE,
+                &this->nfurl_regex_enabled);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->nfurl_regex_enabled ? "TRUE" : "FALSE"));
     }
     
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.agent.logout.url.regex";
         am_properties_get_with_default(this->properties, parameter, NULL, &(this->alogout_regex));
-        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->alogout_regex);
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->alogout_regex != NULL ? this->alogout_regex : "");
     }
     
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.config.logout.redirect.disable";
-        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
-                reinterpret_cast<int *> (&this->user_logout_redirect_disable));
+        am_properties_get_boolean_with_default(this->properties, parameter, AM_FALSE,
+                &this->user_logout_redirect_disable);
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->user_logout_redirect_disable ? "TRUE" : "FALSE"));
     }
     
     if (AM_SUCCESS == status) {
         parameter = "com.forgerock.agents.agent.invalid.url.regex";
         am_properties_get_with_default(this->properties, parameter, NULL, &(this->invalid_url_regex));
-        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->invalid_url_regex);
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->invalid_url_regex != NULL ? this->invalid_url_regex : "");
     }
     
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
         status = am_properties_get_boolean_with_default(this->properties,
                 AM_POLICY_URL_COMPARISON_CASE_IGNORE_PROPERTY, AM_FALSE,
-                reinterpret_cast<int *>(&this->url_comparison_ignore_case));
+                &this->url_comparison_ignore_case);
     }
     
     /* Get the POST data cache preserve status */
@@ -608,8 +606,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 am_properties_get_boolean_with_default(this->properties,
                 parameter,
                 AM_FALSE,
-                reinterpret_cast<int *>
-                (&this->postdatapreserve_enable));
+                &this->postdatapreserve_enable);
     }
  
     /* Get the mode the LB uses to get the sticky session */
@@ -871,14 +868,14 @@ am_status_t AgentConfiguration::populateAgentProperties()
         parameter = AM_WEB_GET_CLIENT_HOSTNAME;
         status = am_properties_get_boolean_with_default(
                 this->properties,
-                parameter, (int)true,
+                parameter, AM_TRUE,
                 &this->getClientHostname);
         if (status != AM_SUCCESS) {
             am_web_log_warning("%s: Error %s while getting %s property. "
                     "Defaulting to true.", thisfunc,
                     am_status_to_string(status),
                     parameter);
-            this->getClientHostname = true;
+            this->getClientHostname = AM_TRUE;
             status = AM_SUCCESS;
         }
     }
@@ -886,39 +883,39 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_WEB_OVERRIDE_PROTOCOL;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->override_protocol));
     }
     if (AM_SUCCESS == status) {
         parameter = AM_WEB_OVERRIDE_HOST;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->override_host));
     }
     if (AM_SUCCESS == status) {
         parameter = AM_WEB_OVERRIDE_PORT;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->override_port));
     }
     if (AM_SUCCESS == status && this->notification_enable) {
         parameter = AM_WEB_OVERRIDE_NOTIFICATION_URL;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->override_notification_url));
     }
     
     if (AM_SUCCESS == status) {
         parameter = AM_COMMON_IGNORE_PATH_INFO;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->ignore_path_info));
     }
 
     if (AM_SUCCESS == status) {
         parameter = AM_COMMON_IGNORE_PATH_INFO_FOR_NOT_ENFORCED_LIST;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->ignore_path_info_for_not_enforced_list));
     }
     
@@ -954,7 +951,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
         if (AM_SUCCESS == status && proxyHost != NULL && proxyHost[0] != '\0') {
             /* is_server_alive always skipped when proxy is specified */
             /* no direct tcp/ip connection through proxy */ 
-	    this->ignore_server_check = true;
+	    this->ignore_server_check = AM_TRUE;
         }
     }
 
@@ -991,7 +988,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_WEB_OWA_ENABLED;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->owa_enable));
     }
     
@@ -999,7 +996,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_WEB_OWA_ENABLED_CHANGE_PROTOCOL;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->owa_enable_change_protocol));
     }
     
@@ -1015,7 +1012,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_PROXY_OVERRIDE_HOST_PORT_PROPERTY;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->override_host_port));
     }
 
@@ -1023,7 +1020,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_DOMINO_CHECK_NAME_DB_PROPERTY;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->check_name_database));
     }
 
@@ -1031,7 +1028,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
     if (AM_SUCCESS == status) {
         parameter = AM_DOMINO_LTPA_TOKEN_ENABLE_PROPERTY;
         status = am_properties_get_boolean_with_default(
-                this->properties, parameter, 0,
+                this->properties, parameter, AM_FALSE,
                 &(this->ltpa_enable));
     }
 
@@ -1245,7 +1242,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 Properties::iterator iter;
                 for(iter = attributeMap.begin();
                       iter != attributeMap.end(); iter++) {
-                    string attr = (*iter).second;
+                    std::string attr = (*iter).second;
                     am_web_log_max_debug("Profile Attribute=%s", attr.c_str());
                     this->attrList.push_back(attr);
                 }
@@ -1264,7 +1261,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                   for(iter_sessionAttr = sessionAttributeMap.begin();
                           iter_sessionAttr != sessionAttributeMap.end();
                            iter_sessionAttr++) {
-                      string attr = (*iter_sessionAttr).second;
+                      std::string attr = (*iter_sessionAttr).second;
                                am_web_log_max_debug(
                                "Session Attribute=%s", attr.c_str());
                       this->attrList.push_back(attr);
@@ -1283,7 +1280,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                   for(iter_responseAttr = responseAttributeMap.begin();
                       iter_responseAttr != responseAttributeMap.end();
                       iter_responseAttr++) {
-                      string attr = (*iter_responseAttr).second;
+                      std::string attr = (*iter_responseAttr).second;
                       am_web_log_max_debug("Response Attribute=%s", attr.c_str());
                       this->attrList.push_back(attr);
                   }
@@ -1387,9 +1384,9 @@ am_status_t AgentConfiguration::populateAgentProperties()
 
 
     if (AM_SUCCESS == status) {
-        this->lock = PR_NewLock();
-        if (NULL == this->lock) {
-            status = AM_NSPR_ERROR;
+        this->lock = new Mutex();
+        if (!this->lock) {
+            status = AM_NO_MEMORY;
         }
     }
 
@@ -1457,8 +1454,7 @@ AgentConfiguration::unload_fqdn_handler()
     return result;
 }
 
-void AgentConfiguration::cleanup_properties()
-{
+void AgentConfiguration::cleanup_properties() {
     if (this->properties != AM_PROPERTIES_NULL) {
         am_properties_destroy(this->properties);
         this->properties = AM_PROPERTIES_NULL;
@@ -1471,14 +1467,13 @@ void AgentConfiguration::cleanup_properties()
     Utils::cleanup_url_info_list(&this->cdsso_server_url_list);
     this->access_denied_url = NULL;
     this->logout_redirect_url = NULL;
-    if (((PRLock *) NULL) != this->lock) {
-        PR_DestroyLock(this->lock);
-        this->lock = (PRLock *) NULL;
-    }
-    if (this->not_enforce_IPAddr != NULL) {
-        delete this->not_enforce_IPAddr;
-        this->not_enforce_IPAddr = NULL;
-    }
+
+    delete this->lock;
+    this->lock = NULL;
+
+    delete this->not_enforce_IPAddr;
+    this->not_enforce_IPAddr = NULL;
+
     Utils::cleanup_url_info_list(&this->login_url_list);
     this->unauthenticated_user = NULL;
 
@@ -1487,10 +1482,8 @@ void AgentConfiguration::cleanup_properties()
     this->fqdn_default = NULL;
     this->fqdn_default_len = 0;
 
-    if (this->cookie_domain_list != NULL) {
-        delete this->cookie_domain_list;
-        this->cookie_domain_list = NULL;
-    }
+    delete this->cookie_domain_list;
+    this->cookie_domain_list = NULL;
 
     Utils::cleanup_cookie_info_list(&this->cookie_list);
     this->cookie_reset_default_domain = NULL;
@@ -1518,9 +1511,8 @@ void AgentConfiguration::cleanup_properties()
     this->clientHostnameHeader = NULL;
 
     if (this->postdatapreserve_enable) {
-        if (this->postcache_handle != NULL) {
-            delete this->postcache_handle;
-        }
+        delete this->postcache_handle;
+        this->postcache_handle = NULL;
     }
 
     this->notenforcedIPmode = NULL;
@@ -1528,19 +1520,17 @@ void AgentConfiguration::cleanup_properties()
     this->password_encr_key = NULL;
     this->alogout_regex = NULL;
     this->invalid_url_regex = NULL;
-    
+
     this->cond_login_url.clear();
 
     try {
         unload_fqdn_handler();
-    }
-    catch (std::exception& exs) {
+    }    catch (std::exception& exs) {
         am_web_log_error("Exception caught while unloading "
-                         "fqdn handler: %s", exs.what());
-    }
-    catch (...) {
+                "fqdn handler: %s", exs.what());
+    }    catch (...) {
         am_web_log_error("Unknown exception caught while unloading "
-                         "fqdn handler.");
+                "fqdn handler.");
     }
 }
 

@@ -24,7 +24,11 @@
  *
  * $Id: http.cpp,v 1.6 2009/12/19 00:05:46 subbae Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #include <cstdio>
 #include <algorithm>
 #include <new>
@@ -39,41 +43,8 @@ USING_PRIVATE_NAMESPACE
 namespace {
     // The following constants must be all lower case in order for the
     // string comparisons in hasPrefixIgnoringCase to work correctly.
-    const char HTTP_REPLY_VERSION[] = "http/1.1";
-    const char CONTENT_LENGTH_HDR[] = "content-length:";
-    const char SET_COOKIE_HDR[] = "set-cookie:";
-
-    class LineBuffer {
-    public:
-	LineBuffer(Connection& connArg)
-	    : conn(connArg), data(), len(0), offset(0), eof(false)
-	{
-	    data[len] = '\0';
-	}
-
-	am_status_t getLine(const char *& linePtr);
-	std::size_t getDataLen() const { return len - offset; }
-
-	void extractRemainingData(char *dest)
-	{
-	    std::memcpy(dest, &data[offset], getDataLen());
-	    offset = len;
-	}
-
-    private:
-	am_status_t fill();
-	am_status_t findEndOfLine(char *& eolPtr);
-
-	Connection& conn;
-	// This buffer is sized to be large enough to hold the least
-	// allowable maximum size for a cookie: 4k.  This allows some
-	// extra room for the domain and path parameters.  Enough?
-	char data[5000];
-	std::size_t len;
-	std::size_t offset;
-	bool eof;
-    };
-
+    //const char CONTENT_LENGTH_HDR[] = "content-length:";
+    
     enum {
 	TOKEN = 0x1,    // a cookie "token" as defined in RFC 2965 informally 
 			// a sequence of non special, non whitespace chars, 
@@ -296,108 +267,6 @@ struct CompareIgnoringCase {
     std::string keyToFind;
 };
 
-am_status_t LineBuffer::fill()
-{
-    am_status_t status;
-    std::size_t readLen;
-
-    if (0 < offset && offset < len) {
-	len -= offset;
-	std::memmove(data, &data[offset], len);
-	offset = 0;
-	data[len] = '\0';
-    }
-
-    if (! eof) {
-	readLen = sizeof(data) - len - 1;
-	if (readLen > 0) {
-	    status = conn.receiveData(&data[len], readLen);
-	    if (AM_SUCCESS == status) {
-		if (readLen > 0) {
-		    len += readLen;
-		    data[len] = '\0';
-		} else {
-		    eof = true;
-		}
-	    } else {
-		data[len] = '\0';
-	    }
-	} else {
-	    status = AM_BUFFER_TOO_SMALL;
-	}
-    } else {
-	status = AM_END_OF_FILE;
-    }
-
-    return status;
-}
-
-am_status_t LineBuffer::findEndOfLine(char *& eolPtr)
-{
-    am_status_t status = AM_SUCCESS;
-
-    eolPtr = std::strchr(&data[offset], '\n');
-    while (NULL == eolPtr) {
-	status = fill();
-	if (AM_SUCCESS == status) {
-	    eolPtr = std::strchr(&data[offset], '\n');
-	} else {
-	    break;
-	}
-    }
-
-    if (NULL == eolPtr) {
-	Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-		 "LineBuffer::findEndOfLine(): %s", &data[offset]);
-
-	status = AM_NOT_FOUND;
-    }
-
-    return status;
-}
-
-am_status_t LineBuffer::getLine(const char *& linePtr)
-{
-    am_status_t status;
-    char *eolPtr = NULL;
-
-    status = findEndOfLine(eolPtr);
-    while (AM_SUCCESS == status && isWhitespace(eolPtr[1])) {
-	// This line is folded onto the next line, so we need to replace
-	// the [<CR>]<LF>1*(<SP>|<HT>) with <SP>, copy the rest of the
-	// data (including the terminating NUL) forward, and then resume
-	// searching for the end of the line.
-	char *startOfLine = eolPtr + 2;
-
-	while (isWhitespace(*startOfLine)) {
-	    startOfLine += 1;
-	}
-	if (eolPtr > data && '\r' == eolPtr[-1]) {
-	    eolPtr[-1] = ' ';
-	} else {
-	    *(eolPtr++) = ' ';
-	}
-
-	std::memmove(eolPtr, startOfLine, len - (startOfLine - data) + 1);
-	len -= (startOfLine - eolPtr);
-	status = findEndOfLine(eolPtr);
-    }
-
-    if (AM_SUCCESS == status) {
-	// NUL terminate the line and move the offset to
-	// point to just after the <CR><LF> pair.
-	if (eolPtr > data && '\r' == eolPtr[-1]) {
-	    eolPtr[-1] = '\0';
-	} else {
-	    *eolPtr = '\0';
-	}
-	linePtr = &data[offset];
-	offset = (eolPtr - data) + 1;
-    }
-
-    return status;
-}
-
 Http::HeaderMap::HeaderMap():headers(MapType()) {
     // The headers map std::map won't initialize correctly.
     // this is a gig so that we force it to initialize correctly.
@@ -514,13 +383,12 @@ Http::Response::Response()
  *	NSPRException if NSPR error. 
  *	ParseException upon parse error.
  */
-Http::Response::Response(Log::ModuleId logModule, Connection& conn,
-			 std::size_t initialBufferLen)
+Http::Response::Response(Log::ModuleId logModule, Connection& conn)
     : httpStatus(INVALID), cookieList(), extraHdrs(), bodyPtr(NULL), bodyLen(0)
 {
     am_status_t status;
 
-    status = readAndParse(logModule, conn, initialBufferLen);
+    status = readAndParse(logModule, conn);
 
     if (AM_SUCCESS != status) {
 	if (AM_NO_MEMORY == status) {
@@ -533,153 +401,78 @@ Http::Response::Response(Log::ModuleId logModule, Connection& conn,
     }
 }
 
-am_status_t Http::Response::readAndParse(Log::ModuleId logModule,
-					    Connection& conn,
-					    std::size_t initialBufferLen)
-{
-    am_status_t status;
-    LineBuffer buffer(conn);
-    const char *linePtr;
-    PRInt32 contentLength = 0;
+static bool http_to_lower(char l, char r) {
+    return (tolower(l) == tolower(r));
+}
+
+am_status_t Http::Response::readAndParse(Log::ModuleId logModule, Connection& conn) {
+    am_status_t status = AM_FAILURE;
     bool contentLengthHdrSeen = false;
 
-    status = buffer.getLine(linePtr);
-    if (AM_SUCCESS == status) {
-	linePtr += sizeof(HTTP_REPLY_VERSION) - 1;
+    int htsts = conn.httpStatusCode();
 
-	linePtr = skipWhitespace(linePtr);
+    Log::log(logModule, Log::LOG_DEBUG,
+            "HTTP Status = %d", htsts);
 
-	if (isDigit(*linePtr) && isDigit(linePtr[1]) &&
-	    isDigit(linePtr[2])) {
-	    unsigned int value;
-
-	    value = (*linePtr - '0') * 100;
-	    value += (linePtr[1] - '0') * 10;
-	    value += linePtr[2] - '0';
-	    httpStatus = static_cast<Status>(value);
-	    linePtr += 3;
-
-	    linePtr = skipWhitespace(linePtr);
-
-	    Log::log(logModule, Log::LOG_DEBUG,
-		     "HTTP Status = %d (%s)", httpStatus, linePtr);
-	} else {
-	  Log::log(logModule, Log::LOG_ERROR, "Http::Response::readAndParse(): "
-		   "Unable to retrieve status header from server.");
-	    status = AM_FAILURE;
-	}
+    if (htsts != -1) {
+        status = AM_SUCCESS;
+        httpStatus = static_cast<Status> (htsts);
     }
 
-    Log::log(logModule, Log::LOG_MAX_DEBUG,
-	     "Http::Response::readAndParse(): Reading headers.");
-
-    if (AM_SUCCESS == status) {
-	for (status = buffer.getLine(linePtr);
-	     AM_SUCCESS == status;
-	     status = buffer.getLine(linePtr)) {
-	    std::size_t len = std::strlen(linePtr);
-
-	    if (0 < len) {
-		if (hasPrefixIgnoringCase(linePtr, CONTENT_LENGTH_HDR)) {
-		    linePtr += sizeof(CONTENT_LENGTH_HDR) - 1;
-		    linePtr = skipWhitespace(linePtr);
-		    if (PR_sscanf(linePtr, "%u", &contentLength) == 1) {
-			contentLengthHdrSeen = true;
-		    }
-		} else if (hasPrefixIgnoringCase(linePtr, SET_COOKIE_HDR)) {
-		    linePtr += sizeof(SET_COOKIE_HDR) - 1;
-		    linePtr = skipWhitespace(linePtr);
-
-		    try {
-			cookieList.push_back(Cookie(linePtr));
-			Log::log(logModule, Log::LOG_MAX_DEBUG,
-				 "%s %s", SET_COOKIE_HDR, linePtr);
-		    } catch (...) {
-			// Could not parse the header.  Log it and go on?
-			Log::log(logModule, Log::LOG_INFO,
-				 "Unparsable Set-Cookie header: %s", linePtr);
-			continue;
-		    }
-
-		} else {
-		    const char *colonPtr = std::strchr(linePtr, ':');
-
-		    if (colonPtr) {
-			std::string key(linePtr, colonPtr - linePtr);
-
-			extraHdrs.set(key, skipWhitespace(colonPtr + 1));
-			Log::log(logModule, Log::LOG_MAX_DEBUG, "%s", linePtr);
-		    } else {
-			// XXX - Replace this with proper processing
-			Log::log(logModule, Log::LOG_WARNING,
-				 "Unparsable header: %s", linePtr);
-		    }
-		}
-	    } else {
-		// End of HTTP response headers
-		break;
-	    }
-	}
+    if (htsts != 200) {
+        status = AM_HTTP_ERROR;
     }
 
-    if(contentLengthHdrSeen == true) {
-	Log::log(logModule, Log::LOG_MAX_DEBUG,
-		 "Http::Response::readAndParse(): "
-		 "Reading body content of length: %llu", contentLength);
-    } else {
-	Log::log(logModule, Log::LOG_DEBUG,
-		 "Http::Response::readAndParse(): "
-		 "No content length in response.");
-    }
+    if (status == AM_SUCCESS) {
+        int contentLength = conn.httpContentLength();
 
-    if (AM_SUCCESS == status) {
-	bodyLen = buffer.getDataLen();
+        if (contentLength != -1) {
+            contentLengthHdrSeen = true;
+        }
 
-	if (contentLength >= initialBufferLen) {
-	    initialBufferLen = contentLength + 1;
-	}
-	if (bodyLen > initialBufferLen) {
-	    initialBufferLen = bodyLen + 1;
-	}
+        std::string search("set-cookie");
+        Connection::ConnHeaderMap::iterator it = conn.begin();
+        Connection::ConnHeaderMap::iterator itEnd = conn.end();
+        for (; it != itEnd; ++it) {
+            std::string k = (*it).first;
+            std::string v = (*it).second;
+            std::string::iterator fpos = std::search(k.begin(), k.end(), search.begin(), search.end(), http_to_lower);
+            if (fpos != k.end()) {
+                cookieList.push_back(Cookie(v.c_str()));
+                //Log::log(logModule, Log::LOG_MAX_DEBUG, "Set-Cookie: %s", v.c_str());
+            } else {
+                extraHdrs.set(k, v);
+                //Log::log(logModule, Log::LOG_MAX_DEBUG, "Header: %s: %s", k.c_str(), v.c_str());
+            }
+        }
 
-	bodyPtr = new (std::nothrow) char[initialBufferLen];
-	if (NULL != bodyPtr) {
-	    if (0 < bodyLen) {
-		buffer.extractRemainingData(bodyPtr);
-	    }
+        if (contentLengthHdrSeen == true) {
+            Log::log(logModule, Log::LOG_DEBUG,
+                    "Http::Response::readAndParse(): "
+                    "Reading body content of length: %d", contentLength);
 
-	    status = conn.waitForReply(bodyPtr, initialBufferLen, bodyLen,
-				       bodyLen);
-	    if (AM_SUCCESS != status) {
-		delete[] bodyPtr;
-		bodyPtr = NULL;
-	    }
-	} else {
-	    status = AM_NO_MEMORY;
-	}
+            std::string body = conn.getBody();
+            if (body.length() == 0) {
+                status = AM_END_OF_FILE;
+                bodyPtr = NULL;
+            } else {
+                bodyPtr = new (std::nothrow) char[body.length() + 1];
+                bodyLen = body.length();
+                strcpy(bodyPtr, body.c_str());
+            }
+
+        } else {
+            Log::log(logModule, Log::LOG_DEBUG,
+                    "Http::Response::readAndParse(): "
+                    "No content length in response.");
+        }
     }
 
     Log::log(logModule, Log::LOG_MAX_DEBUG, "Http::Response::readAndParse(): "
-	     "Completed processing the response with status: %s",
-	     am_status_to_string(status));
+            "Completed processing the response with status: %s",
+            am_status_to_string(status));
 
     return status;
-}
-
-/**
- * Get the HTTP response and discard it
- */
-void Http::Response::readAndIgnore(Log::ModuleId logModule,
-                                   Connection& conn)
-{
-    LineBuffer buffer(conn);
-    const char *linePtr;
-
-    while (AM_SUCCESS == buffer.getLine(linePtr) && strlen(linePtr) > 0) {
-        Log::log(logModule, Log::LOG_MAX_DEBUG,
-                 "Http::Response::readAndIgnore(): %s",
-                 linePtr);
-    }
 }
 
 /*

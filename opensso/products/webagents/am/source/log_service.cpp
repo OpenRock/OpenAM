@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 
 #include "log_service.h"
@@ -136,12 +136,8 @@ USING_PRIVATE_NAMESPACE
 LogService::LogService(const ServiceInfo &svcInfo, const SSOToken &ssoToken,
         const Http::CookieList &ckieList,
         const std::string &logFileName,
-        const Properties &svcParams,
-        const std::string &cert_passwd,
-        const std::string &cert_nick_name,
-        bool trustServerCert) :
-BaseService("LogService", svcParams, cert_passwd, cert_nick_name,
-trustServerCert),
+        const Properties &svcParams) :
+BaseService("LogService", svcParams),
 serviceInfo(svcInfo),
 loggedByToken(ssoToken),
 cookieList(ckieList),
@@ -155,12 +151,8 @@ remoteBodyChunkListInitialized(false) {
 
 LogService::LogService(const ServiceInfo &svcInfo,
         const Properties &svcParams,
-        const std::string &cert_passwd,
-        const std::string &cert_nick_name,
-        bool trustServerCert,
         unsigned int buffSize) :
-BaseService("LogService", svcParams, cert_passwd, cert_nick_name,
-trustServerCert),
+BaseService("LogService", svcParams),
 serviceInfo(svcInfo),
 loggedByToken(SSOToken()),
 cookieList(Http::CookieList()),
@@ -491,10 +483,8 @@ am_status_t LogService::flushBuffer() throw () {
     bufferCount = 0;
     remoteBodyChunkListInitialized = false;
     remoteBodyChunkList.clear();
-    if (remoteRequest != NULL) {
-        delete remoteRequest;
-        remoteRequest = NULL;
-    }
+    delete remoteRequest;
+    remoteRequest = NULL;
     lock_status = mLock.unlock();
     return status;
 }

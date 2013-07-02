@@ -25,17 +25,16 @@
  * $Id: policy_engine.cpp,v 1.10 2009/08/27 21:41:30 subbae Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <string.h>
-
 #include <list>
 #include <map>
 #include <stdexcept>
 #include <utility>
 #include <vector>
-
-#include <nspr.h>
-
 #include "am_types.h"
 #include "log.h"
 #include "policy_engine.h"
@@ -45,13 +44,6 @@
 #include "service.h"
 #if !defined(_MSC_VER)
 #include <limits.h>
-#endif
-
-#if (defined(WINNT) || defined(_AMD64_))
-#if defined(_AMD64_)
-#define stricmp _stricmp
-#endif
-#define strcasecmp stricmp
 #endif
 
 #define POLICY_ENGINE "PolicyEngine"

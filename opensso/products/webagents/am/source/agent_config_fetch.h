@@ -31,20 +31,16 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #ifndef __AGENT_CONFIG_FETCH_H__
 #define __AGENT_CONFIG_FETCH_H__
 
 #include <stdexcept>
-#include <string>
-
-
 #include "hash_table.h"
 #include "http.h"
 #include "internal_exception.h"
-#include "nspr_exception.h"
 #include "internal_macros.h"
 #include "mutex.h"
 #include "thread_pool.h"
@@ -54,91 +50,62 @@
 
 BEGIN_PRIVATE_NAMESPACE
         
-using std::string;
-
 class AgentConfigFetch:public ThreadFunction {
 private:
     Log::ModuleId htcID;
     AgentProfileService *agentProfileService;
-    volatile PRTime sleepTime;
-    PRLock *lock;
-    PRCondVar *condVar;
+    volatile unsigned long sleepTime;
+    Mutex *mLock;
+    ConditionVariable *condVar;
     volatile bool stayAlive;
     mutable volatile bool doneExit;
     const char *message;
     
 public:
-    /* Throws NSPRException upon NSPR error */
+
     AgentConfigFetch(AgentProfileService *agentProfileServiceParam,
-                     PRTime fetchInterval, const char *messStr)
-            : htcID(Log::addModule("Polling")),
+                     unsigned long fetchInterval, const char *messStr)
+            : ThreadFunction("AgentConfigFetch"), htcID(Log::addModule("Polling")),
               agentProfileService(agentProfileServiceParam),
-              sleepTime(fetchInterval),
-              lock(NULL), condVar(NULL), stayAlive(true),
+              sleepTime(fetchInterval), stayAlive(true),
               doneExit(false), message(messStr) {
-        
-        lock = PR_NewLock();
-        if (lock == NULL) {
-            throw NSPRException("AgentConfigFetch::AgentConfigFetch", 
-                    "PR_NewLock", PR_GetError());
-        } else {
-            condVar = PR_NewCondVar(lock);
-            if(condVar == NULL) {
-                throw NSPRException("AgentConfigFetch::AgentConfigFetch", 
-                        "PR_NewLock",
-                        PR_GetError());
-            }
+        mLock = new Mutex();
+        condVar = new ConditionVariable();
+        if (!mLock || !condVar) {
+            throw std::bad_alloc();
         }
     }
     ~AgentConfigFetch() {
-        PR_DestroyCondVar(condVar);
+        delete mLock;
+        mLock = NULL;
+        delete condVar;
         condVar = NULL;
-        PR_DestroyLock(lock);
-        lock = NULL;
-        message = NULL;
     }
     
     inline void stopCleaning() {
         stayAlive = false;
-        PR_Lock(lock);
-        PR_NotifyAllCondVar(condVar);
-        PR_Unlock(lock);
+        mLock->lock();
+        condVar->signalAll();
+        mLock->unlock();
     }
        
     void operator()() const {
         am_status_t sts = AM_SUCCESS;
-        PRTime tps = PR_TicksPerSecond(), sleepCount = 0, rollover = 0;       
+        unsigned long tps = 1000, sleepCount = 0, rollover = 0;       
         while(stayAlive) {           
-            /**
-             * NSPR documentation suggests that we
-             * don't give sleep timers that are more
-             * than 6 hours.  On some OS, the PRTime
-             * might roll over. Just to be safe we take
-             * five hour intervals.
-             * sleepCount is the # of 5 hour chunks
-             * rollover is the mins to sleep that is
-             * the remainder of time.
-             * NOTE: We calculate the timer value
-             * everytime bcoz, we can dynamically change
-             * it if needed using the set timer
-             */
+            
             sleepCount = sleepTime/300;
             rollover = sleepTime % 300;
             
-            /**
-             * First thing to do when we get in here.
-             * Take a good rest.  Long work ahead!.
-             */
-            PR_Lock(lock);           
+            mLock->lock();
             if (stayAlive)
-                for(PRTime counter = 0; counter < sleepCount; counter ++)
-                    if(stayAlive) PR_WaitCondVar(condVar, tps * 300 * 60);
-            
-            /* Wait for the reminder of the time */
-            if(stayAlive)
-                PR_WaitCondVar(condVar, tps * rollover * 60);
-            
-            PR_Unlock(lock);
+                for (unsigned long counter = 0; counter < sleepCount; counter++)
+                    if (stayAlive) condVar->wait(*mLock, tps * 300 * 60);
+
+            if (stayAlive)
+                condVar->wait(*mLock, tps * rollover * 60);
+
+            mLock->unlock();
             
             if (stayAlive) {
                 Log::log(htcID, Log::LOG_INFO,
@@ -163,7 +130,6 @@ public:
             }
         }
         doneExit = true;
-        return;
     }       
 };
 

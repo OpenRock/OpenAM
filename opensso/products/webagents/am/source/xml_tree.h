@@ -28,35 +28,45 @@
  *
  * Representation ofan XML parse tree.
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef XML_TREE_H
 #define XML_TREE_H
 
-#include <exception>
-#include <string>
-
 #include "internal_macros.h"
+#include <exception>
+#include <stdexcept>
+#include "xml_utilities.h"
 #include "xml_element.h"
 
 BEGIN_PRIVATE_NAMESPACE
 
 class XMLTree {
 public:
-    class ParseException: public std::exception {
+
+    class ParseException : public std::exception {
     public:
-	explicit ParseException(const std::string& msg)
-	    : std::exception(), message(msg)
-	{}
 
-	~ParseException() throw() {}
+        explicit ParseException(const std::string& msg)
+        : std::exception(), message(msg) {
+        }
 
-	const char *what() const throw() { return "XMLTree::ParseException"; }
+        ~ParseException() throw () {
+        }
 
-	const std::string& getMessage() const { return message; }
+        const char *what() const throw () {
+            return "XMLTree::ParseException";
+        }
+
+        const std::string& getMessage() const {
+            return message;
+        }
 
     private:
-	std::string message;
+        std::string message;
     };
 
     //
@@ -133,7 +143,13 @@ private:
 
     static bool initialized;
 
+#ifdef _MSC_VER
+    MSXML2::IXMLDOMDocument2Ptr docPtr;
+    MSXML2::IXMLDOMElementPtr rootPtr;
+#else
     struct _xmlDoc *docPtr;
+#endif
+
 };
 
 END_PRIVATE_NAMESPACE

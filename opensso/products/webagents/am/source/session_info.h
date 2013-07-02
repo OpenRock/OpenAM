@@ -30,14 +30,15 @@
  * Container for the information returned by the DSAME Session Service.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef SESSION_INFO_H
 #define SESSION_INFO_H
 
 #include <string>
-
-#include <prtime.h>
-
+#include <time.h>
 #include "internal_macros.h"
 #include "properties.h"
 #include "sso_token.h"
@@ -81,11 +82,11 @@ public:
     const std::string& getSessionType() const { return sessionType; }
     const std::string& getId() const { return id; }
     const std::string& getDomain() const { return domain; }
-    PRTime getMaxSessionTime() const { return maxSessionTime; }
-    PRTime getMaxIdleTime() const { return maxIdleTime; }
-    PRTime getMaxCachingTime() const { return maxCachingTime; }
-    PRTime getRemainingSessionTime() const { return remainingSessionTime; }
-    PRTime getIdleTime() const { return idleTime; }
+    time_t getMaxSessionTime() const { return maxSessionTime; }
+    time_t getMaxIdleTime() const { return maxIdleTime; }
+    time_t getMaxCachingTime() const { return maxCachingTime; }
+    time_t getRemainingSessionTime() const { return remainingSessionTime; }
+    time_t getIdleTime() const { return idleTime; }
     State getState() const { return state; }
     bool isValid() const { return state == VALID; }
     const Properties& getProperties() const { return properties; }
@@ -107,11 +108,11 @@ private:
     std::string sessionType;
     std::string id;
     std::string domain;
-    PRTime maxSessionTime;
-    PRTime maxIdleTime;
-    PRTime maxCachingTime;
-    PRTime remainingSessionTime;
-    PRTime idleTime;
+    time_t maxSessionTime;
+    time_t maxIdleTime;
+    time_t maxCachingTime;
+    time_t remainingSessionTime;
+    time_t idleTime;
     State state;
     Properties properties;
 };

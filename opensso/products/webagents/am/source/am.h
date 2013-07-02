@@ -56,11 +56,17 @@ AM_BEGIN_EXTERN_C
 /* Common Properties */
 #define	AM_COMMON_SSL_CERT_DIR_PROPERTY AM_COMMON_PROPERTY_PREFIX "sslcert.dir"
 #define AM_COMMON_CERT_DB_PREFIX_PROPERTY AM_COMMON_PROPERTY_PREFIX "certdb.prefix"
+#define AM_COMMON_CERT_DB_PASSWORD_PROPERTY AM_COMMON_PROPERTY_PREFIX "certdb.password"
 
 #define AM_COMMON_TRUST_SERVER_CERTS_PROPERTY AM_COMMON_PROPERTY_PREFIX "trust.server.certs"
+#define AM_COMMON_CERT_KEY_PROPERTY "com.forgerock.agents.config.cert.key"
+#define AM_COMMON_CERT_KEY_PASSWORD_PROPERTY "com.forgerock.agents.config.cert.key.password"
+#define AM_COMMON_CERT_FILE_PROPERTY "com.forgerock.agents.config.cert.file"
+#define AM_COMMON_CERT_CA_FILE_PROPERTY "com.forgerock.agents.config.cert.ca.file"
+#define AM_COMMON_CIPHERS_PROPERTY "com.forgerock.agents.config.ciphers"
+
 #define	AM_COMMON_COOKIE_NAME_PROPERTY	AM_COMMON_PROPERTY_PREFIX "cookie.name"
 #define	AM_COMMON_COOKIE_SECURE_PROPERTY	AM_COMMON_PROPERTY_PREFIX "cookie.secure"
-#define AM_COMMON_CERT_DB_PASSWORD_PROPERTY AM_COMMON_PROPERTY_PREFIX "certdb.password"
 #define	AM_COMMON_NAMING_URL_PROPERTY	AM_COMMON_PROPERTY_PREFIX "naming.url"
 #define AM_COMMON_NOTIFICATION_ENABLE_PROPERTY AM_COMMON_PROPERTY_PREFIX "notification.enable"
 #define AM_COMMON_NOTIFICATION_URL_PROPERTY	"com.sun.identity.client.notification.url"

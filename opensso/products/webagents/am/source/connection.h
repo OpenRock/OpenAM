@@ -30,14 +30,22 @@
  * This class encapsulates a TCP socket connection.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
 #include <cstdlib>
 #include <string>
+#include <map>
 
-#include <prio.h>
+#ifdef _MSC_VER
+#include <windows.h>
+#include <winhttp.h>
+#include <wincrypt.h>
+#endif
 
 #include <am_types.h>
 #include "internal_macros.h"
@@ -46,197 +54,249 @@
 #include "properties.h"
 #include "server_info.h"
 
+#define NETWORK_TIMEOUT 4000 //msec
+
+#if !defined(_MSC_VER) && !defined(__sun)
+extern "C" void libiconv_close();
+#endif
+
 BEGIN_PRIVATE_NAMESPACE
+
+#ifdef _MSC_VER
 
 class Connection {
 public:
-    //
-    // Creates connection object that encapsulates a TCP socket connection.
-    //
-    // Parameters:
-    //   server
-    //		the end point information for the remote end of the connection
-    //
-    //   certDBPasswd
-    //          certificate database password
-    //
-    //   alwaysTrustServerCert
-    //		if true, then always trust the server's certificate when
-    //		establishing an SSL connection.
-    //
-    // Throws:
-    //   NSPRException if the requested connection cannot be established
-    //
-    Connection(const ServerInfo& server, const std::string &certDBPasswd,
-	       const std::string &certNickName,
-	       bool alwaysTrustServerCert); 
 
-    //
-    // Destroys the connection object and closes any associated socket
-    // connection.
-    //
+    typedef std::map<std::string, std::string> ConnHeaderMap;
+    typedef std::pair<std::string, std::string> ConnHeaderMapValue;
+
+    typedef enum {
+        GET = 0,
+        POST,
+        HEAD
+    } REQUEST_TYPE;
+
+    typedef enum {
+        NO_AUTH = 0,
+        CERT_AUTH
+    } AUTH_TYPE;
+
+    typedef struct {
+        HINTERNET hRequest;
+        DWORD dwSize;
+        DWORD dwStatusCode;
+    } REQUEST_CONTEXT_INT;
+
+    typedef struct {
+        HINTERNET hSession;
+        HINTERNET hConnect;
+        LPWSTR lpUrlPath;
+        DWORD dwReqFlag;
+        DWORD dwSecFlag;
+        REQUEST_CONTEXT_INT *lpRequest;
+        AUTH_TYPE tokenType;
+        PCCERT_CONTEXT pCertContext;
+        HCERTSTORE pfxStore;
+    } REQUEST_CONTEXT;
+
+    Connection(const ServerInfo& server);
+
     ~Connection();
 
-    //
-    // Sends an array of bytes to the remote end of the connection.
-    //
-    // Parameters:
-    //   data	points to the bytes to be sent
-    //
-    //   len	the length of the data to be sent.  If the length is zero,
-    //		then the data array is assumed to be NUL terminated and
-    //		strlen is used to determine the length of the data.
-    //
-    // Returns:
-    //   AM_SUCCESS
-    //		if all of the data is sent successfully
-    //
-    //   AM_INVALID_ARGUMENT
-    //		if the data parameter is NULL
-    //
-    //   AM_NSPR_ERROR
-    //		if PR_Write returns an error.  PR_GetError() can be used to
-    //		retrieve more information about the error.
-    //
-    am_status_t sendData(const char *data, std::size_t len = 0);
-
-    //
-    // Receives data from the remote end of the connection.
-    //
-    // Parameters:
-    //   buffer points to a buffer where the received data should be stored
-    //
-    //	 bufferLen
-    //		On entry, it specifies the length of the buffer pointed to
-    //		by the buffer parameter.  On return, it specifies the
-    //		actual number bytes of data stored.
-    //
-    // Returns:
-    //   AM_SUCCESS
-    //		if no error is detected.  If the method returns
-    //		AM_SUCCESS and bufferLen is zero, then the end of the
-    //		data stream has been reached for the connection.
-    //
-    //   AM_INVALID_ARGUMENT
-    //		if the buffer parameter is NULL or the bufferLen argument
-    //		is 0.
-    //
-    //   AM_NSPR_ERROR
-    //		if PR_Read returns an error.  PR_GetError() can be used to
-    //		retrieve more information about the error.
-    //
-    am_status_t receiveData(char *buffer, std::size_t& bufferLen);
-
-    //
-    // Waits for a reply to be received and returns an allocated buffer of
-    // memory containing any received data.  The method reads until EOF is
-    // encountered or an error occurs.  For the convience of the caller, a
-    // NUL character is placed after the received data.  The NUL character
-    // is not included in the reported length of the returned data.
-    //
-    // Parameters:
-    //   buffer A reference to the pointer where the address of the
-    //		allocated buffer should be stored.
-    //
-    //   receivedLen
-    //		A reference to the variable where the size of the received
-    //		data should be stored.
-    //
-    //	 initialBufferLen
-    //		If non-zero, the size of the initial buffer to allocate for
-    //		the received data.
-    //
-    // Returns:
-    //   AM_SUCCESS
-    //		if no error is detected.  If the method returns
-    //		AM_SUCCESS and bufferLen is zero, then the end of the
-    //		data stream has been reached for the connection.
-    //
-    //   AM_NO_MEMORY
-    //		if unable to allocate memory for the reply buffer
-    //
-    //   AM_NSPR_ERROR
-    //		if PR_Read returns an error.  PR_GetError() can be used to
-    //		retrieve more information about the error.
-    //
-    am_status_t waitForReply(char *&reply, std::size_t& receivedLen,
-				std::size_t initialBufferLen = 0);
-
-    am_status_t waitForReply(char *&reply, std::size_t initialBufferLen,
-				std::size_t offset, std::size_t& receivedLen);
-
-    //
-    // Initializes the underlying libraries that are used to create
-    // SSL connections.
-    //
-    // Parameters:
-    //   properties
-    //		A Properties object containing the configuration
-    //		information needed to initialize the connection module
-    //		including, if necessary, the underlying SSL libraries.
-    //
-    // Returns:
-    //   AM_SUCCESS
-    //		if no error is detected.
-    //
-    //   AM_NSPR_ERROR
-    //		if any of the SSL library initialization routines returns
-    //		an error.  PR_GetError() can be used to retrieve more
-    //		information about the error.
-    //
-    //   AM_INVALID_ARGUMENT
-    //		if the certDir argument is NULL
-    //
-    // NOTE: This function is called automatically by am_init.
-    //
     static am_status_t initialize(const Properties& properties);
+
     static am_status_t initialize_in_child_process(const Properties& properties);
 
-    //
-    // Cleans up the underlying libraries.
-    //
-    // Parameters:
-    //   None.
-    //
-    // Returns:
-    //    AM_SUCCESS
-    //		if no error is detected
-    //
-    // NOTE: This function is called automatically by am_cleanup.
-    //
-    static am_status_t shutdown(void);
-    static am_status_t shutdown_in_child_process(void);
+    static am_status_t shutdown();
 
-    //
-    // Performs SSL handshake on a TCP socket
-    //
-    PRFileDesc *secureSocket(const std::string &certDBPasswd,
-                             const std::string &certNickName,
-                             bool alwaysTrustServerCert,
-                             PRFileDesc *rawSocket);
+    static am_status_t shutdown_in_child_process();
+
+    am_status_t sendRequest(const char *type, std::string& uri, ConnHeaderMap& hdrs, std::string& data);
+
+    int httpContentLength() {
+        if (context) {
+            REQUEST_CONTEXT_INT *r = context->lpRequest;
+            if (r) {
+                return r->dwSize;
+            }
+        }
+        return -1;
+    }
+
+    int httpStatusCode() {
+        if (context) {
+            REQUEST_CONTEXT_INT *r = context->lpRequest;
+            if (r) {
+                return r->dwStatusCode;
+            }
+        }
+        return -1;
+    }
+
+    std::string& getBody() {
+        return dataBuffer;
+    }
+
+    ConnHeaderMap::iterator begin() {
+        return headers.begin();
+    }
+
+    ConnHeaderMap::iterator end() {
+        return headers.end();
+    }
+
+    ConnHeaderMap::const_iterator begin() const {
+        return headers.begin();
+    }
+
+    ConnHeaderMap::const_iterator end() const {
+        return headers.end();
+    }
 
 
 private:
-    Connection(const Connection&);		// Not implemented
-    Connection& operator=(const Connection&);	// Not implemented
 
-   /**
-    * Throws NSPRException upon NSPR error
-    */
-    PRFileDesc *createSocket(PRFileDesc *rawSocket, bool useSSL,
-			     const std::string &certDBPasswd,
-			     const std::string &certNickName,
-			     bool alwaysTrustServerCert); 
+    Connection(const Connection&);
+    Connection& operator=(const Connection&);
 
-    char *growBuffer(char *oldBuffer, std::size_t oldBufferLen,
-		     std::size_t newBufferLen);
-    am_status_t read(char *buffer, std::size_t& bufferLen);
+    static unsigned long timeout;
+    REQUEST_CONTEXT *context;
+    ConnHeaderMap headers;
+    std::string dataBuffer;
 
-    static bool initialized;
-    PRFileDesc *socket;
-    char *certdbpasswd;
-    char *certnickname;
+    static std::string proxyHost;
+    static std::string proxyUser;
+    static std::string proxyPassword;
+    static std::string proxyPort;
+    static bool trustServerCerts;
+    static std::string cipherList;
+    static std::string keyName;
+
+    void http_close();
+    BOOL request(REQUEST_TYPE type, std::wstring& urlpath, ConnHeaderMap& hdrs, std::string& post);
+    BOOL response(REQUEST_TYPE type);
+
+    void log_error(const char *head, DWORD errCode) {
+        LPSTR errString = NULL;
+        DWORD size = 0;
+        if ((size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_FROM_SYSTEM, 0, errCode, 0, (LPSTR) & errString, 0, 0)) == 0) {
+            Log::log(Log::ALL_MODULES, Log::LOG_WARNING,
+                    "%s Unknown error code (%X)", head, errCode);
+        } else {
+            char *p = strchr(errString, '\r');
+            if (p != NULL) *p = '\0';
+            if (errCode == 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                        "%s %s", head, errString);
+            } else {
+                Log::log(Log::ALL_MODULES, Log::LOG_WARNING,
+                        "%s %s (%X)", head, errString, errCode);
+            }
+            LocalFree(errString);
+        }
+    }
 };
+
+#else
+
+class Connection {
+public:
+
+    typedef std::map<std::string, std::string> ConnHeaderMap;
+    typedef std::pair<std::string, std::string> ConnHeaderMapValue;
+    
+    Connection(const ServerInfo& server);
+
+    ~Connection();
+
+    static am_status_t initialize(const Properties& properties);
+
+    static am_status_t initialize_in_child_process(const Properties& properties);
+
+    static am_status_t shutdown();
+
+    static am_status_t shutdown_in_child_process();
+
+    am_status_t sendRequest(const char *type, std::string& uri, ConnHeaderMap& hdrs, std::string& data);
+
+    int httpContentLength() {
+        return dataLength;
+    }
+
+    int httpStatusCode() {
+        return statusCode;
+    }
+
+    std::string& getBody() {
+        return dataBuffer;
+    }
+
+    ConnHeaderMap::iterator begin() {
+        return headers.begin();
+    }
+
+    ConnHeaderMap::iterator end() {
+        return headers.end();
+    }
+
+    ConnHeaderMap::const_iterator begin() const {
+        return headers.begin();
+    }
+
+    ConnHeaderMap::const_iterator end() const {
+        return headers.end();
+    }
+
+
+private:
+    static unsigned long timeout;
+    int sock;
+    int statusCode;
+    int dataLength;
+    ConnHeaderMap headers;
+    std::string dataBuffer;
+    ServerInfo server;
+    void *ssl;
+
+    static std::string proxyHost;
+    static std::string proxyUser;
+    static std::string proxyPassword;
+    static std::string proxyPort;
+    static bool trustServerCerts;
+    static std::string cipherList;
+    static std::string keyFile;
+    static std::string keyPassword;
+    static std::string caFile;
+    static std::string certFile;
+
+    void http_close();
+
+    ssize_t response(char **);
+    ssize_t request(const char *buff, const size_t len);
+
+    void net_error(int n) {
+#ifdef __sun
+        size_t size = 1024;
+        char *s = (char *) malloc(size);
+        if (s == NULL) return;
+        while (strerror_r(n, s, size) == -1 && errno == ERANGE) {
+            size *= 2;
+            s = (char *) realloc(s, size);
+            if (s == NULL) return;
+        }
+        if (s != NULL) {
+            Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection(): %s", s);
+            free(s);
+        }
+#else
+        Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection(): code %d", n);
+#endif
+    }
+
+};
+
+#endif
 
 END_PRIVATE_NAMESPACE
 

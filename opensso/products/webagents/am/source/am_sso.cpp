@@ -25,9 +25,13 @@
  * $Id: am_sso.cpp,v 1.8 2008/09/13 01:11:52 robertis Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <stdexcept>
 #include <am_sso.h>
+#include <string>
 #include "internal_macros.h"
 #include "log.h"
 #include "sso_token.h"
@@ -113,10 +117,8 @@ void am_sso_set_initializeLog(boolean_t value) {
  * cleanup sso module.
  * Throws: InternalException
  */
-void PRIVATE_NAMESPACE_NAME::sso_cleanup()
-{
-    if (SSOTokenSvc)
-	    delete(SSOTokenSvc);
+void PRIVATE_NAMESPACE_NAME::sso_cleanup() {
+    delete(SSOTokenSvc);
     SSOTokenSvc = NULL;
     return;
 }
@@ -258,35 +260,6 @@ am_sso_invalidate_token(const am_sso_token_handle_t sso_token_handle)
     return sts;
 }
 
-#if defined(_AMD64_)
-extern "C"
-ULONG64 am_sso_get_auth_level(const am_sso_token_handle_t sso_token_handle) 
-{
-    ULONG64 retVal = ULLONG_MAX; /* double check this max value*/
-
-    if(sso_token_handle != NULL) {
-	try {
-	    const SessionInfo &sessionInfo = *(reinterpret_cast<const SessionInfo *>(sso_token_handle));
-	    if(sessionInfo.isValid()) {
-		const Properties &properties = sessionInfo.getProperties();
-		retVal = Utils::getNumber(properties.get("AuthLevel"));
-	    }
-	} catch(...) {
-	    Log::log(ssoHdlModule, Log::LOG_ERROR,
-		     "am_sso_get_auth_level(): "
-		     "Unknown exception thrown.");
-	    retVal = ULLONG_MAX;
-	}
-    } else {
-	retVal = ULLONG_MAX;
-	Log::log(ssoHdlModule, Log::LOG_ERROR,
-		 "am_sso_get_auth_level(): "
-		 "One or more input parameters has an invalid value.");
-    }
-    return retVal;
-}
-
-#else
 extern "C"
 unsigned long
 am_sso_get_auth_level(const am_sso_token_handle_t sso_token_handle)
@@ -298,7 +271,7 @@ am_sso_get_auth_level(const am_sso_token_handle_t sso_token_handle)
 	    const SessionInfo &sessionInfo = *(reinterpret_cast<const SessionInfo *>(sso_token_handle));
 	    if(sessionInfo.isValid()) {
 		const Properties &properties = sessionInfo.getProperties();
-		retVal = Utils::getNumber(properties.get("AuthLevel"));
+		retVal = (unsigned long) Utils::getNumber(properties.get("AuthLevel"));
 	    }
 	} catch(...) {
 	    Log::log(ssoHdlModule, Log::LOG_ERROR,
@@ -314,7 +287,6 @@ am_sso_get_auth_level(const am_sso_token_handle_t sso_token_handle)
     }
     return retVal;
 }
-#endif
 
 extern "C"
 const char *
@@ -425,11 +397,7 @@ am_string_set_t * am_get_char_seperated_string_set(const char *str, char sep)
     am_string_set_t *ret = NULL;
     int n_sep = 0;
     const char *ptr, *beg;
-#if defined(_AMD64_)
-    INT_PTR len;
-#else
-    int len;
-#endif
+    int64_t len;
     char c;
     int i;
 
@@ -675,7 +643,7 @@ am_sso_validate_token(const am_sso_token_handle_t sso_token_handle)
 	    SessionInfo *sessionInfo=
 			    reinterpret_cast<SessionInfo *>(sso_token_handle);
             Http::CookieList cookieList;
-	    string ssoTokenId = sessionInfo->getSSOToken().getString();
+	    std::string ssoTokenId = sessionInfo->getSSOToken().getString();
 	    sts = SSOTokenSvc->getSessionInfo(ServiceInfo(),
 					      ssoTokenId,
 					      cookieList,
@@ -742,7 +710,7 @@ am_sso_refresh_token(const am_sso_token_handle_t sso_token_handle)
 	    SessionInfo *sessionInfo=
 		reinterpret_cast<SessionInfo *>(sso_token_handle);
             Http::CookieList cookieList;
-	    string ssoTokenId = sessionInfo->getSSOToken().getString();
+	    std::string ssoTokenId = sessionInfo->getSSOToken().getString();
 	    sts = SSOTokenSvc->getSessionInfo(ServiceInfo(),
 					      ssoTokenId,
 					      cookieList,
@@ -899,7 +867,7 @@ am_sso_add_listener(const am_sso_token_listener_func_t listener,
         try {
             sts = SSOTokenSvc->addSSOListener(listener,
                                               args,
-					      dispatch_in_sep_thread);
+					      dispatch_in_sep_thread ? true : false);
         }
         catch (InternalException& exc) {
             Log::log(ssoHdlModule, Log::LOG_ERROR,
@@ -954,7 +922,7 @@ am_sso_add_sso_token_listener(am_sso_token_handle_t sso_token_handle,
 						   listener,
                                                    args,
                                                    "",
-						   dispatch_to_sep_thread);
+						   dispatch_to_sep_thread ? true : false);
         }
         catch (InternalException& exc) {
             Log::log(ssoHdlModule, Log::LOG_ERROR,
@@ -1017,11 +985,9 @@ am_sso_handle_notification(const std::string& notifData)
             Log::log(ssoHdlModule, Log::LOG_ERROR,
                      "am_sso_handle_notification(): "
                      "NSPR Exception encountered: "
-		     "Throwing method: %s, NSPR method: %s, NSPR error %s.",
+		     "Throwing method: %s, NSPR method: %s",
 		     exc.getThrowingMethod(),
-		     exc.getNsprMethod(),
-		     PR_ErrorToString(exc.getErrorCode(),
-				      PR_LANGUAGE_I_DEFAULT));
+		     exc.getNsprMethod());
             sts = AM_NSPR_ERROR;
         }
         catch (std::exception& exc) {

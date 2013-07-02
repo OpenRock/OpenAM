@@ -71,7 +71,6 @@ SUNW_1.0 {
 		am_properties_create;
 		am_properties_destroy;
 		am_properties_get;
-		am_properties_get_boolean;
 		am_properties_get_boolean_with_default;
 		am_properties_get_signed;
 		am_properties_get_signed_with_default;

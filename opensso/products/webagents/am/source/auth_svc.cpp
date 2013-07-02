@@ -27,12 +27,11 @@
  */ 
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 #include <iostream>
 #include <string.h>
-#include <prprf.h>
 #include <am.h>
 #include <am_string_set.h>
 #include "connection.h"
@@ -47,8 +46,6 @@
 USING_PRIVATE_NAMESPACE
 
 #define AUTH_SVC_MODULE "AuthService"
-
-#define READ_INIT_BUF_LEN 1024
 
 /*
  * Must match enumeration of am_auth_index_t.
@@ -590,7 +587,7 @@ const char quote[] = {
     QUOTE_DATA 
 };
 
-const char endElement[] = { 
+const char endElementDt[] = { 
     END_ELEMENT_DATA 
 };
 
@@ -838,8 +835,8 @@ AuthService::quoteChunk(quote,
 				    sizeof(quote) - 1);
 
 const AuthService::BodyChunk
-AuthService::endElementChunk(endElement,
-				    sizeof(endElement) - 1);
+AuthService::endElementChunk(endElementDt,
+				    sizeof(endElementDt) - 1);
 
 const AuthService::BodyChunk
 AuthService::quoteEndElementChunk(quoteEndElement,
@@ -894,13 +891,8 @@ AuthService::httpTokenSuffixChunk(httpTokenCallbackSuffix,
  * Throws: InternalException upon error
  */
 AuthService::AuthService(const Properties &config) 
-    : BaseService(AUTH_SVC_MODULE,
-                config,
-		config.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, ""),
-		config.get(AM_AUTH_CERT_ALIAS_PROPERTY, ""),
-		config.getBool(AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, false)),
+    : BaseService(AUTH_SVC_MODULE, config),
     logID(Log::addModule(AUTH_SVC_MODULE)),
-    cdbPasswd(config.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, "")),
     orgName(""),
     namingURL(config.get(AM_COMMON_NAMING_URL_PROPERTY, "")),
     cookieList()
@@ -971,8 +963,7 @@ AuthService::create_auth_context(AuthContext &auth_ctx)
     bodyChunkList.push_back(authContextSuffixChunk);
     bodyChunkList.push_back(xmlRequestSuffixChunk);
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), Http::CookieList(),
-			bodyChunkList, response, READ_INIT_BUF_LEN,
-			auth_ctx.certNickName);
+			bodyChunkList, response);
     if(status != AM_SUCCESS) {
 	throw InternalException("AuthService::create_auth_context()",
 		"Error sending request for authentication context from server.",
@@ -1099,8 +1090,7 @@ AuthService::login(AuthContext &auth_ctx,
     bodyChunkList.push_back(xmlRequestSuffixChunk);
 
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), cookieList,
-			bodyChunkList, response, READ_INIT_BUF_LEN,
-			auth_ctx.certNickName);
+			bodyChunkList, response);
     if(status != AM_SUCCESS) {
         throw InternalException("AuthService::login()",
 		"Error sending login request to server.",
@@ -1155,8 +1145,7 @@ AuthService::logout(AuthContext &auth_ctx)
     bodyChunkList.push_back(xmlRequestSuffixChunk);
 
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), cookieList,
-			bodyChunkList, response, READ_INIT_BUF_LEN,
-			auth_ctx.certNickName);
+			bodyChunkList, response);
     if(status != AM_SUCCESS) {
         throw InternalException("AuthService::logout()",
 		"Error sending logout request to server.",
@@ -1209,8 +1198,7 @@ AuthService::abort(AuthContext &auth_ctx)
     bodyChunkList.push_back(xmlRequestSuffixChunk);
 
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), cookieList,
-			bodyChunkList, response, READ_INIT_BUF_LEN,
-			auth_ctx.certNickName);
+			bodyChunkList, response);
     if(status != AM_SUCCESS) {
         throw InternalException("AuthService::abort()",
 		"Error sending abort request to server.",
@@ -1264,8 +1252,7 @@ AuthService::getModuleInstanceNames(AuthContext &auth_ctx,
     bodyChunkList.push_back(xmlRequestSuffixChunk);
 
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), cookieList,
-			    bodyChunkList, response, READ_INIT_BUF_LEN,
-			    auth_ctx.certNickName);
+			    bodyChunkList, response);
     if(status != AM_SUCCESS) {
 	throw InternalException("AuthService::getModuleInstanceNames()",
 				"Error sending getModuleInstanceNames request",
@@ -1336,15 +1323,9 @@ AuthService::processGetModuleInstanceNames(AuthContext &auth_ctx,
 					   const XMLElement &getReqNode,
 					   am_string_set_t** module_inst_names)
 {
-    XMLElement queryInfoNode;
     am_string_set_t *string_set;
- 
     XMLElement valueNode;
-#if defined(_AMD64_)
     int num_instances = 0;
-#else
-    std::size_t num_instances = 0;
-#endif
     std::string value;
     if (getReqNode.getSubElement(VALUE, valueNode)) {
        
@@ -2343,7 +2324,7 @@ AuthService::submitRequirements(AuthContext &auth_ctx) {
     numCallbacks = validateAndCountRequirements(auth_ctx);
 
     char number[15];
-    PR_snprintf(number, 14, "%lu", numCallbacks);
+    snprintf(number, 14, "%lu", numCallbacks);
     bodyChunkList.push_back(BodyChunk(number, strlen(number)));
     bodyChunkList.push_back(quoteEndElementChunk);
 
@@ -2359,8 +2340,7 @@ AuthService::submitRequirements(AuthContext &auth_ctx) {
     // post callback requirements as filled in by client to server
     Http::Response response;
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), cookieList,
-                        bodyChunkList, response, READ_INIT_BUF_LEN,
-			auth_ctx.certNickName);
+                        bodyChunkList, response);
 
     auth_ctx.cleanupCallbacks();
 
@@ -3019,8 +2999,7 @@ AuthService::create_auth_context_cac(AuthContext &auth_ctx)
     bodyChunkList.push_back(authContextSuffixChunk);
     bodyChunkList.push_back(xmlRequestSuffixChunk);
     status = doHttpPost(auth_ctx.authSvcInfo, std::string(), Http::CookieList(),
-                        bodyChunkList, response, READ_INIT_BUF_LEN,
-                        auth_ctx.certNickName);
+                        bodyChunkList, response);
     if(status != AM_SUCCESS) {
         throw InternalException("AuthService::create_auth_context_cac()",
                 "Error sending request for authentication context from server.",

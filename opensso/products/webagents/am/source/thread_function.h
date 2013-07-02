@@ -30,19 +30,50 @@
  * The object will be called by the thread in the thread pool.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef __THREAD_FUNCTION_H__
 #define __THREAD_FUNCTION_H__
 
 #include "internal_macros.h"
+#include <string>
 
 BEGIN_PRIVATE_NAMESPACE
 class ThreadFunction {
+private:
+    bool exitNow;
+    std::string name;
 public:
-    virtual void operator()(void) const = 0;
-    virtual ~ThreadFunction() { }
-};
-END_PRIVATE_NAMESPACE
 
+    ThreadFunction(std::string name = "ThreadFunction",
+            bool exitNow = false) : name(name), exitNow(exitNow) {
+    }
+    virtual void operator()(void) const = 0;
+
+    virtual ~ThreadFunction() {
+    }
+
+    const std::string& getName() const {
+        return name;
+    }
+
+    bool exit() {
+        return exitNow;
+    }
+};
+
+class WorkerThreadExit : public ThreadFunction {
+public:
+
+    WorkerThreadExit() : ThreadFunction("WorkerThreadExit", true) {
+    }
+
+    void operator()() const {
+    }
+};
+
+END_PRIVATE_NAMESPACE
 
 #endif	/* not __THREAD_FUNCTION_H__ */

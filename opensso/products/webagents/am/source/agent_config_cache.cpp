@@ -28,6 +28,9 @@
  * Agent Config Cache: This class creates/updates a Hash table which 
  * containes the agent configuration instances.
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include "am_web.h"
 #include "agent_config_cache.h"
@@ -115,12 +118,12 @@ AgentConfigurationRefCntPtr AgentConfigCache::getLatestAgentConfigInstance()
 void AgentConfigCache::deleteOldAgentConfigInstances() 
 {
     Log::log(logID, Log::LOG_INFO,
-            "Starting to clean Agent Config Hash table, size=%u.",
+            "Starting to clean Agent Config Hash table, size: %u",
             agentConfigCacheTable.size());
     
     agentConfigCacheTable.cleanup_cac(getLatestAgentConfigKey());
     
     Log::log(logID, Log::LOG_INFO,
-            "Finished cleaning Agent Config Hash table size=%u.",
+            "Finished cleaning Agent Config Hash table size: %u",
             agentConfigCacheTable.size());
 }

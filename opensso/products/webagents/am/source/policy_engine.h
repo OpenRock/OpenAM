@@ -24,7 +24,10 @@
  *
  * $Id: policy_engine.h,v 1.8 2008/09/13 01:11:53 robertis Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 #ifndef __POLICY_ENGINE_H__
 #define __POLICY_ENGINE_H__
 #include <vector>
@@ -41,10 +44,6 @@
 #include "nspr_exception.h"
 #include "properties.h"
 #include "scope_lock.h"
-
-#if defined(WINNT) || defined(_AMD64_)
-#include <windows.h>
-#endif
 
 BEGIN_PRIVATE_NAMESPACE
 
@@ -141,11 +140,7 @@ class PolicyEngine {
 
     inline am_policy_t addService(Service *svc) {
 	ScopeLock scopeLck(vectorLock);
-#if defined(_AMD64_)
-	DWORD64 x = services.size();
-#else
-	int x = services.size();
-#endif
+	am_policy_t x = (am_policy_t) services.size();
 	services.push_back(svc);
 	return x;
     }

@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.17 2009/12/04 00:47:57 robertis Exp $
 
 -->
+<!--
+Portions Copyrighted 2013 ForgeRock Inc
+-->
 
 <project name="open-source-web-agents-webserver" default="build">
     <description>Open Web Single Sign-On Web Agent Install</description>
@@ -86,26 +89,6 @@
                     <include name="crypt_util"/>
             </fileset>
         </copy>
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${webagents.basedir}/extlib/Linux/nss${build.type.suffix}/bin">
-                    <include name="certutil"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/Linux/nss${build.type.suffix}/lib">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/Linux/nspr${build.type.suffix}/lib">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/Linux/libxml2${build.type.suffix}/lib">
-                    <include name="libxml2.so.2"/>
-            </fileset>
-        </copy>
     </target>
 
     <target name="copy-SunOS_sparc-files">
@@ -117,26 +100,6 @@
         <copy todir="${container.web_agent.bin.dir}">
             <fileset dir="${webagents.am.src.dir}">
                     <include name="crypt_util"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS/nss${build.type.suffix}/bin">
-                    <include name="certutil"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS/nss${build.type.suffix}/lib">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS/nspr${build.type.suffix}/lib">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS/libxml2${build.type.suffix}/lib">
-                    <include name="libxml2.so.2"/>
             </fileset>
         </copy>
     </target>
@@ -152,26 +115,6 @@
                     <include name="crypt_util"/>
             </fileset>
         </copy>
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS_i86pc/nss${build.type.suffix}/bin">
-                    <include name="certutil"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib//SunOS_i86pc/nss${build.type.suffix}/lib">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib//SunOS_i86pc/nspr${build.type.suffix}/lib">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS_i86pc/libxml2${build.type.suffix}/lib">
-                    <include name="libxml2.so.2"/>
-            </fileset>
-        </copy>
     </target>
 
     <target name="copy-WINNT-files">
@@ -183,51 +126,6 @@
         <copy todir="${container.web_agent.bin.dir}">
             <fileset dir="${webagents.am.src.dir}">
                     <include name="cryptit.exe"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/bin">
-                    <include name="certutil.exe"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/am/source">
-                    <include name="amsdk.dll"/>
-                    <include name="amsdk.pdb"/>
-                    <include name="vc*.pdb"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib">
-                    <include name="nss3.dll"/>
-                    <include name="ssl3.dll"/>
-                    <include name="softokn3.dll"/>
-                    <include name="softokn3.chk"/>
-                    <include name="freebl3.dll"/>
-                    <include name="freebl3.chk"/>
-                    <include name="smime3.dll"/>
-                    <include name="jss4.dll"/>
-                    <include name="nssckbi.dll"/>
-                    <include name="nssdbm3.dll"/>
-                    <include name="nssdbm3.chk"/>
-                    <include name="nssutil3.dll"/>
-                    <include name="sqlite3.dll"/>
-
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/WINNT/nspr${winnt.lib.ext}/lib">
-                    <include name="libnspr4.dll"/>
-                    <include name="libplc4.dll"/>
-                    <include name="libplds4.dll"/>
-                    <include name="nspr4.dll"/>
-                    <include name="plc4.dll"/>
-                    <include name="plds4.dll"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/WINNT/libxml2${winnt.lib.ext}/lib">
-                    <include name="libxml2.dll"/>
             </fileset>
         </copy>
         <copy todir="${container.web_agent.lib.dir}">

@@ -24,13 +24,16 @@
  *
  * $Id: agent_config_cache.h,v 1.3 2008/06/25 08:14:22 qcheng Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef __AGENT_CONFIG_CACHE_H__
 #define __AGENT_CONFIG_CACHE_H__
 
 #include <stdexcept>
 #include <string>
-
+#include <time.h>
 #include "hash_table.h"
 #include "http.h"
 #include "internal_exception.h"
@@ -45,49 +48,64 @@
 BEGIN_PRIVATE_NAMESPACE
 
 class AgentConfigCache {
- private:   
+private:
     Log::ModuleId logID;
     mutable Mutex lock;
 
     /**
      * Agent config cache hashtable, made it public for quick access
      */
-    HashTable<AgentConfiguration> agentConfigCacheTable;    
-    
+    HashTable<AgentConfiguration> agentConfigCacheTable;
+
     /* Latest Agent Config instance key */
     std::string latestConfigKey;
-     
+
     /* Updates the latest Agent Config instance key 
      * Need to have the scope lock to here as we are
      * updating the member variable
      */
-    void setLatestAgentConfigKey()
-    {        
+    void setLatestAgentConfigKey() {
         ScopeLock myLock(lock);
-        char hdr[100];
-        PRUint32 len;
-        PRExplodedTime now;
-        PR_ExplodeTime(PR_Now(), PR_LocalTimeParameters, &now);
-        len = PR_snprintf(hdr, sizeof(hdr),
-                         "%d-%02d-%02d-%02d:%02d:%02d.%03d",
-                          now.tm_year, now.tm_month+1, now.tm_mday,
-                          now.tm_hour, now.tm_min, now.tm_sec,
-                          now.tm_usec / 1000);
+        char hdr[64];
+
+#ifdef _MSC_VER
+
+        SYSTEMTIME lt;
+        GetLocalTime(&lt);
+        _snprintf(hdr, sizeof (hdr), "%d-%02d-%02d-%02d:%02d:%02d.%03d", lt.wYear, lt.wMonth, lt.wDay,
+                lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
+
+#else 
+
+        struct tm now;
+        struct timespec ts;
+        unsigned short msec = 0;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        msec = ts.tv_nsec / 1000000;
+        localtime_r(&ts.tv_sec, &now);
+        snprintf(hdr, sizeof (hdr),
+                "%d-%02d-%02d-%02d:%02d:%02d.%03d",
+                now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
+                now.tm_hour, now.tm_min, now.tm_sec,
+                msec);
+
+#endif
+
         latestConfigKey = hdr;
     }
-    
+
     friend class AgentProfileService;
-    
- public:    
+
+public:
     /**
      * Agent Config cache constructor 
      */
     AgentConfigCache();
-    
+
     /**
      * Agent Config destructor
      */
-   ~AgentConfigCache();
+    ~AgentConfigCache();
 
     /**
      * Insert an entry in Agent config cache hash table      
@@ -96,28 +114,28 @@ class AgentConfigCache {
      * Throws: std::exception's from hashtable methods.
      */
     bool populateAgentConfigCacheTable(
-         const AgentConfigurationRefCntPtr agentConfigEntry);
+            const AgentConfigurationRefCntPtr agentConfigEntry);
 
     /**
      * Returns the latest agent config instance key
      * Throws: InternalException, std::bad_alloc and other std::exception's 
      *	       from thread pool and hashtable calls. 
      */
-    std::string getLatestAgentConfigKey() {       
+    std::string getLatestAgentConfigKey() {
         return latestConfigKey;
     }
-    
+
     /**
      * Returns the latest agent configuration instance from the hash table
      * @return AgentConfigurationRefCntPtr: Agent Config cache data Ref Ptr
      * Throws: std::exception's from hashtable methods.
      */
-    AgentConfigurationRefCntPtr getLatestAgentConfigInstance();	
-        
+    AgentConfigurationRefCntPtr getLatestAgentConfigInstance();
+
     /**
-    * Deletes all the old Agent config instances.  
-    * Throws: std::exception's from hashtable methods.
-    */
+     * Deletes all the old Agent config instances.  
+     * Throws: std::exception's from hashtable methods.
+     */
     void deleteOldAgentConfigInstances();
 };
 

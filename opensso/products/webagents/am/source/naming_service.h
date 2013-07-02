@@ -29,6 +29,9 @@
  * Service interface class for the AM "Naming" service.
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef NAMING_SERVICE_H
 #define NAMING_SERVICE_H
@@ -42,10 +45,7 @@ BEGIN_PRIVATE_NAMESPACE
 
 class NamingService: public BaseService {
 public:
-    explicit NamingService(const Properties& props,
-                const std::string &cert_passwd,
-                const std::string &cert_nick_name,
-                bool alwaysTrustServerCert);
+    explicit NamingService(const Properties& props);
     virtual ~NamingService();
 
     /* Throws XMLTree::ParseException */
@@ -61,7 +61,7 @@ private:
 
     bool ignoreNamingService;
     std::string namingURL;
-
+    
     void processAttribute(const std::string& name, const std::string& value,
 			  NamingInfo& namingInfo,
                           bool isAppSSOTokenPresent) const;
@@ -70,7 +70,7 @@ private:
 				       const std::string& ssoToken,
 				       NamingInfo& namingInfo,
                                        bool isAppSSOTokenPresent) const;
-    am_status_t check_server_alive(std::string hostname, unsigned short portnumber);
+    am_status_t check_server_alive(bool ssl, std::string hostname, unsigned short portnumber);
     
     void addLoadBalancerCookie(NamingInfo& namingInfo, Http::CookieList& cookieList);
     

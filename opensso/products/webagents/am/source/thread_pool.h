@@ -24,28 +24,72 @@
  *
  * $Id: thread_pool.h,v 1.3 2008/06/25 08:14:39 qcheng Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __THREAD_POOL_H__
 #define __THREAD_POOL_H__
 
 #include <vector>
-#include <prthread.h>
-#include <prcvar.h>
+#include <queue>
 #include "internal_macros.h"
 #include "internal_exception.h"
-#include "nspr_exception.h"
 #include "log.h"
 #include "thread_function.h"
-
-void spin(void *);
+#include "scope_lock.h"
 
 BEGIN_PRIVATE_NAMESPACE
 
+template <typename T>
+class Queue {
+public:
+
+    Queue() : mutex(), condv() {
+    }
+
+    T remove() {
+        mutex.lock();
+        while (queue_.empty()) {
+            condv.wait(mutex);
+        }
+        T val = queue_.front();
+        queue_.pop();
+        mutex.unlock();
+        return val;
+    }
+
+    void add(const T& item) {
+        mutex.lock();
+        queue_.push(item);
+        mutex.unlock();
+        condv.signal();
+    }
+
+    int size() {
+        int size = 0;
+        mutex.lock();
+        size = queue_.size();
+        mutex.unlock();
+        return size;
+    }
+
+private:
+    std::queue<T> queue_;
+    Mutex mutex;
+    ConditionVariable condv;
+
+    Queue(const Queue&);
+    Queue& operator=(const Queue&);
+
+};
+
 class ThreadPool {
- public:
-    // throws std::bad_alloc, NSPRException
+public:
+
     ThreadPool(std::size_t startThreads,
-	       std::size_t maxNumThreads);
+            std::size_t maxNumThreads);
 
     /**
      * By calling dispatch, the function that needs to be invoked,
@@ -55,32 +99,18 @@ class ThreadPool {
     bool dispatch(ThreadFunction*);
 
     ~ThreadPool();
- private:
+private:
 
-    // private static variables
-    PRLock *lock;
     volatile bool exitNow;
-    PRCondVar *condVar;
-    PRCondVar *threadStarted;
-    std::vector<ThreadFunction*> workQueue;
-    std::size_t maxThreads;
-    std::vector<PRThread *> threads;
-    volatile std::size_t activeThreads;
+    size_t maxThreads;
+    Queue<ThreadFunction*> workQueue;
+    std::vector<Thread*> threads;
     static Log::ModuleId logID;
-    friend class ThreadObject;
-    friend void ::spin(void *);
-
-    // Non exposed functions.
     ThreadPool(const ThreadPool &);
     ThreadPool();
     ThreadPool& operator=(const ThreadPool &) const;
 
-
-    
-    // Private functions.
-    // throws std::bad_alloc, NSPRException, InternalException
     void createNewThread();
-    void init(std::size_t, std::size_t);
 };
 END_PRIVATE_NAMESPACE
 #endif

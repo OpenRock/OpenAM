@@ -24,6 +24,10 @@
  *
  * $Id: action_decision.cpp,v 1.3 2008/06/25 08:14:21 qcheng Exp $
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #include "internal_macros.h"
 #include "xml_element.h"
 #include "policy_resource.h"
@@ -34,7 +38,7 @@ using std::string;
 USING_PRIVATE_NAMESPACE;
 
 ActionDecision::ActionDecision(string &actName,
-			       PRTime ttl):actionName(actName),
+			       time_t ttl):actionName(actName),
 						       timeToLive(ttl) {
     return;
 }

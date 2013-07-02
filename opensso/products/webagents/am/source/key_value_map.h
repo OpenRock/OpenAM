@@ -32,6 +32,9 @@
  * represented as an standard C++ vector.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef KEY_VALUE_MAP_H
 #define KEY_VALUE_MAP_H
@@ -56,10 +59,6 @@ public:
 		 Utils::CmpFunc>(Utils::CmpFunc(ignore_case)) {}
 
     KeyValueMap(const KeyValueMap &kvm):KeyValueMapBaseClassType(kvm){}
-
-#if	defined(BROKEN_MSVC)
-    typedef referent_type mapped_type;
-#endif
 
     //
     // Inserts the XML AttributeValuePair element referred by elem into

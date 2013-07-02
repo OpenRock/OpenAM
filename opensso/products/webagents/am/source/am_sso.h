@@ -24,7 +24,11 @@
  *
  * $Id: am_sso.h,v 1.4 2008/09/13 01:11:52 robertis Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #ifndef __AM_SSO_H__
 #define __AM_SSO_H__
 
@@ -33,9 +37,6 @@
 #include <am_types.h>
 #include <am_properties.h>
 #include <am_string_set.h>
-#if defined(WINNT) || defined(_AMD64_)
-#include <windows.h>
-#endif
 
 AM_BEGIN_EXTERN_C
 
@@ -155,13 +156,9 @@ am_sso_invalidate_token(const am_sso_token_handle_t sso_token_handle);
  * 
  *      ULONG_MAX if there was any error.
  */
-#if defined(_AMD64_)
-AM_EXPORT ULONG64 
-am_sso_get_auth_level(const am_sso_token_handle_t sso_token);
-#else
 AM_EXPORT unsigned long
 am_sso_get_auth_level(const am_sso_token_handle_t sso_token);
-#endif
+
 
 /*
  * Get the auth type for this session.

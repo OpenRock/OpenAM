@@ -30,6 +30,9 @@
  * keeps a handle to the thread, hash table for POST Cache
  *
 */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef FQDN_HANDLER_H
 #define FQDN_HANDLER_H
@@ -41,10 +44,6 @@
 #include "internal_macros.h"
 #include "log.h"
 #include "properties.h"
-
-#if (defined(WINNT) || defined(_AMD64_))
-#define snprintf        _snprintf
-#endif
 
 BEGIN_PRIVATE_NAMESPACE
 

@@ -25,12 +25,11 @@
  * $Id: server_info.cpp,v 1.5 2008/09/13 01:11:53 robertis Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <stdio.h>
-#if (defined(WINNT) || defined(_AMD64_))
-#define snprintf        _snprintf
-#endif
-
 #include <climits>
 #include <cstring>
 #include <stdexcept>

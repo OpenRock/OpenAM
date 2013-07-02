@@ -24,19 +24,16 @@
  *
  * $Id: xml_tree.cpp,v 1.4 2008/09/13 01:11:53 robertis Exp $
  *
- */ 
-#include <stdio.h>
-#if (defined(WINNT) || defined(_AMD64_))
-#define	vsnprintf	_vsnprintf
-#endif
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
+#include <stdio.h>
 #include <climits>
 #include <cstdarg>
 #include <stdexcept>
 #include <cstring>
-
-#include <libxml/parser.h>
-
 #include "xml_tree.h"
 
 USING_PRIVATE_NAMESPACE
@@ -143,7 +140,7 @@ void XMLTree::initialize()
 {
     if (! initialized) {
 	xmlInitParser();
-	xmlKeepBlanksDefault(false); // XXX - Is this correct?
+	xmlKeepBlanksDefault(false);
 	initialized = true;
     }
 }

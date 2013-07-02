@@ -136,22 +136,24 @@ com.sun.identity.agents.config.debug.level =
 #
 # SSL comunication related properties
 #   The following properties are for to establish secure communication
-#   between agent and access manager.
+#   between agent and OpenAM server.
 #
-#   - sslcert.dir: Name of the directory containing the certificate databases for SSL.
-#   - certdb.prefix: Set this property if the certificate databases in the directory
-#         specified by the previous property have a prefix.
-#   - certdb.password: Certificates database password.
-#   - auth.certificate.alias: Certificate alias.
+#   - com.forgerock.agents.config.cert.key: PEM encoded private key (used only in certificate based mutual authentication);
+#         Microsoft Windows users need to enter private key alias name here as imported by Windows Certificate Manager.
+#   - com.forgerock.agents.config.cert.key.password: private key password (not used on Microsoft Windows platform)
+#   - com.forgerock.agents.config.cert.file: PEM encoded client certificate (not used on Microsoft Windows platform)
+#   - com.forgerock.agents.config.cert.ca.file: a list of PEM encoded CA certificates (not used on Microsoft Windows platform)
+#   - com.forgerock.agents.config.ciphers: cipher list according to http://www.openssl.org/docs/apps/ciphers.html (not used on Microsoft Windows platform)
 #   - trust.server.certs: Should agent trust all server certificates when OpenAM server
 #         is running SSL? Valid values are {true, false}
 #
 # Hot-Swap Enabled: No
 #
-com.sun.identity.agents.config.sslcert.dir = 
-com.sun.identity.agents.config.certdb.prefix = 
-com.sun.identity.agents.config.certdb.password = 
-com.sun.identity.agents.config.certificate.alias = 
+com.forgerock.agents.config.cert.key =
+com.forgerock.agents.config.cert.key.password =
+com.forgerock.agents.config.cert.file = 
+com.forgerock.agents.config.cert.ca.file = 
+com.forgerock.agents.config.ciphers = 
 com.sun.identity.agents.config.trust.server.certs = true
 
 

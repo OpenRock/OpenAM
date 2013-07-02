@@ -25,19 +25,23 @@
  * $Id: properties.cpp,v 1.12 2008/09/13 01:11:53 robertis Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #include <cerrno>
 #include <cstdlib>
 #include <stdexcept>
-
-#include <prerror.h>
-#include <prio.h>
-#include <prprf.h>
-
 #include "internal_macros.h"
 #include "properties.h"
 #include "am_web.h"
 #include <cstring>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifdef _MSC_VER
+#define stat _stat
+#endif
 
 USING_PRIVATE_NAMESPACE
 
@@ -243,11 +247,7 @@ am_status_t Properties::parseBuffer(char *buffer)
 {
     am_status_t status = AM_SUCCESS;
     char *nextLine;
-#if defined(_AMD64_)
-    size_t len;
-#else
-    int len;
-#endif
+    std::size_t len;
 
     try {
 	for (buffer = skipWhitespaceAndComments(buffer);
@@ -289,67 +289,52 @@ am_status_t Properties::parseBuffer(char *buffer)
     return status;
 }
 
-am_status_t Properties::load(const std::string& fileName)
-{
+am_status_t Properties::load(const std::string& fileName) {
     am_status_t status = AM_SUCCESS;
-    PRFileDesc *propFile;
+    FILE *propFile;
 
-    PRErrorCode pr_errorCode;
-
-    propFile = PR_Open(fileName.c_str(), PR_RDONLY, 0);
+    propFile = fopen(fileName.c_str(), "rb");
     if (NULL != propFile) {
-	PRFileInfo fileInfo;
+        struct stat st;
+        if (stat(fileName.c_str(), &st) == 0 && st.st_size > 0) {
+            try {
+                std::size_t readCount;
+                char *buffer = new char[st.st_size + 1];
 
-	if (PR_GetOpenFileInfo(propFile, &fileInfo) == PR_SUCCESS) {
-	    try {
-		PRInt32 readCount;
-		char *buffer = new char[fileInfo.size + 1];
+                readCount = fread(buffer, 1, st.st_size, propFile);
+                if (readCount == st.st_size) {
+                    buffer[readCount] = '\0';
+                    status = parseBuffer(buffer);
+                } else {
+                    Log::log(Log::ALL_MODULES,
+                            Log::LOG_ERROR,
+                            "am_properties_load(): "
+                            "Could not load properties file %s: "
+                            "Number of bytes read (%d) "
+                            "did not match expected file size (%d).",
+                            fileName.c_str(), readCount, st.st_size);
+                    status = AM_BUFFER_TOO_SMALL;
+                }
 
-		readCount = PR_Read(propFile, buffer, fileInfo.size);
-		if (readCount == fileInfo.size) {
-		    buffer[readCount] = '\0';
-		    status = parseBuffer(buffer);
-		} else {
-		    Log::log(Log::ALL_MODULES, 
-			     Log::LOG_ERROR, 
-			     "am_properties_load(): "
-			     "Could not load properties file %s: "
-			     "Number of bytes read (%d) "
-			     "did not match expected file size (%d).\n", 
-			     fileName.c_str(), readCount, fileInfo.size);
-		    status = AM_NSPR_ERROR;
-		}
-               
                 delete[] buffer;
-	    } catch (const std::bad_alloc&) {
-		status = AM_NO_MEMORY;
-	    }
+            } catch (const std::bad_alloc&) {
+                status = AM_NO_MEMORY;
+            }
 
-	} else {
-	    pr_errorCode = PR_GetError();
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, 
-		     "am_properties_load(): "
-		     "Error getting info for properties file %s: %s\n", 
-		     fileName.c_str(), 
-		     PR_ErrorToString(pr_errorCode, PR_LANGUAGE_I_DEFAULT));
-	    status = AM_NSPR_ERROR;
-	}
-	PR_Close(propFile);
+        } else {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "am_properties_load(): "
+                    "Error getting info for properties file %s (unable to determine file size)",
+                    fileName.c_str());
+            status = AM_END_OF_FILE;
+        }
+        fclose(propFile);
     } else {
-	pr_errorCode = PR_GetError();
-
-	if (PR_FILE_NOT_FOUND_ERROR == pr_errorCode) {
-	    status = AM_NOT_FOUND;
-	} else if (PR_NO_ACCESS_RIGHTS_ERROR == pr_errorCode) {
-	    status = AM_ACCESS_DENIED;
-	} else {
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, 
-		     "am_properties_load(): "
-		     "Error opening properties file '%s': %s\n", 
-		     fileName.c_str(), 
-		     PR_ErrorToString(pr_errorCode, PR_LANGUAGE_I_DEFAULT));
-	    status = AM_NSPR_ERROR;
-	}
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                "am_properties_load(): "
+                "Error opening properties file %s (unable to open file for reading)",
+                fileName.c_str());
+        status = AM_NOT_FOUND;
     }
 
     return status;
@@ -358,22 +343,20 @@ am_status_t Properties::load(const std::string& fileName)
 am_status_t Properties::store(const std::string& fileName) const
 {
     am_status_t status = AM_SUCCESS;
-    PRFileDesc *propFile;
+    FILE *propFile;
 
-    propFile = PR_Open(fileName.c_str(),
-		       PR_WRONLY|PR_CREATE_FILE|PR_TRUNCATE, 0644);
+    propFile = fopen(fileName.c_str(), "w");
     if (NULL != propFile) {
-	PRUint32 rc = 0;
+	int rc = 0;
 
 	for (const_iterator iter = begin(); iter != end(); ++iter) {
-	    rc = PR_fprintf(propFile, "%s=%s\n", iter->first.c_str(),
+	    rc = fprintf(propFile, "%s=%s\n", iter->first.c_str(),
 			    iter->second.c_str());
-	    if (static_cast<PRUint32>(-1) == rc) {
+	    if (-1 == rc) {
 		break;
 	    }
 	}
-	if (PR_SUCCESS != PR_Close(propFile) ||
-	    static_cast<PRUint32>(-1) == rc) {
+	if (0 != fclose(propFile) || -1 == rc) {
 	    status = AM_NSPR_ERROR;
 	}
     } else {
@@ -417,7 +400,7 @@ const std::string& Properties::get(const std::string& key,
         if (terse) {
 	    Log::log(logID, Log::LOG_MAX_DEBUG, 
 	        "No value specified for key %s, using default value %s.", 
-		    key.c_str(), defaultValue.c_str());
+		    key.c_str(), defaultValue.empty() ? "\"\"" : defaultValue.c_str());
         }
 	return defaultValue;
     } else {
@@ -427,7 +410,7 @@ const std::string& Properties::get(const std::string& key,
             if (terse) {
 	        Log::log(logID, Log::LOG_MAX_DEBUG,
 	         "Invalid value specified for key %s, using default value %s.", 
-		    key.c_str(), defaultValue.c_str());
+		    key.c_str(), defaultValue.empty() ? "\"\"" : defaultValue.c_str());
             }
 	    return defaultValue;
         }

@@ -25,11 +25,14 @@
  * $Id: sso_token_service.cpp,v 1.8 2008/09/13 01:11:53 robertis Exp $
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #include <climits>
 #include <ctime>
 #include <string>
 #include <list>
-#include <prlong.h>
 #include "internal_macros.h"
 #include "am.h"
 #include "sso_token.h"
@@ -52,9 +55,9 @@ using std::list;
 
 namespace {
     const unsigned long START_THREADS = 1;
-    const unsigned long DEFAULT_HASH_SIZE = 131;
+    unsigned long DEFAULT_HASH_SIZE = 131;
     const unsigned long DEFAULT_TIMEOUT = 3;
-    const PRUint32 DEFAULT_MAX_THREADS = 10;
+    const std::size_t DEFAULT_MAX_THREADS = 10;
 }
 
 
@@ -66,34 +69,20 @@ namespace {
  */
 SSOTokenService::SSOTokenService(const char *serviceName,
 		                 const Properties& initParams)
-    : SessionService(serviceName, 
-		   initParams,
-                   initParams.get(
-                        AM_COMMON_CERT_DB_PASSWORD_PROPERTY,
-                        ""),
-                   initParams.get(
-                        AM_AUTH_CERT_ALIAS_PROPERTY,
-                        ""),
-                   initParams.getBool(
-                       AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, false)),
+    : SessionService(serviceName, initParams),
     mServiceName(serviceName),
     mServiceParams(initParams, mLogID),
     mLogID(Log::addModule(serviceName)),
-    mAlwaysTrustServerCert(initParams.getBool(
-                               AM_COMMON_TRUST_SERVER_CERTS_PROPERTY, false)),
     mNamingServiceURL(initParams.get(AM_COMMON_NAMING_URL_PROPERTY, "")),
     mNamingServiceInfo(mNamingServiceURL),
-    mNamingService(initParams,
-		   initParams.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
-		   initParams.get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-                   mAlwaysTrustServerCert),
+    mNamingService(initParams),
     mDefSessionURL(""),
     mSessionServiceInfo(mDefSessionURL),
     mNotifEnabled(initParams.getBool(
                       AM_COMMON_NOTIFICATION_ENABLE_PROPERTY, false)),
     mNotifURL(initParams.get(AM_COMMON_NOTIFICATION_URL_PROPERTY, "")),
     mSSOTokenListenerTable(DEFAULT_HASH_SIZE,
-                           LL_MAXINT), // entry never times out
+                           ULONG_MAX), // entry never times out
     mSSOTokenListenerTableLock(),
     mCookieName(initParams.get(AM_COMMON_COOKIE_NAME_PROPERTY, DEF_COOKIENAME)),
     mLoadBalancerEnabled(initParams.getBool(
@@ -420,11 +409,8 @@ SSOTokenService::getSessionInfo(const ServiceInfo& serviceInfo,
     std::string ssoTokenID = ssoTokID;
     bool cookieEncoded = false;
     
-#if defined(_AMD64_)
     size_t pos = ssoTokID.find('%');
-#else
-    int pos = ssoTokID.find('%');
-#endif
+
     if (pos != std::string::npos)
 	cookieEncoded = true;
    
@@ -871,7 +857,6 @@ SSOTokenService::addSSOTokenListener(
 					dispatchInSepThread);
 			    oldEntry = mSSOTokenListenerTable.insert(
 					ssoTokenID, ssoTokenListenerEntry);
-			    PR_ASSERT(oldEntry == 0);
 			}
 		    }
 		    Log::log(mLogID, Log::LOG_INFO,
@@ -926,7 +911,7 @@ SSOTokenService::handleNotif(const std::string& notifData)
 	XMLElement timeElem;
 	std::string sessionID, state, typeStr, timeStr;
 	long typeVal;
-	PRTime timeVal;
+	time_t timeVal;
 
 	// parse notification
 	if(!rootElement.isNamed(SESSION_NOTIFICATION)) {
@@ -955,8 +940,8 @@ SSOTokenService::handleNotif(const std::string& notifData)
                      "notification type or time element value.");
             sts = AM_ERROR_PARSING_XML;
         }
-        else if (PR_sscanf(typeStr.c_str(), "%d", &typeVal) != 1 ||
-                 PR_sscanf(timeStr.c_str(), "%lld", &timeVal) != 1) 
+        else if (sscanf(typeStr.c_str(), "%d", &typeVal) != 1 ||
+                 sscanf(timeStr.c_str(), "%lld", &timeVal) != 1) 
         {
             Log::log(mLogID, Log::LOG_ERROR,
                      "SSOTokenService::handleNotif(): "
@@ -1045,21 +1030,12 @@ SSOTokenService::handleNotif(const std::string& notifData)
     return sts;
 }
 
-#if defined(_AMD64_)
 am_status_t 
 SSOTokenService::callSSOTokenListeners(
 	const std::string& sessionID, 
 	const XMLElement& sessionElem, 
 	const am_sso_token_event_type_t event_type, 
-	const long long event_time) 
-#else
-am_status_t 
-SSOTokenService::callSSOTokenListeners(
-	const std::string& sessionID, 
-	const XMLElement& sessionElem, 
-	const am_sso_token_event_type_t event_type, 
-	const long event_time) 
-#endif
+	const time_t event_time) 
 {
     am_status_t sts = AM_SUCCESS;
     am_status_t sts1 = AM_SUCCESS;
@@ -1107,20 +1083,11 @@ SSOTokenService::callSSOTokenListeners(
     return sts;
 }
 
-
-#if defined(_AMD64_)
 am_status_t 
 SSOTokenService::callSSOListeners(const std::string& sessionID, 
 				  const XMLElement& sessionElem, 
 				  const am_sso_token_event_type_t event_type, 
-				  const long long event_time) 
-#else
-am_status_t 
-SSOTokenService::callSSOListeners(const std::string& sessionID, 
-				  const XMLElement& sessionElem, 
-				  const am_sso_token_event_type_t event_type, 
-				  const long event_time) 
-#endif
+				  const time_t event_time) 
 {
     am_status_t sts = AM_SUCCESS;
     am_status_t sts1 = AM_SUCCESS;
@@ -1162,23 +1129,13 @@ SSOTokenService::callSSOListeners(const std::string& sessionID,
     return sts;
 }
 
-#if defined(_AMD64_)
 am_status_t
 SSOTokenService::callTheListener(
 	SSOTokenListenerThreadFunc *listenerThrFunc,
 	const std::string& sessionID, 
 	const XMLElement& sessionElem, 
 	const am_sso_token_event_type_t event_type, 
-	const long long event_time) 
-#else
-am_status_t
-SSOTokenService::callTheListener(
-	SSOTokenListenerThreadFunc *listenerThrFunc,
-	const std::string& sessionID, 
-	const XMLElement& sessionElem, 
-	const am_sso_token_event_type_t event_type, 
-	const long event_time) 
-#endif
+	const time_t event_time) 
 {
     am_status_t sts = AM_SUCCESS;
     try {
@@ -1250,7 +1207,6 @@ SSOTokenService::removeSSOTokenListener(const std::string& ssoTokenID,
 	        removed = ssoTokenListenerEntry->removeListener(listener);
                 if (removed && ssoTokenListenerEntry->getNumListeners()==0) {
                     oldEntry = mSSOTokenListenerTable.remove(ssoTokenID);
-		    PR_ASSERT(oldEntry == ssoTokenListenerEntry);
                 }
             }
 	}

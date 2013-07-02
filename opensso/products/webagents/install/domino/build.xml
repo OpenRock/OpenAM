@@ -181,8 +181,6 @@
                     <include name="libamdomino.a"/>
             </fileset>
         </copy>
-        <copy file="${webagents.am.src.dir}/libamsdk.so.3"
-            tofile="${container.web_agent.lib.dir}/libamsdk.so"/>
         <move file="${container.web_agent.lib.dir}/libxml2.so.2"
               tofile="${container.web_agent.lib.dir}/libxml2.so"/>
     </target>

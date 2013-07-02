@@ -29,14 +29,15 @@
  * Represents an attribute of an element in an XML parse tree.
  *
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 #ifndef XML_ATTRIBUTE_H
 #define XML_ATTRIBUTE_H
 
-#include <string>
-
 #include "internal_macros.h"
-#include "log.h"
+#include "xml_utilities.h"
 
 BEGIN_PRIVATE_NAMESPACE
 
@@ -150,46 +151,56 @@ public:
     //		the default value, zero, can is appropriate.
     //
     void log(Log::ModuleId logModule, Log::Level level,
-	     unsigned int depth = 0) const;
+            unsigned int depth = 0) const;
 
 private:
     friend class XMLElement;
 
+#ifdef _MSC_VER
+    explicit XMLAttribute(MSXML2::IXMLDOMNodePtr pointer);
+#else
     explicit XMLAttribute(struct _xmlAttr *pointer);
+#endif
 
+#ifdef _MSC_VER
+    MSXML2::IXMLDOMNodePtr attrPtr;
+#else
     struct _xmlAttr *attrPtr;
+#endif
 };
 
 inline XMLAttribute::XMLAttribute()
-    : attrPtr(NULL)
-{
+: attrPtr(NULL) {
 }
+
+#ifdef _MSC_VER
+
+inline XMLAttribute::XMLAttribute(MSXML2::IXMLDOMNodePtr attrPtrArg)
+: attrPtr(attrPtrArg) {
+}
+#else
 
 inline XMLAttribute::XMLAttribute(struct _xmlAttr *attrPtrArg)
-    : attrPtr(attrPtrArg)
-{
+: attrPtr(attrPtrArg) {
 }
+#endif
 
 inline XMLAttribute::XMLAttribute(const XMLAttribute& rhs)
-    : attrPtr(rhs.attrPtr)
-{
+: attrPtr(rhs.attrPtr) {
 }
 
-inline XMLAttribute::~XMLAttribute()
-{
+inline XMLAttribute::~XMLAttribute() {
     attrPtr = NULL;
 }
 
-inline XMLAttribute& XMLAttribute::operator=(const XMLAttribute& rhs)
-{
+inline XMLAttribute& XMLAttribute::operator=(const XMLAttribute& rhs) {
     // Not worth checking for self-assignment, since this is safe to do anyway.
     attrPtr = rhs.attrPtr;
 
     return *this;
 }
 
-inline bool XMLAttribute::isValid() const
-{
+inline bool XMLAttribute::isValid() const {
     return attrPtr != NULL;
 }
 

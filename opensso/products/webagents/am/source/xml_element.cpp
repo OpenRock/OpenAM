@@ -24,11 +24,12 @@
  *
  * $Id: xml_element.cpp,v 1.3 2008/06/25 08:14:41 qcheng Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 #include <stdexcept>
-
-#include <libxml/tree.h>
-
 #include "xml_element.h"
 #include "xml_utilities.h"
 
