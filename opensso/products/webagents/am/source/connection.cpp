@@ -730,6 +730,7 @@ ssize_t Connection::response(char ** buff) {
                 }
             } while (len > 0);
         }
+        free(tmp);
     }
 
     if (*buff != NULL) {

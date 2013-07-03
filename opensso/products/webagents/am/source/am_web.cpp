@@ -438,7 +438,13 @@ void mbyte_to_wchar(const char * orig_str, char *dest_str, int dest_len) {
         /* Perform iconv conversion */
         Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
                 "i18n b4 convlen = %d  size = %d", len, size);
+
+#if defined(__SunOS_5_10)
         const char **s = (const char **) &origstr;
+#else
+        char **s = (char **) &origstr;
+#endif
+
         int ret = iconv(encoder, s, &len, &dest_str, &size);
         Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
                 "i18n len = %d  size = %d", len, size);
