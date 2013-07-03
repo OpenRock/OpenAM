@@ -33,6 +33,14 @@ bool XMLTree::initialized = false;
 XMLTree::XMLTree(bool validate, const char *docBuffer, std::size_t bufferLen) : docPtr(NULL), rootPtr(NULL) {
     VARIANT_BOOL status = VARIANT_FALSE;
 
+    envInit = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (!SUCCEEDED(envInit)) {
+        _com_error er(envInit);
+        std::ostringstream ss;
+        ss << "XMLTree() unable to initialize XML parser: " << er.ErrorMessage();
+        throw ParseException(ss.str());
+    }
+
     if (static_cast<const char *> (NULL) == docBuffer) {
         throw ParseException("XMLTree() empty document (NULL data buffer)");
     }
@@ -80,17 +88,15 @@ XMLTree::XMLTree(bool validate, const char *docBuffer, std::size_t bufferLen) : 
 
 XMLTree::~XMLTree() {
     docPtr = 0;
-}
-
-void XMLTree::initialize() {
-    if (!initialized) {
-        CoInitialize(NULL);
-        initialized = true;
+    if (SUCCEEDED(envInit)) {
+        CoUninitialize();
     }
 }
 
+void XMLTree::initialize() {
+}
+
 void XMLTree::shutdown() {
-    CoUninitialize();
 }
 
 XMLElement XMLTree::getRootElement() const {

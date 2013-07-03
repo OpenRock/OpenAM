@@ -146,6 +146,7 @@ private:
 #ifdef _MSC_VER
     MSXML2::IXMLDOMDocument2Ptr docPtr;
     MSXML2::IXMLDOMElementPtr rootPtr;
+    HRESULT envInit;
 #else
     struct _xmlDoc *docPtr;
 #endif
