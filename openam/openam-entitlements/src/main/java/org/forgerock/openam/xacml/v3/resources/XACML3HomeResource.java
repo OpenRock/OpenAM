@@ -56,7 +56,7 @@ public class XACML3HomeResource extends XACML3Resource {
         // Formulate the Home Document for XML Consumption, based upon Atom - RFC4287
         sb.append(XML_HEADER);
         sb.append("<resources xmlns=\042http://ietf.org/ns/home-documents\042");
-        sb.append("xmlns:atom=\042http://www.w3.org/2005/Atom\042>");
+        sb.append(" xmlns:atom=\042http://www.w3.org/2005/Atom\042>");
         sb.append("<resource rel=\042http://docs.oasis-open.org/ns/xacml/relation/pdp\042>");
         sb.append("<atom:link href=\042" + PDP_ENDPOINT + "\042/>");
         sb.append("</resource>");

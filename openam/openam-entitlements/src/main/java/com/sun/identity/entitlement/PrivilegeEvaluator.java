@@ -251,20 +251,20 @@ class PrivilegeEvaluator {
      * @param recursive <code>true</code> for sub tree evaluation.
      * @return <code>true</code> if the subject has privilege to have the
      * given entitlement.
-     * @throws com.sun.identity.entitlement. EntitlementException if
+     * @throws com.sun.identity.entitlement.EntitlementException if
      * evaluation fails.
      */
     public List<Entitlement> evaluate(
-        String realm,
-        Subject adminSubject,
-        Subject subject,
-        String applicationName,
-        String resourceName,
-        Object envParameters,
-        boolean recursive
+            String realm,
+            Subject adminSubject,
+            Subject subject,
+            String applicationName,
+            String resourceName,
+            Object envParameters,
+            boolean recursive
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
-            resourceName, null, envParameters, recursive);        
+                resourceName, null, envParameters, recursive);
         long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
         indexes = getApplication().getResourceSearchIndex(resourceName, realm);
         PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
@@ -277,7 +277,49 @@ class PrivilegeEvaluator {
 
         return entitlements;
     }
-    
+    /**
+     * Returns list of entitlements which is entitled to a subject.
+     *
+     * @param adminSubject Administrator subject which is used for evaluation.
+     * @param subject Subject to be evaluated.
+     * @param applicationName Application Name.
+     * @param resourceNames Resource name.
+     * @param envParameters Environment parameters.
+     * @param recursive <code>true</code> for sub tree evaluation.
+     * @return <code>true</code> if the subject has privilege to have the
+     * given entitlement.
+     * @throws com.sun.identity.entitlement.EntitlementException if
+     * evaluation fails.
+     */
+    public List<Entitlement> evaluate(
+            String realm,
+            Subject adminSubject,
+            Subject subject,
+            String applicationName,
+            Set<String> resourceNames,
+            String requestID,
+            Object envParameters,
+            boolean recursive
+    ) throws EntitlementException {
+        init(adminSubject, subject, realm, applicationName,
+                requestID, null, envParameters, recursive);
+        long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
+
+        indexes = new ResourceSearchIndexes(null,null,null);
+        for (String res : resourceNames) {
+            indexes.addAll(getApplication().getResourceSearchIndex(res, realm));
+        }
+        PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
+
+        List<Entitlement> entitlements = Collections.emptyList();
+
+        if (!indexes.isEmpty()) {
+            entitlements = evaluate(realm);
+        }
+
+        return entitlements;
+    }
+
     private List<Entitlement> evaluate(String realm)
         throws EntitlementException {
 

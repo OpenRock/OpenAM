@@ -88,22 +88,20 @@ public class XACMLEvalContext  {
           */
 
     }
-    public static Response XACMLEvaluate(Request request, Subject adminSubject) {
+    public static Response XACMLEvaluate(Request request, Subject adminSubject, String appname) {
         XACML3Request xReq = new  XACML3Request(request);
-        Response response = new Response();
         XACMLEvalContext eContext =  new XACMLEvalContext();
-        eContext.setReponse(response);
         eContext.setRequest(xReq);
 
         try {
-            Evaluator eval = new Evaluator(adminSubject,"xacml3");
+            Evaluator eval = new Evaluator(adminSubject,appname);
             Set<String> rNames = xReq.getResources();
-            List<Entitlement> ent = eval.evaluate("/", adminSubject,rNames,eContext);
+            List<Entitlement> ent = eval.evaluate("/", adminSubject,rNames,eContext,xReq.getContextID());
 
         } catch (Exception ex) {
 
         }
-        return response;
+        return null;
     }
 
 }

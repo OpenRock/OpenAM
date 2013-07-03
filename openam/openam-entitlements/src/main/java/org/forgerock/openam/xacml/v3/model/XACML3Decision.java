@@ -40,23 +40,30 @@ public class XACML3Decision {
     private ObligationExpressions obligations;
     private AdviceExpressions advices;
 
-    public  XACML3Decision() {
+    public static final String OK = "urn:oasis:names:tc:xacml:1.0:status:ok";
+    public static final String MISSING_ATTRIBUTE = "urn:oasis:names:tc:xacml:1.0:status:missing-attribute";
+    public static final String SYNTAX_ERROR = "urn:oasis:names:tc:xacml:1.0:status:syntax-error";
+    public static final String PROECESSING_ERROR = "urn:oasis:names:tc:xacml:1.0:status:processing-error";
 
+    public  XACML3Decision() {
     }
 
     public Status getStatus() {
+        if (status == null) {
+             setStatus(SYNTAX_ERROR);
+        }
         return status;
     }
     public void setStatus(String stat) {
         status = new Status();
         StatusCode sc = new StatusCode();
-        sc.setValue("urn:oasis:names:tc:xacml:1.0:status:ok");
-        if (stat != null) {
-            status.setStatusMessage(stat);
-        }
+        sc.setValue(stat);
     }
 
     public DecisionType getDecision() {
+        if (decision == null) {
+            setDecision("Indeterminate");
+        }
         return decision;
     }
     public void setDecision(String dec) {

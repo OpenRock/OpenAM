@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import javax.security.auth.Subject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -773,6 +774,21 @@ public class XACMLPrivilegeUtils {
         return XACMLConstants.XACML_RULE_DENY_OVERRIDES;
     }
 
+    public static String applicationFromPolicySet(PolicySet policySet, String realm, Subject adminSubject) {
+        String appName = null;
+        try {
+            appName = policySet.getPolicySetId();
+            Application app = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject,realm, appName);
+            if (app == null) {
+                app = ApplicationManager.getApplication(adminSubject,realm, "xacml3").initFrom(realm, appName);
+                ApplicationManager.saveApplication(adminSubject,realm,app);
+            }
+        } catch(EntitlementException ex) {
+
+        }
+        return appName;
+    }
+
     public static Set<Privilege> policySetToPrivileges(PolicySet policySet) 
             throws EntitlementException {
         if (policySet == null) {
@@ -789,7 +805,7 @@ public class XACMLPrivilegeUtils {
         return privileges;
     }
 
-    public static Privilege policyToXACML3Privilege(Policy policy)
+    public static Privilege policyToXACML3Privilege(Policy policy, String appName)
             throws EntitlementException {
         try {
 
@@ -803,7 +819,7 @@ public class XACMLPrivilegeUtils {
                 resourceNames.add("xacml3");
             }
 
-            Entitlement entitlement = new Entitlement(XACML3_ENTITLEMENT_APP, resourceNames, actionValues);
+            Entitlement entitlement = new Entitlement(appName, resourceNames, actionValues);
 
             Privilege privilege = new XACMLOpenSSOPrivilege();
             String privilegeName = policyIdToPrivilegeName(policy.getPolicyId());

@@ -70,13 +70,13 @@ public class XACMLOpenSSOPrivilege extends OpenSSOPrivilege {
         List<Entitlement> results = null;
         try {
             XACML3Policy pol = (XACML3Policy) getContext();
-             Object result = pol.evaluate((XACMLEvalContext) env);
+             results = pol.evaluate((XACMLEvalContext) env);
         } catch (Exception ex) {
             System.out.println("Exception = " + ex.getMessage()) ;
             // exception
         }
 
-        return null;
+        return results;
     }
 
     protected void init(JSONObject jo) throws JSONException {

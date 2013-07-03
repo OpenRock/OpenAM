@@ -167,25 +167,56 @@ public class Evaluator {
      * @throws EntitlementException if the result cannot be determined.
      */
     public List<Entitlement> evaluate(
-        String realm,
-        Subject subject,
-        String resourceName,
-        //Map<String, Set<String>> environment,
-        Object environment,
-        boolean recursive
+            String realm,
+            Subject subject,
+            String resourceName,
+            //Map<String, Set<String>> environment,
+            Object environment,
+            boolean recursive
     ) throws EntitlementException {
         long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :
-            EVAL_SINGLE_LEVEL_MONITOR.start();        
+                EVAL_SINGLE_LEVEL_MONITOR.start();
 
         PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
         List<Entitlement> results = evaluator.evaluate(realm, adminSubject,
-            subject, applicationName, resourceName, environment, recursive);
+                subject, applicationName, resourceName, environment, recursive);
 
         if (recursive) {
             EVAL_SUB_TREE_MONITOR.end(start);
         } else {
             EVAL_SINGLE_LEVEL_MONITOR.end(start);
         }
+
+        return results;
+    }
+    /**
+     * Returns a list of entitlements for a given subject, resource name
+     * and environment.
+     *
+     * @param realm Realm Name.
+     * @param subject Subject who is under evaluation.
+     * @param resourceNames Resource name.
+     * @param environment Environment parameters.
+
+     * @return a list of entitlements for a given subject, resource name
+     *         and environment.
+     * @throws EntitlementException if the result cannot be determined.
+     */
+    public List<Entitlement> evaluate(
+            String realm,
+            Subject subject,
+            Set<String> resourceNames,
+            //Map<String, Set<String>> environment,
+            Object environment,
+            String requestName
+    ) throws EntitlementException {
+        long start = EVAL_SINGLE_LEVEL_MONITOR.start();
+
+        PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
+        List<Entitlement> results = evaluator.evaluate(realm, adminSubject,
+                subject, applicationName, resourceNames, requestName, environment, false);
+
+        EVAL_SINGLE_LEVEL_MONITOR.end(start);
 
         return results;
     }

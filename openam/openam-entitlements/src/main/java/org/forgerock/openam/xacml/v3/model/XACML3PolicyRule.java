@@ -45,6 +45,10 @@ public class XACML3PolicyRule {
 
     }
 
+    public String getName() {
+        return ruleName;
+    }
+
 
     public XACML3PolicyRule(Rule rule) {
         target = XACML3PrivilegeUtils.getTargetFunction(rule.getTarget(),new HashSet<String>());
@@ -83,7 +87,7 @@ public class XACML3PolicyRule {
             evalResult = condition.evaluate(pip);
             if (evalResult.isTrue() || evalResult.isFalse())        {    // we Match Target,  and Condition
 
-                result.setStatus(null);
+                result.setStatus(XACML3Decision.OK);
                 result.setDecision(effect);
 
                 if (obligations != null) {
@@ -107,7 +111,7 @@ public class XACML3PolicyRule {
             }
         }
         } catch (XACML3EntitlementException ex) {
-            result.setStatus("Indeterminate");
+            result.setDecision("Indeterminate");
         }
 
         return result;

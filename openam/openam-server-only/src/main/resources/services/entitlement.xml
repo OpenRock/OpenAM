@@ -440,7 +440,10 @@
                                       id="applicationType">
                         <AttributeValuePair>
                             <Attribute name="actions" />
-                            <Value>ACCESS=true</Value>
+                            <Value>ALLOW=true</Value>
+                            <Value>DENY=false</Value>
+                            <Value>INDETERMINATE=false</Value>
+                            <Value>NOTAPPLICABLE=false</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="searchIndexImpl" />

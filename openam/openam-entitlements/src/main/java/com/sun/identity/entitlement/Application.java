@@ -132,6 +132,14 @@ public class Application implements Cloneable {
         return clone;
     }
 
+    public Application initFrom(String realm, String name) {
+        Application clone = new Application();
+        cloneAppl(clone);
+        clone.realm = realm;
+        clone.name = name;
+        return clone;
+    }
+
     protected void cloneAppl(Application clone) {
         clone.name = name;
         clone.realm = realm;

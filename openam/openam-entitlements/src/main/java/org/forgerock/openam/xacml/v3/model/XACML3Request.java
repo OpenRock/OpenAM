@@ -29,6 +29,7 @@ import com.sun.identity.entitlement.xacml3.core.Attribute;
 import com.sun.identity.entitlement.xacml3.core.AttributeValue;
 import com.sun.identity.entitlement.xacml3.core.Attributes;
 import com.sun.identity.entitlement.xacml3.core.Request;
+import org.joda.time.DateTime;
 
 import java.util.*;
 
@@ -37,6 +38,7 @@ public class XACML3Request {
     private Set<String> resources;
     private boolean returnPolicyIDList;
     private boolean combinedDecision;
+    private String  XACML3RequestContextID  = DateTime.now().toString();
 
     public XACML3Request(Request request) {
         requestData = new HashMap<String, Map<String, DataBag>>();
@@ -83,5 +85,9 @@ public class XACML3Request {
              bag = (DataBag)cData.get(designator.getAttributeID());
         }
         return bag;
+    }
+
+    public String getContextID() {
+        return XACML3RequestContextID;
     }
 }

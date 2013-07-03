@@ -153,8 +153,8 @@ public class XACML3RequestHandler {
     @POST
     @Consumes({"application/xml", "application/xacml+xml"})
     @Produces({"application/xml", "application/xacml+xml"})
-    @Path("/pdp")
-    public JAXBElement<Response> getXMLDecision(JAXBElement<Request> req) {
+    @Path("/pdp/{appname}")
+    public JAXBElement<Response> getXMLDecision(JAXBElement<Request> req, @PathParam("appname") String appname) {
         final String methodName = "XACML3RequestHandler.getXMLDecision: ";
         Response response = null;
         try {
@@ -162,7 +162,7 @@ public class XACML3RequestHandler {
             Subject adminSubject = SubjectUtils.createSuperAdminSubject();
             // TODO :: I do not see a correct Request UnMarshal Functions Appearing in Stack?
             // TODO :: Nothing is available to evaluate.
-            response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+            response = XACMLEvalContext.XACMLEvaluate(request, adminSubject, appname);
         } catch (Exception exception) {
             if (exception instanceof XACML3EntitlementException) {
                 DEBUG.error(methodName + "Entitlement Exception Occurred: " + exception.getMessage(), exception);
@@ -196,8 +196,8 @@ public class XACML3RequestHandler {
     @POST
     @Consumes({"application/json", "application/xacml+json"})
     @Produces({"application/json", "application/xacml+json"})
-    @Path("/pdp")
-    public JAXBElement<Response> getJSONDecision(JAXBElement<Request> req) {
+    @Path("/pdp/{appname}")
+    public JAXBElement<Response> getJSONDecision(JAXBElement<Request> req, @PathParam("appname") String appname) {
         final String methodName = "XACML3RequestHandler.getJSONDecision: ";
         Response response = null;
         try {
@@ -205,7 +205,7 @@ public class XACML3RequestHandler {
             Subject adminSubject = SubjectUtils.createSuperAdminSubject();
             // TODO :: I do not see a correct Request UnMarshal Functions Appearing in Stack?
             // TODO :: Nothing is available to evaluate.
-            response = XACMLEvalContext.XACMLEvaluate(request, adminSubject);
+                response = XACMLEvalContext.XACMLEvaluate(request, adminSubject, appname);
         } catch (Exception exception) {
             if (exception instanceof XACML3EntitlementException) {
                 DEBUG.error(methodName + "Entitlement Exception Occurred: " + exception.getMessage(), exception);
@@ -240,6 +240,29 @@ public class XACML3RequestHandler {
 
      }
      **/
+    /**
+     * POST
+     * Handle either XML or JSON Requests
+     *
+     * @param req JAXBElement<Request>
+     * @return JAXBElement<Response>
+     */
+    @POST
+    @Consumes // Consume All and any Application or Media Types
+    @Produces({"application/xml", "application/xacml+xml", "application/json", "application/xacml+json"})
+    @Path("/pdp")
+    public JAXBElement<Response> getDecision(JAXBElement<Request> req,
+                                             @Context javax.servlet.http.HttpServletRequest httpServletRequest,
+                                             @Context javax.ws.rs.core.SecurityContext securityContext) {
+        // Obtain our Content Type we are dealing with...
+        ContentType requestContentType = getContentType(httpServletRequest);
+        // Perform Appropriate Decision Method by Content Type.
+        if (requestContentType.getCommonType().equals(CommonType.XML)) {
+           return getXMLDecision(req,"xacml3");
+        } else {
+           return getJSONDecision(req,"xacml3");
+        }
+    }
 
     /**
      * POST
@@ -251,17 +274,18 @@ public class XACML3RequestHandler {
     @POST
     @Consumes // Consume All and any Application or Media Types
     @Produces({"application/xml", "application/xacml+xml", "application/json", "application/xacml+json"})
-    public JAXBElement<Response> getDecision(JAXBElement<Request> req,
+    public JAXBElement<Response> getDecisionall(JAXBElement<Request> req,
                                              @Context javax.servlet.http.HttpServletRequest httpServletRequest,
                                              @Context javax.ws.rs.core.SecurityContext securityContext) {
         // Obtain our Content Type we are dealing with...
-        ContentType requestContentType = getContentType(httpServletRequest);
+       // ContentType requestContentType = getContentType(httpServletRequest);
         // Perform Appropriate Decision Method by Content Type.
-        if (requestContentType.getCommonType().equals(CommonType.XML)) {
-            return getXMLDecision(req);
-        } else {
-            return getJSONDecision(req);
-        }
+       // if (requestContentType.getCommonType().equals(CommonType.XML)) {
+           // return getXMLDecision(req);
+       // } else {
+           // return getJSONDecision(req);
+       // }
+        return null;
     }
 
     /**
@@ -277,6 +301,27 @@ public class XACML3RequestHandler {
     @Produces({"application/xml", "application/xacml+xml", "application/json", "application/xacml+json"})
     @Path("/dumprequest")
     public JAXBElement<Request> getDumpRequest(JAXBElement<Request> req) {
+        Request request = req.getValue();
+        ObjectFactory objectFactory = new ObjectFactory();
+        return objectFactory.createRequest(request);
+    }
+    /**
+     * POST
+     * provides a simple debugging tool to dump and echo the request back to ensure
+     * Data is in sync and correct for a quick eyeballing.
+     *
+     * @param req -- JAXBElement<Request>
+     * @return JAXBElement<Request>
+     */
+    @POST
+    @Consumes // Consume All and any Application or Media Types
+    @Produces({"application/xml", "application/xacml+xml", "application/json", "application/xacml+json"})
+    @Path("/dumprequest/{appname}")
+    public JAXBElement<Request> getDecision(JAXBElement<Request> req,
+                                             @Context javax.servlet.http.HttpServletRequest httpServletRequest,
+                                             @Context javax.ws.rs.core.SecurityContext securityContext,
+                                             @PathParam("appname") String appname) {
+
         Request request = req.getValue();
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createRequest(request);

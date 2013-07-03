@@ -43,10 +43,7 @@ import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilegeManager;
+import com.sun.identity.entitlement.*;
 
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 
@@ -130,6 +127,7 @@ public class CreateXACML extends AuthenticatedCommand {
                         realm, adminSubject);
                 ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(
                         realm, adminSubject);
+                String app = XACMLPrivilegeUtils.applicationFromPolicySet(ps,realm,adminSubject);
                 Set<Policy> policies
                         = XACMLPrivilegeUtils.getPoliciesFromPolicySet(ps);
                 for (Policy policy : policies) {
@@ -138,7 +136,7 @@ public class CreateXACML extends AuthenticatedCommand {
                     } else {
                         if (XACMLPrivilegeUtils.USE_NEW_XACML3) {
                             pm.addPrivilege(
-                                    XACMLPrivilegeUtils.policyToXACML3Privilege(policy));
+                                    XACMLPrivilegeUtils.policyToXACML3Privilege(policy,app));
                         } else {
                             pm.addPrivilege(
                                     XACMLPrivilegeUtils.policyToPrivilege(policy));

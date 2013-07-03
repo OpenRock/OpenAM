@@ -25,6 +25,7 @@
  */
 package org.forgerock.openam.xacml.v3.model;
 
+import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.xacml3.core.*;
 import org.json.JSONArray;
@@ -81,18 +82,21 @@ public class XACML3Policy {
         resourceSelectors = rSel;
     }
 
-    public XACML3Decision evaluate(XACMLEvalContext pip) {
+    public List<Entitlement> evaluate(XACMLEvalContext pip) {
 
-        Result result = new Result();
         boolean indeterminate = true;
         FunctionArgument evalResult;
+        List<Entitlement> results = new ArrayList<Entitlement>();
 
         pip.setPolicy(this);
         try {
             evalResult = target.evaluate(pip);
         } catch (XACML3EntitlementException ex) {
-            result.setDecision(DecisionType.fromValue("Indeterminate"));
-            return null;
+            Set actions = new HashSet();
+            actions.add("NotApplicable");
+            results.add(new Entitlement(policyName,actions));
+            //result.setDecision(DecisionType.fromValue("Indeterminate"));
+            return results;
         }
 
         if (evalResult.isTrue())        {    // we  match,  so evaluate
@@ -100,21 +104,25 @@ public class XACML3Policy {
                 XACML3Decision decision = r.evaluate(pip);
 
                 if (decision.getDecision().value().equals("Permit")) {
-                    pip.setResult(decision);
-                    return decision;
+                    indeterminate = false;
+                    Set actions = new HashSet();
+                    actions.add("Permit");
+                    results.add(new Entitlement(r.getName(),actions));
                 }
                 if (decision.getDecision().value().equals("Deny")) {
                     indeterminate = false;
+                    Set actions = new HashSet();
+                    actions.add("Deny");
+                    results.add(new Entitlement(r.getName(),actions));
                 }
             }
         }
         if (indeterminate) {
-            result.setDecision(DecisionType.fromValue("Indeterminate"));
-        } else  {
-            result.setDecision(DecisionType.fromValue("Deny"));
+            Set actions = new HashSet();
+            actions.add("Indeterminate");
+            results.add(new Entitlement(policyName,actions));
         }
-
-        return null;
+        return results;
     }
 
 

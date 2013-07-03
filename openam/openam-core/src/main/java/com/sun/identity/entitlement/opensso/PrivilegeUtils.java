@@ -128,7 +128,7 @@ public class PrivilegeUtils {
         if (policyObject instanceof
                 com.sun.identity.entitlement.xacml3.core.Policy) {
              Privilege p = XACMLPrivilegeUtils.policyToXACML3Privilege(
-                (com.sun.identity.entitlement.xacml3.core.Policy)policyObject);
+                (com.sun.identity.entitlement.xacml3.core.Policy)policyObject,"");
              privileges.add(p);
         } else if (policyObject instanceof Policy) {
             policyToPrivileges((Policy) policyObject, privileges);
