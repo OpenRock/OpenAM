@@ -38,7 +38,7 @@
         <format property="build.date" pattern="MMM dd yyyy HH:mm:ss"/>
     </tstamp>
     <!-- agent version number appended to end of agent zip file name -->
-    <property name="agentversion" value="3.2.0-SNAPSHOT"/>
+    <property name="agentversion" value="3.2.0"/>
     <property name="AGENT_VER" value="${agentversion}"/>
     <property name="AGENT_ER_VER" value=""/>
     <property name="AGENT_FVB_MARKER" value=""/>
