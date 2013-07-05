@@ -86,20 +86,20 @@
         </fileSet>
         <fileSet>
             <outputDirectory>locale</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v10/locale</directory>
+            <directory>${project.basedir}/src/main/assemblylocale</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>etc</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v10/etc</directory>
+            <directory>${project.basedir}/src/main/assemblyetc</directory>
         </fileSet>
         <!-- The amauthprovider.jar is to do with MBeans and needs Weblogic tools to regenerate -->
         <fileSet>
             <outputDirectory>lib</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v10/lib</directory>
+            <directory>${project.basedir}/src/main/assemblylib</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>config</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v10/config</directory>
+            <directory>${project.basedir}/src/main/assemblyconfig</directory>
             <excludes>
                 <exclude>*version*</exclude>
             </excludes>
@@ -107,14 +107,14 @@
         <!-- Create empty directories -->
         <fileSet>
             <outputDirectory>installer-logs</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v10/etc</directory>
+            <directory>${project.basedir}/src/main/assemblyetc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <outputDirectory>data</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v10/etc</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
@@ -124,12 +124,12 @@
         <file>
             <destName>.version</destName>
             <outputDirectory>config</outputDirectory>
-            <source>${project.basedir}/src/main/assembly/v10/config/version</source>
+            <source>${project.basedir}/src/main/assembly/config/version</source>
             <filtered>true</filtered>
         </file>
         <file>
             <outputDirectory>sampleapp</outputDirectory>
-            <source>${project.basedir}/src/main/assembly/v10/sampleapp/readme.txt</source>
+            <source>${project.basedir}/src/main/assembly/sampleapp/readme.txt</source>
         </file>
     </files>
 </assembly>

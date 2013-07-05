@@ -86,15 +86,15 @@
         </fileSet>
         <fileSet>
             <outputDirectory>locale</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v61/locale</directory>
+            <directory>${project.basedir}/src/main/assembly/locale</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>etc</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v61/etc</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>config</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v61/config</directory>
+            <directory>${project.basedir}/src/main/assembly/config</directory>
             <excludes>
                 <exclude>*version*</exclude>
             </excludes>
@@ -102,14 +102,14 @@
         <!-- Create empty directories -->
         <fileSet>
             <outputDirectory>installer-logs</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v61/etc</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <outputDirectory>data</outputDirectory>
-            <directory>${project.basedir}/src/main/assembly/v61/etc</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
@@ -119,12 +119,12 @@
         <file>
             <destName>.version</destName>
             <outputDirectory>config</outputDirectory>
-            <source>${project.basedir}/src/main/assembly/v61/config/version</source>
+            <source>${project.basedir}/src/main/assembly/config/version</source>
             <filtered>true</filtered>
         </file>
         <file>
             <outputDirectory>sampleapp</outputDirectory>
-            <source>${project.basedir}/src/main/assembly/v61/sampleapp/readme.txt</source>
+            <source>${project.basedir}/src/main/assembly/sampleapp/readme.txt</source>
         </file>
     </files>
 </assembly>

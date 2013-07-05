@@ -121,7 +121,7 @@
         <file>
             <destName>.version</destName>
             <outputDirectory>config</outputDirectory>
-            <source>${project.basedir}/src/main/assembly/config/v6-version</source>
+            <source>${project.basedir}/src/main/assembly/config/version</source>
             <filtered>true</filtered>
         </file>
         <file>
