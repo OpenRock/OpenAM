@@ -37,22 +37,20 @@
         <!-- To workaround a bug in Maven where the maven.build.timestamp prop is not available in file filters. -->
         <!-- See http://java.dzone.com/tips/stamping-version-number-and -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
+        <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
     </properties>
 
     <modules>
         <!-- Distribution Modules -->
-        <module>jee-agents-distribution-tomcat</module>
-        <module>jee-agents-distribution-jetty</module>
-        <module>jee-agents-distribution-appserver</module>
-        <module>jee-agents-distribution-jboss</module>
-        <module>jee-agents-distribution-weblogic</module>
-        <module>jee-agents-distribution-websphere</module>
+        <module>jee-agents-distribution-tomcat-v6</module>
+        <module>jee-agents-distribution-jetty-v61</module>
+        <module>jee-agents-distribution-jetty-v7</module>
+        <module>jee-agents-distribution-appserver-v10</module>
+        <module>jee-agents-distribution-jboss-v42</module>
+        <module>jee-agents-distribution-jboss-v7</module>
+        <module>jee-agents-distribution-weblogic-v10</module>
+        <module>jee-agents-distribution-websphere-v61</module>
         <module>jee-agents-distribution-jsr196</module>
-
-        <!-- Activate as required
-        <module>jee-agents-distribution-appserver</module>
-        -->
-
     </modules>
 
     <dependencies>
