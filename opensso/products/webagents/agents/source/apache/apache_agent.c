@@ -956,8 +956,7 @@ static int do_deny(request_rec *r, am_status_t status) {
     /* Set the return code 403 Forbidden */
     r->content_type = "text/plain"; 
     ap_custom_response(r, HTTP_FORBIDDEN,
-                       "Access denied as Agent profile not"
-                       " found in Access Manager.");
+                       "403 Forbidden");
     am_web_log_info("do_deny() Status code= %s.",
         am_status_to_string(status));
     return retVal;
