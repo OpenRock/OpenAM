@@ -28,9 +28,9 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM JavaEE Policy Agents JBoss Common</name>
-    <description>OpenAM JavaEE Policy Agents JBoss Common</description>
-    <artifactId>jee-agents-jboss-common</artifactId>
+    <name>OpenAM JavaEE Policy Agents JBoss v7.x</name>
+    <description>OpenAM JavaEE Policy Agents JBoss v7.x</description>
+    <artifactId>jee-agents-jboss-v7</artifactId>
     <packaging>jar</packaging>
     <properties>
         <jee-agents.properties>../../jee-agents.properties</jee-agents.properties>
@@ -68,6 +68,26 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactSet>
+                        <includes>
+                            <include>org.forgerock.openam.agents:jee-agents-jboss-common</include>
+                            <include>org.forgerock.openam.agents:jee-agents-sdk</include>
+                        </includes>
+                    </artifactSet>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -77,11 +97,56 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-jboss-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-security</artifactId>
             <version>6.1.0.Final</version>
             <scope>provided</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>trove</groupId>
+                    <artifactId>trove</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>apache-log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jpl-pattern</groupId>
+                    <artifactId>jpl-pattern</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jpl-util</groupId>
+                    <artifactId>jpl-util</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.security</groupId>
+                    <artifactId>jacc</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-tomcat</artifactId>
+            <version>6.1.0.Final</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.istack</groupId>
+                    <artifactId>istack-commons-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ws-commons</groupId>
+                    <artifactId>policy</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>trove</groupId>
                     <artifactId>trove</artifactId>

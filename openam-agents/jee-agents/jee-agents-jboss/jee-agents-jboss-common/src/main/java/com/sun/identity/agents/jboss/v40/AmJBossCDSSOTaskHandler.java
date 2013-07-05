@@ -24,8 +24,9 @@
  *
  * $Id: AmJBossCDSSOTaskHandler.java,v 1.1 2010/02/05 00:31:44 leiming Exp $
  */
-
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.agents.jboss.v40;
 
 import com.sun.identity.agents.filter.CDSSOTaskHandler;
@@ -36,9 +37,8 @@ import com.sun.identity.agents.arch.Manager;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This task handler provides the necessary functionality to process incoming
- * requests for Single Sign-On for JBoss
- *
+ * This task handler provides the necessary functionality to process incoming requests for Single Sign-On for JBoss when
+ * running the agent in J2EE_POLICY/ALL mode.
  */
 public class AmJBossCDSSOTaskHandler extends CDSSOTaskHandler {
 
@@ -47,39 +47,29 @@ public class AmJBossCDSSOTaskHandler extends CDSSOTaskHandler {
     }
 
     /**
-     * Method doSSOLogin
+     * This method makes sure that the goto URL stays correct in case form based login is enabled.
      *
-     * @param ctx the AmFilterRequestContext object that carries
-     * information about the incoming request and response objects
-     *
-     * @return AmFilterResult object indicating the necessary action in
-     * order to obtain valid SSO credentials
-     *
+     * @param ctx the AmFilterRequestContext object that carries information about the incoming request and response
+     * objects.
+     * @return AmFilterResult object indicating the necessary action in order to obtain valid SSO credentials.
      */
-    protected AmFilterResult doSSOLogin(AmFilterRequestContext ctx)
-        throws AgentException {
-
+    protected AmFilterResult doSSOLogin(AmFilterRequestContext ctx) throws AgentException {
         HttpServletRequest request = ctx.getHttpServletRequest();
-        String gotoURL = null;
-        String uri = null;
-        String query = null;
 
         if (ctx.isFormLoginRequest()) {
-            Object obj = 
-                    request.getAttribute("javax.servlet.forward.request_uri");
+            Object obj = request.getAttribute("javax.servlet.forward.request_uri");
             if (obj != null) {
-                uri = obj.toString().trim();
-                if ((uri != null) && (uri.compareTo("") != 0)) {
-                   gotoURL = ctx.getBaseURL() + uri;
-                   obj = request.getAttribute(
-                           "javax.servlet.forward.query_string");
-                   if (obj != null) {
-                       query = obj.toString().trim();
-                       if ((query != null) && (query.compareTo("") != 0)) {
-                           gotoURL = gotoURL + "?" + query;
-                       }
-                   }
-                   ctx.setGotoFormLoginURL(gotoURL);
+                String uri = obj.toString().trim();
+                if (uri != null && uri.length() > 0) {
+                    String gotoURL = ctx.getBaseURL() + uri;
+                    obj = request.getAttribute("javax.servlet.forward.query_string");
+                    if (obj != null) {
+                        String query = obj.toString().trim();
+                        if (query != null && query.length() > 0) {
+                            gotoURL = gotoURL + "?" + query;
+                        }
+                    }
+                    ctx.setGotoFormLoginURL(gotoURL);
                 }
             }
         }

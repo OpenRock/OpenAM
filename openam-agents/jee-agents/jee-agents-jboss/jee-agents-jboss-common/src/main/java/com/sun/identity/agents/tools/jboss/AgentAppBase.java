@@ -22,14 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AgentAppBase.java,v 1.1 2008/12/11 14:36:05 naghaon Exp $
+ * $Id: AgentAppBase.java,v 1.1 2008/12/11 15:01:54 naghaon Exp $
  *
  */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock AS.
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.agents.tools.jboss;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
@@ -37,55 +35,42 @@ import com.sun.identity.install.tools.util.ConfigUtil;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.FileUtils;
 import java.io.File;
+import static org.forgerock.agents.tools.jboss.CommonConstants.*;
 
 /**
- * Deploys/undelpoy agentapp.war to JBoss server instance's
- * deploy directory.
+ * Deploys/undelpoy agenntapp.war to JBoss server instance's deploy directory.
  */
+public class AgentAppBase {
 
-public class AgentAppBase implements IConstants, IConfigKeys {
-    
     protected boolean copyAgentAppWarFile(IStateAccess stateAccess) {
         boolean status = false;
         String srcDir = ConfigUtil.getEtcDirPath();
-        String destDir = (String)stateAccess.get(STR_KEY_JB_INST_DEPLOY_DIR);
-        
+        String destDir = (String) stateAccess.get(STR_KEY_JB_INST_DEPLOY_DIR);
+
         try {
             FileUtils.copyJarFile(srcDir, destDir, STR_AGENT_APP_WAR_FILE);
-            Debug.log("ConfigureAgentAppTask.copyAgentAppWarFile() - copy "
-                    + STR_AGENT_APP_WAR_FILE + " from " + srcDir + " to "
-                    + destDir);
+            Debug.log("ConfigureAgentAppTask.copyAgentAppWarFile() - copy " + STR_AGENT_APP_WAR_FILE
+                    + " from " + srcDir + " to " + destDir);
             status = true;
         } catch (Exception e) {
-            Debug.log("ConfigureAgentAppTask." +
-                    "copyAgentAppWarFile() - Error occured while copying "
-                    + STR_AGENT_APP_WAR_FILE
-                    + " from "
-                    + srcDir
-                    + " to " + destDir, e);
+            Debug.log("ConfigureAgentAppTask.copyAgentAppWarFile() - Error occured while copying "
+                    + STR_AGENT_APP_WAR_FILE + " from " + srcDir + " to " + destDir, e);
         }
         return status;
     }
-    
+
     protected boolean removeAgentAppWar(IStateAccess stateAccess) {
         boolean status = false;
-        String destDir = (String)stateAccess.get(STR_KEY_JB_INST_DEPLOY_DIR);
-        String agentAppWar = destDir +
-                STR_FORWARD_SLASH +
-                STR_AGENT_APP_WAR_FILE;
+        String destDir = (String) stateAccess.get(STR_KEY_JB_INST_DEPLOY_DIR);
+        String agentAppWar = destDir + File.separator + STR_AGENT_APP_WAR_FILE;
         try {
             File file = new File(agentAppWar);
             status = file.delete();
-            Debug.log(
-                "ConfigureAgentAppTask.removeAgentAppWar(): "
-                + " Removed file " + agentAppWar);
+            Debug.log("ConfigureAgentAppTask.removeAgentAppWar(): Removed file " + agentAppWar);
         } catch (Exception e) {
-            Debug.log(
-                "ConfigureAgentAppTask.removeAgentAppWar(): "
-                + " Failed to remove file " + agentAppWar, e);
+            Debug.log("ConfigureAgentAppTask.removeAgentAppWar(): Failed to remove file " + agentAppWar, e);
         }
 
         return status;
     }
-    
 }

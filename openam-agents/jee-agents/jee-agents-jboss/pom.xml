@@ -28,7 +28,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM JavaEE Policy Agents JBoss</name>
-    <description>penAM JavaEE Policy Agents JBoss</description>
+    <description>OpenAM JavaEE Policy Agents JBoss</description>
     <artifactId>jee-agents-jboss</artifactId>
     <packaging>pom</packaging>
     <properties>
@@ -39,6 +39,7 @@
         <!-- JBoss Modules -->
         <module>jee-agents-jboss-common</module>
         <module>jee-agents-jboss-v40</module>
+        <module>jee-agents-jboss-v7</module>
     </modules>
 </project>
 

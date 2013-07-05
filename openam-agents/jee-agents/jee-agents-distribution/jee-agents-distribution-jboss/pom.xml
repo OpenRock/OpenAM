@@ -58,6 +58,21 @@
                              </descriptors>
                          </configuration>
                      </execution>
+                     <execution>
+                         <id>jboss-v7-assembly</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <finalName>jboss_v7_agent_${project.version}</finalName>
+                             <appendAssemblyId>false</appendAssemblyId>
+                             <tarLongFileMode>gnu</tarLongFileMode>
+                             <descriptors>
+                                 <descriptor>src/main/assembly/jboss-v7_KitAssembly_Descriptor.xml</descriptor>
+                             </descriptors>
+                         </configuration>
+                     </execution>
                  </executions>
              </plugin>
         </plugins>
@@ -67,6 +82,11 @@
          <dependency>
              <groupId>org.forgerock.openam.agents</groupId>
              <artifactId>jee-agents-jboss-v40</artifactId>
+             <version>${project.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.forgerock.openam.agents</groupId>
+             <artifactId>jee-agents-jboss-v7</artifactId>
              <version>${project.version}</version>
          </dependency>
         <dependency>

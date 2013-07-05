@@ -25,51 +25,43 @@
  * $Id: UnconfigureAgentAppTask.java,v 1.1 2008/12/11 14:36:06 naghaon Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.agents.tools.jboss;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
 import com.sun.identity.install.tools.configurator.ITask;
 import com.sun.identity.install.tools.configurator.InstallException;
 import com.sun.identity.install.tools.util.LocalizedMessage;
-
 import java.util.Map;
+import static org.forgerock.agents.tools.jboss.CommonConstants.*;
 
 /**
  * Undeploys agentapp.war from JBoss server instance's deploy directory.
  */
+public class UnconfigureAgentAppTask extends AgentAppBase implements ITask {
 
-public class UnconfigureAgentAppTask extends AgentAppBase
-        implements ITask {
-    
-    public static final String LOC_TSK_MSG_UNCONFIGURE_AGENT_APP_EXECUTE
-            = "TSK_MSG_UNCONFIGURE_AGENT_APP_EXECUTE";
-    
-    public boolean execute(String name, IStateAccess stateAccess,
-            Map properties) throws InstallException {
-        
-        boolean status = false;
-        return status = removeAgentAppWar(stateAccess);
+    public static final String LOC_TSK_MSG_UNCONFIGURE_AGENT_APP_EXECUTE = "TSK_MSG_UNCONFIGURE_AGENT_APP_EXECUTE";
+
+    public boolean execute(String name, IStateAccess stateAccess, Map properties) throws InstallException {
+        return removeAgentAppWar(stateAccess);
     }
-    
-    public LocalizedMessage getExecutionMessage(IStateAccess stateAccess,
-            Map properties) {
-        Object[] args = { STR_AGENT_APP_WAR_FILE };
-        LocalizedMessage message = LocalizedMessage.get(
-                LOC_TSK_MSG_UNCONFIGURE_AGENT_APP_EXECUTE,
-                STR_JB_GROUP, args);
-        
+
+    public LocalizedMessage getExecutionMessage(IStateAccess stateAccess, Map properties) {
+        Object[] args = {STR_AGENT_APP_WAR_FILE};
+        LocalizedMessage message = LocalizedMessage.get(LOC_TSK_MSG_UNCONFIGURE_AGENT_APP_EXECUTE,
+                (String) properties.get(STR_JBOSS_I18N_FILE), args);
+
         return message;
     }
-    
-    public LocalizedMessage getRollBackMessage(IStateAccess stateAccess,
-            Map properties) {
+
+    public LocalizedMessage getRollBackMessage(IStateAccess stateAccess, Map properties) {
         // No roll back during un-install
         return null;
     }
-    
-    public boolean rollBack(String name, IStateAccess state, Map properties)
-    throws InstallException {
+
+    public boolean rollBack(String name, IStateAccess state, Map properties) throws InstallException {
         // Nothing to roll back during un-install
         return true;
     }

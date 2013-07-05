@@ -25,7 +25,9 @@
  * $Id: ConfigureAgentAppTask.java,v 1.1 2008/12/11 14:36:05 naghaon Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.agents.tools.jboss;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
@@ -33,52 +35,38 @@ import com.sun.identity.install.tools.configurator.ITask;
 import com.sun.identity.install.tools.configurator.InstallException;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import java.util.Map;
+import static org.forgerock.agents.tools.jboss.CommonConstants.*;
 
 /**
  * @author sevani
  *
  * Deploys agentapp.war to JBoss server instance's deploy directory.
  */
+public class ConfigureAgentAppTask extends AgentAppBase implements ITask {
 
-public class ConfigureAgentAppTask extends AgentAppBase
-        implements ITask {
-    
-    public static final String LOC_TSK_MSG_CONFIGURE_AGENT_APP_EXECUTE
-            = "TSK_MSG_CONFIGURE_AGENT_APP_EXECUTE";
-    
-    public static final String LOC_TSK_MSG_CONFIGURE_AGENT_APP_ROLLBACK
-            = "TSK_MSG_CONFIGURE_AGENT_APP_ROLLBACK";
-    
-    public boolean execute(String name, IStateAccess stateAccess,
-            Map properties) throws InstallException {
-        
-        boolean status = false;
-        return status = copyAgentAppWarFile(stateAccess);
+    public static final String LOC_TSK_MSG_CONFIGURE_AGENT_APP_EXECUTE = "TSK_MSG_CONFIGURE_AGENT_APP_EXECUTE";
+    public static final String LOC_TSK_MSG_CONFIGURE_AGENT_APP_ROLLBACK = "TSK_MSG_CONFIGURE_AGENT_APP_ROLLBACK";
+
+    public boolean execute(String name, IStateAccess stateAccess, Map properties) throws InstallException {
+        return copyAgentAppWarFile(stateAccess);
     }
-    
-    public LocalizedMessage getExecutionMessage(IStateAccess stateAccess,
-            Map properties) {
-        Object[] args = { STR_AGENT_APP_WAR_FILE };
-        LocalizedMessage message = LocalizedMessage.get(
-                LOC_TSK_MSG_CONFIGURE_AGENT_APP_EXECUTE,
-                STR_JB_GROUP, args);
-        
+
+    public LocalizedMessage getExecutionMessage(IStateAccess stateAccess, Map properties) {
+        Object[] args = {STR_AGENT_APP_WAR_FILE};
+        LocalizedMessage message = LocalizedMessage.get(LOC_TSK_MSG_CONFIGURE_AGENT_APP_EXECUTE,
+                (String) properties.get(STR_JBOSS_I18N_FILE), args);
+
         return message;
     }
-    
-    public LocalizedMessage getRollBackMessage(IStateAccess stateAccess,
-            Map properties) {
-        Object[] args = { STR_AGENT_APP_WAR_FILE };
-        LocalizedMessage message = LocalizedMessage.get(
-                LOC_TSK_MSG_CONFIGURE_AGENT_APP_ROLLBACK,
-                STR_JB_GROUP, args);
+
+    public LocalizedMessage getRollBackMessage(IStateAccess stateAccess, Map properties) {
+        Object[] args = {STR_AGENT_APP_WAR_FILE};
+        LocalizedMessage message = LocalizedMessage.get(LOC_TSK_MSG_CONFIGURE_AGENT_APP_ROLLBACK,
+                (String) properties.get(STR_JBOSS_I18N_FILE), args);
         return message;
     }
-    
-    public boolean rollBack(String name, IStateAccess stateAccess,
-            Map properties) throws InstallException {
-        boolean status = false;
-        return status = removeAgentAppWar(stateAccess);
+
+    public boolean rollBack(String name, IStateAccess stateAccess, Map properties) throws InstallException {
+        return removeAgentAppWar(stateAccess);
     }
-    
 }

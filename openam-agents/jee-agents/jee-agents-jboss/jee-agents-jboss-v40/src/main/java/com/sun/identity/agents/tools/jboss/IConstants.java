@@ -25,7 +25,9 @@
  * $Id: IConstants.java,v 1.2 2009/01/25 05:57:48 naghaon Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.agents.tools.jboss;
 
 public interface IConstants {
@@ -83,7 +85,6 @@ public interface IConstants {
     public static final String STR_JB_SERVER_BIN = "bin";
     public static final String STR_JB_INST_CONF = "conf";
     public static final String STR_JB_INST_DEPLOY = "deploy";
-    public static final String STR_AGENT_APP_WAR_FILE = "agentapp.war";
     public static final String STR_SERVER_ELEMENT = "default";
     public static final String STR_ARCHIVES_ATTR = "archives";
     public static final String STR_AGENT_CLASSPATH= "classpath";
