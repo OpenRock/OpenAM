@@ -60,6 +60,30 @@
                      </execution>
                  </executions>
             </plugin>
+             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                       <id>copy-build_date.js</id>
+                       <phase>package</phase>
+                       <goals>
+                         <goal>copy-resources</goal>
+                       </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../src/main/assembly</directory>
+                                    <includes>
+                                        <include>build_date.js</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                       </configuration>
+                    </execution>
+                </executions>
+             </plugin>
         </plugins>
     </build>
 
