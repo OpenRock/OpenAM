@@ -194,13 +194,17 @@ extern "C" void stop_naming_validator();
 extern "C" int naming_validate_helper(const char *url, const char **msg, int *hs) {
     const char *name;
     am_status_t status = AM_FAILURE;
-    const Properties& propPtr = *reinterpret_cast<Properties *> (boot_info.properties);
-    if (boot_info.url_validation_level == 1) {
-        NamingValidateHttp v(url, propPtr);
-        status = v.validate_url(hs);
-    } else {
-        NamingValidateHttpLogin v(url, propPtr);
-        status = v.validate_url(hs);
+    try {
+        const Properties& propPtr = *reinterpret_cast<Properties *> (boot_info.properties);
+        if (boot_info.url_validation_level == 1) {
+            NamingValidateHttp v(url, propPtr);
+            status = v.validate_url(hs);
+        } else {
+            NamingValidateHttpLogin v(url, propPtr);
+            status = v.validate_url(hs);
+        }
+    } catch (...) {
+        status = AM_FAILURE;
     }
     get_status_info(status, &name, msg);
     return (AM_SUCCESS == status && Http::OK == *hs ? 0 : status);
@@ -1072,20 +1076,22 @@ am_web_init(const char *agent_bootstrap_file,
                         }
                     }
                 }
+                am_web_log_debug("naming_validator(): waiting for Naming Validator to start up...");
 #ifdef _MSC_VER
                 nv_thr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) naming_validator, nvld, 0, NULL);
+                
                 SleepEx((nvld->ping_interval + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
 #else
                 sprintf(fn, "/tmp/%s", AM_NAMING_LOCK);
                 unlink(fn);
                 pthread_create(&nv_thr, NULL, naming_validator, nvld);
 #endif
+                am_web_log_debug("naming_validator(): Naming Validator started.");
             }
         }
     }
     return status;
 }
-
 /**
  * Performs cleanup.
  */
@@ -1103,7 +1109,11 @@ am_web_cleanup() {
         am_web_log_debug("%s: Agent logout done.", thisfunc);
 
         if (nvld != NULL) {
+            am_web_log_debug("%s: waiting for Naming Validator to shut down...", thisfunc);
             stop_naming_validator();
+#ifdef _MSC_VER
+            SleepEx((nvld->ping_interval + 2) * 1000, FALSE); //allow naming_validator to shutdown
+#endif
             release_char_list(nvld->url_list, nvld->url_size);
             if (nvld->default_set != NULL) free(nvld->default_set);
             nvld->default_set = NULL;
@@ -1111,7 +1121,7 @@ am_web_cleanup() {
             nvld = NULL;
             am_web_log_debug("%s: Naming Validator stopped.", thisfunc);
         }
-        
+
         status = am_cleanup();
         initialized = AM_FALSE;
     } else {
@@ -1442,6 +1452,7 @@ am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_
 
         try {
             std::string name;
+            XMLTree::Init xt;
             XMLTree tree(false, str, strlen(str));
             XMLElement rootElement = tree.getRootElement();
             rootElement.getName(name);

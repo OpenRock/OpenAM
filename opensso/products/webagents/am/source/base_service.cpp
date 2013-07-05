@@ -467,6 +467,7 @@ am_status_t BaseService::doHttpPost(const ServiceInfo& service,
 std::vector<std::string>
 BaseService::parseGenericResponse(const Http::Response& response,
         const char *expectedId) const {
+    XMLTree::Init xt;
     XMLTree responseTree(false, response.getBodyPtr(), response.getBodyLen());
     XMLElement element = responseTree.getRootElement();
     std::vector<std::string> responses;

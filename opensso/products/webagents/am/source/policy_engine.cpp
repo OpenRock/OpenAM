@@ -265,6 +265,7 @@ PolicyEngine::policy_notification_handler(Service *serviceEntry,
                                           bool configChangeNotificationEnabled)
 {
     try {
+        XMLTree::Init xt;
 	XMLTree tree(false, data.c_str(), data.size());
 	XMLElement rootElement = tree.getRootElement();
 	string nodeName;

@@ -152,6 +152,7 @@ am_status_t NamingService::parseNamingResponse(const std::string& data,
 	     "NamingService()::parseNamingResponse(): Buffer to be parsed: %s",
 	     data.c_str());
 
+    XMLTree::Init xt;
     XMLTree namingTree(false, data.c_str(), data.size());
     XMLElement element = namingTree.getRootElement();
 
@@ -472,6 +473,15 @@ am_status_t NamingService::doNamingRequest(const ServiceInfo& service,
             Log::log(logModule, Log::LOG_ERROR,
                  "NamingService::doNamingRequest() caught exception: %s",
                  exc.getMessage().c_str());
+            status = AM_NAMING_FAILURE;
+        } catch (std::exception &exs) {
+            Log::log(logModule, Log::LOG_ERROR,
+                    "aNamingService::doNamingRequest(): exception encountered: %s",
+                    exs.what());
+            status = AM_NAMING_FAILURE;
+        } catch (...) {
+            Log::log(logModule, Log::LOG_ERROR,
+                    "NamingService::doNamingRequest(): Unknown exception thrown.");
             status = AM_NAMING_FAILURE;
         }
     }

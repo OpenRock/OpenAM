@@ -667,6 +667,7 @@ Service::process_policy_response(PolicyEntryRefCntPtr &policyEntry,
 				 const KeyValueMap &env,
 				 const string &xmlData)
 {
+    XMLTree::Init xt;
     XMLTree xmlObj(false, xmlData.data(), xmlData.size());
     XMLElement rootElem = xmlObj.getRootElement();
     KVMRefCntPtr lclKVM(new KeyValueMap(env));

@@ -904,6 +904,7 @@ SSOTokenService::handleNotif(const std::string& notifData)
     // get session id, state, notification type, and time.
 
     try {
+        XMLTree::Init xt;
         XMLTree tree(false, notifData.c_str(), notifData.size());
         XMLElement rootElement = tree.getRootElement();
 	XMLElement sessionElem;

@@ -155,6 +155,7 @@
         <copy todir="${container.web_agent.bin.dir}">
             <fileset dir="${webagents.apache24.src.dir}">
                     <include name="libamapc24.dll"/>
+                    <include name="libamapc24.pdb"/>
             </fileset>
         </copy>
         <!-- FIXME: this is only here until we fix the manifests-->

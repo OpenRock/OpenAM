@@ -562,6 +562,7 @@ PolicyService::getPolicyDecisions(const ServiceInfo& service,
 						  "an empty ResponseSet");
 		}
 
+                XMLTree::Init xt;
 		for (std::size_t i = 0;
 		     i < policyResponses.size() && AM_SUCCESS == status;
 		     ++i) {
@@ -680,6 +681,7 @@ PolicyService::sendNotificationMsg(bool addOrRemove,
 					  "Returned an empty ResponseSet"
 					  "while (de)registering notification.");
 	}
+        XMLTree::Init xt;
 	XMLTree policyTree(false,
 			   policyResponses[0].c_str(),
 			   policyResponses[0].size());
@@ -760,6 +762,7 @@ PolicyService::getAdvicesList(const ServiceInfo &service,
 	    throw XMLTree::ParseException("Policy Service returned "
 					 "an empty ResponseSet");
 	}
+        XMLTree::Init xt;
 	for(std::size_t i = 0;
 	    i < policyResponses.size() && AM_SUCCESS == status; ++i) {
 	    XMLTree adviceTree(false,

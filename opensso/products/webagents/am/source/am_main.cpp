@@ -472,7 +472,8 @@ am_notify(const char *data, am_policy_t policy_handle)
     else {
         try {
 
-	    XMLTree tree(false, data, strlen(data));
+	    XMLTree::Init xt;
+            XMLTree tree(false, data, strlen(data));
 	    XMLElement element = tree.getRootElement();
 	    if(element.isNamed(NOTIFICATION_SET)) {
 		std::string version;

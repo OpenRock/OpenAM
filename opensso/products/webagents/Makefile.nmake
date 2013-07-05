@@ -95,12 +95,7 @@ LDFLAGS_LIB = /NOLOGO /ERRORREPORT:none /LTCG /NODEFAULTLIB \
 
 CFLAGS = /O2 /Oi /GL /Gy /D _WINDLL /FD /D_CRT_SECURE_NO_WARNINGS \
    /D AM_BUILDING_LIB /wd4996 /wd4101 /wd4244 /D WINNT \
-   /EHsc /nologo /Zi /errorReport:none /Iam\source /MD /W3 /D PCRE_STATIC \
-!IFDEF X64 
-   /D _AMD64_ /c
-!ELSE
-  /c
-!ENDIF
+   /EHsc /nologo /Zi /errorReport:none /Iam\source /MD /W3 /D PCRE_STATIC /c
 
 #
 # AMSDK and cryptit begin
@@ -186,7 +181,7 @@ apache22.obj : $(AM_APA22_SRC)
 	$(CC) $(CFLAGS) /I"extlib\WINNT\apache22\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DEAPI /DUSE_EXPAT /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache22 /Foagents\source\apache22\ /Tc $(AM_APA22_SRC)
 
 apache2i : apache22.obj
-	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache22\lib" $(DEP_LIBPATH) /DEF:"agents\source\apache22\libamapc.def" \
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache22\lib" $(DEP_LIBPATH) /EXPORT:dsame_module \
 		/PDB:"agents\source\apache22\libamapc22.pdb" \
 		/DLL /OUT:agents\source\apache22\libamapc22.dll /LIBPATH:"extlib\WINNT\apache2\lib" agents\source\apache22\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libaprutil-1.lib libhttpd.lib
 
@@ -194,7 +189,7 @@ apache24.obj : $(AM_APA24_SRC)
 	$(CC) $(CFLAGS) /I"extlib\WINNT\apache24\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DEAPI /DUSE_EXPAT /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache24 /Foagents\source\apache24\ /Tc $(AM_APA24_SRC)
 
 apache24i : apache24.obj
-	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) /DEF:"agents\source\apache24\libamapc.def" \
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) /EXPORT:dsame_module \
 		/PDB:"agents\source\apache24\libamapc24.pdb" \
 		/DLL /OUT:agents\source\apache24\libamapc24.dll /LIBPATH:"extlib\WINNT\apache24\lib" agents\source\apache24\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libaprutil-1.lib libhttpd.lib
 

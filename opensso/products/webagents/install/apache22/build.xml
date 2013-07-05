@@ -155,6 +155,7 @@
         <copy todir="${container.web_agent.bin.dir}">
             <fileset dir="${webagents.apache22.src.dir}">
                     <include name="libamapc22.dll"/>
+                    <include name="libamapc22.pdb"/>
             </fileset>
         </copy>
         <!-- FIXME: this is only here until we fix the manifests-->

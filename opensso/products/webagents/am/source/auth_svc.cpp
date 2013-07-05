@@ -981,6 +981,7 @@ AuthService::create_auth_context(AuthContext &auth_ctx)
     }
 
     Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[0].c_str());
+    XMLTree::Init xt;
     XMLTree authCtxTree(false, authCtxResponses[0].c_str(),
 			authCtxResponses[0].size());
 
@@ -1108,6 +1109,7 @@ AuthService::login(AuthContext &auth_ctx,
     }
 
     std::size_t i = 0;
+    XMLTree::Init xt;
     for(i = 0; i < authCtxResponses.size(); i++) {
 	Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[i].c_str());
 	XMLTree authCtxTree(false, authCtxResponses[i].c_str(),
@@ -1162,6 +1164,7 @@ AuthService::logout(AuthContext &auth_ctx)
                                 AM_AUTH_FAILURE);
     }
 
+    XMLTree::Init xt;
     for(std::size_t i = 0; i < authCtxResponses.size(); i++) {
 	Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[i].c_str());
 	XMLTree authCtxTree(false, authCtxResponses[i].c_str(),
@@ -1215,6 +1218,7 @@ AuthService::abort(AuthContext &auth_ctx)
                                 AM_AUTH_FAILURE);
     }
 
+    XMLTree::Init xt;
     for(std::size_t i = 0; i < authCtxResponses.size(); i++) {
 	Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[i].c_str());
 	XMLTree authCtxTree(false, authCtxResponses[i].c_str(),
@@ -1269,6 +1273,7 @@ AuthService::getModuleInstanceNames(AuthContext &auth_ctx,
 				AM_AUTH_FAILURE);
     }
 
+    XMLTree::Init xt;
     for(std::size_t i = 0; i < authCtxResponses.size(); i++) {
 	Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[i].c_str());
 	XMLTree authCtxTree(false, authCtxResponses[i].c_str(),
@@ -2361,6 +2366,7 @@ AuthService::submitRequirements(AuthContext &auth_ctx) {
 				AM_AUTH_FAILURE);
     }
 
+    XMLTree::Init xt;
     for(i = 0; i < authCtxResponses.size(); i++) {
 	Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[i].c_str());
 	XMLTree authCtxTree(false, authCtxResponses[i].c_str(),
@@ -3017,6 +3023,7 @@ AuthService::create_auth_context_cac(AuthContext &auth_ctx)
     }
 
     Log::log(logID, Log::LOG_MAX_DEBUG, authCtxResponses[0].c_str());
+    XMLTree::Init xt;
     XMLTree authCtxTree(false, authCtxResponses[0].c_str(),
                         authCtxResponses[0].size());
 

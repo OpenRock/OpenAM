@@ -560,6 +560,7 @@ am_status_t  AgentProfileService::parseAgentResponse(const std::string xmlRespon
 {
     am_status_t status = AM_SUCCESS;
 
+    XMLTree::Init xt;
     XMLTree namingTree(false, xmlResponse.c_str(), xmlResponse.size());
     XMLElement element = namingTree.getRootElement();
     XMLElement element1; 

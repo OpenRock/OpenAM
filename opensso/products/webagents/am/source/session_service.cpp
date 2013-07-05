@@ -535,6 +535,7 @@ SessionService::getSessionInfo(const ServiceInfo& service,
                             "an empty ResponseSet");
                 }
                 
+                XMLTree::Init xt;
                 for (std::size_t i = 0;
                 i < sessionResponses.size() && AM_SUCCESS == status;
                 ++i) {
@@ -667,6 +668,7 @@ SessionService::destroySession(const ServiceInfo& service,
                         "an empty ResponseSet");
             }
             
+            XMLTree::Init xt;
             for (std::size_t i = 0;
             i < sessionResponses.size() && AM_SUCCESS == status;
             ++i) {
@@ -804,6 +806,7 @@ SessionService::setProperty(const ServiceInfo& service,
                         "an empty ResponseSet");
             }
             
+            XMLTree::Init xt;
             for (std::size_t i = 0;
             i < sessionResponses.size() && AM_SUCCESS == status;
             ++i) {
@@ -921,6 +924,7 @@ SessionService::addListener(const ServiceInfo& service,
                             "an empty ResponseSet");
                 }
                 
+                XMLTree::Init xt;
                 for (std::size_t i = 0;
                 i < sessionResponses.size() && AM_SUCCESS == status;
                 ++i) {

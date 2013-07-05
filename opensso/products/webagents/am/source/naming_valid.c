@@ -193,6 +193,7 @@ static void *url_validator(void *arg) {
     const char *status_message;
     int validate_status, httpcode = 0;
     naming_validator_int_t *v = (naming_validator_int_t *) arg;
+    if (!keep_going) return 0;
     validate_status = v->validate(v->url, &status_message, &httpcode);
     MUTEX_LOCK(mutex);
     if (validate_status == 0) {
@@ -236,6 +237,7 @@ static void callback(union sigval si) {
     for (i = 0; i < v->url_size; i++) {
         THREAD vthr;
         naming_validator_int_t *arg = NULL;
+        if (!keep_going) return;
         MUTEX_LOCK(mutex);
         j = nlist->list[i].run;
         MUTEX_UNLOCK(mutex);
@@ -253,6 +255,7 @@ static void callback(union sigval si) {
         arg->validate = v->validate;
         arg->url = v->url_list[i];
         arg->idx = i;
+        if (!keep_going) return;
         THREAD_CREATE(vthr, url_validator, arg);
         MUTEX_LOCK(mutex);
         nlist->list[i].run = 1;
@@ -356,6 +359,7 @@ void *naming_validator(void *arg) {
             while (keep_going) {
                 sleep(1);
             }
+            THREAD_WAIT(wthr);
 #ifdef _MSC_VER
             DeleteTimerQueue(tick_q);
 #else

@@ -69,6 +69,30 @@ public:
         std::string message;
     };
 
+    class Init {
+    public:
+
+        explicit Init()
+#ifdef _MSC_VER
+        : hr(CoInitializeEx(NULL, COINIT_MULTITHREADED))
+#endif
+        {
+        }
+
+        ~Init() {
+#ifdef _MSC_VER
+            if (SUCCEEDED(hr))
+                CoUninitialize();
+#endif
+        }
+    private:
+#ifdef _MSC_VER
+        HRESULT hr;
+#endif
+        Init(const Init&);
+        Init& operator=(const Init&);
+    };
+
     //
     // Constructs an XMLTree object based on the contents of the specified
     // string.  If the string cannot be parsed, then a ParseException is
@@ -146,7 +170,6 @@ private:
 #ifdef _MSC_VER
     MSXML2::IXMLDOMDocument2Ptr docPtr;
     MSXML2::IXMLDOMElementPtr rootPtr;
-    HRESULT envInit;
 #else
     struct _xmlDoc *docPtr;
 #endif
