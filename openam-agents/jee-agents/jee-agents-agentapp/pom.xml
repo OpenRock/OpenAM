@@ -43,6 +43,11 @@
           <configuration>
             <!-- exclude all libs since we expect them to come from the container's classpath setup during the install -->
             <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+            <archive>
+              <manifestEntries>
+                <Dependencies>org.forgerock.openam.agent</Dependencies>
+              </manifestEntries>
+            </archive>
           </configuration>
         </plugin>
       </plugins>
