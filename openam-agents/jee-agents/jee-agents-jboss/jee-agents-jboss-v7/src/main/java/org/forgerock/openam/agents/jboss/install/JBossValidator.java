@@ -85,7 +85,7 @@ public class JBossValidator extends ValidatorBase {
     public ValidationResult isVersionValid(String instanceName, Map params, IStateAccess state) {
         String homeDir = (String) state.get(HOME_DIR);
         ValidationResultStatus status = ValidationResultStatus.STATUS_FAILED;
-        LocalizedMessage message = LocalizedMessage.get(LOC_VERSION_INVALID, new Object[]{homeDir, instanceName});
+        LocalizedMessage message = LocalizedMessage.get(LOC_VERSION_INVALID, BUNDLE_NAME, new Object[]{homeDir});
 
         StringBuilder command = new StringBuilder(100);
         command.append(homeDir).append(File.separator).append("bin").append(File.separator).append(instanceName);
@@ -110,9 +110,9 @@ public class JBossValidator extends ValidatorBase {
             Debug.log("Command output:");
             while ((line = br.readLine()) != null) {
                 Debug.log(line);
-                if (line.contains("AS 7")) {
+                if (line.contains("AS 7") || line.contains("Application Server 7")) {
                     status = ValidationResultStatus.STATUS_SUCCESS;
-                    message = LocalizedMessage.get(LOC_VERSION_VALID);
+                    message = LocalizedMessage.get(LOC_VERSION_VALID, BUNDLE_NAME);
                     break;
                 }
             }
