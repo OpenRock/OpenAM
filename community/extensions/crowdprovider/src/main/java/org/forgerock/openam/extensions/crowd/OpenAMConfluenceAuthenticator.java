@@ -48,7 +48,7 @@ import org.apache.log4j.Category;
  */
 public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
     private static final Category log = Category.getInstance(OpenAMConfluenceAuthenticator.class);
-    private static final String OPENAM_URL = "https://idp.forgerock.org:443/openam/identity/";
+    private static final String OPENAM_URL = "https://sso.forgerock.com:443/openam/identity/";
     private static final String TOKEN_VALID = "isTokenValid?tokenid=";
     private static final String GET_ATTRS = "attributes?subjectid=";
     private static final String COOKIE_NAME = "iPlanetDirectoryPro";
@@ -60,59 +60,66 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
         try {
             request.getSession(true);
             
+            // if we are already authenticated, just return the user
+            if (request.getSession() != null && request.getSession().getAttribute(LOGGED_IN_KEY) != null) {
+                log.debug("Session found; user already logged in");
+                user = (Principal) request.getSession().getAttribute(LOGGED_IN_KEY);
+                log.debug("returning user is " + user);
+                return user;
+            }
+            
             Object loop = request.getAttribute("loop");
             
+            // check for cookie present but invalid case
             if (loop != null && loop.equals("true")) {
                 log.debug("token invalid; looping");
                 return null;
             } 
             
+            // check for cookie is missing case
             if (loop != null && loop.equals("nocookie")) {
                 log.debug("no cookie; looping");
                 return null;
             } 
             
+            // determine the start of the cookie
             String token = getToken(request);
-            log.info("token=" + token);
+            log.debug("token=" + token);
             boolean tokenValid;
             
             if (token != null) {
                 tokenValid = isTokenValid(token);
                 
-                log.info("valid=" + tokenValid);
+                log.debug("valid=" + tokenValid);
             
                 if (!tokenValid) {
                     request.setAttribute("loop", "true");
+                    return null;
                 }
             } else {
                 request.setAttribute("loop", "nocookie");
+                return null;
             }
             
-            log.info("Trying seamless Single Sign-on...");
-            String username = obtainUsername(request);
-            log.info("Got username = " + username);
+            log.debug("Trying seamless Single Sign-on...");
+            String username = obtainUsername(token, tokenValid);
+            log.debug("Got username = " + username);
+            
             if (username != null) {
-                if (request.getSession() != null && request.getSession().getAttribute(LOGGED_IN_KEY) != null) {
-                    log.info("Session found; user already logged in");
-                    user = (Principal) request.getSession().getAttribute(LOGGED_IN_KEY);
-                } else {
-                    user = getUser(username);
-                    log.info("Logged in via SSO, with User " + user);
-                    request.getSession().setAttribute(LOGGED_IN_KEY, user);
-                    request.getSession().setAttribute(LOGGED_OUT_KEY, null);
-                }
+                user = getUser(username);
+                log.debug("Logged in via SSO, with User " + user);
+                request.getSession().setAttribute(LOGGED_IN_KEY, user);
+                request.getSession().setAttribute(LOGGED_OUT_KEY, null);
             } else {
-                log.info("Username is null");
-                
+                log.debug("Username is null");
                 return null;
             }
         } catch (Exception ex) {
             log.warn("Exception: " + ex, ex);
         }
         
-        log.info("returning user is " + user);
+        log.debug("returning user is " + user);
         return user;
-
     }
     
     private String getToken(HttpServletRequest request) {
@@ -186,12 +193,10 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
         return result;        
     }
 
-    private String obtainUsername(HttpServletRequest request) {
+    private String obtainUsername(String token, boolean isTokenValid) {
         String result = null;
-        String token = getToken(request);
-        log.debug("found token from request " + token);
         
-        if (token != null && isTokenValid(token)) {
+        if (token != null && isTokenValid) {
             try {
                 result = getProperty(token, "uid");
             } catch (Exception ex) {
