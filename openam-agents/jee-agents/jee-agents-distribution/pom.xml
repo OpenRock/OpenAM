@@ -36,8 +36,13 @@
         <jee-agents.properties>../jee-agents.properties</jee-agents.properties>
         <!-- To workaround a bug in Maven where the maven.build.timestamp prop is not available in file filters. -->
         <!-- See http://java.dzone.com/tips/stamping-version-number-and -->
+
+        <!-- Due to an issue in Jenkins, the Maven timestamp is not being created with the right format, switching -->
+        <!-- to a plugin until this issue is resolved. See https://issues.jenkins-ci.org/browse/JENKINS-9693 -->
+        <!--
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+        -->
     </properties>
 
     <modules>
@@ -52,6 +57,27 @@
         <module>jee-agents-distribution-websphere-v61</module>
         <module>jee-agents-distribution-jsr196</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.keyboardsamurais.maven</groupId>
+                <artifactId>maven-timestamp-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <propertyName>build.timestamp</propertyName>
+                    <timestampPattern>yyyyMMdd</timestampPattern>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
