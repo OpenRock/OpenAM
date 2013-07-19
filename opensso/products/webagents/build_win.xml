@@ -366,7 +366,7 @@
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="README.TXT"/>
-            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile"/>
+            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile.nmake"/>
         </zip>
         <delete file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}_build_date.js" quiet="true"/>
         <echo file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}_build_date.js">document.write("${nightly.date}");</echo>  

@@ -7,7 +7,7 @@ OpenAM Policy Agent 3.0
 DISCLAIMER
 -----------
    THIS SAMPLE CODE IS PROVIDED AS-IS FOR REFERENCE PURPOSES ONLY. 
-   SUN MICROSYSTEMS, INC. IS NOT LIABLE FOR ANY DAMAGE RESULTING 
+   FORGEROCK INC. IS NOT LIABLE FOR ANY DAMAGE RESULTING 
    FROM THE USE OF THIS CODE OR ANY PORTION THEREOF.
 
 
@@ -57,86 +57,58 @@ What is provided
 Building Sample Program on UNIX platforms
 ------------------------------------------
 
-   On Solaris platform, the sample program can be built using gmake. This
+   The sample program can be built using GNU make. This
    can be done by the following steps:
 
-   1. Make sure you have gmake or any other compliant make program 
-      available. We recommend the use of GNU's gmake program version
-      3.76 or higher.
+   1. Make sure you have GNU make program available. We recommend 
+      the use of GNU's make program version 3.76 or higher.
 
    2. Make sure you have gcc or any other compliant C compiler program
-      available on Linux, Sun Studio 11 C/C++ compiler on Solaris, 
-      IBM C/C++ compiler on AIX and HP C/C++ compiler aCC on HP-UX.
+      available on Linux and Sun Studio 11 C/C++ compiler on Solaris.
 
-   3. Under install directory>/is_csdk/lib, please do the following
-
-       ln -s libamsdk.so.3 libamsdk.so
-       ln -s libxml2.so.2 libxml2.so (if libxml2.so.2 is present)
-	
-      Note: For HP-UX platform, please do the following
-
-       ln -s libxml2.so libxml2.so.9
-
-   4. Include directory>/is_csdk/lib in LD_LIBRARY_PATH
-
-   5. From the samples directory, simply invoke the make program. For
+   3. From the samples directory, simply invoke the GNU make program. For
       example, 
 
 	  $ gmake
-   6. If compiling on a 64-bit machine, please execute as following:
 
-	  $ gmake BUILD_VERSION=64
+   4. If compiling on a 64-bit machine, please execute as following:
+
+	  $ gmake 64=1
+ 
+   5. If compiling a debug version, please execute as following:
+
+	  $ gmake DEBUG=1
 
    6. This produces executables of the samples am_*_test in the same directory.
 
-   On Solaris Sparc/x86 (32-bit machines) LD_LIBRARY_PATH must be set to have
-   /usr/lib:/usr/lib/mps:<C-SDK install directory>/is_csdk/lib:/usr/dt/lib:/usr/ucblib
-
-   On Solaris Sparc/x86 (64-bit machines) LD_LIBRARY_PATH must be set to have
-   /usr/lib/64:/<C-SDK install directory>/is_csdk/lib:/usr/lib/mps/64:/usr/dt/lib/sparcv9:/usr/ucblib/sparcv9:/usr/lib/mps/sparcv9
-
-   On Linux (32-bit/64-bit) machines LD_LIBRARY_PATH must be set to have
-   <C-SDK install directory>/lib
-
    7. Rename ../config/OpenSSOAgentBootstrap.template.orig as ../config/OpenSSOAgentBootstrap.properties and update the tags appropriately.
    8. Rename ../config/OpenSSOAgentConfiguration.template.orig as ../config/OpenSSOAgentConfiguration.properties and update the tags appropriately.
-
-   Note: Only 32-bit machines are supported for HP-UX and AIX platforms.
 
 Building Sample Program on Windows
 ----------------------------------
 
    On Windows platform, the sample programs can be built using 
-   Microsoft Visual Studio 7.0.  Be sure to do the following: 
-       - Define WINNT in the compile flags.
-       - On 32-bit Windows machine, run vcvars32.bat which will 
-         set the all the required path,include libraries required to compile the samples.
-         For setting these variables in 64-bit Windows, it is explained below.
-       - Add ../bin as an additional PATH environment variable. 
-       - Add ../include as an additional INCLUDE environment variable. 
-       - Add ../bin as an additional LIB environment variable. 
-       - Link with all libraries in the ../lib directory. 
+   Microsoft Visual Studio 2010, including Visual C++ Express version,
+   and nmake. This can be done by the following steps:
 
-   If gmake and MKS toolkit are installed on the system, the default 
-   Makefile can be used to make all samples by simply typing a 
-   gmake on the command. For example: 
-  
-       C:\samples>gmake
+   1. Open Visual Studio Command Prompt (either 32bit or 64bit,
+      depending on target platform requirements)
 
-   On a 64-bit windows machine, install Visual Studio 2008 and cygwin 
-   to build the samples. Then set the PATH,INCLUDE and LIB environment variables 
-   with that of the Visual Studio compiler tools. Please note that while using 
-   cygwin to build the samples, PATH, INCLUDE and LIB environment variables have to be set manually. 
-   You can start a Visual Studio 2008 x64 Win64 command prompt and run echo %PATH%, 
-   echo %LIB% and echo %INCLUDE% to get the values. You can then set them either by 
-   using export in cygwin shell or through the system properties of Windows. 
-   you can then run gmake in the cygwin shell and build the samples. For example:
-   
-       $ cd /cygdrive/<path to samples folder>/ 
-       $ gmake
-   
-   While executing the sample programs, execute from a Windows command prompt and not from
-   the cygwin shell.
+   2. From the samples directory, simply invoke the nmake program. For
+      example, 
+
+	  C:\path\to\samples> nmake -f Makefile.nmake
+
+   3. If compiling on a 64-bit machine, please execute as following:
+
+	  C:\path\to\samples> nmake X64=1 -f Makefile.nmake
+ 
+   4. This produces executables of the samples am_*_test in the same directory.
+
+   5. To be able to use executables, copy ../lib/amsdk.dll library to samples directory.
+
+   6. Rename ../config/OpenSSOAgentBootstrap.template.orig as ../config/OpenSSOAgentBootstrap.properties and update the tags appropriately.
+   7. Rename ../config/OpenSSOAgentConfiguration.template.orig as ../config/OpenSSOAgentConfiguration.properties and update the tags appropriately. 
 
 Executing the Sample Program
 ----------------------------
@@ -151,7 +123,7 @@ Executing the Sample Program
    generate the encrypted password using this key. 
    It can be found in the bin folder of C-SDK bundle. The usage is :
      a)in Unix :
-          ./cryptutil <password> <key>  
+          ./crypt_util <password> <key>  
      b)in Windows :
           cryptit.exe <password> <key>
    Please specify this password for the property below in the
@@ -322,53 +294,15 @@ Executing the Sample Program on Solaris
    On Solaris platform you can run the sample programs by launching
    the generated executables on the command line. 
 
-   Note: Set the LD_LIBRARY_PATH environment variable to include the
-   lib directories, /usr/lib/mps:/usr/lib:/usr/ucblib
-   which contain libamsdk.so, libxml2.so, libssl3.so, libnss3.so,
-   libplc4.so, libplds4.so, libnspr4.so, and libucb.so. The directory
-   /usr/lib is included before /usr/ucblib so that common programs,
-   like editors, will continue to function.
-
 Executing the Sample Program on Linux
 ---------------------------------------
    On Linux you can run the sample programs by launching
    the generated executables on the command line. 
 
-   Note: Set the LD_LIBRARY_PATH environment variable to include the
-   directory, <install-location>/agent/lib, which contains 
-   libamsdk.so, libxml2.so, libssl3.so, libnss3.so, libplc4.so, 
-   libplds4.so and libnspr4.so. 
-
-Executing the Sample Program on AIX
----------------------------------------
-   On AIX you can run the sample programs by launching
-   the generated executables on the command line. 
-
-   Note: Set the LIBPATH environment variable to include the
-   directory, <install-location>/agent/lib, which contains 
-   libamsdk.so, libxml2.so, libssl3.so, libnss3.so, libplc4.so, 
-   libplds4.so and libnspr4.so. 
-
-Executing the Sample Program on HP-UX
----------------------------------------
-   On HP-UX you can run the sample programs by launching
-   the generated executables on the command line. 
-
-   Note: Set the SHLIB_PATH environment variable to include the
-   directory, <install-location>/agent/lib, which contains 
-   libamsdk.so, libxml2.so, libssl3.so, libnss3.so, libplc4.so, 
-   libplds4.so and libnspr4.so. 
-
 Executing the Sample Program on Windows
 ---------------------------------------
    On Windows platform you can run the sample programs by launching
    the generated executables on the command line
-   
-   Note: You must have the <sample-directory>/lib directory 
-   in your path before launching the sample programs. 
-   Alternatively, you can use the run.bat script to launch the sample programs 
-   which will set your path appropriately.
-
 
 Related References
 ------------------
