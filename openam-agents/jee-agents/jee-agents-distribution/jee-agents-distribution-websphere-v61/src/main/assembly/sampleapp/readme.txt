@@ -24,6 +24,9 @@
 
    $Id: readme.txt,v 1.3 2009/01/17 01:38:45 leiming Exp $
 -->
+<!--
+   Portions Copyrighted 2013 ForgeRock AS.
+-->
 
 ------------------------------------
 J2EE Policy Agent Sample Application
@@ -34,7 +37,7 @@ with the Websphere Application Server 6.1/7.0 and the J2EE Agent. Please note th
 the agent needs to be installed first before deploying this sample application.
 
     * Overview
-    * Configure the OpenSSO server
+    * Configure the OpenAM server
     * Configure the agent properties
     * Compiling and Assembling the Application
     * Deploying the Sample Application
@@ -58,17 +61,17 @@ The application is already built and ready to be deployed. It is available at
 sampleapp/dist/agentsample.ear.
 
 Note, the instructions here assume that you have installed the agent 
-successfully and have followed the steps outlined in the OpenSSO 
+successfully and have followed the steps outlined in the OpenAM
 Policy Agent 3.0 Guide for IBM Websphere Server 6.1/7.0, including the 
 post-installation steps.
 
 
-Configure the OpenSSO server
+Configure the OpenAM server
 ----------------------------
-This agent sample application requires that the OpenSSO server is configured 
+This agent sample application requires that the OpenAM server is configured
 with the subjects and policies required by the sample application.
 
-On OpenSSO admin console, do the following configuration.
+On OpenAM admin console, do the following configuration.
 1.  Create the following users:
     Here is the following list of users with username/password :
 
@@ -117,7 +120,7 @@ Configure the agent properties
 ------------------------------
 
    If the agent configuration is centralized, then do the following steps.
-   1). login to Opensso console as amadmin user
+   1). login to OpenAM console as amadmin user
    2). navigate to Access Control/realm/Agents/J2EE, and click on the agent 
        instance link (assume the agent instance is already created, otherwise 
        refer to the agent doc to create the agent instance).
@@ -158,7 +161,7 @@ Configure the agent properties
    Optionally, you can try out the fetch mode features that allow the agent to
    fetch some values and make them available to your application. For example, 
    you can fetch user profile values(like email or full name) from the user data
-   store of your opensso setup and make them available to your application code
+   store of your OpenAM setup and make them available to your application code
    (through cookies, headers, or request attributes) for application 
    customization. See the Policy Agent 3.0 for details about the fetching 
    attributes for details on using this feature. If you change the agent's 
@@ -182,12 +185,12 @@ To rebuild the entire application from scratch, follow these steps:
       <appserver_install_root>.
    3  Change the Universal User Id (UUID) 
       By default, the Application server specific deployment descriptors assume 
-      that the OpenSSO Server product was installed under default Org/Realm 
+      that the OpenAM Server product was installed under default Org/Realm
       "dc=opensso,dc=java,dc=net". If the Org/Realm for the deployment scenario
       is different from the default root suffix, the UUID for the role/principal
       mappings should be changed accordingly. The UUID can be obtained from the
-      OpenSSO server console the group/role pages.
-      e.g. the root suffix of the OpenSSO server deployment is "dc=xyz,dc=com".
+      OpenAM server console the group/role pages.
+      e.g. the root suffix of the OpenAM server deployment is "dc=xyz,dc=com".
       then replace all the occurrences of "dc=opensso,dc=java,dc=net" with 
       "dc=xyz,dc=com" in etc/ibm-application-bnd.xmi. 
 
@@ -229,4 +232,4 @@ If you encounter problems when running the application, review the log files to
 learn what exactly went wrong. J2EE Agent logs can be found at 
 <agent_install_root>/Agent_<instance_number>/logs/debug directory.
 
-Also, see the OpenSSO Policy Agent 3.0 Guide for IBM Websphere Server 6.1/7.0.
+Also, see the OpenAM Policy Agent 3.0 Guide for IBM Websphere Server 6.1/7.0.

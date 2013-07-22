@@ -29,7 +29,7 @@
 #------------------------------------------------------------------------------
 # Configuration Property File
 #
-# OpenSSO Policy Agent for:
+# OpenAM Policy Agent for:
 # GlassFish 2.1
 #
 # Version: 3.0
@@ -377,7 +377,7 @@ com.sun.identity.agents.config.redirect.param = goto
 #
 # LOGIN URL
 #   Specifies the login URLs to be used by the Agent to redirect 
-#   incoming users without sufficient credentials to the OpenSSO 
+#   incoming users without sufficient credentials to the OpenAM
 #   authentication service.
 # Hot-Swap Enabled: Yes
 #
@@ -386,7 +386,7 @@ com.sun.identity.agents.config.login.url[0] = @AM_SERVICES_PROTO@://@AM_SERVICES
 #
 # LOGOUT URL
 #   Specifies the logout URLs to be used by the Agent to log out
-#   the authenticated users from the OpenSSO authentication service.
+#   the authenticated users from the OpenAM authentication service.
 # Hot-Swap Enabled: Yes
 #
 com.sun.identity.agents.config.logout.url[0] = @AM_SERVICES_PROTO@://@AM_SERVICES_HOST@:@AM_SERVICES_PORT@@AM_SERVICES_DEPLOY_URI@/UI/Logout
@@ -485,7 +485,7 @@ com.sun.identity.agents.config.cookie.reset.path[] =
 #     that may be used by the Agent for CDSSO processing.
 #   - cdsso.clock.skew: Specifies a time in seconds to be used by the 
 #     Agent to determine the validity of the CDSSO AuthnResponse assertion.
-#   - cdsso.trusted.id.providers: This property specifies the OpenSSO 
+#   - cdsso.trusted.id.providers: This property specifies the OpenAM
 #     Server/ID providers that should be trusted by the agent, when evaluating
 #     the CDC Liberty Responses. Used when a Load Balancer/Firewall is between 
 #     the agent & server.
@@ -723,7 +723,7 @@ com.sun.identity.agents.config.bypass.principal[0] =
 #
 # PRIVILEGED ATTRIBUTE PROCESSING PROPERTIES
 #   - default.privileged.attribute: A list of privileged attributes that will
-#     be granted to all users who have a valid OpenSSO session.
+#     be granted to all users who have a valid OpenAM session.
 #   - privileged.attribute.type: A list of privileged attribute types that will
 #     be fetched for each user.
 #   - privileged.attribute.tolowercase : A MAP property that specifies if the 
@@ -751,7 +751,7 @@ com.sun.identity.agents.config.privileged.attribute.mapping[] =
 
 #
 # SSO TOKEN COOKIE NAME
-#   The name of the SSO Token cookie used between the OpenSSO server and
+#   The name of the SSO Token cookie used between the OpenAM server and
 #   the Agent.
 # Hot-Swap Enabled: No
 com.iplanet.am.cookie.name=iPlanetDirectoryPro
@@ -835,7 +835,7 @@ com.iplanet.am.server.port=@AM_SERVICES_PORT@
 #     to be used for different service names. 
 #   - com.sun.identity.policy.client.clockSkew: Specifies time in seconds
 #     which is allowed to accommodate the time difference between the 
-#     OpenSSO server machine and the remote policy client machine.
+#     OpenAM server machine and the remote policy client machine.
 #
 #     Note: the Notification URL for remote policy client is set by the 
 #     property com.sun.identity.client.notification.url.
@@ -885,7 +885,7 @@ com.sun.identity.agents.config.policy.env.jsession.param[0]=
 
 # AGENT NOTIFICATION URL PROPERTY
 #  -com.sun.identity.client.notification.url: URL for agent to receive
-#   notifications from the OpenSSO server for session, policy, and
+#   notifications from the OpenAM server for session, policy, and
 #   configuration changes.
 # Hot-Swap Enabled: No
 #

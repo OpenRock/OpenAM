@@ -26,7 +26,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2013 ForgeRock, Inc.
+   Portions Copyrighted 2013 ForgeRock AS.
 -->
 
 ------------------------------------
@@ -120,7 +120,7 @@ Configure the agent properties
 ------------------------------
 
    If the agent configuration is centralized, then do the following steps.
-   1). login to Opensso console as amadmin user
+   1). login to OpenAM console as amadmin user
    2). navigate to Access Control/realm/Agents/J2EE, and click on the agent
        instance link (assume the agent instance is already created, otherwise
        refer to the agent doc to create the agent instance).
