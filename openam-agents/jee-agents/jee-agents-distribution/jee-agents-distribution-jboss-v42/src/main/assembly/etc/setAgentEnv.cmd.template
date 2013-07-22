@@ -27,8 +27,10 @@
 \\@rem
 \\@rem
 
+\\@rem Portions Copyrighted 2013 ForgeRock AS.
+
 \\@rem *************************************************************************
-\\@rem This script is used to set up your environment for OpenSSO
+\\@rem This script is used to set up your environment for OpenAM
 \\@rem JBoss policy agent. 
 
 \\@rem Append AGENT_CLASSPATH to the JBoss system classpath
