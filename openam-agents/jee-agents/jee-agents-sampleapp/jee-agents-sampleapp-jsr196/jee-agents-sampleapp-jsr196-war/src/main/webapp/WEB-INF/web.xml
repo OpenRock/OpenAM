@@ -27,9 +27,13 @@
 
 -->
 
+<!--
+   Portions Copyrighted 2013 ForgeRock AS
+-->
+
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"> 
 
-    <display-name> Sun Federated Access Manager J2EE Policy Agent Sample Application</display-name>
+    <display-name> OpenAM J2EE Policy Agent Sample Application</display-name>
     <description> An application to demonstrate the features of J2EE Policy Agents </description>
     
     <servlet>
