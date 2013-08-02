@@ -20,12 +20,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import org.forgerock.openam.guice.AMGuiceModule;
 import org.forgerock.openam.utils.AMKeyProvider;
-import org.forgerock.openam.utils.SignatureUtil;
+import org.forgerock.util.SignatureUtil;
 
 import javax.inject.Singleton;
 
 /**
- * Guice Module for configuring bindings for the IdentityRestService classes.
+ * Guice Module for configuring bindings for the AuthenticationRestService classes.
  *
  * @author Phill Cunnington
  */

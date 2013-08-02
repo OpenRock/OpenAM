@@ -51,7 +51,9 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.restlet.data.Status;
+import org.restlet.engine.header.Header;
 import org.restlet.resource.ResourceException;
+import org.restlet.util.Series;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -84,13 +86,23 @@ public class ClientVerifierImpl implements ClientVerifier{
         String realm = OAuth2Utils.getRealm(request);
         if (request.getChallengeResponse() != null && clientId != null){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Client (" + clientId + ") using multiple authentication methods");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "Using multiple authentication methods");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         } else if (request.getChallengeResponse() != null) {
-            client = verify(request.getChallengeResponse(), realm);
+            try {
+                client = verify(request.getChallengeResponse(), realm);
+            } catch (OAuthProblemException e){
+                Series<Header> responseHeaders = (Series<Header>) response.getAttributes().get("org.restlet.http.headers");
+                if (responseHeaders == null) {
+                    responseHeaders = new Series(Header.class);
+                    response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+                }
+                responseHeaders.add(new Header("WWW-Authenticate", "Basic realm=\"" + OAuth2Utils.getRealm(request) + "\""));
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT_401.handle(null, "Client authentication failed");
+            }
         } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret, realm);
         } else {
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "No client authentication supplied");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
@@ -119,13 +131,13 @@ public class ClientVerifierImpl implements ClientVerifier{
             if (ret == null){
                 OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify password for: " +
                         clientId);
-                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Invalid client");
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
             } else {
                 user = new ClientApplicationImpl(ret);
             }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client", e);
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Invalid client");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
         return user;
     }
@@ -153,31 +165,30 @@ public class ClientVerifierImpl implements ClientVerifier{
                 }
                 // there's missing requirements not filled by this
                 if (missing.size() > 0) {
+                    lc.logout();
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                             "Missing requirements");
                 }
                 lc.submitRequirements(callbacks);
             }
 
-            if (OAuth2Utils.DEBUG.messageEnabled()) {
-                OAuth2Utils.DEBUG.message("ClientVerifierImpl::authenticate returning an InvalidCredentials"
-                        + " exception for invalid passwords.");
-            }
-
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
                 try {
-                    ret = IdUtils.getIdentity(lc.getSSOToken());
+                    ret = OAuth2Utils.getClientIdentity(username, realm);
                 } catch (Exception e) {
                     OAuth2Utils.DEBUG.error( "ClientVerifierImpl::authContext: "
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
+                    lc.logout();
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
                 }
             } else {
+                lc.logout();
                 throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED);
             }
+            lc.logout();
         } catch (AuthLoginException le) {
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
@@ -196,7 +207,7 @@ public class ClientVerifierImpl implements ClientVerifier{
     public ClientApplication findClient(String clientId, Request request){
 
         if (clientId == null || clientId.isEmpty()){
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
         String realm = OAuth2Utils.getRealm(request);
         ClientApplication user = null;
@@ -204,7 +215,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             AMIdentity id = getIdentity(clientId, realm);
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null);
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
         return user;
     }
@@ -229,8 +240,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
 
             if (results == null || results.size() != 1) {
-                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
-                                                                                 "Not able to get client from OpenAM");
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
 
             }
 
@@ -244,7 +254,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
     }
 }

@@ -31,7 +31,7 @@ public class RestAuthService extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(IdentityRestService.class);
+        classes.add(AuthenticationRestService.class);
         return classes;
     }
 }

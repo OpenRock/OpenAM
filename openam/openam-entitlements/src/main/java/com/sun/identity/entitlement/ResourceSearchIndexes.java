@@ -99,7 +99,6 @@ public class ResourceSearchIndexes {
     public Set<String> getPathIndexes() {
         return pathIndexes;
     }
-
     /**
      * @return Whether there are any indexes present.
      */

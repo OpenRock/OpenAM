@@ -45,6 +45,27 @@
         <filter-class>com.sun.identity.rest.AuthZFilter</filter-class>
     </filter>
 
+    <listener>
+        <listener-class>org.forgerock.openam.jaspi.config.AuthnFilterConfigurator</listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>CommonsAuthnFilter</filter-name>
+        <filter-class>org.forgerock.openam.jaspi.config.AMAuthNFilter</filter-class>
+        <init-param>
+            <param-name>moduleConfiguration</param-name>
+            <param-value>all</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>SessionAdminOnlyFilter</filter-name>
+        <filter-class>org.forgerock.authz.AuthZFilter</filter-class>
+        <init-param>
+            <param-name>configurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.AdminOnlyAuthZConfigurator</param-value>
+        </init-param>
+    </filter>
 
     <!-- filter declaration -->
 
@@ -63,6 +84,14 @@
     <filter-mapping>
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthnFilter</filter-name>
+        <url-pattern>/json/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>SessionAdminOnlyFilter</filter-name>
+        <url-pattern>/json/sessions/*</url-pattern>
     </filter-mapping>
 
     <!-- filter mapping -->
@@ -946,6 +975,30 @@
     </servlet>
 
     <servlet>
+        <servlet-name>WebFinger</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+
+        <!-- Your application class name (Optional - For mode 3) -->
+        <init-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>org.forgerock.openam.WebFinger</param-value>
+        </init-param>
+
+        <!-- List of supported client protocols (Optional - Only in mode 3) -->
+        <init-param>
+            <param-name>org.restlet.clients</param-name>
+            <param-value>RIAP CLAP</param-value>
+        </init-param>
+
+        <!-- Add the Servlet context path to routes (Optional) -->
+        <init-param>
+            <param-name>org.restlet.autoWire</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+    </servlet>
+
+    <servlet>
         <servlet-name>OAuth2RegisterClient</servlet-name>
         <jsp-file>/oauth2/registerClient.jsp</jsp-file>
     </servlet>
@@ -975,6 +1028,11 @@
     <servlet-mapping>
         <servlet-name>OAuth2RestletAdapter</servlet-name>
         <url-pattern>/oauth2/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>WebFinger</servlet-name>
+        <url-pattern>/.well-known/*</url-pattern>
     </servlet-mapping>
 
     <servlet>

@@ -15,12 +15,14 @@
  */
 package org.forgerock.openam.forgerockrest.session;
 
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -39,6 +41,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.ServerContextHelper;
+import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 
@@ -65,6 +68,8 @@ import java.util.Map;
  * @author robert.wapshott@forgerock.com
  */
 public class SessionResource implements CollectionResourceProvider {
+
+    private static final Debug DEBUG = SessionService.sessionDebug;
 
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
@@ -118,19 +123,24 @@ public class SessionResource implements CollectionResourceProvider {
             String tokenId = ServerContextHelper.getCookieFromServerContext(context);
 
             if (tokenId == null) {
-                handler.handleError(new BadRequestException("iPlanetDirectoryCookie not set on request"));
+                BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
+                DEBUG.error("iPlanetDirectoryCookie not set on request", e);
+                handler.handleError(e);
             }
 
             try {
                 JsonValue jsonValue = logout(tokenId);
                 handler.handleResult(jsonValue);
             } catch (InternalServerErrorException e) {
+                DEBUG.error("Exception handling logout", e);
                 handler.handleError(e);
             }
             return;
         }
 
-        handler.handleError(new NotSupportedException("Not implemented for this Resource"));
+        NotSupportedException e = new NotSupportedException("Action, " + id + ", Not implemented for this Resource");
+        DEBUG.error("Action, " + id + ", Not implemented for this Resource", e);
+        handler.handleError(e);
     }
 
     /**
@@ -150,12 +160,15 @@ public class SessionResource implements CollectionResourceProvider {
                 JsonValue jsonValue = logout(resourceId);
                 handler.handleResult(jsonValue);
             } catch (InternalServerErrorException e) {
+                DEBUG.error("Exception handling logout", e);
                 handler.handleError(e);
             }
             return;
         }
 
-        handler.handleError(new NotSupportedException(id + ", not implemented for this Resource"));
+        NotSupportedException e = new NotSupportedException("Action, " + id + ", Not implemented for this Resource");
+        DEBUG.error("Action, " + id + ", Not implemented for this Resource", e);
+        handler.handleError(e);
     }
 
     /**
@@ -169,6 +182,7 @@ public class SessionResource implements CollectionResourceProvider {
         SSOToken ssoToken;
         try {
             if (tokenId == null) {
+                DEBUG.error("Invalid Token Id");
                 throw new InternalServerErrorException("Invalid Token Id");
             }
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -176,6 +190,7 @@ public class SessionResource implements CollectionResourceProvider {
         } catch (SSOException ex) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("result", "Token has expired");
+            DEBUG.error("Token has expired");
             return new JsonValue(map);
         }
 
@@ -183,12 +198,14 @@ public class SessionResource implements CollectionResourceProvider {
             try {
                 AuthUtils.logout(ssoToken.getTokenID().toString(), null, null);
             } catch (SSOException e) {
+                DEBUG.error("Error logging out", e);
                 throw new InternalServerErrorException("Error logging out", e);
             }
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("result", "Successfully logged out");
+        DEBUG.message("Successfully logged out");
         return new JsonValue(map);
     }
 
@@ -282,15 +299,11 @@ public class SessionResource implements CollectionResourceProvider {
         return Math.round(mins);
     }
 
-    private NotSupportedException generateException(String type) {
-        return new NotSupportedException(type + " are not supported for this Resource");
-    }
-
     /**
      * {@inheritDoc}
      */
     public void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Creates"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -298,7 +311,7 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
             ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Deletes"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -306,7 +319,7 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void patchInstance(ServerContext ctx, String resId, PatchRequest request,
             ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Patches"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -314,6 +327,6 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
             ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Updates"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 }

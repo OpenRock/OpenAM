@@ -92,35 +92,19 @@ public class XACML3Policy {
         try {
             evalResult = target.evaluate(pip);
         } catch (XACML3EntitlementException ex) {
-            Set actions = new HashSet();
-            actions.add("NotApplicable");
-            results.add(new Entitlement(policyName,actions));
-            //result.setDecision(DecisionType.fromValue("Indeterminate"));
+            XACML3Decision result = new XACML3Decision(policyName,pip.getRequest().getContextID(),"Indeterminate");
+            results.add(result.asEntitlement());
             return results;
         }
 
         if (evalResult.isTrue())        {    // we  match,  so evaluate
             for (XACML3PolicyRule r : rules) {
                 XACML3Decision decision = r.evaluate(pip);
-
-                if (decision.getDecision().value().equals("Permit")) {
-                    indeterminate = false;
-                    Set actions = new HashSet();
-                    actions.add("Permit");
-                    results.add(new Entitlement(r.getName(),actions));
-                }
-                if (decision.getDecision().value().equals("Deny")) {
-                    indeterminate = false;
-                    Set actions = new HashSet();
-                    actions.add("Deny");
-                    results.add(new Entitlement(r.getName(),actions));
-                }
+                results.add(decision.asEntitlement());
             }
-        }
-        if (indeterminate) {
-            Set actions = new HashSet();
-            actions.add("Indeterminate");
-            results.add(new Entitlement(policyName,actions));
+        } else {
+            XACML3Decision result = new XACML3Decision(policyName,pip.getRequest().getContextID(),"NotApplicable");
+            results.add(result.asEntitlement());
         }
         return results;
     }

@@ -54,8 +54,10 @@ import org.forgerock.json.jwt.SignedJwt;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -83,6 +85,8 @@ public class OAuth2Utils {
     private static Logger accessLogger;
     private static Logger errorLogger;
     public static boolean logStatus = false;
+    private static final Map<String, OAuth2ProviderSettings> settingsProviderMap =
+            new HashMap<String, OAuth2ProviderSettings>();
 
     static {
         DEBUG = Debug.getInstance("OAuth2Provider");
@@ -678,7 +682,12 @@ public class OAuth2Utils {
     }
 
     public static Set<String> stringToSet(String string){
-        return OAuth2Utils.split(string, " ");
+        if (string == null || string.isEmpty()){
+            return Collections.EMPTY_SET;
+        }
+        String[] values = string.split(" ");
+        Set<String> set = new HashSet<String>(Arrays.asList(values));
+        return set;
     }
 
     /**
@@ -778,6 +787,43 @@ public class OAuth2Utils {
         }
     }
 
+    public static AMIdentity getClientIdentity(String uName, String realm) throws OAuthProblemException {
+        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        AMIdentity theID = null;
+
+        try {
+            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
+
+            IdSearchControl idsc = new IdSearchControl();
+            idsc.setRecursive(true);
+            idsc.setAllReturnAttributes(true);
+            // search for the identity
+            Set<AMIdentity> results = Collections.EMPTY_SET;
+            idsc.setMaxResults(0);
+            IdSearchResults searchResults =
+                    amIdRepo.searchIdentities(IdType.AGENTONLY, uName, idsc);
+                results = searchResults.getSearchResults();
+
+            if (results == null || results.size() != 1) {
+                OAuth2Utils.DEBUG.error("OAuth2Utils.getClientIdentity()::No client profile or more than one profile found.");
+                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
+                        "Not able to get client from OpenAM");
+            }
+
+            theID = results.iterator().next();
+
+            //if the client is deactivated return null
+            if (theID.isActive()){
+                return theID;
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get client AMIdentity: ", e);
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+        }
+    }
+
     public static AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentity theID = null;
@@ -796,10 +842,9 @@ public class OAuth2Utils {
             if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results = searchResults.getSearchResults();
             } else {
-                Map<String, Set<String>> avPairs = toAvPairMap(OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.AUTHENITCATION_ATTRIBUTES,
-                                                                    Set.class,
-                                                                    Request.getCurrent()),
-                                                               uName);
+                OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
+                Map<String, Set<String>> avPairs = toAvPairMap(settings.getListOfAttributesTheResourceOwnerIsAuthenticatedOn(),
+                        uName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
                 searchResults =
                         amIdRepo.searchIdentities(IdType.USER, "*", idsc);
@@ -868,5 +913,20 @@ public class OAuth2Utils {
         return sjwt;
     }
 
-
+    /*
+     * This method is called from multiple threads, and must initialize a new OAuth2ProviderSettings instance atomically.
+     */
+    public static OAuth2ProviderSettings getSettingsProvider(Request request){
+        synchronized (settingsProviderMap) {
+            String realm = OAuth2Utils.getRealm(request);
+            OAuth2ProviderSettings setting = settingsProviderMap.get(realm);
+            if (setting != null){
+                return setting;
+            } else {
+                setting = new OAuth2ProviderSettingsImpl(request);
+                settingsProviderMap.put(realm, setting);
+                return setting;
+            }
+        }
+    }
 }

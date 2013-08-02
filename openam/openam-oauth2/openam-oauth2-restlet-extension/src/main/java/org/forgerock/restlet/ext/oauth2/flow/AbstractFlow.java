@@ -25,12 +25,14 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMIdentityVerifier;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
@@ -39,13 +41,10 @@ import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.Restlet;
 import org.restlet.data.*;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
@@ -71,6 +70,8 @@ public abstract class AbstractFlow extends ServerResource {
     protected boolean issueRefreshToken = false;
     protected boolean fragment = false;
 
+    protected static final int RESULT_VALID = 4;
+
     /**
      * If the {@link AbstractFlow#getCheckedScope} change the requested scope
      * then this value is true.
@@ -84,13 +85,8 @@ public abstract class AbstractFlow extends ServerResource {
     public AbstractFlow(){
     }
     protected boolean checkIfRefreshTokenIsRequired(Request request){
-        String setting = OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN, String.class, request);
-        if (setting != null && !setting.isEmpty()){
-            issueRefreshToken = Boolean.parseBoolean(setting);
-        } else {
-            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for issue refresh token");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for issue refresh token");
-        }
+        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(request);
+        issueRefreshToken = settings.getRefreshTokensEnabledState();
         return issueRefreshToken;
     }
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
@@ -380,8 +376,22 @@ public abstract class AbstractFlow extends ServerResource {
     }
 
     protected User getAuthenticatedResourceOwner() throws OAuthProblemException {
-        if (getRequest().getClientInfo().getUser() != null
-                && getRequest().getClientInfo().isAuthenticated()) {
+        //authenticate the resource owner
+        OpenAMIdentityVerifier identityVerifier = new OpenAMIdentityVerifier();
+        int verified = identityVerifier.verify(getRequest(), getResponse());
+        if (verified != RESULT_VALID){
+            OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Unable to login resource owner.");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "Resource Owner unable to login");
+        }
+        if (endpointType.equals(OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)){
+            OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
+            if (authorizer.authorize(getRequest(), getResponse()) == false){
+                OAuth2Utils.DEBUG.error("The authorization server can not authorize the resource owner.");
+                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
+                        "The authorization server can not authorize the resource owner.");
+            }
+        }
+        if (getRequest().getClientInfo().getUser() != null) {
             return getRequest().getClientInfo().getUser();
         }
         OAuth2Utils.DEBUG.error("The authorization server can not authenticate the resource owner.");
@@ -600,10 +610,9 @@ public abstract class AbstractFlow extends ServerResource {
             requestedScopeSet =
                     new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            pluginClass =
-                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
-                            String.class,
-                            getRequest());
+
+            OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+            pluginClass = settings.getScopeImplementationClass();
             if (pluginClass != null && !pluginClass.isEmpty()){
                 scopeClass = (Scope) Class.forName(pluginClass).newInstance();
             }
@@ -634,10 +643,8 @@ public abstract class AbstractFlow extends ServerResource {
             requestedScopeSet =
                     new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            pluginClass =
-                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
-                            String.class,
-                            getRequest());
+            OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+            pluginClass = settings.getScopeImplementationClass();
             if (pluginClass != null && !pluginClass.isEmpty()){
                 scopeClass = (Scope) Class.forName(pluginClass).newInstance();
             }
@@ -669,10 +676,8 @@ public abstract class AbstractFlow extends ServerResource {
             requestedScopeSet =
                     new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            pluginClass =
-                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
-                            String.class,
-                            getRequest());
+            OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+            pluginClass = settings.getScopeImplementationClass();
             if (pluginClass != null && !pluginClass.isEmpty()){
                 scopeClass = (Scope) Class.forName(pluginClass).newInstance();
             }
@@ -700,10 +705,8 @@ public abstract class AbstractFlow extends ServerResource {
         String pluginClass = null;
         Scope scopeClass = null;
         try {
-            pluginClass =
-                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
-                            String.class,
-                            getRequest());
+            OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+            pluginClass = settings.getScopeImplementationClass();
             if (pluginClass != null && !pluginClass.isEmpty()){
                 scopeClass = (Scope) Class.forName(pluginClass).newInstance();
             }
@@ -729,10 +732,8 @@ public abstract class AbstractFlow extends ServerResource {
         String pluginClass = null;
         Scope scopeClass = null;
         try {
-            pluginClass =
-                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
-                            String.class,
-                            getRequest());
+            OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+            pluginClass = settings.getScopeImplementationClass();
             if (pluginClass != null && !pluginClass.isEmpty()){
                 scopeClass = (Scope) Class.forName(pluginClass).newInstance();
             }
@@ -754,24 +755,22 @@ public abstract class AbstractFlow extends ServerResource {
     }
 
     protected Map<String,String> getResponseTypes(String realm){
-            Set<String> responseTypeSet =
-                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST,
-                            Set.class,
-                            getRequest());
-            if (responseTypeSet == null || responseTypeSet.isEmpty()){
-                OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): No response types for realm: " + realm);
-                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invlaid Response Type");
+        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+        Set<String> responseTypeSet = settings.getResponseTypes();
+        if (responseTypeSet == null || responseTypeSet.isEmpty()){
+            OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): No response types for realm: " + realm);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invlaid Response Type");
+        }
+        Map<String, String> responseTypes = new HashMap<String, String>();
+        for (String responseType : responseTypeSet){
+            String[] parts = responseType.split("\\|");
+            if (parts.length != 2){
+                OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): Response type wrong format for realm: " + realm);
+                continue;
             }
-            Map<String, String> responseTypes = new HashMap<String, String>();
-            for (String responseType : responseTypeSet){
-                String[] parts = responseType.split("\\|");
-                if (parts.length != 2){
-                    OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): Response type wrong format for realm: " + realm);
-                    continue;
-                }
-                responseTypes.put(parts[0], parts[1]);
-            }
-            return responseTypes;
+            responseTypes.put(parts[0], parts[1]);
+        }
+        return responseTypes;
     }
 
 }

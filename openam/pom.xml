@@ -125,17 +125,19 @@
         <openam.properties>openam.properties</openam.properties>
 
         <!-- Version Properties -->
-        <opendj.server.version>2.4.6</opendj.server.version>
-        <opendj.sdk.version>3.0.0-SNAPSHOT</opendj.sdk.version>
+        <opendj.server.version>2.6.0</opendj.server.version>
+        <opendj.sdk.version>2.6.0</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
+        <commons.authfilter.version>1.0.0-SNAPSHOT</commons.authfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
+        <powermock.version>1.5</powermock.version>
 
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
@@ -187,6 +189,7 @@
     <modules>
 
         <module>openam-ldap-utils</module>
+        <module>openam-datastore</module>
         <!-- OpenAM Locale - Common Module -->
         <module>openam-locale</module>
 
@@ -218,6 +221,9 @@
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
+        <!-- OpenAM Commons Authentication Filter -->
+        <module>openam-auth-filter</module>
+
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
 
@@ -230,13 +236,15 @@
         <!-- OpenAM OAuth2 Token Service -->
         <module>openam-oauth2</module>
 
-        <!-- UI Modules -->
         <module>openam-common-auth-ui</module>
+
         <module>openam-server-auth-ui</module>
+
         <module>openam-ui-ria</module>
 
-        <!-- OpenAM Server -->
         <module>openam-server-only</module>
+
+        <!-- OpenAM Server -->
         <module>openam-server</module>
 
         <!-- Tools Artifacts -->
@@ -256,96 +264,6 @@
 
         <module>openam-examples</module>
     </modules>
-
-    <!-- Developers -->
-    <developers>
-
-        <developer>
-            <id>allan.foster</id>
-            <name>Allan Foster</name>
-            <email>allan.foster@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>VP Community</role>
-                <role>Support Staff</role>
-                <role>OpenAM Guru</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>jamie.nelson</id>
-            <name>Jamie Nelson</name>
-            <email>jamie.nelson@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>VP Engineering</role>
-                <role>Support Staff</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>jonathan.scudder</id>
-            <name>Jonathan Scudder</name>
-            <email>jonathan.scudder@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock UK - Oslo</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>OpenAM Chief Architect</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>jason.lemay</id>
-            <name>Jason Lemay</name>
-            <email>jason.lemay@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>Support Staff</role>
-                <role>Software Engineer</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>alin.brici</id>
-            <name>Alin Brici</name>
-            <email>alin.brici@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>Support Staff</role>
-                <role>Software Engineer</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <id>peter.major</id>
-            <name>Peter Major</name>
-            <email>peter.major@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock - HUNGARY</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>Software Engineer</role>
-            </roles>
-        </developer>
-
-
-        <!-- TODO Add remaining OpenAM Team -->
-
-    </developers>
-
-    <!-- Contributors -->
-    <contributors>
-        <!-- TODO Add OpenAM Additional Contributors -->
-    </contributors>
 
     <!-- Mailing Lists -->
     <mailingLists>
@@ -433,36 +351,17 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
         <repository>
-            <id>maven-central</id>
-            <url>http://maven.forgerock.org/repo/maven-central</url>
+            <id>restlet-cache</id>
+            <name>Restlet Cache Repository</name>
+            <url>http://maven.forgerock.org/repo/maven.restlet.org</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
-
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-
-        <repository>
-            <id>powermock</id>
-            <name>Public online PowerMock repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-
-        <repository>
-            <id>maven-one</id>
-            <name>Maven One</name>
-            <url>http://download.java.net/maven/1</url>
-        </repository>
-
     </repositories>
 
     <pluginRepositories>
@@ -480,17 +379,6 @@
             <id>forgerock-openam-plugin-snapshots</id>
             <name>openam-snapshots</name>
             <url>http://maven.forgerock.org/repo/openam-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>maven-central-plugins</id>
-            <url>http://maven.forgerock.org/repo/maven-central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -534,7 +422,7 @@
     <scm>
         <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
-        <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
+        <url>http://sources.forgerock.org/browse/openam/trunk</url>
     </scm>
 
     <!-- Dependency Management -->
@@ -549,6 +437,21 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-modules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authz-filter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -581,6 +484,16 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-datastore</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-persistentcookie</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -679,6 +592,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-dashboard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-datastore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -889,6 +807,12 @@
                 <type>zip</type>
             </dependency>
 
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authfilter-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- External project dependencies -->
             <dependency>
                 <groupId>asm</groupId>
@@ -1029,7 +953,6 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <!-- version>2.1.9</version -->
                 <version>1.0.6</version>
                 <!-- Originally ? -->
             </dependency>
@@ -1038,16 +961,12 @@
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-libs</artifactId>
                 <version>1.0.6</version>
-
-                <!-- version>1.0.6</version -->
                 <!-- Originally ? -->
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-xjc</artifactId>
-                <!-- version>2.1.9</version -->
-
                 <version>1.0.6</version>
                 <!-- Originally ? -->
             </dependency>
@@ -1082,16 +1001,15 @@
             </dependency>
 
             <dependency>
-                <groupId>external</groupId>
-                <artifactId>sleepycat-je</artifactId>
-                <version>2011-04-07</version>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>5.0.73</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-bundle</artifactId>
-                <version>1.17.1</version>
-                <!-- version>1.1.1-ea</version -->
+                <version>1.1.1-ea</version>
                 <!-- Originally 1.1.1-ea-SNAPSHOT -->
             </dependency>
 
@@ -1353,7 +1271,7 @@
                 <artifactId>opendj-ldap-sdk</artifactId>
                 <version>${opendj.sdk.version}</version>
             </dependency>
-            <!-- OpenDJ Server - 2.4.6 -->
+            <!-- OpenDJ Server - 2.6 -->
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-server</artifactId>
@@ -1467,26 +1385,6 @@
                 <version>2.1.1</version>
             </dependency>
 
-            <!-- JoSQL -->
-            <dependency>
-                <groupId>org.JoSQL</groupId>
-                <artifactId>JoSQL</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.JoSQL</groupId>
-                <artifactId>gentlyWEB-utils</artifactId>
-                <version>1.1</version>
-            </dependency>
-
-            <!-- JavaTuples -->
-            <dependency>
-                <groupId>org.javatuples</groupId>
-                <artifactId>javatuples</artifactId>
-                <version>1.2</version>
-                <scope>compile</scope>
-            </dependency>
-
             <!-- Session HA Module Dependencies-->
             <dependency>
                 <groupId>commons-net</groupId>
@@ -1503,85 +1401,66 @@
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>1.9.7</version>
             </dependency>
-
-            <!-- RESTlet OSGI Components -->
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.jackson</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.servlet</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.freemarker</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.ssl</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.restlet.osgi</groupId>
-                <artifactId>org.restlet</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.osgi</groupId>
-                <artifactId>org.restlet.ext.json</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.osgi</groupId>
-                <artifactId>org.restlet.ext.freemarker</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.json</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.simple</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.ext.atom</artifactId>
+                <artifactId>org.restlet.ext.crypto</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.restlet.jse</groupId>
-                <artifactId>org.restlet.test</artifactId>
+                <artifactId>org.restlet.ext.httpclient</artifactId>
                 <version>${restlet.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <!-- Commons Dependencies -->
@@ -1625,6 +1504,31 @@
                 <artifactId>forgerock-util</artifactId>
                 <version>${commons.forgerock-util.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-container</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-auth-filter-common</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-authz-filter</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.security.auth.message</artifactId>
+                <version>3.1</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -1666,20 +1570,11 @@
                 <version>20090211</version>
             </dependency>
 
-            <!-- Guice Dependency Injection -->
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>3.0</version>
             </dependency>
-
-            <!-- Joda Time API -->
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>2.2</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
@@ -1695,27 +1590,37 @@
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-core</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-reflect</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng-common</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.12.1.GA</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1923,6 +1828,23 @@
             </plugin>
 
             <plugin>
+                <groupId>org.forgerock.maven.plugins</groupId>
+                <artifactId>javadoc-updater-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>fixjavadoc</goal>
+                        </goals>
+                        <configuration>
+                            <directory>${project.reporting.outputDirectory}</directory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <inherited>true</inherited>
@@ -2011,10 +1933,11 @@
                 </configuration>
             </plugin>
 
+            <!-- Run link test as part of the documentation build
             <plugin>
                 <groupId>org.forgerock.maven.plugins</groupId>
                 <artifactId>linktester-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <inherited>false</inherited>
                 <configuration>
                     <includes>
@@ -2034,6 +1957,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
 
         <pluginManagement>

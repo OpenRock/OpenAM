@@ -19,19 +19,18 @@ package org.forgerock.openam.core.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
+import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.ldap.LDAPUser;
-import com.iplanet.services.ldap.ServerGroup;
-import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.sso.SSOToken;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -41,12 +40,8 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.guice.AMGuiceModule;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
-import org.forgerock.opendj.ldap.requests.BindRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
@@ -55,6 +50,7 @@ import java.security.PrivilegedAction;
  * Guice Module for configuring bindings for the OpenAM Core classes.
  *
  * @author apforrest
+ * @author robert.wapshott@forgerock.com
  */
 @AMGuiceModule
 public class CoreGuiceModule extends AbstractModule {
@@ -64,7 +60,6 @@ public class CoreGuiceModule extends AbstractModule {
         bind(new AdminTokenType()).toProvider(new AdminTokenProvider()).in(Singleton.class);
         bind(ServiceManagementDAO.class).to(ServiceManagementDAOWrapper.class).in(Singleton.class);
         bind(DNWrapper.class).in(Singleton.class);
-        bind(ConnectionFactory.class).toProvider(new ConnectionFactoryProvider()).in(Singleton.class);
         bind(IndexChangeObservable.class).in(Singleton.class);
         bind(ShutdownManagerWrapper.class).in(Singleton.class);
         bind(SearchResultHandler.class).to(IndexChangeHandler.class).in(Singleton.class);
@@ -88,6 +83,25 @@ public class CoreGuiceModule extends AbstractModule {
                 }
             }
         }).in(Singleton.class);
+
+        /**
+         * Core Token Service bindings
+         * CTSPersistentStore using provider to delay initialisation.
+         */
+        bind(CTSPersistentStore.class).toProvider(new Provider<CTSPersistentStore>() {
+            public CTSPersistentStore get() {
+                return CoreTokenServiceFactory.getInstance();
+            }
+        });
+
+        /**
+         * Session related dependencies.
+         */
+        bind(SessionService.class).toProvider(new Provider<SessionService>() {
+            public SessionService get() {
+                return SessionService.getSessionService();
+            }
+        }).in(Singleton.class);
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.
@@ -101,35 +115,6 @@ public class CoreGuiceModule extends AbstractModule {
         public PrivilegedAction<SSOToken> get() {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
-        }
-
-    }
-
-    // Simple provider implementation to return a connection factory.
-    private static class ConnectionFactoryProvider implements Provider<ConnectionFactory> {
-
-        @Override
-        public ConnectionFactory get() {
-            // TODO: This needs to delegate to the new connection utils class.
-            DSConfigMgr dsCfg = null;
-
-            try {
-                dsCfg = DSConfigMgr.getDSConfigMgr();
-            } catch (LDAPServiceException e) {
-                throw new RuntimeException(e);
-            }
-
-            ServerGroup sg = dsCfg.getServerGroup("sms");
-            ServerInstance svrCfg = sg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
-            String connDN = svrCfg.getAuthID();
-            String connPWD = svrCfg.getPasswd();
-            String hostString = dsCfg.getHostName("sms");
-            int pos = hostString.indexOf(":");
-            String hostName = hostString.substring(0, pos);
-            int port = Integer.parseInt(hostString.substring(pos + ":".length()));
-            ConnectionFactory factory = new LDAPConnectionFactory(hostName, port);
-            BindRequest bindRequest = Requests.newSimpleBindRequest(connDN, connPWD.toCharArray());
-            return Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
         }
 
     }

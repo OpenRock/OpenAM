@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.setup;
@@ -38,42 +38,61 @@ import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.ShutdownPriority;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.LDAPAttribute;
+import com.sun.identity.shared.ldap.LDAPConnection;
+import com.sun.identity.shared.ldap.LDAPEntry;
+import com.sun.identity.shared.ldap.LDAPException;
+import com.sun.identity.shared.ldap.LDAPModification;
+import org.opends.messages.Message;
+import org.opends.server.core.DirectoryServer;
+import org.opends.server.extensions.ConfigFileHandler;
+import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
+import org.opends.server.tools.InstallDS;
+import org.opends.server.tools.RebuildIndex;
+import org.opends.server.tools.dsconfig.DSConfig;
+import org.opends.server.tools.dsreplication.ReplicationCliMain;
+import org.opends.server.types.DirectoryEnvironmentConfig;
+import org.opends.server.util.EmbeddedUtils;
+import org.opends.server.util.ServerConstants;
+import org.opends.server.util.TimeThread;
 
-import java.io.*;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletContext;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
-
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPModification;
-
-import org.opends.messages.Message;
-import org.opends.server.core.DirectoryServer;
-import org.opends.server.extensions.ConfigFileHandler;
-import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
-import org.opends.server.tools.dsconfig.DSConfig;
-import org.opends.server.tools.RebuildIndex;
-import org.opends.server.types.DirectoryEnvironmentConfig;
-import org.opends.server.util.EmbeddedUtils;
-import org.opends.server.util.ServerConstants;
-import org.opends.server.util.TimeThread;
+import org.forgerock.openam.utils.IOUtils;
 
 // OpenDS does not have APIs to install and setup replication yet
-import org.opends.server.tools.InstallDS;
-import org.opends.server.tools.dsreplication.ReplicationCliMain;
 
 /**
  * This class encapsulates all <code>OpenDS</code>  dependencies.
@@ -92,7 +111,6 @@ public class EmbeddedOpenDS {
      * List of Schema to be copied and applied during installation.
      */
     private static final String[] additionalSchemaToBeApplied = {
-            "/WEB-INF/template/ldif/oauth2/99-oauth2attributes.ldif",
             "/WEB-INF/template/ldif/sfha/cts-add-schema.ldif"
     };
 
@@ -153,21 +171,8 @@ public class EmbeddedOpenDS {
                     "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
             throw ioe;
         } finally {
-            if (bin != null) {
-                try {
-                    bin.close();
-                } catch (Exception ex) {
-                    //No handling requried
-                }
-            }
-
-            if (bout != null) {
-                try {
-                    bout.close();
-                } catch (Exception ex) {
-                    //No handling requried
-                }
-            }
+            IOUtils.closeIfNotNull(bin);
+            IOUtils.closeIfNotNull(bout);
         }
 
         ZipFile opendsZip = new ZipFile(odsRoot + "/opendj.zip");
@@ -196,21 +201,8 @@ public class EmbeddedOpenDS {
                         "EmbeddedOpenDS.setup(): Error loading ldifs", ioe);
                 throw ioe;
             } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
+                IOUtils.closeIfNotNull(is);
+                IOUtils.closeIfNotNull(fos);
             } // End of Inner Finally.
 
             if (file.getName().endsWith("sh") || file.getName().startsWith("bin")) {
@@ -218,52 +210,9 @@ public class EmbeddedOpenDS {
             }
         } // End of File Elements from Zip for OpenDJ.
 
-        // copy OpenDJ jar file
-        // TODO Make this Dynamic, so we can eliminate versions on Jars.
-        String[] opendsJarFiles = {
-                "opendj-server-2.4.6.jar",     // Was OpenDJ.jar before Maven Support.
-                "sleepycat-je-2011-04-07.jar",          // Was je.jar before Maven Support.
-                "mail-1.4.5.jar"                        // Was mail.jar before Maven Support.
-        };
-        String[] NewOpendsJarFiles = {                 // We use this table to rename the files
-                "opendj-server.jar",                   // Since OpenDJ seems to need je.jar by name
-                "je.jar",
-                "mail-1.4.5.jar"
-        };
-
-        for (int i = 0; i < opendsJarFiles.length; i++) {
-            String jarFileName = "/WEB-INF/lib/" + opendsJarFiles[i];
-            ReadableByteChannel inChannel = Channels.newChannel(AMSetupServlet.getResourceAsStream(servletCtx, jarFileName));
-            FileChannel outChannel = new FileOutputStream(odsRoot + "/lib/" + NewOpendsJarFiles[i]).getChannel();
-
-            try {
-                channelCopy(inChannel, outChannel);
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
-                throw ioe;
-            } finally {
-                if (inChannel != null) {
-                    try {
-                        inChannel.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-
-                if (outChannel != null) {
-                    try {
-                        outChannel.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-            }
-        }
-
         // create tag swapped files
         String[] tagSwapFiles = {
-                "ldif/openam_suffix.ldif.template"
+                "template/ldif/openam_suffix.ldif.template"
         };
 
         for (int i = 0; i < tagSwapFiles.length; i++) {
@@ -288,26 +237,14 @@ public class EmbeddedOpenDS {
                         "EmbeddedOpenDS.setup(): Error tag swapping files", e);
                 throw e;
             } finally {
-                if (fin != null) {
-                    try {
-                        fin.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-                if (fout != null) {
-                    try {
-                        fout.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
+                IOUtils.closeIfNotNull(fin);
+                IOUtils.closeIfNotNull(fout);
             }
         }
 
         // ****************************************************
         // Copy in additional Schemata Definitions.
-        copyFiles(additionalSchemaToBeApplied, odsRoot + "/config/schema/", servletCtx);
+        copyFiles(additionalSchemaToBeApplied, odsRoot + "/template/config/schema/", servletCtx);
 
         // remove zip
         File toDelete = new File(odsRoot + "/opendj.zip");
@@ -512,11 +449,9 @@ public class EmbeddedOpenDS {
                 "--jmxPort",                    // 12
                 "1689",                         // 13
                 "--no-prompt",                  // 14
-                "--configFile",                 // 15
-                "/path/to/config.ldif",         // 16
-                "--doNotStart",                 // 17
-                "--hostname",                   // 18
-                "hostname"                      // 19
+                "--doNotStart",                 // 15
+                "--hostname",                   // 16
+                "hostname"                      // 17
         };
 
         setupCmd[2] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
@@ -524,8 +459,7 @@ public class EmbeddedOpenDS {
         setupCmd[6] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
         setupCmd[8] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT);
         setupCmd[13] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT);
-        setupCmd[16] = getOpenDJConfigFile(map);
-        setupCmd[19] = getOpenDJHostName(map);
+        setupCmd[17] = getOpenDJHostName(map);
 
         Object[] params = {concat(setupCmd)};
         SetupProgress.reportStart("emb.setupcommand", params);
@@ -533,7 +467,7 @@ public class EmbeddedOpenDS {
         setupCmd[11] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
 
         int ret = InstallDS.mainCLI(
-                setupCmd, true,
+                setupCmd,
                 SetupProgress.getOutputStream(),
                 SetupProgress.getOutputStream(),
                 null);
@@ -884,15 +818,14 @@ public class EmbeddedOpenDS {
                             "userRoot",                                         // 5
                             "-l",                                               // 6
                             ldif,                                               // 7
-                            "-Q",                                               // 8
-                            "--trustAll",                                       // 9
-                            "-D",                                               // 10
-                            "cn=Directory Manager",                             // 11
-                            "-w",                                               // 12
-                            "password"                                          // 13
+                            "--trustAll",                                       // 8
+                            "-D",                                               // 9
+                            "cn=Directory Manager",                             // 10
+                            "-w",                                               // 11
+                            "password"                                          // 12
                     };
-            args1[11] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
-            args1[13] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
+            args1[10] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
+            args1[12] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
             ret = org.opends.server.tools.ImportLDIF.mainImportLDIF(args1, false,
                     SetupProgress.getOutputStream(), SetupProgress.getOutputStream());
 
@@ -1427,6 +1360,7 @@ public class EmbeddedOpenDS {
         int ret = 0;
         shutdownServer("Rebuild index");
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
+
         String[] args = {
                 "--configClass",
                 "org.opends.server.extensions.ConfigFileHandler",
@@ -1434,20 +1368,7 @@ public class EmbeddedOpenDS {
                 getOpenDJConfigFile(map),
                 "--baseDN",
                 (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
-                "--index",
-                "sunxmlkeyvalue",
-                "--index",
-                "memberof",
-                "--index",
-                "iplanet-am-user-federation-info-key",
-                "--index",
-                "sun-fm-saml2-nameid-infokey",
-                "--index",
-                "pkey",
-                "--index",
-                "skey",
-                "--index",
-                "expirationDate"};
+                "--rebuildAll"};
         OutputStream bos = new ByteArrayOutputStream();
         OutputStream boe = new ByteArrayOutputStream();
         TimeThread.start();

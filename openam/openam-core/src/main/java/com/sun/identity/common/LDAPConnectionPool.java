@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.common;
 
@@ -459,7 +459,7 @@ public class LDAPConnectionPool {
             try {
                 con = createConnection(LDAPConnPoolUtils.connectionPoolsStatus);
                 backupPool.add(con);
-                adjustCurrentConnections(+1);
+                adjustCurrentConnections(1);
                 adjustBusyConnections(1);
             } catch(Exception ex) {
                 debug.error("LDAPConnection pool:" + name +
@@ -467,15 +467,20 @@ public class LDAPConnectionPool {
             }
         } else {
             if (currentConnectionCount > busyConnectionCount) {
-                con = pool[currentConnectionCount - busyConnectionCount - 1];
-                pool[currentConnectionCount - busyConnectionCount - 1] = null;
-                adjustBusyConnections(1);
-                currentPool.remove(con);
-                if ((cleaner != null) && 
-                    ((currentConnectionCount - busyConnectionCount) >=
-                    minSize)) {
-                    cleaner.removeElement(null);
-                }
+            	int index = currentConnectionCount - busyConnectionCount;
+            	if (index <= pool.length) {
+            	    con = pool[index - 1];
+                    pool[index - 1] = null;
+                    adjustBusyConnections(1);
+                    currentPool.remove(con);
+                    if ((cleaner != null) && 
+                        (index >= minSize)) {
+                        cleaner.removeElement(null);
+                    }
+            	} else {
+            	    debug.error("LDAPConnection pool:" + name +
+                    ":Error getting connection. pool size too small");
+            	} 
             }
         }
         return con;
@@ -643,12 +648,12 @@ public class LDAPConnectionPool {
             backupPool.add(pool[i]);
             currentPool.add(pool[i]);
         }
-        adjustCurrentConnections(minSize);
-        busyConnectionCount = 0;
+        currentConnectionCount = minSize;
+        setBusyConnectionCount(0);
         waitCount = 0;
     }
 
-    private LDAPConnection createConnection(HashMap aConnectionPoolsStatus)
+    private LDAPConnection createConnection(Map<String, LDAPConnectionPool> aConnectionPoolsStatus)
         throws LDAPException {
 
         // Make LDAP connection, using template if available
@@ -698,9 +703,7 @@ public class LDAPConnectionPool {
                         // Mark the host to be down and failover
                         // to the next server in line.
                         if (aConnectionPoolsStatus != null) {
-                            synchronized(aConnectionPoolsStatus) {
-                                aConnectionPoolsStatus.put(key, this);
-                            }
+                            aConnectionPoolsStatus.put(key, this);
                         }
                         if (debug.messageEnabled()) {
                             debug.message("LDAPConnectionPool: "+
@@ -722,9 +725,7 @@ public class LDAPConnectionPool {
             // Mark the host to be down and failover
             // to the next server in line.
             if (aConnectionPoolsStatus != null) {
-                synchronized(aConnectionPoolsStatus) {
-                    aConnectionPoolsStatus.put(key, this);
-                }
+                aConnectionPoolsStatus.put(key, this);
             }
             throw le;
         }
@@ -824,18 +825,25 @@ public class LDAPConnectionPool {
 
     private void decreaseCurrentConnection() {
         synchronized (this) {
-            try {
-                LDAPConnection con = pool[currentConnectionCount -
-                    busyConnectionCount - 1];
-                currentPool.remove(con);
-                backupPool.remove(con);
-                con.disconnect();
-            } catch (LDAPException e) {
-                debug.error("LDAPConnection pool:" + name +
-                    ":Error during disconnect.", e);
+            int index = currentConnectionCount - busyConnectionCount;
+            if (index >0 && index <= pool.length) {
+                try {
+                    LDAPConnection con = pool[index - 1];
+                    currentPool.remove(con);
+                    backupPool.remove(con);
+                    con.disconnect();
+                } catch (LDAPException e) {
+                    debug.error("LDAPConnection pool:" + name +
+                        ":Error during disconnect.", e);
+                }
+                pool[index - 1] = null;
+                adjustCurrentConnections(-1);
+            } else {
+                debug.warning("LDAPConnection pool:" + name +
+                    " currentConnectionCount="+currentConnectionCount +
+                    " busyConnectionCount="+busyConnectionCount );
+
             }
-            pool[currentConnectionCount - busyConnectionCount - 1] = null;
-            adjustCurrentConnections(-1);
         }
     }
     
@@ -1055,9 +1063,7 @@ public class LDAPConnectionPool {
         String downKey = name + ":" + ld.getHost() + ":" +
             ld.getPort() + ":" + authdn;
         if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-            synchronized(LDAPConnPoolUtils.connectionPoolsStatus) {
-                LDAPConnPoolUtils.connectionPoolsStatus.put(downKey, this);
-            }
+            LDAPConnPoolUtils.connectionPoolsStatus.put(downKey, this);
         }
 
         for (int i = 0; i < size; i++) {
@@ -1134,11 +1140,8 @@ public class LDAPConnectionPool {
             // from the hashmap to denote that the server which was
             // down earlier is up now.
             if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-                synchronized(LDAPConnPoolUtils.connectionPoolsStatus) {
-                    if (LDAPConnPoolUtils.connectionPoolsStatus.containsKey(
-                        upKey)) {
-                        LDAPConnPoolUtils.connectionPoolsStatus.remove(upKey);
-                    }
+                if (LDAPConnPoolUtils.connectionPoolsStatus.containsKey(upKey)) {
+                    LDAPConnPoolUtils.connectionPoolsStatus.remove(upKey);
                 }
             }
             if (debug.messageEnabled()) {
@@ -1168,14 +1171,7 @@ public class LDAPConnectionPool {
                         } else {
                             // Mark the host to be down and failover
                             // to the next server in line.
-                            if (LDAPConnPoolUtils.
-                                connectionPoolsStatus != null) {
-                                synchronized(LDAPConnPoolUtils.
-                                    connectionPoolsStatus) {
-                                    LDAPConnPoolUtils.
-                                    connectionPoolsStatus.put(upKey, this);
-                                }
-                            }
+                            LDAPConnPoolUtils.connectionPoolsStatus.put(upKey, this);
                             debug.message("LDAPConnectionPool."+
                                 "failoverAndfallback():primary host-" +
                                 upHost +" primary port-" + upPort +
@@ -1194,11 +1190,7 @@ public class LDAPConnectionPool {
                          // Mark the host to be down and failover
                          // to the next server in line.
                          if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-                             synchronized(LDAPConnPoolUtils.
-                                 connectionPoolsStatus) {
-                                 LDAPConnPoolUtils.connectionPoolsStatus.put(
-                                 upKey, this);
-                             }
+                             LDAPConnPoolUtils.connectionPoolsStatus.put(upKey, this);
                          }
                          debug.message("LDAPConnectionPool. "+
                              "failoverAndfallback():primary host-" + upHost +
@@ -1222,11 +1214,8 @@ public class LDAPConnectionPool {
             && (upPort != null) && (upPort.length() != 0) ) {
             String upKey = name + ":" + upHost + ":" +upPort + ":" + authdn;
             if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-                synchronized(LDAPConnPoolUtils.connectionPoolsStatus) {
-                    if (!LDAPConnPoolUtils.connectionPoolsStatus.
-                        containsKey(upKey)) {
-                        retVal = true;
-                    }
+                if (!LDAPConnPoolUtils.connectionPoolsStatus.containsKey(upKey)) {
+                    retVal = true;
                 }
             }
         }
@@ -1290,10 +1279,14 @@ public class LDAPConnectionPool {
 
     private void adjustCurrentConnections(int diff) {
         currentConnectionCount += diff;
-        if (MonitoringUtil.isRunning()) {
+    }
+
+    private void setBusyConnectionCount(int newVal) {
+    	busyConnectionCount = newVal;
+    	if (MonitoringUtil.isRunning()) {
             SsoServerConnPoolSvcImpl monitor = Agent.getConnPoolSvcMBean();
-            monitor.adjustCurrentConnections(diff);
-        }
+            monitor.setUsedConnections(newVal);
+    	}
     }
 
     private void incReleasedConns() {

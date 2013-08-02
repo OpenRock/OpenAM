@@ -26,7 +26,7 @@
 */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.idm.server;
 
@@ -67,6 +67,7 @@ import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.SchemaType;
@@ -312,7 +313,30 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         return res;
     }
-    
+
+    public Map<String, Set<String>> getBinaryAttributes_idrepo(String token, String type, String name,
+            Set<String> attrNames, String amOrgName, String amsdkDN)
+            throws RemoteException, IdRepoException, SSOException {
+        SSOToken ssoToken = getSSOToken(token);
+        IdType idType = IdUtils.getType(type);
+        Map<String, byte[][]> binaryAttributes =
+                idServices.getAttributes(ssoToken, idType, name, attrNames, amOrgName, amsdkDN, false);
+        Map<String, Set<String>> ret = new HashMap<String, Set<String>>();
+        if (binaryAttributes != null) {
+            //shuffle around the data so we can send it across the wire
+            for (Map.Entry<String, byte[][]> entry : binaryAttributes.entrySet()) {
+                String attrName = entry.getKey();
+                byte[][] values = entry.getValue();
+                Set<String> stringValues = new HashSet<String>(values.length);
+                for (byte[] bytes : values) {
+                    stringValues.add(Base64.encode(bytes));
+                }
+                ret.put(attrName, XMLUtils.encodeAttributeSet(stringValues, idRepoDebug));
+            }
+        }
+        return ret;
+    }
+
     public Set getMembers_idrepo(
         String token,
         String type,
@@ -621,6 +645,19 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     ) throws RemoteException, IdRepoException, SSOException {
         SSOToken ssoToken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
+        if (!isString) {
+            Map<String, byte[][]> binaryAttributes = new HashMap<String, byte[][]>(attributes.size());
+            for (Map.Entry<String, Set<String>> entry : ((Map<String, Set<String>>) attributes).entrySet()) {
+                Set<String> stringValues = entry.getValue();
+                byte[][] values = new byte[stringValues.size()][];
+                int counter = 0;
+                for (String value : stringValues) {
+                    values[counter++] = Base64.decode(value);
+                }
+                binaryAttributes.put(entry.getKey(), values);
+            }
+            attributes = binaryAttributes;
+        }
         idServices.setAttributes(ssoToken, idtype, name, attributes, isAdd,
             amOrgName, amsdkDN, isString);
     }

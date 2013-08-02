@@ -97,6 +97,9 @@ public class XACMLEvalContext  {
             Evaluator eval = new Evaluator(adminSubject,appname);
             Set<String> rNames = xReq.getResources();
             List<Entitlement> ent = eval.evaluate("/", adminSubject,rNames,eContext,xReq.getContextID());
+            if (ent != null) {
+                System.out.println("Entitlements are: " + ent);
+            }
 
         } catch (Exception ex) {
 

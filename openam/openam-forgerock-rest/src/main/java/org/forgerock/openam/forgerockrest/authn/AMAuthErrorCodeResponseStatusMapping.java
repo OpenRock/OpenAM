@@ -28,11 +28,33 @@ import java.util.Map;
 public class AMAuthErrorCodeResponseStatusMapping {
 
     /**
+     * Returns the Http Status code for the given AMAuth error code.
+     *
+     * @param authErrorCode The AMAuthErrorCode.
+     * @return The Http Status code.
+     */
+    public int getAuthLoginExceptionResponseStatus(String authErrorCode) {
+
+        int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
+
+        Map<String, Response.Status> authErrorCodeResponseStatuses = getAMAuthErrorCodeResponseStatuses();
+
+        Response.Status responseStatus = authErrorCodeResponseStatuses.get(authErrorCode);
+        if (responseStatus == null && AMAuthErrorCode.AUTH_TIMEOUT.equals(authErrorCode)) {
+            statusCode = 408;
+        } else if (responseStatus != null) {
+            statusCode = responseStatus.getStatusCode();
+        }
+
+        return statusCode;
+    }
+
+    /**
      * Returns a map of AMErrorCodes to Http Response Status codes.
      *
      * @return A Map of AM error codes to Response.Status.
      */
-    public Map<String, Response.Status> getAMAuthErrorCodeResponseStatuses() {
+    private Map<String, Response.Status> getAMAuthErrorCodeResponseStatuses() {
 
         Map<String, Response.Status> authErrorCodeResponseStatuses = new HashMap<String, Response.Status>();
 
@@ -52,7 +74,8 @@ public class AMAuthErrorCodeResponseStatusMapping {
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_TYPE_DENIED, Response.Status.BAD_REQUEST);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED, Response.Status.UNAUTHORIZED);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_PROFILE_CREATE, Response.Status.BAD_REQUEST);
-        authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_SESSION_CREATE_ERROR, Response.Status.INTERNAL_SERVER_ERROR);
+        authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_SESSION_CREATE_ERROR,
+                Response.Status.INTERNAL_SERVER_ERROR);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.INVALID_AUTH_LEVEL, Response.Status.BAD_REQUEST);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, Response.Status.UNAUTHORIZED);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_TOO_MANY_ATTEMPTS, Response.Status.UNAUTHORIZED);

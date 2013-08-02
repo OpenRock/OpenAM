@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.HttpCallback;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -95,6 +95,8 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(request.getParameter("httpAuthorization")).willReturn(null);
+        given(httpCallback.getNegotiationHeaderName()).willReturn("WWW-Authenticate");
+        given(httpCallback.getNegotiationHeaderValue()).willReturn("Negotiate");
 
         //When
         boolean exceptionCaught = false;
@@ -113,8 +115,8 @@ public class RestAuthHttpCallbackHandlerTest {
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
-        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean)true);
-        assertEquals(exception.getJsonResponse().get("reason").asString(), "iwa-failed");
+        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean) true);
+        assertEquals(exception.getJsonResponse().get("reason").asString(), "http-auth-failed");
     }
 
     @Test
@@ -129,6 +131,8 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(request.getParameter("httpAuthorization")).willReturn("");
+        given(httpCallback.getNegotiationHeaderName()).willReturn("WWW-Authenticate");
+        given(httpCallback.getNegotiationHeaderValue()).willReturn("Negotiate");
 
         //When
         boolean exceptionCaught = false;
@@ -147,12 +151,12 @@ public class RestAuthHttpCallbackHandlerTest {
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
-        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean)true);
-        assertEquals(exception.getJsonResponse().get("reason").asString(), "iwa-failed");
+        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean) true);
+        assertEquals(exception.getJsonResponse().get("reason").asString(), "http-auth-failed");
     }
 
     @Test
-    public void shouldHandleCallbackAndSetIWAFailedIfReasonInPostBody() {
+    public void shouldHandleCallbackAndSetHttpAuthFailedIfReasonInPostBody() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
@@ -160,7 +164,7 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpCallback originalHttpCallback = mock(HttpCallback.class);
         Map<String, String> postBodyMap = new LinkedHashMap<String, String>();
-        postBodyMap.put("reason", "iwa-failed");
+        postBodyMap.put("reason", "http-auth-failed");
         JsonValue jsonPostBody = new JsonValue(postBodyMap);
 
         //When
@@ -169,7 +173,7 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //Then
         assertEquals(originalHttpCallback, httpCallback);
-        verify(request).setAttribute("iwa-failed", true);
+        verify(request).setAttribute("http-auth-failed", true);
     }
 
     @Test
@@ -188,7 +192,7 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //Then
         assertEquals(originalHttpCallback, httpCallback);
-        verify(request, never()).setAttribute("iwa-failed", true);
+        verify(request, never()).setAttribute("http-auth-failed", true);
     }
 
     @Test (expectedExceptions = RestAuthException.class)

@@ -141,10 +141,32 @@
    and automatically entered with a simple touch of a button on the YubiKey,
    and without the need of any client software or drivers.</para>
   </listitem>
+
+  <listitem>
+    <para>OpenAM now supports (<link
+                 xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1375"
+                 xlink:show="new">OPENAM-1375</link>)the Device Print adaptive authentication module.
+             The module can use various characteristics of a system, including installed
+             fonts, screen resolution, timezone, and geolocation to uniquely identify a
+             system. The Device Print module includes all of the functionality associated
+             with the HOTP authentication module.</para>
+  </listitem>
+
+  <listitem>
+    <para>OpenAM now supports the Core Token Service version 2 (CTSv2), with a more
+    generalized token storage format. This covers all CTS areas including sessions,
+    SAML Tokens, and OAuth Tokens. A new LDAP schema has been defined which is in
+    addition to the existing schema.</para>
+  </listitem>
+
  </itemizedlist>
 
  <itemizedlist>
   <title>Additional New Features</title>
+
+  <listitem>
+    <para>OpenID now adds support for OpenID Connect 1.0.</para>
+  </listitem>
 
   <listitem>
    <para>The zero page login has been modified so that administrators can disable the

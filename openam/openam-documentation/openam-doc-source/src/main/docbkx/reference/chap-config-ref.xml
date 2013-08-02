@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock, Inc.
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-config-ref'
@@ -57,6 +57,84 @@
   <para>The primary difference is that when configuring services globally,
   you set the default values to be used when a module is configured further
   for a specific realm.</para>
+  
+  <para>The Core Authentication module includes some fields under this tab that are not 
+  available through the realm changes under the <literal>Access Control</literal> tab. 
+  Because attributes set under the <literal>Configuration</literal> tab apply on a 
+  server level, the changes you make here will apply to all realms. Attributes 
+  set under the <literal>Access Control</literal> tab only apply to the realms that
+  you specify. The Authentication table under the <literal>Configuration</literal> tab
+  lists all existing types of modules available for configuration, including any
+  customized modules you have added.</para>
+  
+  <para>The following are the global fields you can configure for the Core Authentication 
+  module under the <literal>Configuration</literal> tab.</para>
+  
+   <variablelist>
+    <varlistentry>
+     <term>Pluggable Authentication Module Classes</term>
+     <listitem>
+      <para>Add class names for custom authentication modules to this list.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-authenticators</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
+     <listitem>
+      <para>Sets a minimum and maximum number of LDAP connections in the pool
+      for connecting to a directory server. When tuning for production, start
+      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
+      for specific servers override the default.</para>
+      <para>This attribute is for LDAP and Membership authentication services
+      only.</para>
+      <para>This connection pool is different than the SDK connection pool
+      configured in <filename>serverconfig.xml</filename>.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
+      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
+     <listitem>
+      <para>Sets a minimum and maximum number of LDAP connections in the pool
+      for connecting to a directory server. When tuning for production, start
+      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
+      for specific servers override the default.</para>
+      <para>This attribute is for LDAP and Membership authentication services
+      only.</para>
+      <para>This connection pool is different than the SDK connection pool
+      configured in <filename>serverconfig.xml</filename>.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
+      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Remote Auth Security</term>
+     <listitem>
+      <para>Require the authenticating application to send its SSOToken. This
+      allows the Authentication Service to obtain the username and password
+      associated with the application.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunRemoteAuthSecurityEnabled</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Keep Post Process Objects for Logout Processing, Keep Authentication
+     Module Objects for Logout Processing</term>
+     <listitem>
+      <para>When enabled, retain objects used to process authentication or
+      post authentication operations in the user session until the user
+      logs out.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>sunAMAuthKeepPostProcessInstances</literal>, and
+      <literal>sunAMAuthKeepAuthModuleIntances</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  
  </section>
 
  <section xml:id="console-configuration">
@@ -1438,6 +1516,31 @@
    </varlistentry>
 
    <varlistentry>
+    <term>Response Type Plugins</term>
+    <listitem>
+     <para>List of plugins that handle the valid
+     <literal>response_type</literal> values. OAuth 2.0 clients pass response
+     types as parameters to the OAuth 2.0 Authorization end point
+     (<literal>/oauth2/authorize</literal>) to indicate which grant type is
+     requested from the provider. For example, the client passes
+     <literal>code</literal> when requesting an authorization code, and
+     <literal>token</literal> when requesting an access token.</para>
+
+     <para>Values in this list take the form <literal
+     ><replaceable>response-type</replaceable>|<replaceable
+     >plugin-class-name</replaceable></literal>.</para>
+
+     <para>Defaults:
+     <literal>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</literal>,
+     <literal>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</literal>,
+     <literal>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-response-type-map-class</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term>User Profile Attribute(s) the Resource Owner is Authenticated On</term>
     <listitem>
      <para>Names of profile attributes that resource owners use to log in.
@@ -1446,6 +1549,21 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-authentication-attributes</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Shared Consent Attribute Name</term>
+    <listitem>
+     <para>Name of a multi-valued attribute on resource owner profiles where
+     OpenAM can save authorization consent decisions. When the resource owner
+     chooses to save the decision to authorize access for a client application,
+     then OpenAM updates the resource owner's profile to avoid having to
+     prompt the resource owner to grant authorization when the client issues
+     subsequent authorization requests.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-saved-consent-attribute</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -2401,17 +2519,6 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Exempt top-level admins from constraint checking</term>
-    <listitem>
-     <para>If yes, then OpenAM exempts to top-level admin role from quota
-     constraints.</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-session-enable-session-constraint-bypass-topleveladmin</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>Resulting behavior if session quota exhausted</term>
     <listitem>
      <para>You can either set the next expiring session to be destroyed,
@@ -2450,8 +2557,8 @@
    <varlistentry>
     <term>DN Restriction Only Enabled</term>
     <listitem>
-     <para>If enabled, then OpenAM performs strict DN checks while setting
-     restrictions in cookie hijacking migration mode.</para>
+     <para>If enabled, OpenAM does not perform DNS lookups when checking
+     restrictions in cookie hijacking mode.</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-session-dnrestrictiononly</literal></para>
@@ -3911,22 +4018,75 @@
     <term><literal>openam.retained.http.headers</literal></term>
     <listitem>
      <para>Comma-separated list of HTTP headers to copy to the forwarded
-     request when the distributed authentication server forwards a request to
-     another distributed authentication server. Usually requests are forwarded
-     when the user has an <literal>AMAuthCookie</literal> from a different
-     distributed authentication server.</para>
+     response when the server forwards a request to another server.</para>
+
+     <para>Requests are forwarded when the server receiving the request is
+     not the server that originally initiated authentication. The server that
+     originally initiated authentication is identified by a cookie.</para>
+
+     <para>When the distributed authentication service (DAS) is in use, then
+     the cookie is the <literal>AMDistAuthCookie</literal> that identifies the
+     DAS server by its URL.</para>
+
+     <para>When authentication is done directly on OpenAM, then the cookie is
+     the <literal>AMAuthCookie</literal> that holds a session ID that identifies
+     the OpenAM server.</para>
+
+     <para>On subsequent requests the server receiving the request checks the
+     cookie. If the cookie identifies another server, the current server
+     forwards the request to that server.</para>
+
+     <para>If a header such as <literal>Cache-Control</literal> has been
+     included in the list of values for the property
+     <literal>openam.retained.http.request.headers</literal>
+     and the header must also be copied to the response, then add it to the
+     list of values for this property.</para>
+
+     <para>Example: <literal>openam.retained.http.headers=X-DSAMEVersion,Cache-Control</literal></para>
+
      <para>Default: <literal>X-DSAMEVersion</literal></para>
     </listitem>
    </varlistentry>
 
-   <varlistentry>
+   <varlistentry xml:id="openam-retained-http-request-headers">
     <term><literal>openam.retained.http.request.headers</literal></term>
     <listitem>
      <para>Comma-separated list of HTTP headers to copy to the forwarded request
-     when the distributed authentication server forwards a request to another
-     distributed authentication server. Usually requests are forwarded when the
-     user has an <literal>AMAuthCookie</literal> from a different distributed
-     authentication server.</para>
+     when the server forwards a request to another server.</para>
+
+     <para>Requests are forwarded when the server receiving the request is
+     not the server that originally initiated authentication. The server that
+     originally initiated authentication is identified by a cookie.</para>
+
+     <para>When the distributed authentication service (DAS) is in use, then
+     the cookie is the <literal>AMDistAuthCookie</literal> that identifies the
+     DAS server by its URL.</para>
+
+     <para>When authentication is done directly on OpenAM, then the cookie is
+     the <literal>AMAuthCookie</literal> that holds a session ID that identifies
+     the OpenAM server.</para>
+
+     <para>On subsequent requests the server receiving the request checks the
+     cookie. If the cookie identifies another server, the current server
+     forwards the request to that server.</para>
+
+     <para>When configuring the distributed authentication service, or when a
+     reverse proxy is set up to provide the client IP address in the
+     <literal>X-Forwarded-For</literal> header, if your deployment includes
+     multiple OpenAM servers, then this property must be set to include the
+     header.</para>
+
+     <para>Example: <literal>openam.retained.http.request.headers=X-DSAMEVersion,X-Forwarded-For</literal></para>
+
+     <para>OpenAM copies the header when forwarding a request to the
+     authoritative server where the client originally began the authentication
+     process, so that the authoritative OpenAM server receiving the forwarded
+     request can determine the real client IP address.</para>
+
+     <para>In order to retain headers to return in the response to the OpenAM
+     server that forwarded the request, use the property
+     <literal>openam.retained.http.headers</literal>.</para>
+
      <para>Default: <literal>X-DSAMEVersion</literal></para>
     </listitem>
    </varlistentry>

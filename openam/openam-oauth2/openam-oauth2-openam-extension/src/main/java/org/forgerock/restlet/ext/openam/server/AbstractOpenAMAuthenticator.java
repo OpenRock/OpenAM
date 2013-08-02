@@ -28,7 +28,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
-import org.forgerock.restlet.ext.openam.OpenAMUser;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -50,7 +50,6 @@ import com.sun.identity.idm.IdUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 

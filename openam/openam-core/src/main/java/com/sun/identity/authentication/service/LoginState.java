@@ -1,4 +1,3 @@
-
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -183,6 +182,7 @@ public class LoginState {
     int cacheTime;
     int authLevel=0;
     int moduleAuthLevel=Integer.MIN_VALUE;
+    private String pCookieAuthLevel;
     String client= null;
     String authMethName="";
     String pAuthMethName=null;
@@ -214,6 +214,10 @@ public class LoginState {
     String defaultOrgFailureLoginURL=null;
     Set orgFailureLoginURLSet = null;
     Map requestMap = new HashMap();
+    /**
+     * Indicates whether to create a session once a user has been authenticated.
+     */
+    private boolean noSession = false;
     /**
      * Indicates userID generate mode is enabled
      */
@@ -362,7 +366,9 @@ public class LoginState {
     
     static final int POSTPROCESS_SUCCESS = 1;
     static final int POSTPROCESS_FAILURE = 2;
-    static final int POSTPROCESS_LOGOUT = 3;    
+    static final int POSTPROCESS_LOGOUT = 3;
+
+    private static final String NO_SESSION_QUERY_PARAM = "noSession";
     
     // Variable indicating a request "forward" after 
     // authentication success
@@ -640,6 +646,8 @@ public class LoginState {
                 this.requestMap.put(key,value);
             }
         }
+
+        noSession = Boolean.parseBoolean((String) requestHash.get(NO_SESSION_QUERY_PARAM));
     }
     
     /**
@@ -878,7 +886,8 @@ public class LoginState {
             
             invalidAttemptsDataAttrName = CollectionHelper.getMapAttr(
                 attrs, ISAuthConstants.INVALID_ATTEMPTS_DATA_ATTR_NAME);
-            
+
+            pCookieAuthLevel = CollectionHelper.getMapAttr(attrs, ISAuthConstants.PCOOKIE_AUTH_LEVEL);
             if (messageEnabled) {
                 debug.message("Getting Org Profile: " + orgDN
                         + "\nlocale->" + localeContext.getLocale()
@@ -1136,12 +1145,16 @@ public class LoginState {
     }
     
     /**
-     * Activates session on successful authenticaton.
+     * Activates session on successful authentication.
+     * <p>
+     * Unless the noSession query parameter was set on the request and then in that case no new permanent session is
+     * activated and <code>true</code>.
      *
      * @param subject
      * @param ac
      * @param loginContext instance of JAAS <code>LoginContext</code>
-     * @return true if user session is activated successfully 
+     * @return <code>true</code> if user session is activated successfully, <code>false if failed to activated</code>
+     *          or <code>true</code> if the noSession parameter is set to true.
      */
     public boolean activateSession(Subject subject, AuthContextLocal ac, Object
         loginContext) throws AuthException {
@@ -1152,10 +1165,17 @@ public class LoginState {
             }
 
             setSuccessLoginURL(indexType,indexName);
+
+            SessionID oldSessId = session.getID();
+            if (noSession) {
+                //destroying the authentication session
+                AuthD.getSS().destroyInternalSession(oldSessId);
+                return true;
+            }
+
             //Fix for OPENAM-75
             //Create a new session upon successful authentication instead using old session and change state from
             //INVALID to VALID only.
-            SessionID oldSessId = session.getID();
             InternalSession authSession = session;
             //Generating a new session ID for the successfully logged in user
             session = AuthD.newSession(getOrgDN(), null);
@@ -1179,7 +1199,7 @@ public class LoginState {
                 loginContext);
             }
             if (messageEnabled) {
-		debug.message("Activating session: " + session);
+		        debug.message("Activating session: " + session);
             }
             return session.activate(userDN);
         } catch (AuthException ae) {
@@ -3023,6 +3043,10 @@ public class LoginState {
      * @param authLevel Authentication Level.
      */
     public void setAuthLevel(String authLevel) {
+        //check if we authenticated using a persistent cookie, and if so, use the persistent cookie authlevel instead
+        if (foundPCookie != null && foundPCookie) {
+            authLevel = pCookieAuthLevel;
+        }
         // check if module Level is set and is greater
         // then authenticated modules level
         if (authLevel == null) {
@@ -3486,15 +3510,12 @@ public class LoginState {
                 //the cookie should have already reach its lifetime
                 return null;
             }
-            
-            if (messageEnabled) {
-                debug.message("authMethStr: " + authMethStr);
-            }
-            pAuthMethName = authMethStr;
+
+            pAuthMethName = ISAuthConstants.PCOOKIE_AUTH_TYPE;
             if (messageEnabled) {
                 debug.message("Found valid PC : username=" + usernameStr +
                     "\ndomainname=" + domainStr + "\nauthMethod=" +
-                    pAuthMethName + "\nmaxSession=" + maxSession +
+                    authMethStr + "\nmaxSession=" + maxSession +
                     "\nidleTime=" + idleTime + "\ncacheTime=" + cacheTime +
                     "\norgDN=" + orgDN);
             }
@@ -4352,6 +4373,13 @@ public class LoginState {
     public synchronized void setPrevCallback(Callback[] prevCallback) {
         this.prevCallback = prevCallback;
     }
+
+    /**
+     * @return <code>true</code> if the authentication request was made with the noSession query parameter set to true.
+     */
+    public boolean isNoSession() {
+        return noSession;
+    }
     
     protected String getAccountLife() {
         return accountLife;
@@ -4760,6 +4788,9 @@ public class LoginState {
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
             }
+            if (noSession) {
+                props.put(LogConstants.NO_SESSION, noSession);
+            }
             
             ad.logIt(data,ad.LOG_ACCESS,messageId.toString(), props);
         } catch (Exception e) {
@@ -4796,6 +4827,9 @@ public class LoginState {
             }
             if (session != null) {
                 props.put(LogConstants.LOGIN_ID_SID, sid.toString());
+            }
+            if (noSession) {
+                props.put(LogConstants.NO_SESSION, noSession);
             }
 
             ad.logIt(data, ad.LOG_ACCESS, logId, props);
@@ -4908,6 +4942,9 @@ public class LoginState {
             }
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
+            }
+            if (noSession) {
+                props.put(LogConstants.NO_SESSION, noSession);
             }
 
             ad.logIt(data,ad.LOG_ERROR,messageId.toString(), props);
@@ -5759,8 +5796,10 @@ public class LoginState {
      * failover is enabled
      */
     void updateSessionForFailover() {
-        InternalSession intSess = getSession();
-        intSess.setIsISStored(true);
+        if (!noSession) {
+            InternalSession intSess = getSession();
+            intSess.setIsISStored(true);
+        }
     }
     
     /**

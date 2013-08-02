@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -303,7 +303,7 @@
 
    <para>Fedlets support the following SAML 2.0 features.</para>
 
-   <table>
+   <table xml:id="fedlet-saml2-features">
     <title>Fedlet Support for SAML 2.0 Features</title>
     <tgroup cols="3">
      <colspec colnum="1" colwidth="4*"/>
@@ -382,10 +382,12 @@
    </table>
 
    <para>For more information on using fedlets, see <link xlink:show="new"
-   xlink:href="dev-guide#chap-fedlet-java"><citetitle>Using Fedlets in Java Web
-   Applications</citetitle></link> and <link xlink:show="new"
-   xlink:href="dev-guide#chap-fedlet-java"><citetitle>Using Fedlets in .NET
-   Applications</citetitle></link> in the <citetitle>Developer's
+   xlink:href="dev-guide#chap-fedlet-java"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using Fedlets in
+   Java Web Applications</citetitle></link> and <link xlink:show="new"
+   xlink:href="dev-guide#chap-fedlet-dotnet"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using Fedlets in
+   .NET Applications</citetitle></link> in the <citetitle>Developer's
    Guide</citetitle>.</para>
 
    <para>The following procedure describes how to create a Java Fedlet.</para>
@@ -438,9 +440,6 @@
    following stages.</para>
    <orderedlist>
     <listitem>
-     <para>Create the .war file for the discovery service.</para>
-    </listitem>
-    <listitem>
      <para>Deploy the .war file into your web application container.</para>
     </listitem>
     <listitem>
@@ -457,27 +456,6 @@
     </listitem>
    </orderedlist>
    
-   <procedure xml:id="create-idpdisco-file">
-    <title>To Create the Discovery Service Web Application</title>
-    
-    <para>Before you start, have access to metadata for the identity and
-    service providers in the circle of trust.</para>
-    
-    <step>
-     <para>Unpack the <filename>opensso.war</filename> file into a temporary
-     directory.</para>
-     <screen>$ mkdir /tmp/disco ; cd /tmp/disco
-$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
-    </step>
-    <step>
-     <para>Create the <filename>disco.war</filename> file.</para>
-     <screen>$ cd ~/Downloads/opensso/deployable-war
-$ sh createwar.sh --staging /tmp/disco --type idpdiscovery --warfile disco.war
-
-WAR file was created.</screen>
-    </step>
-   </procedure>
-   
    <procedure xml:id="deploy-idpdisco-on-tomcat">
     <title>To Deploy the Discovery Service on Tomcat</title>
 
@@ -486,16 +464,16 @@ WAR file was created.</screen>
     on Apache Tomcat.</para>
 
     <step>
-     <para>Put the <filename>disco.war</filename> you created in the Tomcat
-     <filename>webapps/</filename> directory.</para>
-     <screen>$ mv disco.war /path/to/tomcat/webapps/</screen>
+     <para>Copy the <filename><?eval ${ipdiscoWarFile}?></filename> file to
+     the <filename>webapps/</filename> directory.</para>
+     <screen>$ ~/Downloads/openam/<?eval ${ipdiscoWarFile}?> /path/to/tomcat/webapps/disco.war</screen>
     </step>
     <step>
      <para>Access the configuration screen through your browser.</para>
      <para>In this example, Apache Tomcat listens for HTTP requests on
-     <literal>idp.disco.example:8080</literal>, and Tomcat has unpacked the
+     <literal>www.disco.example:8080</literal>, and Tomcat has unpacked the
      application under <literal>/disco</literal>, so the URL is
-     <literal>http://idp.disco.example:8080/disco</literal>, which redirects to
+     <literal>http://www.disco.example:8080/disco</literal>, which redirects to
      <filename>Configurator.jsp</filename>.</para>
     </step>
    </procedure>
@@ -546,7 +524,7 @@ WAR file was created.</screen>
        <listitem>
         <para>The cookie domain is the common cookie domain used in your circle
         of trust for identity provider discovery, in this case
-        <literal>www.disco.example</literal>.</para>
+        <literal>.disco.example</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -599,9 +577,9 @@ WAR file was created.</screen>
      discovery service endpoints, and Save your work.</para>
 
      <para>In this example, the writer URL is
-     <literal>http://idp.disco.example:8080/disco/saml2writer</literal>, and the
+     <literal>http://www.disco.example:8080/disco/saml2writer</literal>, and the
      reader URL is
-     <literal>http://idp.disco.example:8080/disco/saml2reader</literal>.</para>
+     <literal>http://www.disco.example:8080/disco/saml2reader</literal>.</para>
     </step>
 
     <step>
@@ -1707,6 +1685,14 @@ CookieWriterServlet.doGetPost: Redirect to
    </step>
 
    <step>
+    <para>Enter the EntityID for your Salesforce service provider.</para>
+    
+    <para>This ID is used as the persistent EntityDescriptor metadata
+    element so that users can have multiple service provider instances.
+    This field is used for the EntityDescriptor on the next page.</para>
+   </step>
+
+   <step>
     <para>On the OpenAM console Common Tasks page, click Configure Salesforce
     CRM.</para>
    </step>
@@ -1717,9 +1703,8 @@ CookieWriterServlet.doGetPost: Redirect to
     from Salesforce CRM with the user profile attribute on your IDP.</para>
 
     <para>For example, add a mapping for <literal>IDPEmail</literal> to
-    <literal>mail</literal>, and then click Create. In any case, make sure
-    the attribute mapper is sending the correct attribute to be used for
-    the federated identity.</para>
+    <literal>mail</literal>, and then click Create. Make sure the attribute mapper 
+    is sending the correct attribute to be used for the federated identity.</para>
    </step>
 
    <step>
@@ -1764,7 +1749,7 @@ CookieWriterServlet.doGetPost: Redirect to
 
      <step>
       <para>In Salesforce CRM, browse to Setup &gt; Administration Setup &gt;
-      Single Sign-On Settings &gt; Security Controls, and then click Edit for
+      Security Controls &gt; Single Sign-On Settings, and then click Edit for
       Single Sign-On Settings.</para>
      </step>
 
@@ -1782,8 +1767,8 @@ CookieWriterServlet.doGetPost: Redirect to
      </step>
 
      <step>
-      <para>Save the OpenAM verification certificate to a text file, such as
-      <filename>OpenAM.pem</filename>.</para>
+      <para>Copy or download the OpenAM verification certificate to a text file, such 
+      as <filename>OpenAMCert.pem</filename> or <filename>OpenAMCert.txt</filename>.</para>
      </step>
 
      <step>
@@ -1792,13 +1777,23 @@ CookieWriterServlet.doGetPost: Redirect to
      </step>
 
      <step>
-      <para>For SAML User ID Type in Salesforce CRM, choose Assertion contains
+      <para>For SAML Identity Type in Salesforce CRM, choose Assertion contains
       the Federation ID from the User object.</para>
      </step>
 
      <step>
-      <para>For SAML User Location in Salesforce CRM, choose User ID is in an
+      <para>For SAML Identity Location in Salesforce CRM, choose Identity is in an
       Attribute element.</para>
+     </step>
+
+     <step>
+      <para>If you require specific login or logout pages, enter them in the next
+      two fields.</para>
+     </step>
+
+     <step>
+      <para>Enter the URL of your page specific error page if you have a page where
+      you would like users redirected to when they encounter an error.</para>
      </step>
 
      <step>
@@ -1828,16 +1823,10 @@ CookieWriterServlet.doGetPost: Redirect to
      </step>
 
      <step>
-      <para>Salesforce CRM displays a Salesforce.com Single Logout URL.</para>
-
-      <para>If you want to perform Global Logout when a user logs out of
-      Salesforce, edit this form to include the OpenAM Logout URL here.</para>
-
-      <para>If you do not want to OpenAM to end the user's session when they
-      log out of Salesforce, edit this for to leave this blank.</para>
+      <para>Salesforce CRM returns to the Single Sign-On Settings form.</para>
      </step>
-
-     <step><!-- Pending OPENAM-1232: Enhance Salesforce workflow -->
+     
+     <step>
       <para>Click Download Metadata to download the Salesforce CRM SP
       metadata.</para>
 
@@ -1878,6 +1867,26 @@ CookieWriterServlet.doGetPost: Redirect to
      <step>
       <para>Click Import Entity..., and then use the Import Entity Provider
       page to import the Salesforce CRM metadata.</para>
+      
+      <itemizedlist>
+       <listitem>
+        <para>Update the <literal>Realm Name</literal> to the appropriate realm.</para>
+       </listitem>
+       <listitem>
+        <para>Select the location where the metadata file is.</para>
+       </listitem>
+       <listitem>
+        <para>Enter the path for the metadata file.</para>
+       </listitem>
+       <listitem>
+        <para>If you have an extended data file, select the location where the file
+        is.</para>
+       </listitem>
+       <listitem>
+        <para>If you have an extended data file, enter the path for the metadata 
+        file.</para>
+       </listitem>
+      </itemizedlist>
      </step>
     </substeps>
 
@@ -2255,10 +2264,11 @@ CookieWriterServlet.doGetPost: Redirect to
     <term><literal>binding</literal></term>
     <listitem>
      <para>(Required) Use this parameter to indicate what binding to use for the
-     operation. For example, specify <literal>binding=HTTP-POST</literal> to
-     use HTTP POST binding with a self-submitting form rather than the default
-     HTTP redirect binding. In addition to <literal>binding=HTTP-POST</literal>,
-     you can also use <literal>binding=HTTP-Artifact</literal>.</para>
+     operation. The full, long name format is required for this parameter to work.
+     For example, specify <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>
+     to use HTTP POST binding with a self-submitting form rather than the default
+     HTTP redirect binding. In addition, you can use 
+     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
     </listitem>
    </varlistentry>
    
@@ -2322,10 +2332,11 @@ CookieWriterServlet.doGetPost: Redirect to
     <term><literal>binding</literal></term>
     <listitem>
      <para>(Required) Use this parameter to indicate what binding to use for the
-     operation. For example, specify <literal>binding=HTTP-POST</literal> to
-     use HTTP POST binding with a self-submitting form rather than the default
-     HTTP redirect binding. In addition to <literal>binding=HTTP-POST</literal>,
-     you can also use <literal>binding=HTTP-Artifact</literal>.</para>
+     operation. The full, long name format is required for this parameter to work.
+     For example, specify <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal> 
+     to use HTTP POST binding with a self-submitting form rather than the default
+     HTTP redirect binding. In addition, you can use 
+     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
     </listitem>
    </varlistentry>
 

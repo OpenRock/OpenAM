@@ -41,14 +41,14 @@ import java.util.Map;
  */
 public class DevicePrintAuthenticationConfig {
 
-    private static final Debug DEBUG = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+    private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
     public static final String PROFILE_EXPIRATION_DAYS = "iplanet-am-auth-adaptive-device-print-profile-expiration-days";
     public static final String MAX_STORED_PROFILES = "iplanet-am-auth-adaptive-device-print-maximum-profiles-stored-quantity";
 
     public static final String MAX_TOLERATED_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points";
     public static final String SCREEN_COLOUR_DEPTH_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points";
-    public static final String SCREEN_RESOLUTION_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-screen-resoultion-penalty-points";
+    public static final String SCREEN_RESOLUTION_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points";
     public static final String INSTALLED_PLUGINS_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-installed-plugins-penalty-points";
     public static final String INSTALLED_FONTS_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-installed-fonts-penalty-points";
     public static final String TIMEZONE_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-timezone-penalty-points";

@@ -86,7 +86,7 @@
     <para>Other endpoints can only be used when called by some option in the OpenAM console. For example, while the
     AgentAdd.jsp endpoint exists in the console/agentconfig subdirectory, you would get an error by navigating directly
     to a URL such as <literal>http://sp.example.com:8080/openam/console/agentconfig/AgentAdd.jsp</literal>. For that
-    particluar endpoint, you'll have click through the options required to add an agent. (Access Control &gt;
+    particular endpoint, you'll have click through the options required to add an agent. (Access Control &gt;
     <replaceable>realm name</replaceable> &gt; Agents &gt; Agent &gt; New)</para>
 
     <para>In general, this chapter does not include dynamic endpoints, such as those that may include security
@@ -185,7 +185,7 @@
     <term><literal>Debug.jsp</literal></term>
     <listitem>
         <para>Supports debug logging by service. For more information, see the <citetitle>Administration Guide</citetitle>
-                chapter on <link xlink:href="admin-guide#chap-monitoring#log-debug-selective-capture"
+                chapter on <link xlink:href="admin-guide#log-debug-selective-capture"
                                  xlink:role="http://docbook.org/xlink/role/olink">
             <citetitle>Debug Logging by Service.</citetitle></link></para>
         </listitem>
@@ -271,18 +271,11 @@
     <listitem>
         <para>Supports GUI-based access to the options associated with the <literal>ssoadm</literal> command.
             The ssoadm.jsp file is disabled by default. Instructions for enabling this feature are available from
-            the <citetitle>Administration Guide</citetitle> entry on <link xlink:show="new" xlink:href=
-                    "admin-guide#chap-admin-tools#openam-ssoadm-jsp-overview"
+            the <citetitle>Administration Guide</citetitle> entry on <link xlink:show="new"
+               xlink:href="admin-guide#openam-ssoadm-jsp-overview"
                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM ssoadm.jsp.</citetitle></link></para>
     </listitem>
 </varlistentry>
-
-
-<para>All of the validat*.jsp files near the end of this list relate to testing and verifying federation. It requires
-    at least one identity
-provider (IDP) and one service provider (SP). At least one of these components must be configured remotely to set up
-a valid Circle of Trust (COT). If federation does not apply to your configuration, the validat*.jsp files
-are not essential to your configuration.</para>
 
 
 <varlistentry>
@@ -350,6 +343,13 @@ are not essential to your configuration.</para>
     </listitem>
 </varlistentry>
 </variablelist>
+
+     <para>All of the validat*.jsp files near the end of this list relate to testing and verifying federation. It requires
+    at least one identity
+provider (IDP) and one service provider (SP). At least one of these components must be configured remotely to set up
+a valid Circle of Trust (COT). If federation does not apply to your configuration, the validat*.jsp files
+are not essential to your configuration.</para>
+
     </section>
 
 
@@ -585,9 +585,9 @@ are not essential to your configuration.</para>
             <term><literal>Login.jsp</literal></term>
             <listitem>
                 <para>Specifies a regular authentication template. As noted in the
-                    <citetitle>Administration Guide</citetitle> entry on <link xlink:show="new" xlink:href=
-                            "admin-guide#chap-securing#secure-openam-administration"
-                                                                               xlink:role="http://docbook.org/xlink/role/olink">
+                    <citetitle>Administration Guide</citetitle> entry on <link xlink:show="new"
+                            xlink:href="admin-guide#secure-openam-administration"
+                            xlink:role="http://docbook.org/xlink/role/olink">
                         <citetitle>Securing OpenAM Administration</citetitle></link>,
                     the Login.jsp file may be customized for different deployments.</para>
             </listitem>
@@ -904,7 +904,8 @@ are not essential to your configuration.</para>
           <listitem>
               <para>Allows an administrator to review default settings for the agent, as configured in the Inheritance
                   Settings page. Inheritance assumes that agent is part of a previously confiugred group.
-                  To access Inheritance Settings, refer to the <link xlink:href="admin-guide#chap-agents#create-agent-profiles"
+                  To access Inheritance Settings, refer to the <link
+                  xlink:href="admin-guide#create-agent-profiles"
                   xlink:role="http://docbook.org/xlink/role/olink">
                   <citetitle>Creating Agent Profiles" section of the Administration Guide</citetitle></link>.</para>
           </listitem>
@@ -3263,7 +3264,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Enables registration of an OAuth 2.0 client with the OpenAM OAuth 2.0 authorization service.
                     For details, see the Administration Guide chatper on
-                        <link xlink:href="admin-guide#chap-oauth2#register-oauth2-client"
+                        <link xlink:href="admin-guide#register-oauth2-client"
                                               xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>Managing OAuth 2.0 Authorization</citetitle></link>.
                     </para>
@@ -3275,7 +3276,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used to log out the resource owner with teh OAuth 2.0 provider. For more information, see
                         the Administration Guide chapter on
-                        <link xlink:href="admin-guide#chap-oauth2#register-oauth2-client"
+                        <link xlink:href="admin-guide#register-oauth2-client"
                               xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>Defining Authentication Services</citetitle></link>.
                         </para>
@@ -3286,7 +3287,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>OAuthProxy.jsp</literal></term>
                 <listitem>
                     <para>Endpoint used for redirection. For more information, see the Administration Guide chapter on
-                        <link xlink:href="admin-guide#chap-oauth2#register-oauth2-client"
+                        <link xlink:href="admin-guide#register-oauth2-client"
                         xlink:role="http://docbook.org/xlink/role/olink">
                         <citetitle>Managing OAuth 2.0 Authorization</citetitle></link>.</para>
                 </listitem>
@@ -3474,8 +3475,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>The MNI in several JSP files relate to ManageNameID, which sets up corresponding accounts
                         on IDPs and SPs. As described in the
-                        <link xlink:href="admin-guide#chap-federation#change-federation"
-                                                                   xlink:role="http://docbook.org/xlink/role/olink">
+                        <link xlink:href="admin-guide#change-federation"
+                              xlink:role="http://docbook.org/xlink/role/olink">
                         <citetitle>Managing SAML2 Federation in the Administration Guide</citetitle></link> chapter of
                         the Administration Guide, it allows you to change federation of persistently linked accounts.
                     The chapter also includes an example of this endpoint at work.</para>
@@ -4057,8 +4058,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>/SPECP/*</literal></term>
                 <listitem>
                     <para>The associated SPECPService class receives and processes single logout (SLO) requests, using
-                        SOAP bindings on the SP. The associated SPECService.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        SOAP bindings on the SP. <!-- The associated SPECService.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4067,9 +4068,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>/SPSloSoap/*</literal></term>
                 <listitem>
                     <para>The associated SPSingleLogoutServiceSOAP class receives and processes single logout
-                        (SLO) requests, using SOAP bindings on the SP. The associated SPSingleLogoutServiceSOAP.java
+                        (SLO) requests, using SOAP bindings on the SP. <!-- The associated SPSingleLogoutServiceSOAP.java
                         file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4131,9 +4132,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/NIMSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named NameIDMappingServiceSOAP; The associated NameIDMappingServiceSOAP.java
+                    <para>Used by a servlet named NameIDMappingServiceSOAP. <!--  The associated NameIDMappingServiceSOAP.java
                         file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4141,9 +4142,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AIDReqUri/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AssertionIDRequestServiceSoap; The associated
+                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
                         AssertionIDRequestURI.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4151,9 +4152,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AIDReqSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AssertionIDRequestServiceSoap; The associated
+                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
                         AssertionIDRequestSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4161,9 +4162,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AuthnQuerySerivceSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AuthnQueryServiceSoap; The associated
+                    <para>Used by a servlet named AuthnQueryServiceSoap. <!-- The associated
                         AuthnQueryServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4171,9 +4172,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AttributeServiceSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AttributeServiceSoap; The associated
+                    <para>Used by a servlet named AttributeServiceSoap. <!-- The associated
                         AttributeServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be  in less frequent use.
+                        the trunk directories in September of 2012, so this may be  in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4181,9 +4182,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/SSOSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named SSOSoap; The associated
+                    <para>Used by a servlet named SSOSoap. <!-- The associated
                         IDPSingleSignOnServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4191,9 +4192,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/IDPMniSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named IDPMniSoap; The associated
+                    <para>Used by a servlet named IDPMniSoap. <!-- The associated
                         IDPManageNameIDServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4228,9 +4229,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/IDPSloSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named IDPSloSoap; The associated
+                    <para>Used by a servlet named IDPSloSoap. <!-- The associated
                         IDPSingleLogoutServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4265,9 +4266,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/ArtifactResolver/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named IDPArtifactResolver; The associated
+                    <para>Used by a servlet named IDPArtifactResolver. <!-- The associated
                         IDPArtifactResolutionServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>

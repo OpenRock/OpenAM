@@ -69,8 +69,8 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .add(createOutputField("message", message))
-                    .addLast(createOutputField("messageType", messageType))
+                .add(createOutputField("message", message))
+                .addLast(createOutputField("messageType", messageType))
                 .build();
 
         return jsonValue;

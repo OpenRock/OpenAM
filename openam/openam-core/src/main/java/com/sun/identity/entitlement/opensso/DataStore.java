@@ -1037,7 +1037,7 @@ public class DataStore {
         }
 
         String result = filter.toString();
-        return (result.length() > 0) ? "(&" + result + ")" : null;
+        return (result.length() > 0) ? "(&" + result + ")" : "";
     }
 
 

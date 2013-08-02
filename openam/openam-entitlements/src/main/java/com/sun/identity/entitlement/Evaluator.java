@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Evaluator.java,v 1.2 2009/09/10 16:35:38 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -39,6 +41,10 @@ import javax.security.auth.Subject;
  * @supported.api
  */
 public class Evaluator {
+
+    // Application retrieval log message code.
+    private static final int APP_RETRIEVAL_ERROR = 248;
+
     private Subject adminSubject;
     private String applicationName =
         ApplicationTypeManager.URL_APPLICATION_TYPE_NAME;
@@ -134,7 +140,7 @@ public class Evaluator {
         String realm,
         Subject subject,
         Set<String> resourceNames,
-        Object environment
+        Map<String, Set<String>> environment
     ) throws EntitlementException {
         if ((resourceNames == null) || resourceNames.isEmpty()) {
             throw new EntitlementException(424);
@@ -156,30 +162,44 @@ public class Evaluator {
      * Returns a list of entitlements for a given subject, resource name
      * and environment.
      *
-     * @param realm Realm Name.
-     * @param subject Subject who is under evaluation.
-     * @param resourceName Resource name.
-     * @param environment Environment parameters.
-     * @param recursive <code>true</code> to perform evaluation on sub resources
-     *        from the given resource name.
+     * @param realm
+     *         Realm Name.
+     * @param subject
+     *         Subject who is under evaluation.
+     * @param resourceName
+     *         Resource name.
+     * @param environment
+     *         Environment parameters.
+     * @param recursive
+     *         <code>true</code> to perform evaluation on sub resources
+     *         from the given resource name.
      * @return a list of entitlements for a given subject, resource name
      *         and environment.
-     * @throws EntitlementException if the result cannot be determined.
+     * @throws EntitlementException
+     *         if the result cannot be determined.
      */
     public List<Entitlement> evaluate(
             String realm,
             Subject subject,
             String resourceName,
-            //Map<String, Set<String>> environment,
-            Object environment,
+            Map<String, Set<String>> environment,
             boolean recursive
     ) throws EntitlementException {
-        long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :
-                EVAL_SINGLE_LEVEL_MONITOR.start();
+        long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() : EVAL_SINGLE_LEVEL_MONITOR.start();
+
+        Application application = ApplicationManager.getApplication(adminSubject, realm, applicationName);
+
+        if (application == null) {
+            // App retrieval error.
+            throw new EntitlementException(APP_RETRIEVAL_ERROR, new String[] {realm});
+        }
+
+        // Normalise the incoming resource URL.
+        resourceName = application.getResourceComparator().canonicalize(resourceName);
 
         PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
-        List<Entitlement> results = evaluator.evaluate(realm, adminSubject,
-                subject, applicationName, resourceName, environment, recursive);
+        List<Entitlement> results = evaluator.evaluate(realm, adminSubject, subject,
+                applicationName, resourceName, environment, recursive);
 
         if (recursive) {
             EVAL_SUB_TREE_MONITOR.end(start);
@@ -189,34 +209,58 @@ public class Evaluator {
 
         return results;
     }
+
     /**
      * Returns a list of entitlements for a given subject, resource name
      * and environment.
      *
-     * @param realm Realm Name.
-     * @param subject Subject who is under evaluation.
-     * @param resourceNames Resource name.
-     * @param environment Environment parameters.
-
+     * This method is called by XACML3 evaluate
+     *
+     * @param realm
+     *         Realm Name.
+     * @param subject
+     *         Subject who is under evaluation.
+     * @param resourceName
+     *         Resource name.
+     * @param environment
+     *         Environment parameters.
+     * @param recursive
+     *         <code>true</code> to perform evaluation on sub resources
+     *         from the given resource name.
      * @return a list of entitlements for a given subject, resource name
      *         and environment.
-     * @throws EntitlementException if the result cannot be determined.
+     * @throws EntitlementException
+     *         if the result cannot be determined.
      */
     public List<Entitlement> evaluate(
             String realm,
             Subject subject,
             Set<String> resourceNames,
-            //Map<String, Set<String>> environment,
             Object environment,
-            String requestName
+            String contextID
     ) throws EntitlementException {
-        long start = EVAL_SINGLE_LEVEL_MONITOR.start();
+        boolean recursive = false;
+        long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() : EVAL_SINGLE_LEVEL_MONITOR.start();
+
+        Application application = ApplicationManager.getApplication(adminSubject, realm, applicationName);
+
+        if (application == null) {
+            // App retrieval error.
+            throw new EntitlementException(APP_RETRIEVAL_ERROR, new String[] {realm});
+        }
+
+        // Normalise the incoming resource URL.
+        //resourceName = application.getResourceComparator().canonicalize(resourceName);
 
         PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
-        List<Entitlement> results = evaluator.evaluate(realm, adminSubject,
-                subject, applicationName, resourceNames, requestName, environment, false);
+        List<Entitlement> results = evaluator.evaluate(realm, adminSubject, subject,
+                applicationName, resourceNames, contextID, environment, false);
 
-        EVAL_SINGLE_LEVEL_MONITOR.end(start);
+        if (recursive) {
+            EVAL_SUB_TREE_MONITOR.end(start);
+        } else {
+            EVAL_SINGLE_LEVEL_MONITOR.end(start);
+        }
 
         return results;
     }

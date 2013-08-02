@@ -19,8 +19,8 @@ package org.forgerock.openam.forgerockrest.authn;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonArray;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -300,7 +300,7 @@ public class RestAuthCallbackHandlerManagerTest {
         given(restAuthCallbackHandler2.convertFromJson(callback2, jsonCallback2)).willReturn(callback2);
 
         //When
-            restAuthCallbackHandlerManager.handleJsonCallbacks(callbacks, jsonCallbacks);
+        restAuthCallbackHandlerManager.handleJsonCallbacks(callbacks, jsonCallbacks);
 
         //Then
         fail();
