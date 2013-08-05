@@ -37,7 +37,7 @@ fi
 if [ -z "$JAVA_HOME" ]; then
     JAVA_VM=java
 else
-    JAVA_VM=${JAVA_HOME}/bin/java
+    JAVA_VM=\${JAVA_HOME}/bin/java
 fi
 
 OS_TYPE=`uname -s | tr '[a-z]' '[A-Z]'`
@@ -49,6 +49,6 @@ else
     AGENT_OPTS=
 fi
 
-AGENT_CLASSPATH=${AGENT_HOME}/lib/openam-installtools-launcher-${openam.version}.jar:${AGENT_HOME}/lib/commons-io-1.4.jar
+AGENT_CLASSPATH=\${AGENT_HOME}/lib/openam-installtools-launcher-${openam.version}.jar:\${AGENT_HOME}/lib/commons-io-1.4.jar
 
 $JAVA_VM -classpath "$AGENT_CLASSPATH"  $AGENT_OPTS com.sun.identity.install.tools.launch.AdminToolLauncher $*

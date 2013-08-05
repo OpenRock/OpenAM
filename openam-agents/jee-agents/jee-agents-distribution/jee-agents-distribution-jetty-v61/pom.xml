@@ -56,6 +56,7 @@
                              <descriptors>
                                  <descriptor>src/main/assembly/jetty-v61_KitAssembly_Descriptor.xml</descriptor>
                              </descriptors>
+                             <escapeString>\</escapeString>
                          </configuration>
                      </execution>
                  </executions>
