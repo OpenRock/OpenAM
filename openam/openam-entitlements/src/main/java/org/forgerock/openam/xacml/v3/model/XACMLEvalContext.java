@@ -35,6 +35,7 @@ import org.forgerock.openam.xacml.v3.profiles.XACML3ProfileManager;
 import javax.security.auth.Subject;
 import java.util.List;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class XACMLEvalContext  {
@@ -92,6 +93,7 @@ public class XACMLEvalContext  {
         XACML3Request xReq = new  XACML3Request(request);
         XACMLEvalContext eContext =  new XACMLEvalContext();
         eContext.setRequest(xReq);
+        Response response = new Response();
 
         try {
             Evaluator eval = new Evaluator(adminSubject,appname);
@@ -99,12 +101,25 @@ public class XACMLEvalContext  {
             List<Entitlement> ent = eval.evaluate("/", adminSubject,rNames,eContext,xReq.getContextID());
             if (ent != null) {
                 System.out.println("Entitlements are: " + ent);
+                Result r = new Result();
+                Status stat = new Status();
+                StatusCode sc = new StatusCode();
+                sc.setValue(XACML3Decision.OK);
+                r.setStatus(stat);
+
+                Map<String,Boolean> actions =  ent.get(0).getActionValues();
+                for (String s : actions.keySet()) {
+                    r.setDecision(DecisionType.fromValue(s));
+                }
+
+                response.getResult().add(r);
+
             }
 
         } catch (Exception ex) {
 
         }
-        return null;
+        return response;
     }
 
 }

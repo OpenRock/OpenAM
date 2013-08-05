@@ -775,7 +775,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="entitlementCombiner" />
-                        <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                        <Value>org.forgerock.openam.xacml.v3.model.XACML3CombinerDenyOverride</Value>
                     </AttributeValuePair>
                 </SubConfiguration>
 

@@ -129,7 +129,10 @@ public class XACML3Decision {
     public Entitlement asEntitlement() {
         Set<String> actions = new HashSet<String>();
         actions.add(decision.value());
-        return new Entitlement(ruleID,resourceID,actions);
+        XACML3Entitlement ent = new XACML3Entitlement(ruleID,resourceID,actions);
+        ent.setRuleName(ruleID);
+        ent.setDecision(this);
+        return ent;
     }
 
 }
