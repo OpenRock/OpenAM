@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 package com.sun.identity.agents.common;
 
@@ -44,6 +44,7 @@ import javax.servlet.ServletInputStream;
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.SurrogateBase;
 import com.sun.identity.agents.util.EnumerationAdapter;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 
 
 /**
@@ -100,7 +101,7 @@ public class HttpServletRequestHelper extends SurrogateBase
 
         while(innerHeaderNames.hasMoreElements()) {
             String nextInnerHeader = (String) innerHeaderNames.nextElement();
-            if (!headerNameList.contains(nextInnerHeader)) {
+            if (!getUserAttributes().containsKey(nextInnerHeader)) {
                 headerNameList.add(nextInnerHeader);
             }
         }
@@ -189,15 +190,9 @@ public class HttpServletRequestHelper extends SurrogateBase
     }
     
     public void addUserAttributes(Map newAttributes) {
-        Map oldAttributes = getUserAttributes();
-        Map userAttributes = new HashMap();
-        if (oldAttributes != null) {
-            userAttributes.putAll(oldAttributes);
-        }
         if (newAttributes != null) {
-            userAttributes.putAll(newAttributes);
+            getUserAttributes().putAll(newAttributes);
         }
-        setUserAttributes(userAttributes);
     }
     
     public ServletInputStream getInputStream(ServletInputStream inputStream) {
@@ -209,7 +204,15 @@ public class HttpServletRequestHelper extends SurrogateBase
     }
 
     private void setUserAttributes(Map map) {
-        _userAttributes = map;
+        if (!(map instanceof CaseInsensitiveHashMap)) {
+            if (map != null) {
+                _userAttributes = new CaseInsensitiveHashMap(map);
+            } else {
+                _userAttributes = new CaseInsensitiveHashMap(0);
+            }
+        } else {
+            _userAttributes = map;
+        }
     }
     
     /**
