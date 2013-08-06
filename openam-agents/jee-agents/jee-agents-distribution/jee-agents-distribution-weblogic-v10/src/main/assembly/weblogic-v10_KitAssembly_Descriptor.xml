@@ -86,20 +86,20 @@
         </fileSet>
         <fileSet>
             <outputDirectory>locale</outputDirectory>
-            <directory>${project.basedir}/src/main/assemblylocale</directory>
+            <directory>${project.basedir}/src/main/assembly/locale</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>etc</outputDirectory>
-            <directory>${project.basedir}/src/main/assemblyetc</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
         </fileSet>
         <!-- The amauthprovider.jar is to do with MBeans and needs Weblogic tools to regenerate -->
         <fileSet>
             <outputDirectory>lib</outputDirectory>
-            <directory>${project.basedir}/src/main/assemblylib</directory>
+            <directory>${project.basedir}/src/main/assembly/lib</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>config</outputDirectory>
-            <directory>${project.basedir}/src/main/assemblyconfig</directory>
+            <directory>${project.basedir}/src/main/assembly/config</directory>
             <excludes>
                 <exclude>*version*</exclude>
             </excludes>
@@ -107,7 +107,7 @@
         <!-- Create empty directories -->
         <fileSet>
             <outputDirectory>installer-logs</outputDirectory>
-            <directory>${project.basedir}/src/main/assemblyetc</directory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
             <excludes>
                 <exclude>*</exclude>
             </excludes>
