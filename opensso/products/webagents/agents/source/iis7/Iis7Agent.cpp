@@ -467,7 +467,7 @@ static void send_ok(IHttpContext* pHttpContext) {
     }
 }
 
-static void send_error(IHttpContext* pHttpContext) {
+static void send_error(IHttpContext* pHttpContext, BOOL ccntrl) {
     am_web_log_debug("send_error(): sending http response error");
     HRESULT hr;
     IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
@@ -479,6 +479,12 @@ static void send_error(IHttpContext* pHttpContext) {
     hr = pHttpResponse->SetHeader("Content-Length", "21", (USHORT) strlen("21"), TRUE);
     if (FAILED(hr)) {
         am_web_log_error("send_error(): SetHeader failed.");
+    }
+    if (ccntrl) {
+        pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
+        pHttpResponse->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+        pHttpResponse->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+        pHttpResponse->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
     }
     HTTP_DATA_CHUNK dataChunk;
     dataChunk.DataChunkType = HttpDataChunkFromMemory;
@@ -974,7 +980,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
         case AM_FAILURE:
         default:
             am_web_log_error("%s: status: %s (%d)", thisfunc, am_status_to_string(status), status);
-            send_error(pHttpContext);
+            send_error(pHttpContext, am_web_is_cache_control_enabled(agent_config) == B_TRUE);
             retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
             break;
     }
@@ -2047,6 +2053,12 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                             am_web_log_error("%s: SetHeader failed.", thisfunc);
                             status = AM_FAILURE;
                         }
+                        if (am_web_is_cache_control_enabled(agent_config) == B_TRUE) {
+                            pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
+                            pHttpResponse->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+                            pHttpResponse->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+                            pHttpResponse->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
+                        }
                         DWORD cbSent;
                         PCSTR pszBuffer = advice_txt;
                         HTTP_DATA_CHUNK dataChunk;
@@ -2120,6 +2132,12 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                                 (USHORT) strlen("25"), TRUE);
                         hr = pHttpResponse->SetHeader("Content-Type", "text/html",
                                 (USHORT) strlen("text/html"), TRUE);
+                    }
+                    if (am_web_is_cache_control_enabled(agent_config) == B_TRUE) {
+                        pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
+                        pHttpResponse->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+                        pHttpResponse->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+                        pHttpResponse->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
                     }
                     HTTP_DATA_CHUNK dataChunk;
                     dataChunk.DataChunkType = HttpDataChunkFromMemory;

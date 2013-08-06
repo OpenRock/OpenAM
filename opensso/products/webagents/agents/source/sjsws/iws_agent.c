@@ -1221,6 +1221,13 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
         am_map_destroy(env_parameter_map);
     }
     
+    /* avoid caching of any unauthenticated response */
+    if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && status != AM_SUCCESS) {
+        set_header("Cache-Control", "no-store, no-cache", args);
+        set_header("Pragma", "no-cache", args);
+        set_header("Expires", "0", args);
+    }
+    
     switch (status) {
         case AM_SUCCESS:
             // Set remote user and authentication type
