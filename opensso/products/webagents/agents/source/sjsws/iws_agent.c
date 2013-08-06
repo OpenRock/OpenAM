@@ -1248,10 +1248,6 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
                 am_web_log_debug("%s: Remote user not set, allowing access "
                         "to the url as it is in not enforced list", thisfunc);
             }
-            if (am_web_is_logout_url(request_url, agent_config) == B_TRUE) {
-                (void)am_web_logout_cookies_reset(reset_cookie, args,
-                                                  agent_config);
-            }
             // set LDAP user attributes to http header
             status = am_web_result_attr_map_set(&result, set_header,
                                                set_cookie_in_response,
@@ -1321,6 +1317,10 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
             break;
 
         case AM_REDIRECT_LOGOUT:
+            if (am_web_is_agent_logout_url(request_url, agent_config) == B_TRUE) {
+                (void)am_web_logout_cookies_reset(reset_cookie, args,
+                                                  agent_config);
+            }
             status = am_web_get_logout_url(&logout_url, agent_config);
             if(status == AM_SUCCESS) {
                 do_url_redirect(sn, rq, logout_url);
