@@ -26,6 +26,9 @@
    $Id: configure.xml,v 1.2 2009/02/16 09:23:38 naghaon Exp $
 
 -->
+<!--
+   Portions Copyrighted 2013 ForgeRock AS
+-->
 <configure>
     <class-prefix>
         <package type="system" 
@@ -224,6 +227,7 @@
             </task>
             <task name="CONFIGURE_AGENT_APP">
                 <class name="ConfigureAgentAppTask" type="common"/>
+                <property name="I18N_FILE" value="jbossv40Tools" />
             </task>
         </instance-tasks>
     </install>
@@ -246,6 +250,7 @@
             </task>
             <task name="UNCONFIGURE_AGENT_APP">
                 <class name="UnconfigureAgentAppTask" type="common"/>
+                <property name="I18N_FILE" value="jbossv40Tools"/>
             </task>
             <task name="DELETE_LAYOUT">
                 <class name="DeleteLayoutTask" type="system"/>
@@ -443,6 +448,7 @@
             </task>
             <task name="CONFIGURE_AGENT_APP">
                 <class name="ConfigureAgentAppTask" type="common"/>
+                <property name="I18N_FILE" value="jbossv40Tools" />
             </task>
         </instance-tasks>
     </custom-install>
