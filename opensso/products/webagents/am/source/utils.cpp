@@ -152,7 +152,7 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
         char separator) {
 
     const char *p1 = patbegin;
-
+    
     if (patbegin == NULL || matchbegin == NULL) {
         return AM_NO_MATCH;
     }
@@ -203,7 +203,7 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
         // and starts comparing from the beginning in the matchbegin string
         const char *s1 = matchbegin;
         int start_position = 0;
-
+    
         // upto the start_position, pattern matching is complete
         while (start_position < (p1 - patbegin)) {
             s1++;
@@ -213,7 +213,7 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
             char *p2 = NULL;
             char *s2 = NULL;
             int count = 0;
-            std::size_t match_position = 0;
+            int match_position = 0;
             int char_match = 0;
             int match_count = 0;
             int query_count = 0;
@@ -228,23 +228,23 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
                 return AM_EXACT_PATTERN_MATCH;
             }
             // Continue with the rest of the pattern
-            string matchbegin(s1);
+            std::string matchbegin_s(s1);
             if (*p1 == '\0') {
                 // if the last character is a "/" , need to ignore the same
-                std::size_t pos = matchbegin.find_last_of("/");
-                if (pos == matchbegin.length() - 1) {
-                    matchbegin.erase(matchbegin.length() - 1);
+                std::size_t pos = matchbegin_s.find_last_of("/");
+                if (pos == matchbegin_s.length() - 1) {
+                    matchbegin_s.erase(matchbegin_s.length() - 1);
                 }
                 // Check whether the pattern has a "?", need to 
                 // exclude "?" from the matchbegin
                 for (std::size_t j = 0, query_index;
-                        (query_index = matchbegin.find('?', j)) != string::npos;
+                        (query_index = matchbegin_s.find('?', j)) != string::npos;
                         j = query_index + 1) {
                     query_count++;
                 }
                 // the pattern is ending with -*-
                 for (std::size_t i = 0, match_index;
-                        (match_index = matchbegin.find('/', i)) != string::npos;
+                        (match_index = matchbegin_s.find('/', i)) != string::npos;
                         i = match_index + 1) {
                     match_count++;
                 }
@@ -254,24 +254,26 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
                     return AM_EXACT_PATTERN_MATCH;
                 }
             }
-            p2 = (char *) malloc(strlen(s1) + 1);
+            size_t s1sz = strlen(s1);
+            p2 = (char *) malloc(s1sz + 1);
             if (p2 != NULL) {
-                memset(p2, '\0', strlen(s1) + 1);
+                memset(p2, '\0', s1sz + 1);
                 // Find either the first pattern or end of the string
                 // p2 will have a substring which is in between the patterns
-                // if it exists or till the p1 is null
-                while ((*p1 != '-') && (*p1 != '*') && (*p1 != '\0')) {
+                // if it exists or till the p1 is null or we are running out of space
+                // (matchbegin is shorter than actual pattern)
+                while ((*p1 != '-') && (*p1 != '*') && (*p1 != '\0') && (count < s1sz)) {
                     p2[count++] = *p1++;
                     char_match++;
                 }
 
                 std::string patternbegin(p2);
-                s2 = (char *) malloc(strlen(s1) + 1);
+                s2 = (char *) malloc(s1sz + 1);
                 if (s2 != NULL) {
-                    memset(s2, '\0', strlen(s1) + 1);
+                    memset(s2, '\0', s1sz + 1);
                     // Try to find the substring in the matchbegin, get the
                     // match position (position where the substring begins)
-                    match_position = matchbegin.find(patternbegin, 0);
+                    match_position = matchbegin_s.find(patternbegin, 0);
                     if (match_position > 0) {
                         // Substring exists, now starting from the index 0 
                         // upto the match_position, collect the characters
