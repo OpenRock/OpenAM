@@ -86,6 +86,7 @@ typedef struct {
     unsigned long ping_interval;
     unsigned long ping_ok_count;
     unsigned long ping_fail_count;
+    int instance_id;
     int default_set_size;
     int *default_set;
     int url_size;
@@ -165,6 +166,8 @@ AM_EXPORT const char *am_status_to_string(am_status_t status);
  *   Name of the status code as a const char *.
  */
 AM_EXPORT const char *am_status_to_name(am_status_t status);
+
+AM_EXPORT int am_instance_id(const char *);
 
 AM_END_EXTERN_C
 

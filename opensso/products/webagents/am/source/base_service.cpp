@@ -43,7 +43,7 @@
 #include <cstring>
 
 #define AM_NAMING_LOCK ".am_naming_lock"
-extern "C" char *read_naming_value(const char *key);
+extern "C" char *read_naming_value(const char *key, int iid);
 extern "C" unsigned long am_web_naming_validation_status();
 
 USING_PRIVATE_NAMESPACE
@@ -244,7 +244,7 @@ BaseService::doRequest(const ServiceInfo& service,
         int j = -1, current_index = -1;
         if (am_web_naming_validation_status() < 2 && svc.getNumberOfServers() > 1) {
             /* validation is enabled and number of servers is more than one */
-            char *current_value = read_naming_value(AM_NAMING_LOCK);
+            char *current_value = read_naming_value(AM_NAMING_LOCK, Log::getLockId());
             if (current_value != NULL) {
                 current_index = strtol(current_value, NULL, 10);
                 if (current_index < 0 || errno == ERANGE) {

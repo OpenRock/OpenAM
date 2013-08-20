@@ -232,9 +232,19 @@ com.sun.identity.agents.config.profilename = @AGENT_PROFILE_NAME@
 #                           For example: for two space separated entries in naming.url property, set
 #                           default.url.set = 0,1 to specify fail-over order and default (first index) entry; 
 #                           Default is not set.
-# 
+# Hot-Swap Enabled: No
+#
 com.forgerock.agents.ext.url.validation.level = 2
 com.forgerock.agents.ext.url.validation.ping.interval = 60
 com.forgerock.agents.ext.url.validation.ping.miss.count = 3
 com.forgerock.agents.ext.url.validation.ping.ok.count = 3
 com.forgerock.agents.ext.url.validation.default.url.set =  
+
+#
+# AGENT INSTANCE ID
+#   Agent unique identifying number to distinguish it from any other 
+#   agent instance running on the same host. Default (not set) value is 0.
+#
+# Hot-Swap Enabled: No
+#
+com.forgerock.agents.instance.id =

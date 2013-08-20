@@ -322,7 +322,10 @@ public:
     static am_status_t 
 	setDebugFileSize(const long DebugFileSize); 
     static am_status_t 
-	setDebugFileRotate(bool debugFileRotate); 
+	setDebugFileRotate(bool debugFileRotate);
+    
+    static void setLockId(int);
+    static int getLockId();
 
 private:
     struct Module {
@@ -358,6 +361,9 @@ private:
     static void writeLog(const char *hdr, const char *logMsg);
     static void writeAuditLog(const char *hdr, const char *logMsg);
 
+    static int lockInstanceId;
+    static char lock[32];
+    static char alock[32];
 #ifndef _MSC_VER
     static ino_t logInode;
     static sem_t *logRtLock;

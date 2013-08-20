@@ -119,7 +119,12 @@ typedef struct {
     apr_global_mutex_t *notification_lock;
     apr_shm_t *pdp_cache;
     apr_global_mutex_t *pdp_lock;
+    int instance_id;
 } agent_server_config;
+
+static char *get_lock_name(apr_pool_t *p, char *name, int id) {
+    return apr_psprintf(p, "%s_%d", name, id);
+}
 
 static int get_global_lock(apr_global_mutex_t * mutex) {
     apr_status_t rs;
@@ -380,6 +385,8 @@ static const command_rec dsame_auth_cmds[] = {
     "Full path of the Agent bootstrap file"),
     AP_INIT_TAKE1("Agent_Max_PID_Count", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, max_pid_count), RSRC_CONF,
     "Agent notification module max pid count"),
+    AP_INIT_TAKE1("Agent_Instance_Id", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, instance_id), RSRC_CONF,
+    "Agent Instance Id"),
     AP_INIT_TAKE1("Agent_Max_PDP_Count", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, max_pdp_count), RSRC_CONF,
     "Agent PDP module max active cache entry count"), {
         NULL
@@ -442,6 +449,7 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
             NULL);
     ((agent_server_config *) cfg)->max_pid_count = 256;
     ((agent_server_config *) cfg)->max_pdp_count = 256;
+    ((agent_server_config *) cfg)->instance_id = 0;
     return (void *) cfg;
 }
 
@@ -506,10 +514,13 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     /* If the shared memory/lock file already exists then delete it.  Otherwise we are
      * going to run into problems creating the shared memory.
      */
-    if (scfg->notification_lockfile)
-        apr_file_remove(scfg->notification_lockfile, pconf);
-    if (scfg->postdata_lockfile)
-        apr_file_remove(scfg->postdata_lockfile, pconf);
+    char *nlock = get_lock_name(pconf, scfg->notification_lockfile, scfg->instance_id);
+    char *plock = get_lock_name(pconf, scfg->postdata_lockfile, scfg->instance_id);
+    
+    if (nlock)
+        apr_file_remove(nlock, pconf);
+    if (plock)
+        apr_file_remove(plock, pconf);
 
     status = am_web_init(scfg->bootstrap_file, scfg->properties_file);
 
@@ -526,11 +537,11 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             ret = HTTP_BAD_REQUEST;
         }
 
-        rv = apr_global_mutex_create(&(scfg->notification_lock), scfg->notification_lockfile, APR_LOCK_DEFAULT, pconf);
+        rv = apr_global_mutex_create(&(scfg->notification_lock), nlock, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "Web Policy Agent notification global mutex file '%s'",
-                    scfg->notification_lockfile);
+                    nlock);
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -543,11 +554,11 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 #endif 
-        rv = apr_global_mutex_create(&(scfg->pdp_lock), scfg->postdata_lockfile, APR_LOCK_DEFAULT, pconf);
+        rv = apr_global_mutex_create(&(scfg->pdp_lock), plock, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "Web Policy Agent postdata global mutex file '%s'",
-                    scfg->postdata_lockfile);
+                    plock);
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -617,19 +628,22 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     /*register callback - clean up apr pool and release shared memory, shut down amsdk backend*/
     apr_pool_cleanup_register(pool_ptr, server_ptr, cleanup_dsame, apr_pool_cleanup_null);
 
-    rv = apr_global_mutex_child_init(&(scfg->notification_lock), scfg->notification_lockfile, pool_ptr);
+    char *nlock = get_lock_name(pool_ptr, scfg->notification_lockfile, scfg->instance_id);
+    char *plock = get_lock_name(pool_ptr, scfg->postdata_lockfile, scfg->instance_id);
+    
+    rv = apr_global_mutex_child_init(&(scfg->notification_lock), nlock, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
                 "Web Policy Agent notification global mutex file '%s'",
-                scfg->notification_lockfile);
+                nlock);
         return;
     }
 
-    rv = apr_global_mutex_child_init(&(scfg->pdp_lock), scfg->postdata_lockfile, pool_ptr);
+    rv = apr_global_mutex_child_init(&(scfg->pdp_lock), plock, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
                 "Web Policy Agent postdata global mutex file '%s'",
-                scfg->postdata_lockfile);
+                plock);
         return;
     }
 

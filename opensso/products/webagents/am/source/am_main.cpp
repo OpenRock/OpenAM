@@ -374,6 +374,24 @@ const char *am_status_to_name(am_status_t status)
     return name;
 }
 
+extern "C" int am_instance_id(const char *agent_bootstrap_file) {
+    int id = 0;
+#define INSTANCE_ID_KEY "com.forgerock.agents.instance.id"
+    FILE *file = fopen(agent_bootstrap_file, "rt");
+    if (file != NULL) {
+        char line[64], key[64];
+        while (fgets(line, sizeof (line), file) != NULL) {
+            if (line[0] != '#' && memcmp(line, INSTANCE_ID_KEY, 32) == 0) {
+                if (sscanf(line, "%[^=] = %d[^abcdefghijklmnopqrstuwzABCDEFGHIJKLMNOPQRSTUWZ]", key, &id) == 2) {
+                    break;
+                }
+            }
+        }
+        fclose(file);
+    }
+    return id;
+}
+
 extern am_status_t
 am_policy_handle_notification(am_policy_t hdl, const std::string& data);
 extern am_status_t

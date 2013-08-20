@@ -98,14 +98,14 @@ THREAD wthr;
 MUTEX mutex;
 naming_status_t* nlist = NULL;
 
-void write_naming_value(const char *key, const char *value);
-char *read_naming_value(const char *key);
+void write_naming_value(const char *key, const char *value, int iid);
+char *read_naming_value(const char *key, int iid);
 
-static void store_index_value(int ix, int *map) {
+static void store_index_value(int ix, int *map, int iid) {
     char idx[8];
     int i = map[ix];
     snprintf(idx, sizeof (idx), "%d", i);
-    write_naming_value(AM_NAMING_LOCK, idx);
+    write_naming_value(AM_NAMING_LOCK, idx, iid);
 }
 
 static void *url_watchdog(void *arg) {
@@ -120,12 +120,12 @@ static void *url_watchdog(void *arg) {
         }
         first_run = 0;
         /* fetch current index value */
-        current_value = read_naming_value(AM_NAMING_LOCK);
+        current_value = read_naming_value(AM_NAMING_LOCK, v->instance_id);
         if (current_value != NULL) {
             current_index = strtol(current_value, NULL, 10);
             if (current_index < 0 || current_index > nlist->size || errno == ERANGE) {
                 v->log("naming_validator(): invalid current index value, defaulting to %s", v->url_list[0]);
-                store_index_value(0, v->default_set);
+                store_index_value(0, v->default_set, v->instance_id);
                 current_index = 0;
             } else {
                 /* map stored index to our ordered list index */
@@ -139,7 +139,7 @@ static void *url_watchdog(void *arg) {
             free(current_value);
         } else {
             v->log("naming_validator(): failed to read current index value, defaulting to %s", v->url_list[0]);
-            store_index_value(0, v->default_set);
+            store_index_value(0, v->default_set, v->instance_id);
         }
         /* check if current index value is valid; double check whether default has 
          * become valid again (ping.ok.count) and fail-back to it if so */
@@ -150,7 +150,7 @@ static void *url_watchdog(void *arg) {
         MUTEX_UNLOCK(mutex);
         if (current_ok > 0) {
             if (current_index > 0 && default_ok >= v->ping_ok_count) {
-                store_index_value(0, v->default_set);
+                store_index_value(0, v->default_set, v->instance_id);
                 v->log("naming_validator(): fail-back to %s", v->url_list[0]);
             } else {
                 v->log("naming_validator(): continue with %s", v->url_list[current_index]);
@@ -175,15 +175,15 @@ static void *url_watchdog(void *arg) {
         MUTEX_UNLOCK(mutex);
         if (next_ok == 0) {
             v->log("naming_validator(): none of the values are valid, defaulting to %s", v->url_list[0]);
-            store_index_value(0, v->default_set);
+            store_index_value(0, v->default_set, v->instance_id);
             continue;
         }
         if (current_index > 0 && default_ok >= v->ping_ok_count) {
             v->log("naming_validator(): fail-back to %s", v->url_list[0]);
-            store_index_value(0, v->default_set);
+            store_index_value(0, v->default_set, v->instance_id);
         } else {
             v->log("naming_validator(): fail-over to %s", v->url_list[i]);
-            store_index_value(i, v->default_set);
+            store_index_value(i, v->default_set, v->instance_id);
         }
     }
     return 0;
@@ -378,7 +378,7 @@ void *naming_validator(void *arg) {
     return 0;
 }
 
-char *read_naming_value(const char *key) {
+char *read_naming_value(const char *key, int iid) {
     char *ret = NULL, fn[1024];
 #ifdef _MSC_VER
 
@@ -391,8 +391,9 @@ char *read_naming_value(const char *key) {
     DWORD dwErr = 0, br, fs, fsh;
     OVERLAPPED rs;
     /* Windows 2003 and IIS6 need read/write access permission for IUSR_ account to c:/windows/temp/ folder */
-    GetTempPath(sizeof (fn), fn);
-    strcat(fn, key);
+    char tfn[1024];
+    GetTempPath(sizeof (tfn), tfn);
+    snprintf(fn, sizeof (fn), "%s%s_%d", tfn, key, iid);
     do {
         fd = CreateFileA(fn, GENERIC_READ, 0, NULL,
                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -436,7 +437,7 @@ char *read_naming_value(const char *key) {
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
-    sprintf(fn, "/tmp/%s", key);
+    snprintf(fn, sizeof (fn), "/tmp/%s_%d", key, iid);
     if ((fd = open(fn, O_RDONLY)) != -1) {
         if (fcntl(fd, F_SETLKW, &fl) != -1) {
             fs = lseek(fd, (off_t) 0, SEEK_END);
@@ -457,14 +458,15 @@ char *read_naming_value(const char *key) {
     return ret;
 }
 
-void write_naming_value(const char *key, const char *value) {
+void write_naming_value(const char *key, const char *value, int iid) {
     char fn[1024];
 #ifdef _MSC_VER
     HANDLE fd;
     DWORD br, fs, fsh;
     OVERLAPPED rs;
-    GetTempPath(sizeof (fn), fn);
-    strcat(fn, key);
+    char tfn[1024];
+    GetTempPath(sizeof (tfn), tfn);
+    snprintf(fn, sizeof (fn), "%s%s_%d", tfn, key, iid);
     if ((fd = CreateFileA(fn, GENERIC_WRITE, FILE_SHARE_READ, NULL,
             CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) != INVALID_HANDLE_VALUE) {
         if (GetLastError() == ERROR_ALREADY_EXISTS) SetLastError(0);
@@ -491,7 +493,7 @@ void write_naming_value(const char *key, const char *value) {
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
-    sprintf(fn, "/tmp/%s", key);
+    snprintf(fn, sizeof (fn), "/tmp/%s_%d", key, iid);
     if ((fd = open(fn, O_WRONLY | O_CREAT | O_TRUNC, 0644)) != -1) {
         if (fcntl(fd, F_SETLKW, &fl) != -1) {
             lseek(fd, (off_t) 0, SEEK_SET);

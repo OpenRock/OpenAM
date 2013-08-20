@@ -987,6 +987,8 @@ am_web_init(const char *agent_bootstrap_file,
     if (!initialized) {
         // initialize log here so any error before properties file is
         // loaded will go to stderr. After it's loaded will go to log file.
+        int iid = am_instance_id(agent_bootstrap_file);
+        Log::setLockId(iid);
         status = Log::initialize();
         if (AM_SUCCESS == status) {
             try {
@@ -1043,6 +1045,7 @@ am_web_init(const char *agent_bootstrap_file,
                 nvld->ping_fail_count = boot_info.ping_fail_count;
                 nvld->default_set = parse_default_url_set(boot_info.default_url_set,
                         nvld->url_size, &nvld->default_set_size);
+                nvld->instance_id = iid;
                                 
                 if (boot_info.naming_url_list.size > 0) {
                     nvld->url_list = (char **) malloc(boot_info.naming_url_list.size * sizeof (char *));
@@ -1076,17 +1079,17 @@ am_web_init(const char *agent_bootstrap_file,
                         }
                     }
                 }
-                am_web_log_debug("naming_validator(): waiting for Naming Validator to start up...");
+                am_web_log_debug("naming_validator(%d): waiting for Naming Validator to start up...", iid);
 #ifdef _MSC_VER
                 nv_thr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) naming_validator, nvld, 0, NULL);
                 
                 SleepEx((nvld->ping_interval + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
 #else
-                sprintf(fn, "/tmp/%s", AM_NAMING_LOCK);
+                sprintf(fn, "/tmp/%s_%d", AM_NAMING_LOCK, iid);
                 unlink(fn);
                 pthread_create(&nv_thr, NULL, naming_validator, nvld);
 #endif
-                am_web_log_debug("naming_validator(): Naming Validator started.");
+                am_web_log_debug("naming_validator(%d): Naming Validator started.", iid);
             }
         }
     }

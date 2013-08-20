@@ -593,16 +593,10 @@ Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLe
                 http_close();
             } else {
                 if (FD_ISSET(sock, &fds)) {
-                    int ret = 0;
-                    size_t rlen = sizeof (ret);
-                    if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &ret, (socklen_t *) & rlen) == 0) {
-                        if (ret == 0) {
-                            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d", host, port);
-                        } else {
-                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() getsockopt error %d", ret);
-                            net_error(ret);
-                            http_close();
-                        }
+                    int ret;
+                    socklen_t rlen = sizeof (ret);
+                    if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &ret, &rlen) == 0) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d", host, port);
                     } else {
                         Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() getsockopt error %d", errno);
                         net_error(errno);

@@ -110,7 +110,7 @@ static void rotate_log(HANDLE file, const char *fn, size_t ms) {
 
 USING_PRIVATE_NAMESPACE
 
-        const Log::ModuleId Log::ALL_MODULES = 0;
+const Log::ModuleId Log::ALL_MODULES = 0;
 const Log::ModuleId Log::REMOTE_MODULE = Log::ALL_MODULES + 1;
 Mutex *Log::lockPtr = new Mutex();
 Mutex *Log::rmtLockPtr = new Mutex();
@@ -143,6 +143,9 @@ HANDLE Log::alogRtLock = NULL;
 
 Log::ModuleId Log::allModule, Log::remoteModule;
 am_log_logger_func_t Log::loggerFunc = NULL;
+char Log::lock[32];
+char Log::alock[32];
+int Log::lockInstanceId = 0;
 
 #define getLevelString(x) \
 (x == Log::LOG_AUTH_REMOTE)?sizeof(levelLabels) - 2:(x == Log::LOG_AUTH_LOCAL)?sizeof(levelLabels) - 1:static_cast<std::size_t>(x)
@@ -163,6 +166,16 @@ namespace {
     const size_t numLabels = sizeof (levelLabels) / sizeof (levelLabels[0]);
 
     static LogService* rmtLogSvc = NULL;
+}
+
+void Log::setLockId(int id) {
+    snprintf(lock, sizeof (lock), "%s_%d", LOG_LOCK, id);
+    snprintf(alock, sizeof (alock), "%s_%d", ALOG_LOCK, id);
+    lockInstanceId = id;
+}
+
+int Log::getLockId() {
+    return lockInstanceId;
 }
 
 inline Log::Module::Module(const std::string& modName)
@@ -189,10 +202,10 @@ throw () {
                     static_cast<Level> (LOG_AUTH_REMOTE | LOG_AUTH_LOCAL);
 
 #ifndef _MSC_VER
-            LOG_LOCK_DESTROY(LOG_LOCK);
-            logRtLock = sem_open(LOG_LOCK, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP, 1);
-            LOG_LOCK_DESTROY(ALOG_LOCK);
-            alogRtLock = sem_open(ALOG_LOCK, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP, 1);
+            LOG_LOCK_DESTROY(lock);
+            logRtLock = sem_open(lock, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP, 1);
+            LOG_LOCK_DESTROY(alock);
+            alogRtLock = sem_open(alock, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP, 1);
             if (logRtLock != SEM_FAILED && alogRtLock != SEM_FAILED) {
                 initialized = true;
                 status = AM_SUCCESS;
@@ -201,17 +214,17 @@ throw () {
                 moduleList = NULL;
                 initialized = false;
                 status = AM_FAILURE;
-                LOG_LOCK_DESTROY(LOG_LOCK);
-                LOG_LOCK_DESTROY(ALOG_LOCK);
+                LOG_LOCK_DESTROY(lock);
+                LOG_LOCK_DESTROY(alock);
             }
 #else
-            logRtLock = CreateMutexA(NULL, FALSE, LOG_LOCK);
+            logRtLock = CreateMutexA(NULL, FALSE, lock);
             if (logRtLock == NULL && GetLastError() == ERROR_ACCESS_DENIED) {
-                logRtLock = OpenMutexA(SYNCHRONIZE, FALSE, LOG_LOCK);
+                logRtLock = OpenMutexA(SYNCHRONIZE, FALSE, lock);
             }
-            alogRtLock = CreateMutexA(NULL, FALSE, ALOG_LOCK);
+            alogRtLock = CreateMutexA(NULL, FALSE, alock);
             if (alogRtLock == NULL && GetLastError() == ERROR_ACCESS_DENIED) {
-                alogRtLock = OpenMutexA(SYNCHRONIZE, FALSE, ALOG_LOCK);
+                alogRtLock = OpenMutexA(SYNCHRONIZE, FALSE, alock);
             }
             if (logRtLock != NULL && alogRtLock != NULL) {
                 initialized = true;
@@ -382,8 +395,8 @@ throw () {
             std::fclose(auditLogFile);
             auditLogFile = NULL;
         }
-        LOG_LOCK_DESTROY(LOG_LOCK);
-        LOG_LOCK_DESTROY(ALOG_LOCK);
+        LOG_LOCK_DESTROY(lock);
+        LOG_LOCK_DESTROY(alock);
 #else
         if (logFile != INVALID_HANDLE_VALUE) {
             CloseHandle(logFile);
