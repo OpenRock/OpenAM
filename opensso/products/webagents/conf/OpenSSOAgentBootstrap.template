@@ -140,7 +140,8 @@ com.sun.identity.agents.config.debug.level =
 #
 #   - com.forgerock.agents.config.cert.key: PEM encoded private key (used only in certificate based mutual authentication);
 #         Microsoft Windows users need to enter private key alias name here as imported by Windows Certificate Manager.
-#   - com.forgerock.agents.config.cert.key.password: private key password (not used on Microsoft Windows platform)
+#   - com.forgerock.agents.config.cert.key.password: encrypted private key password (not used on Microsoft Windows platform);
+#         use crypt_util to encrypt password with encryption key stored in com.sun.identity.agents.config.key property.
 #   - com.forgerock.agents.config.cert.file: PEM encoded client certificate (not used on Microsoft Windows platform)
 #   - com.forgerock.agents.config.cert.ca.file: a list of PEM encoded CA certificates (not used on Microsoft Windows platform)
 #   - com.forgerock.agents.config.ciphers: cipher list according to http://www.openssl.org/docs/apps/ciphers.html (not used on Microsoft Windows platform)

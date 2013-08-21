@@ -66,9 +66,9 @@ USING_PRIVATE_NAMESPACE
 #define SSL_ERROR_WANT_WRITE            3
 #define SSL_OP_NO_SSLv2                 0x01000000L
 #define	MAX_RETRY_COUNT                 5
-#define SOCKET_IO_WAIT_TIME                            300000 //microseconds
+#define SOCKET_IO_WAIT_TIME             300000 //microseconds
 
-        static pthread_mutex_t *ssl_mutexes = NULL;
+static pthread_mutex_t *ssl_mutexes = NULL;
 static void *crypto_lib_h = NULL;
 static void *ssl_lib_h = NULL;
 
@@ -109,6 +109,8 @@ static struct ssl_func ssl_sw[] = {
     {"SSL_CTX_use_PrivateKey_file", NULL},
     {"SSL_set_client_CA_list", NULL},
     {"SSL_CTX_use_certificate_chain_file", NULL},
+    {"SSL_CTX_set_default_passwd_cb", NULL},
+    {"SSL_CTX_set_default_passwd_cb_userdata", NULL},
     {NULL, NULL}
 };
 
@@ -144,6 +146,7 @@ typedef struct stack_st STACK;
 #define STACK_OF(type) STACK
 typedef struct evp_pkey_st EVP_PKEY;
 typedef struct X509_name_st X509_NAME;
+typedef int pem_password_cb(char *buf, int size, int rwflag, void *userdata);
 
 #define SSL_library_init (* (int (*)(void)) ssl_sw[0].ptr)
 #define SSL_CTX_new (* (SSL_CTX * (*)(SSL_METHOD *)) ssl_sw[1].ptr)
@@ -176,6 +179,8 @@ typedef struct X509_name_st X509_NAME;
 #define SSL_CTX_use_PrivateKey_file (* (int (*)(SSL_CTX *, const char *, int)) ssl_sw[28].ptr)
 #define SSL_set_client_CA_list (* (void (*)(SSL *, STACK_OF(X509_NAME) *)) ssl_sw[29].ptr)
 #define SSL_CTX_use_certificate_chain_file (* (int (*)(SSL_CTX *, const char *)) ssl_sw[30].ptr)
+#define SSL_CTX_set_default_passwd_cb (* (void (*)(SSL_CTX *, pem_password_cb *)) ssl_sw[31].ptr)
+#define SSL_CTX_set_default_passwd_cb_userdata (* (void (*)(SSL_CTX *, void *)) ssl_sw[32].ptr)
 
 #define CRYPTO_num_locks (* (int (*)(void)) crypto_sw[0].ptr)
 #define CRYPTO_set_locking_callback \
@@ -204,6 +209,12 @@ struct _tls {
     SSL *sslh;
     SSL_CTX *sslc;
 };
+
+static int password_cb(char *buf, int size, int rwflag, void *passwd) {
+    strncpy(buf, (char *) passwd, size);
+    buf[size - 1] = '\0';
+    return (int) (strlen(buf));
+}
 
 extern "C" void ssl_locking_callback(int mode, int mutex_num, const char *file, int line) {
     if (mode & 1) {
@@ -374,7 +385,8 @@ tls_t * tls_initialize(int sock, int verifycert, const char *keyfile, const char
 
         ssl->sslc = SSL_CTX_new && SSLv23_client_method && SSL_new && SSL_set_fd
                 && SSL_get_fd && SSL_connect && SSL_CTX_set_cipher_list && SSL_CTX_set_verify
-                && SSL_CTX_load_verify_locations && SSL_CTX_use_certificate_file && SSL_CTX_use_PrivateKey_file ?
+                && SSL_CTX_load_verify_locations && SSL_CTX_use_certificate_file && SSL_CTX_use_PrivateKey_file
+                && SSL_CTX_set_default_passwd_cb && SSL_CTX_set_default_passwd_cb_userdata ?
                 SSL_CTX_new(SSLv23_client_method()) : NULL;
         if (ssl->sslc == NULL) {
             Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
@@ -410,6 +422,10 @@ tls_t * tls_initialize(int sock, int verifycert, const char *keyfile, const char
         }
 
         if (keyfile) {
+            if (keypass != NULL) {
+                SSL_CTX_set_default_passwd_cb_userdata(ssl->sslc, (void *) keypass);
+                SSL_CTX_set_default_passwd_cb(ssl->sslc, password_cb);
+            }
             if (!SSL_CTX_use_PrivateKey_file(ssl->sslc, keyfile, 1)) {
                 Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
                         "Connection::Connection() SSL failed to load private key file \"%s\"", keyfile);
