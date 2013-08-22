@@ -471,6 +471,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     apr_size_t shm_size, pd_shm_size;
     void *data; /* These two help ensure that we only init once. */
     const char *data_key = "init_dsame";
+    char *nlock = NULL, *plock = NULL;
     agent_server_config *scfg;
     am_notification_list_item_t *notification_list;
     am_post_data_list_item_t *post_data_list;
@@ -514,8 +515,8 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     /* If the shared memory/lock file already exists then delete it.  Otherwise we are
      * going to run into problems creating the shared memory.
      */
-    char *nlock = get_lock_name(pconf, scfg->notification_lockfile, scfg->instance_id);
-    char *plock = get_lock_name(pconf, scfg->postdata_lockfile, scfg->instance_id);
+    nlock = get_lock_name(pconf, scfg->notification_lockfile, scfg->instance_id);
+    plock = get_lock_name(pconf, scfg->postdata_lockfile, scfg->instance_id);
     
     if (nlock)
         apr_file_remove(nlock, pconf);
@@ -621,6 +622,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
  */
 static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     apr_status_t rv;
+    char *nlock = NULL, *plock = NULL;
     agent_server_config *scfg = ap_get_module_config(server_ptr->module_config, &dsame_module);
 
     /*register callback - shut down notification listener thread before apr pool cleanup*/
@@ -628,8 +630,8 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     /*register callback - clean up apr pool and release shared memory, shut down amsdk backend*/
     apr_pool_cleanup_register(pool_ptr, server_ptr, cleanup_dsame, apr_pool_cleanup_null);
 
-    char *nlock = get_lock_name(pool_ptr, scfg->notification_lockfile, scfg->instance_id);
-    char *plock = get_lock_name(pool_ptr, scfg->postdata_lockfile, scfg->instance_id);
+    nlock = get_lock_name(pool_ptr, scfg->notification_lockfile, scfg->instance_id);
+    plock = get_lock_name(pool_ptr, scfg->postdata_lockfile, scfg->instance_id);
     
     rv = apr_global_mutex_child_init(&(scfg->notification_lock), nlock, pool_ptr);
     if (rv != APR_SUCCESS) {
