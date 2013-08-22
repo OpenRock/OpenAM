@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2012 ForgeRock Inc. All Rights Reserved
+    Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -34,6 +34,6 @@
     <resources>
         <resource>src/main/resources/amAuthMyModule.properties</resource>
         <resource>src/main/resources/amAuthMyModule.xml</resource>
-        <resource>src/main/resources/MyModule.xml</resource>
+        <resource>src/main/resources/config/auth/default/MyModule.xml</resource>
     </resources>
 </archetype>

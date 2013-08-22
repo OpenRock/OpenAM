@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,6 +26,7 @@ package ${packageName};
 
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
@@ -40,12 +41,11 @@ import javax.security.auth.login.LoginException;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class MyModule extends AMLoginModule {
 
-    public static final String MODULE_NAME = "MyModule";
-    public static final String BUNDLE_NAME = "amAuthMyModule";
+    private static final String MODULE_NAME = "MyModule";
+    private static final String BUNDLE_NAME = "amAuthMyModule";
     private static final String AUTHLEVEL = "sunAMAuthMyModuleAuthLevel";
-    private static Debug debug = Debug.getInstance(MODULE_NAME);
+    private static final Debug DEBUG = Debug.getInstance(MODULE_NAME);
     private String authenticatedUser = null;
-    private String password = null;
     private String userName = null;
     private Map currentConfig = null;
     private Map sharedState = null;
@@ -54,7 +54,7 @@ public class MyModule extends AMLoginModule {
      * Constructor
      */
     public MyModule() {
-        debug.message("In MyModule.MyModule()");
+        DEBUG.message("In MyModule.MyModule()");
     }
 
     /**
@@ -62,7 +62,7 @@ public class MyModule extends AMLoginModule {
      */
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
-        debug.message("In MyModule.init()");
+        DEBUG.message("In MyModule.init()");
         this.sharedState = sharedState;
         currentConfig = options;
 
@@ -73,7 +73,7 @@ public class MyModule extends AMLoginModule {
             try {
                 setAuthLevel(Integer.parseInt(authLevel));
             } catch (Exception e) {
-                debug.error("Unable to set auth level " + authLevel, e);
+                DEBUG.error("Unable to set auth level " + authLevel, e);
             }
         }
     }
@@ -88,14 +88,27 @@ public class MyModule extends AMLoginModule {
                 NameCallback nc = (NameCallback) callbacks[0];
                 userName = nc.getName();
                 PasswordCallback pwc = (PasswordCallback) callbacks[1];
-                password = new String(pwc.getPassword());
-                //Authentication logic goes here
-                authenticatedUser = userName;
+                char[] password = pwc.getPassword();
+                //store username password both in success and failure case
+                storeUsernamePasswd(userName, new String(password));
+
+                if (credentialsValid(userName, password)) {
+                    authenticatedUser = userName;
+                } else {
+                    //In case of password failure ALWAYS throw InvalidPasswordException, so account lockout is aware of
+                    //the authentication failure, and increments the failure count.
+                    throw new InvalidPasswordException("Incorrect username/password", authenticatedUser);
+                }
             }
             return ISAuthConstants.LOGIN_SUCCEED;
         }
-        debug.error("Error in MyModule.process()");
+        DEBUG.error("Error in MyModule.process()");
         throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+    }
+
+    private boolean credentialsValid(String userName, char[] password) {
+        //magic goes here
+        return true;
     }
 
     /**
@@ -125,6 +138,5 @@ public class MyModule extends AMLoginModule {
         currentConfig = null;
         sharedState = null;
         userName = null;
-        password = null;
     }
 }

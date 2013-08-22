@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2012 ForgeRock Inc. All Rights Reserved
+    Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -28,9 +28,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>mavenquickstart</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+    <version>10.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>OpenAM - Auth-module quickstart</name>
+    <name>OpenAM Authentication Module Archetype</name>
     
     <description>
         This is a QuickStart Project for OpenAM authentication modules and Post
@@ -41,13 +41,4 @@
         <name>ForgeRock</name>
         <url>http://www.forgerock.com</url>
     </organization>
-
-    <developers>
-        <developer>
-            <id>aldaris</id>
-            <email>majorpetya@sch.bme.hu</email>
-            <name>Peter Major</name>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
 </project>
