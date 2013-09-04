@@ -33,7 +33,7 @@
     <packaging>pom</packaging>
     <properties>
         <jee-agents.properties>jee-agents.properties</jee-agents.properties>
-        <openam.version>10.2.0-SNAPSHOT</openam.version>
+        <openam.version>11.0.0-SNAPSHOT</openam.version>
     </properties>
     <modules>
         <!-- OpenAM JavaEE Policy Agent Modules -->
