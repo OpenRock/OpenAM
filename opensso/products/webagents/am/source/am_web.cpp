@@ -1569,9 +1569,6 @@ buildSetCookieHeader(Utils::cookie_info_t *cookie)
             resetCookieVal.append(value);
         }
         if (NULL != domain && '\0' != domain[0]) {
-            // if domain is an empty string it's better to not
-            // set domain at all since netscape 4.79, IE 5.5
-            // and mozilla < 1.4 ignores those cookie entries.
             resetCookieVal.append(";Domain=");
             resetCookieVal.append(domain);
         }
@@ -1579,6 +1576,13 @@ buildSetCookieHeader(Utils::cookie_info_t *cookie)
             resetCookieVal.append(";Max-Age=");
             resetCookieVal.append(max_age);
             expires = cookie_timestamp(max_age);
+            if (!expires.empty()) {
+                resetCookieVal.append(";Expires=");
+                resetCookieVal.append(expires);
+            }
+        } else if (NULL == value) {
+            resetCookieVal.append(";Max-Age=0");
+            expires = cookie_timestamp("0");
             if (!expires.empty()) {
                 resetCookieVal.append(";Expires=");
                 resetCookieVal.append(expires);
