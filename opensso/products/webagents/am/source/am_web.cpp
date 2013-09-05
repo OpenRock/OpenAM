@@ -505,10 +505,6 @@ static void freeUrlInfo(Utils::url_info_t *ur) {
             free((void*) ur->host);
             ur->host = NULL;
         }
-        if (ur->protocol != NULL) {
-            free((void*) ur->protocol);
-            ur->protocol = NULL;
-        }
     }
     if (ur) free(ur);
     ur = URL_INFO_PTR_NULL;
