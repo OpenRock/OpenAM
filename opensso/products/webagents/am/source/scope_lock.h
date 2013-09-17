@@ -27,8 +27,11 @@
  *
  * Abstract:
  *
- * Provides class to automate locking and unlocking of PRLock objects.
+ * Provides class to automate locking and unlocking of Mutex objects.
  *
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
  */
 
 #ifndef SCOPE_LOCK_H
@@ -41,26 +44,36 @@ BEGIN_PRIVATE_NAMESPACE
 
 class ScopeLock {
 public:
-    explicit ScopeLock(Mutex& lockArg);
-    ~ScopeLock();
+
+    explicit ScopeLock(Mutex& lockArg, bool lck = true) : mlock(lockArg), locked(false) {
+        if (lck) {
+            lock();
+        }
+    }
+
+    ~ScopeLock() {
+        if (locked) {
+            mlock.unlock();
+        }
+    }
+
+    void lock() {
+        locked = true;
+        mlock.lock();
+    }
+
+    void unlock() {
+        locked = false;
+        mlock.unlock();
+    }
 
 private:
     ScopeLock(const ScopeLock& rhs); // not implemented
-    ScopeLock& operator=(const ScopeLock& rhs);	// not implemented
+    ScopeLock& operator=(const ScopeLock& rhs); // not implemented
 
-    Mutex& lock;
+    Mutex& mlock;
+    bool locked;
 };
-
-inline ScopeLock::ScopeLock(Mutex& lockArg)
-    : lock(lockArg)
-{
-    lock.lock();
-}
-
-inline ScopeLock::~ScopeLock()
-{
-    lock.unlock();
-}
 
 END_PRIVATE_NAMESPACE
 
