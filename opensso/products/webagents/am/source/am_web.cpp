@@ -3441,6 +3441,75 @@ am_web_do_result_attr_map_set(am_policy_result_t *result,
 					  args, agent_config);
 }
 
+extern "C" 
+am_status_t clear_headers_v1(
+        am_status_t (*setFunc)(const char *, const char *, void **),
+        am_status_t (*set_cookie_in_response)(const char *, void **),
+        am_status_t (*set_header_attr_as_cookie)(const char *, void **),
+        void **args, void* agent_config) {
+    const char *thisfunc = "clear_headers_v1()";
+    am_status_t sts = AM_SUCCESS, set_sts = AM_SUCCESS;
+    AgentConfigurationRefCntPtr* agentConfigPtr = (AgentConfigurationRefCntPtr*) agent_config;
+    std::list<std::string>::const_iterator attr_iter;
+    std::list<std::string>::const_iterator attr_end = (*agentConfigPtr)->attrList.end();
+
+    for (attr_iter = (*agentConfigPtr)->attrList.begin(); attr_iter != attr_end; attr_iter++) {
+        const char * header_name = (*attr_iter).c_str();
+        if ((SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserProfileAttrsMode) ||
+                (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserSessionAttrsMode) ||
+                (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserResponseAttrsMode)) {
+            am_web_log_warning("%s: Clearing header name %s.", thisfunc, header_name);
+            set_sts = setFunc(header_name, NULL, args);
+            if (set_sts != AM_SUCCESS) {
+                am_web_log_warning("%s: Error encountered while "
+                        "clearing header name %s.", thisfunc, header_name);
+            }
+        } else if ((SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserProfileAttrsMode) ||
+                (SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserSessionAttrsMode) ||
+                (SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserResponseAttrsMode)) {
+            // for cookie, remove all cookies of the same name
+            // in the cookie header.
+            char *cookie_hdr = NULL;
+            std::string cookie_name((*agentConfigPtr)->attrCookiePrefix);
+            cookie_name.append(*attr_iter);
+            Utils::cookie_info_t cookie_info;
+            cookie_info.name = (char *) cookie_name.c_str();
+            cookie_info.value = NULL;
+            cookie_info.domain = NULL;
+            cookie_info.max_age = (char *) "0";
+            cookie_info.path = const_cast<char*> ("/");
+            cookie_hdr = (char*) buildSetCookieHeader(&cookie_info);
+            // set cookie in request and response.
+            if (set_cookie_in_response != NULL) {
+                set_sts = set_cookie_in_response(cookie_hdr, args);
+                if (set_sts != AM_SUCCESS) {
+                    am_web_log_warning("%s: Error encountered while clearing "
+                            "cookie %s in response header",
+                            thisfunc, header_name);
+                }
+            }
+            if (set_header_attr_as_cookie != NULL) {
+                set_sts = set_header_attr_as_cookie(cookie_hdr, args);
+                if (set_sts != AM_SUCCESS) {
+                    am_web_log_warning("%s: Error encountered while clearing "
+                            "cookie %s in request header",
+                            thisfunc, header_name);
+                }
+            }
+            if (cookie_hdr != NULL) {
+                free(cookie_hdr);
+            }
+
+            am_web_log_debug("%s: clear cookie %s returned %s",
+                    thisfunc, cookie_info.name, am_status_to_name(sts));
+            if (set_sts != AM_SUCCESS && sts == AM_SUCCESS) {
+                sts = set_sts;
+            }
+        }
+    }
+    return sts;
+}
+
 /*
  * This function process attr_profile_map of am_policy_result_t
  * and perform appropriate action that caller (i.e. agent) pass in
@@ -3475,8 +3544,14 @@ am_web_result_attr_map_set(
                 am_web_log_info("%s: No profile or session or response"
                                 " attributes to be set as headers or cookies",
                                 thisfunc);
+        // clear headers/cookies
+        clear_headers_v1(setFunc, set_cookie_in_response, set_header_attr_as_cookie, args, agent_config);
     }
     else {
+        
+        // clear headers/cookies first.
+        clear_headers_v1(setFunc, set_cookie_in_response, set_header_attr_as_cookie, args, agent_config);
+        
         for (int i=0; i<3; i++) {
             attrMap = NULL;         /* clear it,  since the switch does not*/
 	      switch (i) {
@@ -3524,20 +3599,6 @@ am_web_result_attr_map_set(
 
                   Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
                     "%s: User attribute is %s.", thisfunc, keyRef.c_str());
-
-                  // Clear the header
-                  /*std::string hdr_or_cookie_name_s(keyRef.c_str());
-                  const char * hdr_or_cookie_name =
-                                             hdr_or_cookie_name_s.c_str();
-                  if (setFunc != NULL) {
-                     set_sts = setFunc(hdr_or_cookie_name, NULL, args);
-                     if (set_sts != AM_SUCCESS) {
-                         am_web_log_warning("%s: Error %s clearing header %s",
-                                            thisfunc,
-                                            am_status_to_string(set_sts),
-                                            hdr_or_cookie_name);
-                     }
-                   }*/
 
                    const KeyValueMap::mapped_type &valueRef =
                                                       iter_header->second;
@@ -3617,44 +3678,9 @@ am_web_result_attr_map_set(
                     const char * hdr_or_cookie_name =
                                  hdr_or_cookie_name_s.c_str();
 
-                    // Clear that cookie
-                    char *cookie_hdr = NULL;
                     char *cookie_header =  NULL;
-                    Utils::cookie_info_t clear_cookie;
-                    std::string c_name((*agentConfigPtr)->attrCookiePrefix);
                     Utils::cookie_info_t attr_cookie;
                     std::string cookie_name((*agentConfigPtr)->attrCookiePrefix);
-                    c_name.append(hdr_or_cookie_name);
-                    clear_cookie.name = const_cast<char*>(c_name.c_str());
-                    clear_cookie.value = const_cast<char*>("");
-                    clear_cookie.domain = NULL;
-                    clear_cookie.max_age = (char *)"0";
-                    clear_cookie.path = const_cast<char*>("/");
-                    cookie_hdr = (char*)(buildSetCookieHeader(&clear_cookie));
-
-                    if (set_cookie_in_response != NULL) {
-                      set_sts =  set_cookie_in_response(cookie_hdr, args);
-                      if (set_sts != AM_SUCCESS) {
-                         am_web_log_warning("%s: Error %s clearing "
-                                            "cookie %s in response header",
-                                            thisfunc,
-                                            am_status_to_string(set_sts),
-                                            hdr_or_cookie_name);
-                      }
-                    }
-                    if (set_header_attr_as_cookie != NULL) {
-                       set_sts = set_header_attr_as_cookie(cookie_hdr,args);
-                      if (set_sts != AM_SUCCESS) {
-                         am_web_log_warning("%s: Error %s clearing "
-                                            "cookie %s in request headers",
-                                            thisfunc,
-                                            am_status_to_string(set_sts),
-                                            hdr_or_cookie_name);
-                      }
-                    }
-                    if (cookie_hdr != NULL) {
-                       free(cookie_hdr);
-                    }
 
                     // Set the new value to the cookie
                     const KeyValueMap::mapped_type &valueRef =
@@ -5590,6 +5616,61 @@ process_cdsso(
     return sts;
 }
 
+static am_status_t clear_headers(am_web_request_params_t *req_params, am_web_request_func_t *req_func, void* agent_config) {
+    const char *thisfunc = "clear_headers()";
+    am_status_t sts = AM_SUCCESS, set_sts = AM_SUCCESS;
+    AgentConfigurationRefCntPtr* agentConfigPtr = (AgentConfigurationRefCntPtr*) agent_config;
+    char *cookie_header_val = NULL;
+    
+    if (req_params->reserved == NULL) {
+        if (req_params->cookie_header_val != NULL) {
+            cookie_header_val = strdup(req_params->cookie_header_val);
+            req_params->reserved = cookie_header_val;
+        }
+    } else {
+        cookie_header_val = (char *) req_params->reserved;
+    }
+    
+    if (cookie_header_val != NULL) {
+        std::list<std::string>::const_iterator attr_iter;
+        std::list<std::string>::const_iterator attr_end = (*agentConfigPtr)->attrList.end();
+        for (attr_iter = (*agentConfigPtr)->attrList.begin(); attr_iter != attr_end; attr_iter++) {
+            const char * header_name = (*attr_iter).c_str();
+            if ((SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserProfileAttrsMode) ||
+                    (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserSessionAttrsMode) ||
+                    (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserResponseAttrsMode)) {
+                am_web_log_warning("%s: Clearing header name %s.", thisfunc, header_name);
+                set_sts = req_func->set_header_in_request.func(req_func->set_header_in_request.args, header_name, NULL);
+                if (set_sts != AM_SUCCESS) {
+                    am_web_log_warning("%s: Error encountered while "
+                            "clearing header name %s.", thisfunc, header_name);
+                }
+            } else if ((SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserProfileAttrsMode) ||
+                    (SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserSessionAttrsMode) ||
+                    (SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserResponseAttrsMode)) {
+                // for cookie, remove all cookies of the same name
+                // in the cookie header.
+                std::string cookie_name((*agentConfigPtr)->attrCookiePrefix);
+                cookie_name.append(*attr_iter);
+                Utils::cookie_info_t cookie_info;
+                cookie_info.name = (char *) cookie_name.c_str();
+                cookie_info.value = NULL;
+                cookie_info.domain = NULL;
+                cookie_info.max_age = (char *) "0";
+                cookie_info.path = const_cast<char*> ("/");
+                // set cookie in request and response.
+                set_sts = set_cookie_in_request_and_response(&cookie_info, req_params, req_func, false);
+                am_web_log_debug("%s: clear cookie %s returned %s",
+                        thisfunc, cookie_info.name, am_status_to_name(sts));
+                if (set_sts != AM_SUCCESS && sts == AM_SUCCESS) {
+                    sts = set_sts;
+                }
+            }
+        }
+    }
+    return sts;
+}
+
 /*
  * this function does what am_web_result_attr_map_set() does
  * but uses the new function as arguments since am_web_result_attr_map_set
@@ -5634,7 +5715,8 @@ set_user_attributes(am_policy_result_t *result,
              (result->attr_response_map == AM_MAP_NULL)) {
                am_web_log_info("%s: All attributes maps are null. Nothing to set ",
 			       thisfunc);
-               sts = AM_SUCCESS;
+               // clear headers/cookies
+               sts = clear_headers(req_params, req_func, agent_config);
     }
     // if set user LDAP attribute option is headers and set
     // request headers is null, return.
@@ -5663,62 +5745,8 @@ set_user_attributes(am_policy_result_t *result,
     // now go do it.
     else {
       try {
-          // clear headers/cookies first.
-          char *cookie_header_val = NULL;
-          if (req_params->reserved == NULL) {
-             if (req_params->cookie_header_val != NULL) {
-                cookie_header_val = strdup(req_params->cookie_header_val);
-                req_params->reserved = cookie_header_val;
-             }
-         } else {
-             cookie_header_val = (char *)req_params->reserved;
-         }
-         if (cookie_header_val != NULL) {
-            std::list<std::string>::const_iterator attr_iter;
-            std::list<std::string>::const_iterator attr_end = 
-                (*agentConfigPtr)->attrList.end();
-            for(attr_iter = (*agentConfigPtr)->attrList.begin(); attr_iter != attr_end;
-                                              attr_iter++) {
-               const char * header_name = (*attr_iter).c_str();
-               if ((SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserProfileAttrsMode) ||
-                   (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserSessionAttrsMode) ||
-                   (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserResponseAttrsMode)) {
-                        am_web_log_warning("%s: Clearing header name %s.",
-                                              thisfunc, header_name);
-                        set_sts = req_func->set_header_in_request.func(
-                                         req_func->set_header_in_request.args,
-                                         header_name, NULL);
-                        if (set_sts != AM_SUCCESS) {
-                           am_web_log_warning("%s: Error encountered while "
-                                              "clearing header name %s.",
-                                              thisfunc, header_name);
-                        }
-                }
-                else if ((SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserProfileAttrsMode) ||
-                         (SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserSessionAttrsMode) ||
-                         (SET_ATTRS_AS_COOKIE == (*agentConfigPtr)->setUserResponseAttrsMode)) {
-                     // for cookie, remove all cookies of the same name
-                     // in the cookie header.
-                     std::string cookie_name((*agentConfigPtr)->attrCookiePrefix);
-                     cookie_name.append(*attr_iter);
-                     Utils::cookie_info_t cookie_info;
-                     cookie_info.name = (char *)cookie_name.c_str();
-                     cookie_info.value = NULL;
-                     cookie_info.domain = NULL;
-                     cookie_info.max_age = (char *)"0";
-                     cookie_info.path = const_cast<char*>("/");
-                     // set cookie in request and response.
-                     set_sts = set_cookie_in_request_and_response(
-                               &cookie_info, req_params, req_func, false);
-                     am_web_log_debug("%s: clear cookie %s returned %s",
-                                     thisfunc, cookie_info.name,
-                                     am_status_to_name(sts));
-                     if (set_sts != AM_SUCCESS && sts == AM_SUCCESS) {
-                         sts = set_sts;
-                     }
-                 }
-              }
-          }
+        // clear headers/cookies first.
+        sts = clear_headers(req_params, req_func, agent_config);
 
 	// now set the cookie header.
         set_sts = req_func->set_header_in_request.func(

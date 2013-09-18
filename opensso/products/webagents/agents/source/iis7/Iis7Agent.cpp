@@ -1510,12 +1510,7 @@ static am_status_t set_header(const char *key, const char *values, void **args) 
     am_status_t status = AM_SUCCESS;
     CHAR** ptr = NULL;
     CHAR* set_headers_list = NULL;
-
-    if (key != NULL && values != NULL) {
-        std::string skey = key;
-        std::string svalues = values;
-    }
-
+    
     if (key != NULL && args != NULL) {
         int cookie_length = 0;
         char* httpHeaderName = NULL;
@@ -1850,60 +1845,8 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
             }
         }
     }
-
-    //Remove empty values from set_headers_list 
-    //also set these non empty headers in pHttpContext
-    if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
-        tmpAttributeList = (char*) malloc(strlen(set_headers_list) + 1);
-        if (tmpAttributeList != NULL) {
-            memset(tmpAttributeList, 0, strlen(set_headers_list) + 1);
-            strcpy(tmpAttributeList, set_headers_list);
-            memset(set_headers_list, 0, strlen(tmpAttributeList) + 1);
-            iValueStart = 0;
-            iValueEnd = 0;
-            for (i = 0; i < strlen(tmpAttributeList); ++i) {
-                if (tmpAttributeList[i] == ':') {
-                    iValueStart = i + 1;
-                }
-                if ((tmpAttributeList[i] == '\r') &&
-                        (tmpAttributeList[i + 1] == '\n')) {
-                    iHdrStart = iValueEnd;
-                    iValueEnd = i;
-                    isEmptyValue = TRUE;
-                    if ((iValueStart > 0) && (iValueEnd > iValueStart)) {
-                        for (j = iValueStart; j < iValueEnd; j++) {
-                            if (tmpAttributeList[j] != ' ') {
-                                isEmptyValue = FALSE;
-                                break;
-                            }
-                        }
-                    }
-                    if (isEmptyValue == FALSE) {
-                        for (j = iHdrStart; j < iValueEnd; j++) {
-                            if ((tmpAttributeList[j] != '\r') &&
-                                    (tmpAttributeList[j] != '\n')) {
-                                pTemp = tmpAttributeList + j;
-                                strncat(set_headers_list, pTemp, 1);
-                            }
-                        }
-                        strcat(set_headers_list, pszCrlf);
-                    }
-                }
-            }
-        } else {
-            am_web_log_error("%s:Not enough memory to allocate "
-                    "tmpAttributeList.", thisfunc);
-            status = AM_NO_MEMORY;
-        }
-        if (tmpAttributeList != NULL) {
-            free(tmpAttributeList);
-            tmpAttributeList = NULL;
-        }
-    }
-
-
-
-    //set the non-empty headers in pHttpContext
+    
+    //set headers in pHttpContext
     std::string headersList = "";
     if (set_headers_list)
         headersList = set_headers_list;
