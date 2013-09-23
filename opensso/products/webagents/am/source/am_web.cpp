@@ -3003,12 +3003,12 @@ am_web_get_url_to_redirect(am_status_t status,
                     std::string encoded_url;
                     std::string retVal;
                     url_info_ptr = find_active_login_server(goto_url, agent_config);
-                    if (NULL == url_info_ptr) {
+                    if (url_info_ptr == NULL || url_info_ptr->url == NULL) {
                         am_web_log_warning("%s: unable to find active Access "
-                                     "Manager Auth server.", thisfunc);
-                    ret = AM_FAILURE;
+                                "Manager Auth server.", thisfunc);
+                        ret = AM_FAILURE;
                     } else {
-                        retVal.append(url_info_ptr->url, url_info_ptr->url_len);
+                        retVal = url_info_ptr->url;
                         // In CDSSO mode, to have the user redirected to a static page that
                         // in turn will redirect to the resource, the goto parameter
                         // with the static page as value must be added to the cdcservlet 
