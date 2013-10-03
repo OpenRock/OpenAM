@@ -502,14 +502,6 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         return OK;
     }
 
-#if defined(LINUX) 					
-    lib_handle = dlopen("libamapc22.so", RTLD_LAZY);
-    if (!lib_handle) {
-        fprintf(stderr, "Error during dlopen(): %s\n", dlerror());
-        exit(1);
-    }
-#endif
-
     scfg = ap_get_module_config(server_ptr->module_config, &dsame_module);
 
     /* If the shared memory/lock file already exists then delete it.  Otherwise we are
@@ -517,7 +509,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
      */
     nlock = get_lock_name(pconf, scfg->notification_lockfile, scfg->instance_id);
     plock = get_lock_name(pconf, scfg->postdata_lockfile, scfg->instance_id);
-    
+
     if (nlock)
         apr_file_remove(nlock, pconf);
     if (plock)
@@ -538,7 +530,13 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             ret = HTTP_BAD_REQUEST;
         }
 
-        rv = apr_global_mutex_create(&(scfg->notification_lock), nlock, APR_LOCK_DEFAULT, pconf);
+        rv = apr_global_mutex_create(&(scfg->notification_lock), nlock,
+#ifdef _MSC_VER
+                APR_LOCK_DEFAULT
+#else
+                APR_LOCK_POSIXSEM
+#endif
+                , pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "Web Policy Agent notification global mutex file '%s'",
@@ -555,7 +553,13 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 #endif 
-        rv = apr_global_mutex_create(&(scfg->pdp_lock), plock, APR_LOCK_DEFAULT, pconf);
+        rv = apr_global_mutex_create(&(scfg->pdp_lock), plock,
+#ifdef _MSC_VER
+                APR_LOCK_DEFAULT
+#else
+                APR_LOCK_POSIXSEM
+#endif
+                , pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "Web Policy Agent postdata global mutex file '%s'",
@@ -632,7 +636,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
 
     nlock = get_lock_name(pool_ptr, scfg->notification_lockfile, scfg->instance_id);
     plock = get_lock_name(pool_ptr, scfg->postdata_lockfile, scfg->instance_id);
-    
+
     rv = apr_global_mutex_child_init(&(scfg->notification_lock), nlock, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
