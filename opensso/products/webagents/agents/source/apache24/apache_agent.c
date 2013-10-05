@@ -730,7 +730,8 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
 }
 
 /**
- * gets request URL
+ * Get and normalize request URL. Trailing forward slashes are not
+ * recognized as part of a resource name.
  */
 static am_status_t get_request_url(request_rec *r, char **requestURL) {
     const char *thisfunc = "get_request_url()";
@@ -738,8 +739,19 @@ static am_status_t get_request_url(request_rec *r, char **requestURL) {
     *requestURL = ap_construct_url(r->pool, r->unparsed_uri, r);
     if (*requestURL == NULL) {
         status = AM_FAILURE;
+    } else {
+        char *url = *requestURL;
+        am_web_log_debug("%s: request url before normalization: %s", thisfunc, url);
+        /*find the end of url string*/
+        while (url && *url) ++url;
+        for (--url; *requestURL < url; --url) {
+            if (*url == '/') {
+                /*erase (all) trailing slashes*/
+                *url = 0;
+            } else break;
+        }
     }
-    am_web_log_debug("%s: Returning request URL = %s", thisfunc, *requestURL);
+    am_web_log_debug("%s: returning request url: %s", thisfunc, *requestURL);
     return status;
 }
 
