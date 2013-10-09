@@ -1036,7 +1036,7 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     }
     // Check notification URL. request_url is getting passed.
     if (status == AM_SUCCESS) {
-        if (B_TRUE == am_web_is_notification(request_url, agent_config)) {
+        if (B_TRUE == am_web_is_notification(orig_request_url, agent_config)) {
             notifResult = process_new_notification(param, sn, rq, agent_config);
             if(query != NULL) {
                 free(query);
