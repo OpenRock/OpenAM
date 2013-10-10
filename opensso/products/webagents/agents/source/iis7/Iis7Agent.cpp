@@ -1150,12 +1150,11 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
     if (status == AM_SUCCESS) {
         const char* colon_ptr = requestHostHeader != NULL ? strchr(requestHostHeader, ':') : NULL;
         if (colon_ptr != NULL) {
-            requestPort = (PCSTR) pHttpContext->
-                    AllocateRequestMemory((DWORD) (strlen(colon_ptr))
-                    + 1);
+            DWORD sz = (DWORD) strlen(colon_ptr);
+            requestPort = (PCSTR) pHttpContext->AllocateRequestMemory(sz);
             if (requestPort != NULL) {
-                strncpy((char *) requestPort, colon_ptr + 1,
-                        strlen(colon_ptr) - 1);
+                ZeroMemory((void *) requestPort, sz);
+                strncpy((char *) requestPort, colon_ptr + 1, sz - 1);
                 am_web_log_debug("%s: port = %s", thisfunc, requestPort);
             } else {
                 am_web_log_error("%s: Unable to allocate requestPort.",
@@ -1238,55 +1237,42 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
 }
 
 /*
- * Retrives the server variables using GetServerVariable.
- *
- * */
+ * Retrieves server variables using GetServerVariable.
+ */
 am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
-        PCSTR* pVarVal, DWORD* pVarValSize,
-        BOOL isRequired) {
+        PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired) {
     const char* thisfunc = "GetVariable()";
     am_status_t status = AM_SUCCESS;
-    DWORD VarValSize = 0;
+    DWORD dw;
 
-    if (pVarValSize == NULL) {
-        pVarValSize = &VarValSize;
+    if (!varName || !pVarVal) {
+        return AM_INVALID_ARGUMENT;
+    } else {
+        am_web_log_debug("%s: trying to fetch variable %s (%s)", thisfunc, varName,
+                isRequired ? "required" : "optional");
     }
-    if (S_OK == (pHttpContext->GetServerVariable(varName, pVarVal,
-            pVarValSize))) {
-        *pVarVal = (PCSTR) pHttpContext->AllocateRequestMemory((*pVarValSize) + 1);
-        if (*pVarVal == NULL) {
-            am_web_log_error("%s: Could not allocate memory", thisfunc);
-            status = AM_NO_MEMORY;
-        } else {
-            if (S_OK != (pHttpContext->GetServerVariable(varName, pVarVal, pVarValSize))) {
-                am_web_log_error("%s: %s is not a valid server variable.",
-                        thisfunc, varName);
+
+    if (pVarValSize) *pVarValSize = 0;
+
+    if (FAILED(pHttpContext->GetServerVariable(varName, pVarVal, &dw))) {
+        if (GetLastError() == ERROR_INVALID_INDEX) {
+            if (isRequired) {
+                am_web_log_error("%s: Server variable %s is not found in HttpContext.", thisfunc, varName);
                 status = AM_FAILURE;
             } else {
-                if (*pVarVal != NULL && strlen(*pVarVal) > 0) {
-                    am_web_log_debug("%s: %s = %s", thisfunc, varName, *pVarVal);
-                } else {
-                    if (isRequired == TRUE) {
-                        am_web_log_error("%s: Could not get a value for header %s.", thisfunc, varName);
-                        status = AM_FAILURE;
-                    } else {
-                        am_web_log_debug("%s: %s = ", thisfunc, varName);
-                    }
-                    if (*pVarVal != NULL && strlen(*pVarVal) == 0) {
-                        *pVarVal = NULL;
-                    }
-                }
+                am_web_log_debug("%s: Server variable %s is not found in HttpContext.", thisfunc, varName);
             }
         }
     } else {
-        if (isRequired) {
-            am_web_log_error("%s: Server variable %s is not found in "
-                    "HttpContext.", thisfunc, varName);
-            status = AM_FAILURE;
-        } else {
-            am_web_log_debug("%s: Server variable %s not found in HttpContext.", thisfunc, varName);
-        }
+        if (pVarValSize) *pVarValSize = dw;
     }
+    
+    if (status == AM_SUCCESS && isRequired &&
+            (*pVarVal == NULL || (*pVarVal)[0] == '\0')) {
+        am_web_log_error("%s: Server variable %s found in HttpContext is empty.", thisfunc, varName);
+        status = AM_FAILURE;
+    }
+
     return status;
 }
 
@@ -1796,12 +1782,9 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
     size_t http_headers_length = 0;
     CHAR* key = NULL;
     CHAR* pkeyStart = NULL;
-    CHAR* tmpAttributeList = NULL;
     CHAR* pTemp = NULL;
     int i, j;
     int iKeyStart, keyLength;
-    int iValueStart, iValueEnd, iHdrStart;
-    BOOL isEmptyValue = FALSE;
 
     CHAR* set_headers_list = *((CHAR**) args[1]);
     CHAR* set_cookies_list = *((CHAR**) args[2]);
@@ -1811,8 +1794,10 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
     //Get the original headers from the request
     status = GetVariable(pHttpContext, "ALL_RAW", &httpHeaders, &httpHeadersSize, TRUE);
 
-    httpHeadersC = (CHAR*) malloc(strlen(httpHeaders) + 1);
-    strcpy(httpHeadersC, httpHeaders);
+    if (status == AM_SUCCESS) {
+        httpHeadersC = (CHAR*) malloc(strlen(httpHeaders) + 1);
+        strcpy(httpHeadersC, httpHeaders);
+    }
 
     //Remove profile attributes from original request headers, if any,
     //to avoid tampering
@@ -2058,6 +2043,7 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                     //redirect to 403 Forbidden or 500 Internal Server error page.
                     pHttpResponse->Clear();
                     PCSTR pszBuffer;
+                    CHAR* set_cookies_list = *((CHAR**) args[2]);
                     //if status is access denied, send 403.
                     //for every other error, send 500.
                     if (policy_status == AM_ACCESS_DENIED) {
@@ -2075,6 +2061,10 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                                 (USHORT) strlen("25"), TRUE);
                         hr = pHttpResponse->SetHeader("Content-Type", "text/html",
                                 (USHORT) strlen("text/html"), TRUE);
+                    }
+                    if (set_cookies_list != NULL) {
+                        set_headers_in_context(pHttpContext, set_cookies_list,
+                                FALSE);
                     }
                     if (am_web_is_cache_control_enabled(agent_config) == B_TRUE) {
                         pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
