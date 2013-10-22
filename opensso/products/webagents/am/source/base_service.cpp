@@ -48,7 +48,7 @@ extern "C" unsigned long am_web_naming_validation_status();
 
 USING_PRIVATE_NAMESPACE
 
-        namespace {
+namespace {
     // A byte formatted as decimal digits will fit in at most 3 char's.
     const unsigned int DIGITS_PER_BYTE = 3;
     const char CONTENT_LENGTH_HDR[] = "Content-Length: ";
@@ -59,19 +59,14 @@ USING_PRIVATE_NAMESPACE
 
     const char HTTP_GET_SUFFIX[] = {
         "Accept: text/plain\r\n"
-        "\r\n"
     };
 
     const char HTTP_POST_SUFFIX[] = {
-        "Accept: text/xml\r\n"
         "Content-Type: text/xml; charset=UTF-8\r\n"
-        "\r\n"
     };
 
     const char HTTP_POST_FORM_SUFFIX[] = {
-        "Accept: text/xml, text/plain\r\n"
         "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n"
-        "\r\n"
     };
 
     const char RESPONSE_SET_VERSION[] = "1.0";
