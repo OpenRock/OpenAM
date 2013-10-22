@@ -77,7 +77,7 @@ public:
             if(excludeTime < now) {
                 int pollTime=0;
                 sscanf(poll_primary_server.c_str(), "%d", &pollTime);
-                excludeTime = now + (pollTime * 60 * 1000000);
+                excludeTime = now + (pollTime * 60);
                 healthy = true;
             }
         }
@@ -88,7 +88,7 @@ public:
         int pollTime=0;
         healthy = false;
         sscanf(poll_primary_server.c_str(), "%d", &pollTime);
-        excludeTime = time(0) + (pollTime * 60 * 1000000);
+        excludeTime = time(0) + (pollTime * 60);
     } 
 
 private:
