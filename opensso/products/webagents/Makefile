@@ -86,7 +86,7 @@ DOMINOOBJS=$(DOMINOSRCS:.c=.o)
 $(APA20OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
 $(APA22OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache22/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
 $(APA24OBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/apache24/include -DAPACHE2 -DEAPI -DXP_UNIX -DCORE_PRIVATE
-$(VRNSHOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/varnish$(ARCH)/include -Iagents/source/varnish -DVARNISH303
+$(VRNSHOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/varnish$(ARCH)/include -Iagents/source/varnish
 $(OIWSOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/sjsws/include -DXP_UNIX
 $(OPSOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/proxy40/include -DXP_UNIX
 $(DOMINOOBJS): CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/domino/include -DUNIX -D_REENTRANT -DUSE_THREADSAFE_INTERFACES

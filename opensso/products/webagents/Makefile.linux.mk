@@ -68,7 +68,7 @@ apache24i: $(APA24OBJS)
 
 varnishi: $(VRNSHOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
-	${CXX} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libvmod_am.so $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/../lib' -Wl,-rpath,'$$ORIGIN' -z origin $(VRNSHOBJS) -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a $(EXT_LIBS) -Lextlib/$(OS_ARCH)$(OS_MARCH)/varnish$(ARCH)/lib -lapr-1
+	${CC} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libvmod_am.so $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/../lib' -Wl,-rpath,'$$ORIGIN' -z origin $(VRNSHOBJS) -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a -lstdc++ $(EXT_LIBS)
 
 oiwsi: $(OIWSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"

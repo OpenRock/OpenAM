@@ -77,7 +77,7 @@ apache24i: $(APA24OBJS)
 ifeq ($(OS_MARCH), i86pc)
 varnishi: $(VRNSHOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
-	${CXX} $(CFLAGS) -h libvmod_am.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(VRNSHOBJS) -R'$$ORIGIN/vmod_am_lib' -R'$$ORIGIN' -z origin -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a $(EXT_LIBS) -Lextlib/$(OS_ARCH)$(OS_MARCH)/varnish$(ARCH)/lib -lapr-1
+	${CXX} $(CFLAGS) -h libvmod_am.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(VRNSHOBJS) -R'$$ORIGIN/vmod_am_lib' -R'$$ORIGIN' -z origin -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a $(EXT_LIBS)
 else
 varnishi:
 	@echo "[*** Creating "$@" shared library ***]"

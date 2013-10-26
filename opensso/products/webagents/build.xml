@@ -321,7 +321,7 @@
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
               tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/varnish/build_date.js.template"
-              tofile="${webagents.dist.dir}/varnish_v303_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/varnish_v30_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <antcall target="all" inheritRefs="true"/>
         <antcall target="postnightly" inheritRefs="true"/>
     </target>
@@ -372,7 +372,7 @@
         <echo message=" domino          : builds the Sun Java System IBM Lotus Domino Server 8.5 agent"/>
         <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
         <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
-        <echo message=" varnish         : builds the Varnish Cache Server 3.0.3 agent"/>
+        <echo message=" varnish         : builds the Varnish Cache Server 3.0.x agent"/>
         <echo message=" usage           : displays this usage message"/>
         <echo message=" "/>
         <echo message=" To run a target, issue the following command:"/>
