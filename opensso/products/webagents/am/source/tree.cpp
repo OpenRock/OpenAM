@@ -25,6 +25,10 @@
  * $Id: tree.cpp,v 1.7 2010/03/10 06:47:41 kiran_gonipati Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
+
 #include "tree.h"
 #include "am_policy.h"
 
@@ -199,6 +203,24 @@ Tree::insertBelow(NodeRefPtr parent, PDRefCntPtr &elem) {
     return true;
 }
 
+void
+Tree::showNodes() const {
+    PDRefCntPtr rootNodePolicyDecision = rootNode->getPolicyDecision();
+    ResourceName rootNodeResouceName = rootNodePolicyDecision->getName();
+    std::string rootNodeName = rootNodeResouceName.getString();
+    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Tree::showNodes rootNode: %s", rootNodeName.c_str());
+    if (rootNode->hasSubNodes()) {
+        std::list<NodeRefPtr>::iterator iter;
+        for (iter = rootNode->begin(); iter != rootNode->end(); iter++) {
+            NodeRefPtr node = *iter;
+            PDRefCntPtr data = node->getPolicyDecision();
+            ResourceName res = data->getName();
+            std::string name = res.getString();
+            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Tree::showNodes node: %s", name.c_str());
+        }
+    }
+}
+
 /**
  * This function removes a node from a tree.
  * The function will fail if root node is being removed.
@@ -235,8 +257,11 @@ Tree::remove(const ResourceName &elem, bool recursive) {
 
 void
 Tree::dfsearch_all(const ResourceName &resName,
-		   std::vector<PDRefCntPtr> &results,
-		   bool usePatterns) const {
+        std::vector<PDRefCntPtr> &results,
+        bool usePatterns) const {
+    if (Log::isLevelEnabled(Log::ALL_MODULES, Log::LOG_MAX_DEBUG)) {
+        showNodes();
+    }
     search_recursive(resName, rootNode, results, usePatterns);
     return;
 }
@@ -261,7 +286,7 @@ Tree::search_recursive(const ResourceName &resName,
 	results.push_back(node->getPolicyDecision());
 	// fall through to the following
     case AM_SUB_RESOURCE_MATCH:
-    case AM_NO_MATCH:
+    case AM_NO_MATCH: 
 	for(iter = node->begin(); iter != node->end(); iter++) {
 	    search_recursive(resName, *iter, results, usePatterns);
 	}

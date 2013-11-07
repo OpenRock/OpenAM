@@ -24,7 +24,11 @@
  *
  * $Id: tree.h,v 1.4 2008/06/25 08:14:40 qcheng Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
+
 #ifndef __TREE_H__
 #define __TREE_H__
 #include <cassert>
@@ -220,6 +224,8 @@ public:
     bool markStale(const ResourceName &, bool recursive=false);
 
     void outdatePolicyDecisions(const std::string &);
+    
+    void showNodes() const;
 };
 
 END_PRIVATE_NAMESPACE

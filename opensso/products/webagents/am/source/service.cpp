@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 
 #include <climits>
@@ -1354,18 +1354,16 @@ Service::getPolicyResult(const char *userSSOToken,
             ResourceName resObj(resName);
             std::string rootRes;
             if (resObj.getResourceRoot(rsrcTraits, rootRes)) {
-	        if (uPolicyEntry->getTree(rootRes,false) == NULL) {
-                    update_policy(ssoToken, resName, actionName, env,
-                            uSessionInfo,
-                        mFetchFromRootResource==true?SCOPE_SUBTREE:SCOPE_SELF,
-                            true, uPolicyEntry, attrList, properties);
-                    Log::log(logID, Log::LOG_WARNING,
-                            "%s:Result size is %d,tree not present for %s", func,
-	              results.size(),resName.c_str());
-                    uPolicyEntry->getAllPolicyDecisions(resName, results);
-                }
+                update_policy(ssoToken, resName, actionName, env,
+                        uSessionInfo,
+                        mFetchFromRootResource == true ? SCOPE_SUBTREE : SCOPE_SELF,
+                        true, uPolicyEntry, attrList, properties);
+                Log::log(logID, Log::LOG_WARNING,
+                        "%s: Result size is %d, tree not present for %s", func,
+                        results.size(), resName.c_str());
+                uPolicyEntry->getAllPolicyDecisions(resName, results);
             }
-                }
+        }
 
         // For each policy decision, if it is stale,
         // get the new one.
