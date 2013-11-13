@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.agents.util;
 
 import com.sun.identity.shared.debug.Debug;
@@ -33,7 +36,6 @@ import com.sun.identity.shared.xml.XMLUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -48,6 +50,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sun.identity.agents.arch.AgentException;
+import java.io.InputStream;
+import org.forgerock.openam.utils.IOUtils;
 
 public class AgentRemoteConfigUtils {
 
@@ -63,25 +67,29 @@ public class AgentRemoteConfigUtils {
     /**
      * Returns <code>Properties</code> object constructed from XML.
      *
-     * @param xml the XML document for the <code>Properties</code> object.
+     * @param urls The different URLs where the OpenAM Identity REST interface can be accessed.
+     * @param tokenId The session ID of the authenticated agent user.
+     * @param profileName The name of the agent profile that needs to be retrieved.
+     * @param realm The realm where the agent profile can be found.
      * @return constructed <code>Properties</code> object.
      */
-    public static Properties getAgentProperties(Vector urls, String tokenId, 
-        String profileName, String realm) throws AgentException {
+    public static Properties getAgentProperties(Vector<URL> urls, String tokenId, String profileName, String realm)
+            throws AgentException {
         Properties result = new Properties();
         if (urls == null) {
             return result;
         }
         
         String xml = null;
-        for (int i = 0; i < urls.size(); i++) {
-            URL url = (URL)urls.get(i);
+        for (URL url : urls) {
             xml = getAttributesInXMLFromRest(url, tokenId, profileName, realm);
             if (xml != null) {
                 break;
             }
         }
-        if (xml != null) {
+        if (xml == null) {
+            throw new AgentException("Unable to retrieve agent profile remotely from the following url(s): " + urls);
+        } else {
             Document doc = null;
             try {
                 doc = XMLUtils.getXMLDocument(
@@ -266,35 +274,39 @@ public class AgentRemoteConfigUtils {
             }
         }
         prop.setProperty(attrName, attrValue);
-        return;
     }
     
-    private static String getAttributesInXMLFromRest(URL url, String tokenId,
-        String profileName, String realm) throws AgentException {
-	HttpURLConnection conn = null;
-        char[] buf = new char[1024];
-        StringBuffer in_buf = new StringBuffer();
-        int len;
-	try {
-            String attributeServiceURL = url + ATTRIBUTE_SERVICE 
-                + "?name=" + URLEncoder.encode(profileName, "UTF-8") 
-                + "&attributes_names=realm"
-                + "&attributes_values_realm=" 
-                + URLEncoder.encode(realm, "UTF-8")
-                + "&attributes_names=objecttype"
-                + "&attributes_values_objecttype=Agent"
-                + "&admin=" + URLEncoder.encode(tokenId, "UTF-8"); 
+    private static String getAttributesInXMLFromRest(URL url, String tokenId, String profileName, String realm) {
+        HttpURLConnection conn = null;
+        try {
+            String attributeServiceURL = url + ATTRIBUTE_SERVICE
+                    + "?name=" + URLEncoder.encode(profileName, "UTF-8")
+                    + "&attributes_names=realm"
+                    + "&attributes_values_realm="
+                    + URLEncoder.encode(realm, "UTF-8")
+                    + "&attributes_names=objecttype"
+                    + "&attributes_values_objecttype=Agent"
+                    + "&admin=" + URLEncoder.encode(tokenId, "UTF-8");
             URL serviceURL = new URL(attributeServiceURL);
-	    conn = (HttpURLConnection)serviceURL.openConnection();
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), "UTF-8"));
-	    while((len = in.read(buf,0,buf.length)) != -1) {
-	        in_buf.append(buf,0,len);
-	    }
-	} catch (Exception e) {
-           throw new AgentException(
-                   "Fetching Agent configuration properties failed", e);
-	} 
-        return in_buf.toString();
+            conn = (HttpURLConnection) serviceURL.openConnection();
+            return IOUtils.readStream(conn.getInputStream(), "UTF-8");
+        } catch (IOException ioe) {
+            String errorResponse = null;
+            if (conn != null) {
+                InputStream errorStream = conn.getErrorStream();
+                if (errorStream != null) {
+                    try {
+                        errorResponse = IOUtils.readStream(errorStream, "UTF-8");
+                    } catch (IOException ioe2) {
+                        System.err.println("AgentRemoteConfigUtils:getAttributesInXMLFromRest: An IO error occurred "
+                                + "while reading the error response: " + ioe2.getMessage());
+                    }
+                }
+            }
+            System.err.println("AgentRemoteConfigUtils:getAttributesInXMLFromRest: An error occurred while trying to "
+                    + "retrieve agent profile from " + url + " : " + ioe.getMessage() + " with content: "
+                    + errorResponse);
+        }
+        return null;
     }
 } 
