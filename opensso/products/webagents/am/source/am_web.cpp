@@ -2418,6 +2418,8 @@ am_web_handle_notification(const char *data,
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
 
+    XMLTree::Init xt;
+    
     Log::log(boot_info.log_module, Log::LOG_DEBUG,
 	     "am_web_handle_notification() data is: %.*s", data_length,
 	     data);

@@ -178,20 +178,20 @@ apachei : apache.obj
 		/DLL /OUT:agents\source\apache\libamapc2.dll agents\source\apache\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr.lib libapriconv.lib libhttpd.lib
 
 apache22.obj : $(AM_APA22_SRC)
-	$(CC) $(CFLAGS) /I"extlib\WINNT\apache22\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DEAPI /DUSE_EXPAT /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache22 /Foagents\source\apache22\ /Tc $(AM_APA22_SRC)
+	$(CC) $(CFLAGS) /I"extlib\WINNT\apache22\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /Iagents\source\apache22 /Foagents\source\apache22\ /Tc $(AM_APA22_SRC)
 
 apache2i : apache22.obj
-	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache22\lib" $(DEP_LIBPATH) /EXPORT:dsame_module \
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache22\lib" $(DEP_LIBPATH) \
 		/PDB:"agents\source\apache22\libamapc22.pdb" \
-		/DLL /OUT:agents\source\apache22\libamapc22.dll /LIBPATH:"extlib\WINNT\apache2\lib" agents\source\apache22\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libaprutil-1.lib libhttpd.lib
+		/DLL /OUT:agents\source\apache22\libamapc22.dll /LIBPATH:"extlib\WINNT\apache2\lib" agents\source\apache22\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib
 
 apache24.obj : $(AM_APA24_SRC)
-	$(CC) $(CFLAGS) /I"extlib\WINNT\apache24\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DEAPI /DUSE_EXPAT /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache24 /Foagents\source\apache24\ /Tc $(AM_APA24_SRC)
+	$(CC) $(CFLAGS) /I"extlib\WINNT\apache24\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DAPACHE24 /Iagents\source\apache24 /Foagents\source\apache24\ /Tc $(AM_APA24_SRC)
 
 apache24i : apache24.obj
-	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) /EXPORT:dsame_module \
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) \
 		/PDB:"agents\source\apache24\libamapc24.pdb" \
-		/DLL /OUT:agents\source\apache24\libamapc24.dll /LIBPATH:"extlib\WINNT\apache24\lib" agents\source\apache24\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libaprutil-1.lib libhttpd.lib
+		/DLL /OUT:agents\source\apache24\libamapc24.dll /LIBPATH:"extlib\WINNT\apache24\lib" agents\source\apache24\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib
 
 
 #
