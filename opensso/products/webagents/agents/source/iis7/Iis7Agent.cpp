@@ -629,7 +629,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
                 strncpy(requestMethod, (char*) reqMethod, requestMethodSize);
                 am_web_log_debug("%s: requestMethod = %s", thisfunc, requestMethod);
             } else {
-                am_web_log_error("%s: Not enough memory to ", "allocate orig_req_method.", thisfunc);
+                am_web_log_error("%s: Not enough memory to allocate orig_req_method.", thisfunc);
                 status = AM_NO_MEMORY;
             }
         }
@@ -965,7 +965,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
                 res->Redirect(logout_url, true, false);
                 retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
             } else {
-                am_web_log_debug("%s: am_web_get_logout_url failed. ");
+                am_web_log_debug("%s: am_web_get_logout_url failed.", thisfunc);
                 retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
             }
             if (set_cookies_list != NULL) {
