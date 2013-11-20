@@ -127,19 +127,11 @@ AgentConfigurationRefCntPtr AgentProfileService::getAgentConfigInstance(am_statu
 am_status_t
 load_bootinfo_to_properties(Utils::boot_info_t *boot_ptr, am_properties_t properties)
 {
-//    const char *thisfunc = "load_bootinfo_to_properties()";
-    const char *function_name = "am_properties_get";
     am_status_t status = AM_SUCCESS;
     const char *parameter = "";
-//    const char *encrypt_passwd = NULL;
     const char *namingURL = NULL;
     const char *agentName = NULL;
     const char *agentPasswd = NULL;
-    const char *certDir = NULL;
-    const char *certDbPrefix = NULL;
-    const char *trustServerCerts = NULL;
-    const char *certDbPasswd = NULL;
-    const char *certAlias = NULL;
     const char *connReceiveTimeout = NULL;
     const char *connTimeout = NULL;
     const char *connTcpDelay = NULL;
@@ -160,7 +152,7 @@ load_bootinfo_to_properties(Utils::boot_info_t *boot_ptr, am_properties_t proper
         am_properties_set(properties, parameter,
                                       agentPasswd);
     }
-
+    
     if (AM_SUCCESS == status) {
         parameter = AM_POLICY_USER_NAME_PROPERTY;
         status = am_properties_get(boot_ptr->properties, parameter,
@@ -170,50 +162,13 @@ load_bootinfo_to_properties(Utils::boot_info_t *boot_ptr, am_properties_t proper
     }
 
     if (AM_SUCCESS == status) {
-        function_name = "am_properties_get";
         parameter = AM_COMMON_NAMING_URL_PROPERTY;
         status = am_properties_get(boot_ptr->properties, parameter,
                                    &namingURL);
         am_properties_set(properties, parameter,
                                       namingURL);
-     }
-
-    if (AM_SUCCESS == status) {
-        parameter = AM_COMMON_SSL_CERT_DIR_PROPERTY;
-        status = am_properties_get(boot_ptr->properties, parameter,
-                                   &certDir);
-        am_properties_set(properties, parameter,
-                                      certDir);
     }
-
-    if (AM_SUCCESS == status) {
-        parameter = AM_COMMON_CERT_DB_PREFIX_PROPERTY;
-        status = am_properties_get(boot_ptr->properties, parameter,
-                                   &certDbPrefix);
-        am_properties_set(properties, parameter,
-                                      certDbPrefix);
-    }
-    if (AM_SUCCESS == status) {
-        parameter = AM_COMMON_TRUST_SERVER_CERTS_PROPERTY;
-        status = am_properties_get(boot_ptr->properties, parameter,
-                                   &trustServerCerts);
-        am_properties_set(properties, parameter,
-                                      trustServerCerts);
-    }
-    if (AM_SUCCESS == status) {
-        parameter = AM_COMMON_CERT_DB_PASSWORD_PROPERTY;
-        status = am_properties_get(boot_ptr->properties, parameter,
-                                   &certDbPasswd);
-        am_properties_set(properties, parameter,
-                                      certDbPasswd);
-    }
-    if (AM_SUCCESS == status) {
-        parameter = AM_AUTH_CERT_ALIAS_PROPERTY;
-        status = am_properties_get(boot_ptr->properties, parameter,
-                                   &certAlias);
-        am_properties_set(properties, parameter,
-                                      certAlias);
-    }
+   
     if (AM_SUCCESS == status) {
         parameter = AM_COMMON_RECEIVE_TIMEOUT_PROPERTY;
         status = am_properties_get(boot_ptr->properties, parameter,
@@ -430,14 +385,15 @@ am_status_t AgentProfileService::fetchAndUpdateAgentConfigCacheInternal
             }
             am_properties_destroy(tmpPropPtr);
     }
-    //Insert the AMAgentConfiguration object in the hast table with the current
+    //Insert the AMAgentConfiguration object in the hash table with the current
     //time stamp as its key.
-    if (status == AM_SUCCESS ) {
-        // AgentConfigurationRefCntPtr agentConfig;
+    if (status == AM_SUCCESS) {
         agentConfig = new AgentConfiguration(properties);
-        status = load_bootinfo_to_properties(&boot_info, 
+        status = load_bootinfo_to_properties(&boot_info,
                 agentConfig->getProperties());
-        agentConfigCache.populateAgentConfigCacheTable(agentConfig);
+        if (status == AM_SUCCESS) {
+            agentConfigCache.populateAgentConfigCacheTable(agentConfig);
+        }
     }
     return status;
 }
