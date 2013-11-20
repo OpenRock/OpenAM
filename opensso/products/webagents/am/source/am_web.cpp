@@ -1254,15 +1254,25 @@ am_bool_t in_not_enforced_list(URL &urlObj,
         found = AM_TRUE;
     } else {
         if ((*agentConfigPtr)->nfurl_regex_enabled) {
+            const char *utm = url;
+            std::string utmp = url;
+            if ((*agentConfigPtr)->ignore_path_info_for_not_enforced_list == AM_TRUE) {
+                std::size_t pPos = utmp.find("?");
+                if (pPos != std::string::npos) {
+                    /*strip all query parameters when ignore_path_info_for_not_enforced_list is set*/
+                    utmp.erase(pPos);
+                    utm = utmp.c_str();
+                }
+            }
             am_web_log_debug("%s(): regular expressions are enabled", thisfunc);
             for (i = 0; (i < (*agentConfigPtr)->not_enforced_list.size) && (AM_FALSE == found); i++) {
-                if (match(url, (*agentConfigPtr)->not_enforced_list.list[i].url)) {
+                if (match(utm, (*agentConfigPtr)->not_enforced_list.list[i].url)) {
                     am_web_log_debug("%s(%s): matched '%s' entry in not-enforced list", thisfunc,
-                            url, (*agentConfigPtr)->not_enforced_list.list[i].url);
+                            utm, (*agentConfigPtr)->not_enforced_list.list[i].url);
                     found = AM_TRUE;
                 } else {
                     am_web_log_debug("%s(%s): does not match '%s' entry in not-enforced list", thisfunc,
-                            url, (*agentConfigPtr)->not_enforced_list.list[i].url);
+                            utm, (*agentConfigPtr)->not_enforced_list.list[i].url);
                 }
             }
         } else {
