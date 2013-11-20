@@ -901,17 +901,21 @@ am_agent_init(boolean_t* pAgentInitialized)
             status = agentProfileService->agentLogin();
         }
     }
-    
+
     if (AM_SUCCESS == status) {
         agentAuthenticated = AM_TRUE;
-        agentProfileService->fetchAndUpdateAgentConfigCache();
-        agent_config = am_web_get_agent_configuration();
-        agentConfigPtr =
-                (AgentConfigurationRefCntPtr*) agent_config;
-        if ((*agentConfigPtr) == NULL) {
-            status = AM_FAILURE;
-        }
-        if ((*agentConfigPtr) != NULL && (*agentConfigPtr)->error == AM_FAILURE) {
+        if (agentProfileService->fetchAndUpdateAgentConfigCache() == AM_SUCCESS) {
+            agent_config = am_web_get_agent_configuration();
+            if (agent_config == NULL) {
+                status = AM_FAILURE;
+            }
+            if (status != AM_FAILURE) {
+                agentConfigPtr = (AgentConfigurationRefCntPtr*) agent_config;
+                if ((*agentConfigPtr) != NULL && (*agentConfigPtr)->error == AM_FAILURE) {
+                    status = AM_FAILURE;
+                }
+            }
+        } else {
             status = AM_FAILURE;
         }
     }
@@ -6923,11 +6927,15 @@ am_web_domino_ltpa_token_name(void* agent_config) {
  */
 extern "C" AM_WEB_EXPORT void*
 am_web_get_agent_configuration() {
+    am_status_t status = AM_FAILURE;
     void *agentC = NULL;
-        if (agentProfileService != NULL) {
-            agentC = new AgentConfigurationRefCntPtr(
-                       agentProfileService->getAgentConfigInstance());
+    if (agentProfileService != NULL) {
+        AgentConfigurationRefCntPtr instance = agentProfileService->getAgentConfigInstance(status);
+        if (status != AM_SUCCESS) {
+            return NULL;
         }
+        agentC = new AgentConfigurationRefCntPtr(instance);
+    }
     return agentC;
 }
 

@@ -103,7 +103,9 @@ public:
             mLock->unlock();
 
             if (stayAlive) {
-                if (agentProfileService->getAgentConfigInstance()->doRemoteLog == AM_TRUE) {
+                am_status_t status = AM_FAILURE;
+                AgentConfigurationRefCntPtr instance = agentProfileService->getAgentConfigInstance(status);
+                if (instance && status == AM_SUCCESS && instance->doRemoteLog == AM_TRUE) {
                     Log::log(htcID, Log::LOG_INFO, "Starting %s.", message);
                     if (logService != NULL) {
                         logService->flushBuffer();

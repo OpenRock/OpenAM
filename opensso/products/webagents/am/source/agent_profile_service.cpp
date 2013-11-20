@@ -103,19 +103,20 @@ AgentProfileService::~AgentProfileService()
  * This function retrieves the latest AgentConfiguration instance from the
  * cache.
  */
-AgentConfigurationRefCntPtr AgentProfileService::getAgentConfigInstance()
+AgentConfigurationRefCntPtr AgentProfileService::getAgentConfigInstance(am_status_t &status)
 {
-    AgentConfigurationRefCntPtr agentConfig = 
-                                agentConfigCache.getLatestAgentConfigInstance();
-
+    am_status_t instance_status = AM_SUCCESS;
+    AgentConfigurationRefCntPtr agentConfig =
+            agentConfigCache.getLatestAgentConfigInstance();
     if (agentConfig == NULL) {
         // Need to refetch the agent configuration, because by the time 
         // we get the latestConfigKey and try to fetch the agent config object
         // associated with this key (before the find_cac() call, the ref_cnt
         // will be zero), the agent config cache cleanup might have
         // already removed this entry.   
-        fetchAndUpdateAgentConfigCacheInternal(agentConfig);
-    }     
+        instance_status = fetchAndUpdateAgentConfigCacheInternal(agentConfig);
+    }
+    status = instance_status;
     return agentConfig;
 }
 

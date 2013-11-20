@@ -91,7 +91,7 @@ public:
     am_status_t fetchAndUpdateAgentConfigCacheInternal(
                                      AgentConfigurationRefCntPtr& agentConfig);
     void deleteOldAgentConfigInstances();
-    AgentConfigurationRefCntPtr getAgentConfigInstance();
+    AgentConfigurationRefCntPtr getAgentConfigInstance(am_status_t &status);
     am_status_t validateAgentSSOToken(); 
 
 
