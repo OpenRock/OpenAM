@@ -71,7 +71,7 @@
             </repository>
             <repository>
                 <id>forgerock</id>
-                <url>http://repo.forgerock.org</url>
+                <url>http://maven.forgerock.org/repo/repo</url>
             </repository>
             <repository>
                 <id>atlassian-m1</id>

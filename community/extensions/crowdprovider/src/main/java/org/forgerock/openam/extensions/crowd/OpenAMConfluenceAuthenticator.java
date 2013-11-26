@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,7 +29,6 @@ import com.atlassian.confluence.user.ConfluenceAuthenticator;
 import com.atlassian.seraph.auth.AuthenticatorException;
 import static com.atlassian.seraph.auth.DefaultAuthenticator.LOGGED_IN_KEY;
 import static com.atlassian.seraph.auth.DefaultAuthenticator.LOGGED_OUT_KEY;
-import com.atlassian.seraph.config.SecurityConfigFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,7 +38,6 @@ import java.security.Principal;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.log4j.Category;
 
 /**
@@ -50,8 +48,9 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
     private static final Category log = Category.getInstance(OpenAMConfluenceAuthenticator.class);
     private static final String OPENAM_URL = "https://sso.forgerock.com:443/openam/identity/";
     private static final String TOKEN_VALID = "isTokenValid?tokenid=";
+    private static final String LOGOUT_TOKEN = "logout?subjectid=";
     private static final String GET_ATTRS = "attributes?subjectid=";
-    private static final String COOKIE_NAME = "iPlanetDirectoryPro";
+    private static final String COOKIE_NAME = "iPlanetDirectoryProSSO";
 
     @Override
     public Principal getUser(HttpServletRequest request, HttpServletResponse response) {
@@ -143,51 +142,72 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
     }
     
     private boolean isTokenValid(String token) {
-        boolean result = false;
+        String result = null;
+        boolean isValid = false;
+        HttpURLConnection conn = null;
         
         try {
             URL url = new URL(OPENAM_URL + TOKEN_VALID + token);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            if (conn.getResponseCode() == 200) {
-                result = true;
-            }
-
-            conn.disconnect();
-        } catch (Exception ex) {
-            log.debug("Error validating token", ex);
-        }
-        
-        log.debug("is token valid: " + result);
-        return result;
-    }
-    
-    private String getProperty(String token, String name) {
-        String result = null;
-        
-        try {
-            URL url = new URL(OPENAM_URL + GET_ATTRS + token + "&attributenames=" + name);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                log.error("Failed : HTTP error code : " + conn.getResponseCode());
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
             
-            String input = null;
+            String input;
+            while ((input = br.readLine()) != null) {
+                if (input.contains("boolean")) {
+                    result = input.substring(input.indexOf("=") + 1);
+                    log.debug("found boolean value " + result);
+                }
+            }
+            
+            if (result != null && result.equalsIgnoreCase("true")) {
+                isValid = true;
+            }
+        } catch (Exception ex) {
+            log.debug("Error validating token", ex);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        
+        log.debug("is token valid: " + isValid);
+        return isValid;
+    }
+    
+    private String getProperty(String token, String name) {
+        String result = null;
+        HttpURLConnection conn = null;
+        
+        try {
+            URL url = new URL(OPENAM_URL + GET_ATTRS + token + "&attributenames=" + name);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            if (conn.getResponseCode() != 200) {
+                log.error("Failed : HTTP error code : " + conn.getResponseCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            
+            String input;
             while ((input = br.readLine()) != null) {
                 if (input.contains("userdetails.attribute.value")) {
                     result = input.substring(input.indexOf("=") + 1);
                     log.debug("found property " + name + " value " + result);
                 }
             }
-
-            conn.disconnect();
         } catch (Exception ex) {
-            log.error("Error validating token", ex);
+            log.error("Error validating token: " + ex.getMessage());
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
         
         return result;        
@@ -211,6 +231,7 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
     public boolean logout(HttpServletRequest request, HttpServletResponse response) 
     throws AuthenticatorException {
         boolean result = false;
+        log.error("logout is called");
         
         try {
             result = doLogout(request, response);
@@ -224,19 +245,32 @@ public class OpenAMConfluenceAuthenticator extends ConfluenceAuthenticator {
     private boolean doLogout(HttpServletRequest request, HttpServletResponse response)
     throws AuthenticatorException, IOException {
         if (super.logout(request, response)) {
-            logoutOfOpenSSO(response);
+            logoutOfOpenSSO(request);
             return true;
         }
         
         return false;
     }
 
-    private void logoutOfOpenSSO(HttpServletResponse response)
+    private void logoutOfOpenSSO(HttpServletRequest request)
     throws IOException {
-        String logoutURL = SecurityConfigFactory.getInstance().getLogoutURL();
+        HttpURLConnection conn = null;
         
-        if (logoutURL != null) {
-            response.sendRedirect(logoutURL);
+        try {
+            String token = getToken(request);
+            URL url = new URL(OPENAM_URL + LOGOUT_TOKEN + token);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            if (conn.getResponseCode() != 200) {
+                log.error("Failed : HTTP error code : " + conn.getResponseCode());
+            }
+        } catch (Exception ex) {
+            log.debug("Error logout token", ex);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
     }    
 }
