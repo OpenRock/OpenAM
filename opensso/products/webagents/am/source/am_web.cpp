@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 #ifdef _MSC_VER
 #include <ws2tcpip.h>
@@ -1106,11 +1107,6 @@ am_web_cleanup() {
     if (initialized) {
         am_web_log_debug("%s: cleanup sequence initiated.", thisfunc);
 
-        const Properties& propPtr =
-                *reinterpret_cast<Properties *> (boot_info.properties);
-        agentProfileService->agentLogout(propPtr);
-        am_web_log_debug("%s: Agent logout done.", thisfunc);
-
         if (nvld != NULL) {
             am_web_log_debug("%s: waiting for Naming Validator to shut down...", thisfunc);
             stop_naming_validator();
@@ -1126,6 +1122,13 @@ am_web_cleanup() {
         }
 
         status = am_cleanup();
+        am_web_log_debug("%s: Agent cleanup done.", thisfunc);
+
+        const Properties& propPtr =
+                *reinterpret_cast<Properties *> (boot_info.properties);
+        agentProfileService->agentLogout(propPtr);
+        am_web_log_debug("%s: Agent logout done.", thisfunc);
+
         initialized = AM_FALSE;
     } else {
         status = AM_SUCCESS;
