@@ -24,6 +24,8 @@
 
    $Id: README.glassfish,v 1.17 2009/06/12 22:11:19 huacui Exp $
 
+   Portions Copyright 2013 ForgeRock AS
+
 -->
 
 =================
@@ -31,7 +33,7 @@ README.glassfish
 =================
 
 This README contains instructions on how to secure web services using 
-OpenSSO WSS providers on SUN Application Server 9.1 (Glassfish V2).
+OpenAM WSS providers on SUN Application Server 9.1 (Glassfish V2).
 
 This document assumes that users have already done the following:
 
@@ -39,25 +41,25 @@ This document assumes that users have already done the following:
    and web services provider (WSP). 
 2. Required Web services client and Web services provider applications are 
    implemented.
-3. Installed and configured the OpenSSO server. 
+3. Installed and configured the OpenAM server.
 
-Follow the steps below to secure the web services using OpenSSO WSS
+Follow the steps below to secure the web services using OpenAM WSS
 providers.
 
 I. Install WSS Agent
 Repeat the following steps on the machines where WSC and WSP are deployed:
-1. Unzip openssowssproviders.zip to a desired directory,
-   say <unzip_dir_of_openssowssproviders.zip>
+1. Unzip openamwssproviders.zip to a desired directory,
+   say <unzip_dir_of_openamwssproviders.zip>
 
 2. Run the installer to install the WSS Agent.
  A. Stop the Application Server instance that the agent is to be
     installed on.
 
  B. On Unix/Linux machine,
-      change directory to <unzip_dir_of_openssowssproviders.zip>/bin
+      change directory to <unzip_dir_of_openamwssproviders.zip>/bin
       and chmod 755 wssagentadmin
     On Windows machine,
-      change directory to <unzip_dir_of_openssowssproviders.zip>\bin
+      change directory to <unzip_dir_of_openamwssproviders.zip>\bin
 
  C. On Unix/Linux machine, run
       ./wssagentadmin --install or ./wssagentadmin --custom-install
@@ -82,12 +84,12 @@ Repeat the following steps on the machines where WSC and WSP are deployed:
     the name of the application server instance that you want the agent
     to be installed on. The default server instance name is "server".
 
- F. Installer prompts for "URL where the OpenSSO server is running",
-    enter the OpenSSO deployemnt URL in the format of
+ F. Installer prompts for "URL where the OpenAM server is running",
+    enter the OpenAM deployemnt URL in the format of
     protocol://host:port/deployURI.
     The protocol is either http or https; the host is the FQDN of the
-    machine where OpenSSO server is running; the deployURI is the OpenSSO
-    deployment URI. e.g. http://opensso.sample.com:58080/opensso
+    machine where OpenAM server is running; the deployURI is the OpenAM
+    deployment URI. e.g. http://openam.sample.com:58080/openam
  G. Installer prompts for "Enter the Agent profile name", enter the 
     agent profile name. This agent user needs to have the permission to
     read the WSC and/or WSP profiles. Out of box, there is such an agent
@@ -105,11 +107,11 @@ Repeat the following steps on the machines where WSC and WSP are deployed:
 
 II. Add Java security permissions 
 
-On the Application Servers that host OpenSSO server (OpenSSO server),
+On the Application Servers that host OpenAM server (OpenAM server),
 Web Service Client application and Web Service Provider application :
 
 If the Security Manager is "on", append the Java security permissions in
-<unzip_dir_of_openssowssproviders.zip>/config/OpenSSOJavaPermissions.txt
+<unzip_dir_of_openamwssproviders.zip>/config/OpenSSOJavaPermissions.txt
 to the server.policy file of the Application Server domain.
 
 Each Application Server domain has its own standard J2SE policy file 
@@ -121,11 +123,12 @@ System Application Server 9 .1 Developer's Guide.
 
 III. Configure the web services client and the web services provider for Web services security.
 
-1.  Login into the OpenSSO Console with user amadmin and <amadmin password>
+1.  Login into the OpenAM Console with user amadmin and <amadmin password>
 
-    openssoserver_protocol://openssoserver_host:openssoserver_port/openssoserver_deploy_uri
+    openamserver_protocol://openamserver_host:openamserver_port/openamserver_deploy_uri
 
-    Note: If you have logged in as any other user, click Logout on the console page and Login again and make sure that you access the OpenSSO Console.
+    Note: If you have logged in as any other user, click Logout on the console page and Login again and make sure
+    that you access the OpenAM Console.
 
     Create agent profiles for WSC and WSP (if not created out of box) :
 
@@ -133,7 +136,8 @@ III. Configure the web services client and the web services provider for Web ser
 
         a) Create "WSC" profile
         Select Web Service Client -> under Agent, click "new" -> enter name as "wsc" and other required fields -> Save.
-        Click on above saved profile to edit -> Select required Security Mechanism and "Is Request Signed" as true (checked).
+        Click on above saved profile to edit -> Select required Security Mechanism and "Is Request Signed" as true
+        (checked).
         Save changes.
         Note : If the required or selected Security Mechanism is "STSSecurity", then 
         select STS Configuration as "SecurityTokenService" and Web Service End Point as "default".
@@ -144,5 +148,5 @@ III. Configure the web services client and the web services provider for Web ser
         Select Web Service End Point as "default" and "Is Request Signature Verified" as true (checked).
         Save changes.
 
-2.  Logout of OpenSSO Administration console.
+2.  Logout of OpenAM Administration console.
 

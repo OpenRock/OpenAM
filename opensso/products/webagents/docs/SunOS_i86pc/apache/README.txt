@@ -27,7 +27,7 @@ README file for Open Web Single Sign-On - Web Agents
 #
 # $Id: README.txt,v 1.7 2008/06/25 05:54:29 qcheng Exp $
 #
-#
+# Portions Copyright 2013 ForgeRock AS
 #
 %% Contents:
     %% 1. Build requirements
@@ -121,8 +121,8 @@ Follow these steps to obtain the LIBXML2:
 2.3.5 ./configure --prefix=<libxml2-install-dir>
 2.3.6 make
 2.3.7 make install
-2.3.8 cp <libxml2-install-dir>/include/libxml2/libxml/* <opensso_webagent>/extlib/SunOS_i86pc/libxml2/include/libxml2/libxml
-2.3.9 cp <libxml2-install-dir>/lib/* <opensso_webagent>/extlib/SunOS_i86pc/libxml2/lib
+2.3.8 cp <libxml2-install-dir>/include/libxml2/libxml/* <openam_webagent>/extlib/SunOS_i86pc/libxml2/include/libxml2/libxml
+2.3.9 cp <libxml2-install-dir>/lib/* <openam_webagent>/extlib/SunOS_i86pc/libxml2/lib
 
 %n2.4 Obtaining NSS 3.11 
 
@@ -131,9 +131,9 @@ Follow these steps to obtain the binaries:
 2.4.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_11_RTM/SunOS5.9_i86pc_OPT.OBJ/
 2.4.2 Download nss-3.11.tar.gz.
 2.4.3 Uncompress the the archive.
-2.4.4 cp nss-3.11/bin/* <opensso_webagent>/extlib/SunOS_i86pc/nss/bin
-2.4.5 cp nss-3.11/include/* <opensso_webagent>/extlib/SunOS_i86pc/nss/include
-2.4.6 cp nss-3.11/lib/* <opensso_webagent>/extlib/SunOS_i86pc/nss/lib
+2.4.4 cp nss-3.11/bin/* <openam_webagent>/extlib/SunOS_i86pc/nss/bin
+2.4.5 cp nss-3.11/include/* <openam_webagent>/extlib/SunOS_i86pc/nss/include
+2.4.6 cp nss-3.11/lib/* <openam_webagent>/extlib/SunOS_i86pc/nss/lib
 
 
 %% 2.5 Obtaining  NSPR 4.6.1
@@ -143,10 +143,10 @@ Follow these steps to obtain the binaries:
 2.5.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v4.6.1/SunOS5.8_i86pc_OPT.OBJ/
 2.5.2 Download nspr-4.6.1.tar.gz.
 2.5.3 Uncompress the the archive.
-2.5.4 cp <nspr-install-dir>/include/*.h <opensso_webagent>/extlib/SunOS_i86pc/nspr/include
-2.5.5 cp -r <nspr-install-dir>/include/obsolete <opensso_webagent>/extlib/SunOS_i86pc/nspr/include
-2.5.6 cp -r <nspr-install-dir>/include/private <opensso_webagent>/extlib/SunOS_i86pc/nspr/include
-2.5.7 cp <nspr-install-dir>/lib/* <opensso_webagent>/extlib/SunOS_i86pc/nspr/lib
+2.5.4 cp <nspr-install-dir>/include/*.h <openam_webagent>/extlib/SunOS_i86pc/nspr/include
+2.5.5 cp -r <nspr-install-dir>/include/obsolete <openam_webagent>/extlib/SunOS_i86pc/nspr/include
+2.5.6 cp -r <nspr-install-dir>/include/private <openam_webagent>/extlib/SunOS_i86pc/nspr/include
+2.5.7 cp <nspr-install-dir>/lib/* <openam_webagent>/extlib/SunOS_i86pc/nspr/lib
 
 %% 2.6 Obtaining libpthread, libCstd, and libCrun
 
@@ -163,7 +163,7 @@ These will be available in /usr/lib in Solaris.
     2.7.1.5 ./configure --prefix=<apache-install-dir>
     2.7.1.6 make
     2.7.1.7 make install
-    2.7.1.8 cp <apache-install-dir>/include/* <opensso_webagent>/extlib/SunOS_i86pc/apache/include
+    2.7.1.8 cp <apache-install-dir>/include/* <openam_webagent>/extlib/SunOS_i86pc/apache/include
 
 2.7.2 If building 2.2.x agent then 
 
@@ -174,7 +174,7 @@ These will be available in /usr/lib in Solaris.
     2.7.2.5 ./configure --prefix=<apache-install-dir>
     2.7.2.6 make
     2.7.2.7 make install
-    2.7.2.8 cp <apache-install-dir>/include/* <opensso_webagent>/extlib/SunOS_i86pc/apache22/include
+    2.7.2.8 cp <apache-install-dir>/include/* <openam_webagent>/extlib/SunOS_i86pc/apache22/include
 
 
 %% 2.8 Obtaining OpenAM Agents Common Installer libraries
@@ -194,7 +194,7 @@ into extlib directory
 
 %% 3. Building the workspace
 
-3.1 cd <opensso_webagent>
+3.1 cd <openam_webagent>
 3.2 ant <agent-name>
 
 ** Execute ant usage to get information about all the supported options.
@@ -215,12 +215,12 @@ Building Apache 2.2.x agent:
      - ant all    : builds all agents. C code compiled in optimized mode.
 
 3.3 Creation of build output directories such as
-        <opensso_webagent>/built
-        <opensso_webagent>/built/dist
-        <opensso_webagent>/bin
-        <opensso_webagent>/drop
-        <opensso_webagent>/include
-        <opensso_webagent>/samples
+        <openam_webagent>/built
+        <openam_webagent>/built/dist
+        <openam_webagent>/bin
+        <openam_webagent>/drop
+        <openam_webagent>/include
+        <openam_webagent>/samples
 
 3.4 Build output
 

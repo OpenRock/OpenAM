@@ -23,21 +23,23 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
    $Id: README,v 1.6 2008/11/20 17:53:02 veiming Exp $
+
+   Portions Copyright 2013 ForgeRock AS
                                                                                 
 -->
 
-OpenSSO - Server based Unit test.
+OpenAM - Server based Unit test.
 
 Steps:
- 1. Install OpenSSO server
+ 1. Install OpenAM server
      - deploy the fam.war and configure it
  2. Setup the test
      - unzip openfm/built/test/dist/opensso-server-test.zip to a directory
        in the same machine where fam.war is deployed.
  3. Run the test
      - type 
-       ant -D""bootstrap.dir=<base dir of your OpenSSO Server installation>"
+       ant -D""bootstrap.dir=<base dir of your OpenAM Server installation>"
        e.g.
-       ant -D"bootstrap.dir=/opensso"
+       ant -D"bootstrap.dir=/openam"
        to run all test suites; or to selectively run individually
        test suite, invoke the specific target in the ant build XML.

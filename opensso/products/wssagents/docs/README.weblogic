@@ -24,25 +24,27 @@
 
    $Id: README.weblogic,v 1.5 2008/08/19 19:15:08 veiming Exp $
 
+   Portions Copyright 2013 ForgeRock AS
+
 -->
 
 ===============
 README.weblogic
 ===============
 
-This README contains instructions on how to secure web services using OpenSSO WSS plugins on WebLogic platform 9.2.
+This README contains instructions on how to secure web services using OpenAM WSS plugins on WebLogic platform 9.2.
 
 This document assumes that users have already done the following:
 
 1. Installed the WebLogic 9.2 servers that host the web services client (WSC) 
    and web services provider (WSP). 
 2. Implemented the web services client and the web services provider.
-3. Set up the OpenSSO server and profiles for the WSC and the WSP.
+3. Set up the OpenAM server and profiles for the WSC and the WSP.
    If not, please refer to the README.common file for details on setting up
-   OpenSSO server and the profiles of WSC and WSP.
+   OpenAM server and the profiles of WSC and WSP.
 
 
-Follow the steps below to secure the web services using OpenSSO WSS
+Follow the steps below to secure the web services using OpenAM WSS
 plugins.
 
 I. Download the required libraries
@@ -62,16 +64,16 @@ II. Set up SOAP runtime environment in WebLogic 9.2 server.
        The <library-dir> is the directory that contains the saaj-impl.jar 
        downloaded previously.
     3. Restart the WebLogic 9.2 server.
-    4. Configure the OpenSSO WSS Authentication Provider using
+    4. Configure the OpenAM WSS Authentication Provider using
        Weblogic 9.2 console
-       The OpenSSO WSS Authentication Provider is used to
+       The OpenAM WSS Authentication Provider is used to
        authenticate the subject 
        to the container.
        4.1. Copy famauthprovider.jar into $WL_HOME/weblogic92/server/lib/mbeantypes
             directory.
        4.2. Restart the WebLogic 9.2 server.
        4.3. Login to weblogic console and follow the steps below to configure 
-            the OpenSSO WSS Authentication Provider.
+            the OpenAM WSS Authentication Provider.
           4.3.1. Login into WebLogic 9.2 console.
           4.3.2. Click on "Lock & Edit" button.
           4.3.3. In the left menu, click on "Security Realms" under "Services" link.
@@ -95,7 +97,7 @@ III. Setting up WSS plugin at the WSC
    security at the WSC side, complete the following steps:
    1. Go to a temp directory and unjar the WSC war file
    2. Go to WEB-INF/classes
-   3. Copy resources/AMClient.properties from the openssowssproviders.zip to the 
+   3. Copy resources/AMClient.properties from the openamwssproviders.zip to the
       directory and make necessary changes. Please refer to the README.common 
       for details of accomplishing this step.
    4. Edit the <packageName>/<ServiceName>_internaldd.xml (<packageName> is the 
@@ -109,10 +111,10 @@ III. Setting up WSS plugin at the WSC
           <j2ee:param-value>value1</j2ee:param-value>
         </j2ee:init-param>
       </j2ee:handler>
-      Section V has an example of <ServiceName>_internaldd.xml with OpenSSO
+      Section V has an example of <ServiceName>_internaldd.xml with OpenAM
       WSS 
       client handler.
-   5. Copy lib/openssoclientsdk.jar and lib/openssowssproviders.jar from the 
+   5. Copy lib/openamclientsdk.jar and lib/openssowssproviders.jar from the
       openssowssproviders.zip to WEB-INF/lib
    6. Regenerate the war file.
    7. Deploy the war file using WebLogic console.
@@ -146,11 +148,11 @@ IV. Setting the WSS plugin at WSP
    7. Deploy the war file using WebLogic console.
 
 After completing all the above steps, the WSC and WSP are now secured using
-OpenSSO WSS plugin.
+OpenAM WSS plugin.
 
 
 
-V. An example of <ServiceName>_internaldd.xml with OpenSSO WSS
+V. An example of <ServiceName>_internaldd.xml with OpenAM WSS
 client handler
 
 <?xml version='1.0' encoding='UTF-8'?>
@@ -174,7 +176,7 @@ client handler
 
 
 
-VI. An example of web.xml with OpenSSO WSS servlet filter
+VI. An example of web.xml with OpenAM WSS servlet filter
 
 <?xml version='1.0' encoding='UTF-8'?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4" id="WebApp_ID">

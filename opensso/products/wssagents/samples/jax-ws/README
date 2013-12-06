@@ -23,6 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: README,v 1.14 2009/12/03 18:57:52 mrudul_uchil Exp $
+ *
+ * Portions Copyright 2013 ForgeRock AS
+ *
  */
 
  %% Contents:
@@ -30,7 +33,7 @@
     %% 2. Environment requirements
     %% 3. Building and Deploying the un-secured samples
     %% 4. Building and Deploying the secured samples
-    %% 5. OpenSSO Server Configuration
+    %% 5. OpenAM Server Configuration
     %% 6. Testing the samples
     %% 7. Explanation of changes for Tomcat and Sun Web Server
     %% 8. Deployment changes for WebSphere Application Server (WAS)
@@ -45,10 +48,10 @@ General Description :
    The sample demonstrates a simple stock quote service where given
    a stock ticker symbol it obtains stock data. The secure communication
    between stock quote web services client is achieved using
-   OpenSSO web services security agents.
+   OpenAM web services security agents.
 
    The following diagram depicts a simple deployment scenario where the
-   profiles of WSC and WSP are all hosted on a single OpenSSO instance.
+   profiles of WSC and WSP are all hosted on a single OpenAM instance.
 
      JAX-WS Compliant Container 1       JAX-WS Compliant Container 2
            _______________                   ________________
@@ -63,23 +66,23 @@ General Description :
                             __V______V_
                             |          |
                             |          | Machine 3
-                            | OpenSSO  | 
+                            | OpenAM  |
                             |(WSC,WSP  |
                             | Profiles)|
                             |__________|
 
 Assumption :
-   1) You have installed and configured OpenSSO server.
-   2) OpenSSO server runs in the same domain (example, ".sun.com") as the domain
+   1) You have installed and configured OpenAM server.
+   2) OpenAM server runs in the same domain (example, ".sun.com") as the domain
       of the server in which WSC application is running. This is required for
-      SSO between OpenSSO server and WSC application, when end user
+      SSO between OpenAM server and WSC application, when end user
       authentication happens in showcasing Web Service Security between WSC and
       WSP.
 
 %% 2. Environment requirements
 
    2.1 Ant (version "1.7" or higher)
-       The OpenSSO Web Services Security Agents workspace uses Apache Ant as the
+       The OpenAM Web Services Security Agents workspace uses Apache Ant as the
        build tool. The build scripts in this workspace use features not present
        in releases of Ant prior to 1.7.  Thus, in order to build this workspace
        you must have Ant version 1.7 or above installed and available in your
@@ -141,7 +144,7 @@ Assumption :
              Application Server that you are running.
              Note : Please do not download/use JBossWS native package as it runs
              into some conflict issues with native Web Services stack when used
-             with these OpenSSO WSS agents.
+             with these OpenAM WSS agents.
        2.5.2 To install the stack downloaded in the previous step, unzip the
              downloaded file and modify the file ant.properties.example by
              providing the JBOSS_HOME value based on the version of JBoss you
@@ -199,7 +202,7 @@ Assumption :
        4.1.2 Run "<wssagents_unzip_location>/wssagent/ant config" to generate
            secured StockService.war by entering appropriate input as follows :
            
-        [input] Enter OpenSSO Server URL :
+        [input] Enter OpenAM Server URL :
         <server_protocol>://<server_host.server_domain>:<server_port>/<server_deploy_uri>
 
         [input] Enter type of application (WSC/ WSP) : (WSC, WSP)
@@ -237,7 +240,7 @@ Assumption :
        4.2.3 Run "<wssagents_unzip_location>/wssagent/ant config" to generate
            secured StockClient.war by entering appropriate input as follows :
 
-        [input] Enter OpenSSO Server URL :
+        [input] Enter OpenAM Server URL :
         <server_protocol>://<server_host.server_domain>:<server_port>/<server_deploy_uri>
 
         [input] Enter type of application (WSC/ WSP) : (WSC, WSP)
@@ -270,7 +273,7 @@ Assumption :
            <wssagents_unzip_location>/wssagent/config/AMConfig.properties file and
            b) To modify the <wssagents_unzip_location>/wssagent/config/AMConfig.properties
            file, in order to update properties that are at the top of the file, under
-           heading "Following properties need to be updated for OpenSSO WSS Agents".
+           heading "Following properties need to be updated for OpenAM WSS Agents".
 
        4.2 cd <wssagents_unzip_location>/wssagent/samples/StockService
            If you plan to deploy on Tomcat or Sun Web Server, then run
@@ -299,16 +302,16 @@ Assumption :
    JDK "1.6.0_12" or higher.
    For deployment changes required on WebSphere 7.x, go to section 8.
    
-%% 5. OpenSSO Server Configuration
+%% 5. OpenAM Server Configuration
 
-   Login into the OpenSSO Console with user amadmin and <amadmin password>,
+   Login into the OpenAM Console with user amadmin and <amadmin password>,
    invoking following URL
 
-   openssoserver_protocol://openssoserver_host:openssoserver_port/
-                                                        openssoserver_deploy_uri
+   openamserver_protocol://openamserver_host:openamserver_port/
+                                                        openamserver_deploy_uri
 
    Note: If you have logged in as any other user, click Logout on the console
-         page and Login again and make sure that you access the OpenSSO Console.
+         page and Login again and make sure that you access the OpenAM Console.
 
    5.1 Configuring cookie encode property (If you have not done already)
 
@@ -317,10 +320,10 @@ Assumption :
              "com.iplanet.am.cookie.c66Encode" property to be "true".
        5.1.3 Save changes.
 
-   5.2 Enabling STS Security for WSC profile in OpenSSO
+   5.2 Enabling STS Security for WSC profile in OpenAM
 
        By default, this sample will use the default WSC and WSP profiles that
-       OpenSSO ships with (named as "wsc" and "wsp" respectively).
+       OpenAM ships with (named as "wsc" and "wsp" respectively).
 
        5.2.1 Go to Access Control -> Default realm -> Agents ->
        5.2.2 Select Web Service Client -> click on "wsc" profile to edit ->
@@ -328,7 +331,7 @@ Assumption :
        5.2.4 Select STS Configuration as "SecurityTokenService"
        5.2.5 Save changes.
     
-   Logout of OpenSSO and Restart the container.
+   Logout of OpenAM and Restart the container.
 
 %% 6. Testing the Samples
 
@@ -341,8 +344,8 @@ Assumption :
        the communication. You should see the SOAP request and response without
        any security token in the SOAP request/response headers.
 
-   6.3 With the secure Samples, you will be redirected to OpenSSO's Authentication
-       service for end user login. Enter any existing OpenSSO user with the 
+   6.3 With the secure Samples, you will be redirected to OpenAM's Authentication
+       service for end user login. Enter any existing OpenAM user with the
        password. Upon successful end user authentication, you will be redirected 
        back to <protocol>://<host>:<port>/StockClient/ page. Click Get Quote for
        a symbol of your choice and by clicking on the Request/Response links on
@@ -350,7 +353,7 @@ Assumption :
        is secured with WS-Security token in the SOAP request/response headers.
 
    Notes :
-       1) With the secure Samples, you will be always redirected to OpenSSO's
+       1) With the secure Samples, you will be always redirected to OpenAM's
           Authentication service for end user login first. If you want this end
           user authentication redirection to be done based on WSC's profile /
           configuration by reading "User Authentication Required" flag setting, 
@@ -373,7 +376,7 @@ Assumption :
 
        2) Even after successfully retrieving stock quote results page, if the
           request / response links on the StockClient web page do not show any
-          data or have exception showing data, then create "opensso" directory
+          data or have exception showing data, then create "openam" directory
           under your "user.home" directory on the machine where StockClient and
           StockService web applications are running.
 
@@ -435,7 +438,7 @@ Assumption :
        8.2.2 Copy <wssagents_unzip_location>/wssagent/lib/xmlsec.jar and
              <wssagents_unzip_location>/wssagent/lib/openssoclientsdk.jar to
              shared_libs.
-       8.2.3 Get xalan.jar and xercesImpl.jar from opensso external libraries
+       8.2.3 Get xalan.jar and xercesImpl.jar from openam external libraries
              at http://download.java.net/general/opensso/extlib/latest/opensso-sun-extlib.zip
              and copy them to shared_libs.
        8.2.4 On WAS console, load these four jars under shared_libs as

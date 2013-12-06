@@ -27,7 +27,7 @@ README file for Open Web Single Sign-On - Web Agents
 #
 # $Id: README.txt,v 1.3 2008/06/25 05:54:29 qcheng Exp $
 #
-#
+# Portions Copyright 2013 ForgeRock AS
 #
 %% Contents:
     %% 1. Build requirements
@@ -121,8 +121,8 @@ Follow these steps to obtain the LIBXML2:
 2.3.4 ./configure --prefix=<libxml2-install-dir>
 2.3.5 make
 2.3.6 make install
-2.3.7 cp <libxml2-install-dir>/include/libxml2/libxml/* <opensso_webagent>/extlib/SunOS/libxml2/include/libxml2/libxml
-2.3.8 cp <libxml2-install-dir>/lib/* <opensso_webagent>/extlib/SunOS/libxml2/lib
+2.3.7 cp <libxml2-install-dir>/include/libxml2/libxml/* <openam_webagent>/extlib/SunOS/libxml2/include/libxml2/libxml
+2.3.8 cp <libxml2-install-dir>/lib/* <openam_webagent>/extlib/SunOS/libxml2/lib
 
 %n2.4 Obtaining NSS 3.11
 
@@ -131,9 +131,9 @@ Follow these steps to obtain the binaries:
 2.4.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_11_RTM/SunOS5.8_OPT.OBJ/
 2.4.2 Download nss-3.11.tar.gz.
 2.4.3 Uncompress the the archive.
-2.4.4 cp nss-3.11/bin/* <opensso_webagent>/extlib/SunOS/nss/bin
-2.4.5 cp nss-3.11/include/* <opensso_webagent>/extlib/SunOS/nss/include
-2.4.6 cp nss-3.11/lib/* <opensso_webagent>/extlib/SunOS/nss/lib
+2.4.4 cp nss-3.11/bin/* <openam_webagent>/extlib/SunOS/nss/bin
+2.4.5 cp nss-3.11/include/* <openam_webagent>/extlib/SunOS/nss/include
+2.4.6 cp nss-3.11/lib/* <openam_webagent>/extlib/SunOS/nss/lib
 
 
 %% 2.5 Obtaining  NSPR 4.6.1
@@ -143,10 +143,10 @@ Follow these steps to obtain the binaries:
 2.5.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v4.6.1/SunOS5.8_OPT.OBJ/
 2.5.2 Download nspr-4.6.1.tar.gz.
 2.5.3 Uncompress the the archive. 
-2.5.4 cp <nspr-install-dir>/include/*.h <opensso_webagent>/extlib/SunOS/nspr/include
-2.5.5 cp -r <nspr-install-dir>/include/obsolete <opensso_webagent>/extlib/SunOS/nspr/include
-2.5.6 cp -r <nspr-install-dir>/include/private <opensso_webagent>/extlib/SunOS/nspr/include
-2.5.7 cp <nspr-install-dir>/lib/* <opensso_webagent>/extlib/SunOS/nspr/lib
+2.5.4 cp <nspr-install-dir>/include/*.h <openam_webagent>/extlib/SunOS/nspr/include
+2.5.5 cp -r <nspr-install-dir>/include/obsolete <openam_webagent>/extlib/SunOS/nspr/include
+2.5.6 cp -r <nspr-install-dir>/include/private <openam_webagent>/extlib/SunOS/nspr/include
+2.5.7 cp <nspr-install-dir>/lib/* <openam_webagent>/extlib/SunOS/nspr/lib
 
 %% 2.6 Obtaining libpthread, libCstd, and libCrun
 
@@ -159,7 +159,7 @@ These will be available in /usr/lib in Solaris.
 2.7.3 Uncompress the the archive.
 2.7.4 Install the server.
 2.7.5 Goto server install directory.
-2.7.6 cp <webserver-install-dir>/include/* <opensso_webagent>/extlib/SunOS/sjsws/include
+2.7.6 cp <webserver-install-dir>/include/* <openam_webagent>/extlib/SunOS/sjsws/include
 
 %% 2.8 Obtaining OpenAM Agents Common Installer libraries
 
@@ -220,8 +220,8 @@ Please follow these instructions:
 4.1.4 ./configure --prefix=<libxml2-install-dir> CC=<SunStudio c compiler path> CFLAGS="-fast -xarch=generic64"
 4.1.5 make
 4.1.6 make install
-4.1.7 cp <libxml2-install-dir>/include/libxml2/libxml/* <opensso_webagent>/extlib/SunOS/libxml2_64/include/libxml2/libxml
-4.1.8 cp <libxml2-install-dir>/lib/* <opensso_webagent>/extlib/SunOS/libxml2_64/lib
+4.1.7 cp <libxml2-install-dir>/include/libxml2/libxml/* <openam_webagent>/extlib/SunOS/libxml2_64/include/libxml2/libxml
+4.1.8 cp <libxml2-install-dir>/lib/* <openam_webagent>/extlib/SunOS/libxml2_64/lib
 
 %%4.2 64-bit NSS 3.11
 
@@ -230,9 +230,9 @@ Follow these steps to obtain the binaries:
 4.2.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_11_RTM/SunOS5.8_64_OPT.OBJ/nss-3.11.tar.gz
 4.2.2 Download nss-3.11.tar.gz.
 4.2.3 Uncompress the the archive.
-4.2.4 cp nss-3.11/bin/* <opensso_webagent>/extlib/SunOS/nss_64/bin
-4.2.5 cp nss-3.11/include/* <opensso_webagent>/extlib/SunOS/nss_64/include
-4.2.6 cp nss-3.11/lib/* <opensso_webagent>/extlib/SunOS/nss_64/lib
+4.2.4 cp nss-3.11/bin/* <openam_webagent>/extlib/SunOS/nss_64/bin
+4.2.5 cp nss-3.11/include/* <openam_webagent>/extlib/SunOS/nss_64/include
+4.2.6 cp nss-3.11/lib/* <openam_webagent>/extlib/SunOS/nss_64/lib
 
 
 %% 4.3 64-bit  NSPR 4.6.1
@@ -242,10 +242,10 @@ Follow these steps to obtain the binaries:
 4.3.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v4.6.1/SunOS5.8_64_OPT.OBJ/nspr-4.6.1.tar.gz
 4.3.2 Download nspr-4.6.1.tar.gz.
 4.3.3 Uncompress the the archive. 
-4.3.4 cp <nspr-install-dir>/include/*.h <opensso_webagent>/extlib/SunOS/nspr_64/include
-4.3.5 cp -r <nspr-install-dir>/include/obsolete <opensso_webagent>/extlib/SunOS/nspr_64/include
-4.3.6 cp -r <nspr-install-dir>/include/private <opensso_webagent>/extlib/SunOS/nspr_64/include
-4.3.7 cp <nspr-install-dir>/lib/* <opensso_webagent>/extlib/SunOS/nspr_64/lib
+4.3.4 cp <nspr-install-dir>/include/*.h <openam_webagent>/extlib/SunOS/nspr_64/include
+4.3.5 cp -r <nspr-install-dir>/include/obsolete <openam_webagent>/extlib/SunOS/nspr_64/include
+4.3.6 cp -r <nspr-install-dir>/include/private <openam_webagent>/extlib/SunOS/nspr_64/include
+4.3.7 cp <nspr-install-dir>/lib/* <openam_webagent>/extlib/SunOS/nspr_64/lib
 
 %% 4.4 Building the 64-bit agent
 

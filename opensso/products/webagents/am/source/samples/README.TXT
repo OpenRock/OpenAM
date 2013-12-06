@@ -1,7 +1,7 @@
 README.TXT
 
 --------------------------------------------------------------------
-OpenAM Policy Agent 3.0
+OpenAM Policy Agent 3.3
 --------------------------------------------------------------------
 
 DISCLAIMER
@@ -10,15 +10,17 @@ DISCLAIMER
    FORGEROCK INC. IS NOT LIABLE FOR ANY DAMAGE RESULTING 
    FROM THE USE OF THIS CODE OR ANY PORTION THEREOF.
 
+   Portions Copyright 2013 ForgeRock AS
 
 SAMPLE CODE
 -----------
 
    * What is provided.
-   * Building Sample Program on Solaris
+   * Building Sample Program on UNIX Platforms
    * Building Sample Program on Windows
    * Executing the Sample Program
      * Executing the Sample Program on Solaris
+     * Executing the Sample Program on Linux
      * Executing the Sample Program on Windows
    * Related References
 
@@ -26,12 +28,11 @@ What is provided
 ----------------
    The sample distribution contains source files:
           
-          1. am_policy_test.c
-          2. apache_agent.c
-	  3. am_auth_test.c
-          4. am_sso_test.c
-	  5. am_log_test.c
-	  6. am_web_agent_test.c
+      1. am_policy_test.c
+	  2. am_auth_test.c
+      3. am_sso_test.c
+	  4. am_log_test.c
+	  5. am_web_agent_test.c
 
    The file am_policy_test.c demonstrates the basic usage of Policy SDK APIs 
    that can be used to evaluate policy for specified resources.
@@ -44,14 +45,6 @@ What is provided
 
    The file am_log_test.c demonstrates the basic usage of Logging SDK APIs 
    that can be used to log a message to the OpenAM server logs.
-
-   The file apache_agent.c demonstrates how the Policy SDK APIs can be used
-   to build a Web Agent for the Apache Web Server. Please note that this
-   is a sample Web Agent and is not intended to serve as a real Web 
-   Agent. 
-
-   When you build the sample code, only apache_agent.c is not compiled. The
-   apache_agent.c is provided for reference purposes only.
 
 
 Building Sample Program on UNIX platforms
@@ -113,7 +106,7 @@ Building Sample Program on Windows
 Executing the Sample Program
 ----------------------------
 
-   From version 3.0, the c-sdk requires a configurable key to encrypt the 
+   From version 3.3, the c-sdk requires a configurable key to encrypt the
    agent profile password. The key has to be a minimum 7-letter(characters between 
    a-z, numbers 0-9) word. Please specify this key for the property below in the
    OpenSSOAgentBootstrap.properties file:
@@ -282,11 +275,6 @@ am_log_test
       sure appropriate values are set in the properties file before calling 
       this program. See the Agents documentation for more information on the 
       properties file.
-     
-apache_agent.c
-
-   Description: sample web agent plugin for the apache HTTP server. 
-   This is a sample and should not be used as an actual web agent.
 
 
 Executing the Sample Program on Solaris

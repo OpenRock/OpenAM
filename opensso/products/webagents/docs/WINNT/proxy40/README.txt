@@ -27,6 +27,7 @@ README file for Open Web Single Sign-On - Proxy Agents
 #
 # $Id: README.txt,v 1.1 2009/03/05 23:28:20 subbae Exp $
 #
+# Portions Copyright 2013 ForgeRock AS
 #
 %% Contents:
     %% 1. Build requirements
@@ -94,8 +95,8 @@ Follow these steps to obtain the LIBXML2:
 2.2.1 Open the web page: http://www.zlatkovic.com/pub/libxml/
 2.2.2 Download libxml2-2.6.23+.win32.zip
 2.2.3 Uncompress the zip file.
-2.2.4 cp <libxml2-install-dir>\include\libxml\* <opensso_webagent>\extlib\WINNT\libxml2\include\libxml2\libxml
-2.2.5 cp <libxml2-install-dir>\lib\* <opensso_webagent>\extlib\WINNT\libxml2\lib
+2.2.4 cp <libxml2-install-dir>\include\libxml\* <openam_webagent>\extlib\WINNT\libxml2\include\libxml2\libxml
+2.2.5 cp <libxml2-install-dir>\lib\* <openam_webagent>\extlib\WINNT\libxml2\lib
 
 %n2.3 Obtaining NSS 3.11 
 
@@ -104,9 +105,9 @@ Follow these steps to obtain the binaries:
 2.3.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_11_RTM/WINNT5.0_OPT.OBJ/
 2.3.2 Download nss-3.11.zip
 2.3.3 Uncompress the zip file. 
-2.3.4 cp nss-3.11\bin\* <opensso_webagent>\extlib\WINNT\nss\bin
-2.3.5 cp nss-3.11\include\* <opensso_webagent>\extlib\WINNT\nss\include
-2.3.6 cp nss-3.11\lib\* <opensso_webagent>\extlib\WINNT\nss\lib
+2.3.4 cp nss-3.11\bin\* <openam_webagent>\extlib\WINNT\nss\bin
+2.3.5 cp nss-3.11\include\* <openam_webagent>\extlib\WINNT\nss\include
+2.3.6 cp nss-3.11\lib\* <openam_webagent>\extlib\WINNT\nss\lib
 
 
 %% 2.4 Obtaining  NSPR 4.6.1
@@ -116,10 +117,10 @@ Follow these steps to obtain the binaries:
 2.4.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v4.6.1/WINNT5.0_OPT.OBJ/
 2.4.2 Download nspr-4.6.1.zip
 2.4.3 Uncompress the zip file. 
-2.4.4 cp <nspr-install-dir>\include\*.h <opensso_webagent>\extlib\WINNT\nspr\include
-2.4.5 cp -r <nspr-install-dir>\include\obsolete <opensso_webagent>\extlib\WINNT\nspr\include
-2.4.6 cp -r <nspr-install-dir>\include\private <opensso_webagent>\extlib\WINNT\nspr\include
-2.4.7 cp <nspr-install-dir>\lib\* <opensso_webagent>\extlib\WINNT\nspr\lib
+2.4.4 cp <nspr-install-dir>\include\*.h <openam_webagent>\extlib\WINNT\nspr\include
+2.4.5 cp -r <nspr-install-dir>\include\obsolete <openam_webagent>\extlib\WINNT\nspr\include
+2.4.6 cp -r <nspr-install-dir>\include\private <openam_webagent>\extlib\WINNT\nspr\include
+2.4.7 cp <nspr-install-dir>\lib\* <openam_webagent>\extlib\WINNT\nspr\lib
 
 %% 2.5 Download SJS Proxy Server 4.0.x Header files
 
@@ -128,9 +129,9 @@ Follow these steps to obtain the binaries:
 2.5.3 Uncompress the the archive.
 2.5.4 Install the server.
 2.5.5 Goto server install directory.
-2.5.6 cp <webserver-install-dir>/include/* <opensso_webagent>/extlib/WINNT/proxy/include
+2.5.6 cp <webserver-install-dir>/include/* <openam_webagent>/extlib/WINNT/proxy/include
 2.5.7 The following is applicable for Windows only. 
-cp <webserver-install-dir>/lib/ns-httpd40.dll <opensso_webagent>/extlib/WINNT/proxy/lib
+cp <webserver-install-dir>/lib/ns-httpd40.dll <openam_webagent>/extlib/WINNT/proxy/lib
 
 %% 2.6 Obtaining OpenAM Agents Common Installer libraries
 

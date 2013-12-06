@@ -24,6 +24,8 @@
 
    $Id: README,v 1.16 2009/06/12 22:17:28 huacui Exp $
 
+   Portions Copyright 2013 ForgeRock AS
+
 -->
 
 ======
@@ -31,7 +33,7 @@ README
 ======
 
 This README contains instructions on how to secure web services using 
-OpenSSO WSS providers on Glassfish V2 or SUN Application Server 9.1
+OpenAM WSS providers on Glassfish V2 or SUN Application Server 9.1
 
 
 General Description:
@@ -42,13 +44,13 @@ client and a standalone client.
 The sample demonstrates a simple stock quote service where given
 a stock ticker symbol it obtains stock data. The secure communication
 between stock quote web services client is achieved using Federation
-OpenSSO web services security agents. The web services security
+OpenAM web services security agents. The web services security
 agents profile configuation is stored in backend repository information
-like regular OpenSSO agents.
+like regular OpenAM agents.
 
 
 The following diagram depicts a simple deployment scenario where the 
-profiles of WSC and WSP are all hosted on a single OpenSSO instance
+profiles of WSC and WSP are all hosted on a single OpenAM instance
 
                 GF1                             GF2
            _______________                   ________________
@@ -63,13 +65,13 @@ profiles of WSC and WSP are all hosted on a single OpenSSO instance
                             __V______V_
                             |          |
                             |          | Machine 3
-                            | OpenSSO  | 
+                            | OpenAM  |
                             |(WSC,WSP  |
                             | Profiles)|
                             |__________|
 
 Sections:
-I.   Installing Glassfish and OpenSSO
+I.   Installing Glassfish and OpenAM
 II.  Installing WSS Agents and Configuring WSC and WSP profiles
 III. Building and Deploying the samples
 IV.  Testing the sample.
@@ -78,15 +80,15 @@ Section I.
 
 1. Install Glassfish that hosts the Web Services Client (WSC). 
 2. Install Glassfish that hosts the Web Services Provider (WSP). 
-3. Install Glassfish and deploy OpenSSO on this Glassfish instance. 
-Note that the OpenSSO server need not be deployed on Glassfish. They can
+3. Install Glassfish and deploy OpenAM on this Glassfish instance.
+Note that the OpenAM server need not be deployed on Glassfish. They can
 be deployed on any container. Only the WSC and WSP need to be on Glassfish.
 
 Section II
 
 Refer to the README.glassfish with the WSS Agent on installing WSS 
 Agents on WSC/WSP containers and configuring WSC/WSP profiles
-in OpenSSO server.
+in OpenAM server.
 
 
 III.  Building and Deploying the samples
@@ -131,7 +133,7 @@ Repeat the steps on WSC and WSP machines:
    and deploy the StockQuoteService onto glassfish container. Please make
    sure you run this on a WSP instance
 
-Note: If you have logged in as any other user, click Logout on the console page and Login again and make sure that you access the OpenSSO Console.
+Note: If you have logged in as any other user, click Logout on the console page and Login again and make sure that you access the OpenAM Console.
 
 
 IV.  Testing the sample.
@@ -140,8 +142,8 @@ IV.  Testing the sample.
 
    http://<wsc-host-name:portnumber>/StockQuoteClient/index.jsp
 
-2. You will be redirected to OpenSSO's Authentication service
-   for end user login. Enter any existing OpenSSO user with
+2. You will be redirected to OpenAM's Authentication service
+   for end user login. Enter any existing OpenAM user with
    its password. Upon successful end user authentication, 
    you will be redirected back to 
    http://<host>:<port>/StockQuoteClient/ page.

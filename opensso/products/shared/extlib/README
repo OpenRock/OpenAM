@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
-README file for Open Web Single Sign-On | extlib
+README file for OpenAM Web Single Sign-On | extlib
 ------------------------------------------------------------------------------
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
@@ -25,6 +25,8 @@ your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
 
 $Id: README,v 1.2 2008/06/25 05:52:42 qcheng Exp $
+
+Portions Copyright 2013 ForgeRock AS
 
 ------------------------------------------------------------------------------
 

@@ -24,6 +24,8 @@
 
    $Id: README,v 1.5 2008/10/08 22:56:29 mallas Exp $
 
+   Portions Copyright 2013 ForgeRock AS
+
 -->
 
 README
@@ -122,18 +124,18 @@ B. Web services proxy case where the intermediary obtains a new token using
    the token that is authenticated by the LoanRequestorClient.
 
 
-Configuring OpenSSO for passthrough (use case A):
+Configuring OpenAM for passthrough (use case A):
 =============================================
 
 
-1.  Login into the OpenSSO Console with user
+1.  Login into the OpenAM Console with user
     amadmin and <amadmin password>
 
-    openssoserver_protocol://openssoserver_host:openssoserver_port/openssoserver_deploy_uri
+    openamserver_protocol://openamserver_host:openamserver_port/openamserver_deploy_uri
 
     Note: If you have logged in as any other user, click Logout on the console
     page and Login again and make sure that you access the Federated
-    OpenSSO Console.
+    OpenAM Console.
 
 2. Create agent profiles for "LoanRequestorService" WSC :
       Create "WSC" profile for "LoanRequestorService"
@@ -187,9 +189,9 @@ Configuring OpenSSO for passthrough (use case A):
       two new profiles as "proxywsp" and "wsp" and in "proxywsp" create the
       end point as the LoanReqestorService web service endpoint.
 
-5.  Logout of OpenSSO Administration console.
+5.  Logout of OpenAM Administration console.
 
-Configuring OpenSSO for proxying with a new token (use case B):
+Configuring OpenAM for proxying with a new token (use case B):
 ==========================================================
 TODO-Later
 

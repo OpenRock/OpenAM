@@ -27,14 +27,14 @@ your own identifying information:
 $Id: README,v 1.23 2009/12/23 02:02:12 leiming Exp $
 
 ------------------------------------------------------------------------------
-Portions Copyrighted 2010-2011 ForgeRock AS
+Portions Copyright 2010-2013 ForgeRock AS
 ------------------------------------------------------------------------------
 
 %% Contents:
     %% 1. Build requirements
     %% 2. Library dependencies
-        %% 2.1 Obtaining OpenSSO Agents Common Installer libraries
-        %% 2.2 Obtaining OpenSSO ClientSDK library
+        %% 2.1 Obtaining OpenAM Agents Common Installer libraries
+        %% 2.2 Obtaining OpenAM ClientSDK library
         %% 2.3 Obtaining J2EE container specific libraries
         %% 2.4 Obtaining commons-io library
         %% 2.5 Obtaining JAVA EE API
@@ -54,7 +54,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
 
 %% 1. Build requirements
 
-The OpenSSO J2EE Agent workspace uses Apache Ant as the build tool. 
+The OpenAM J2EE Agent workspace uses Apache Ant as the build tool.
 The build scripts in this workspace use features not present in 
 releases of Ant prior to 1.6.5.  Thus, in order to build this workspace 
 you must have Ant version 1.6.5 or above installed and available in 
@@ -68,16 +68,16 @@ JAVA_HOME environment variable is setup correctly pointing to its location.
 
 %% 2. Library dependencies
 
-The OpenSSO J2EE Agent sources depend upon a few third-party libraries 
+The OpenAM J2EE Agent sources depend upon a few third-party libraries
 that are not included as a part of the workspace and must be obtained 
 directly from the library vendor or distributor. Some of these libraries 
 are available in source distribution form and must be built locally 
 before they can be used. 
 
-The libraries needed for compiling OpenSSO J2EE Agent sources are:
+The libraries needed for compiling OpenAM J2EE Agent sources are:
 
-   - OpenSSO Agents Common Installer libraries
-   - OpenSSO ClientSDK library
+   - OpenAM Agents Common Installer libraries
+   - OpenAM ClientSDK library
    - J2EE Container specific libraries
    - Commons IO library
    - JAVA EE API library
@@ -100,25 +100,25 @@ must disregard those instructions and instead follow the ones provided by
 the library vendor or distributor in accordance with their terms and 
 conditions.
 
-%% 2.1 Obtaining OpenSSO Agents Common Installer libraries
+%% 2.1 Obtaining OpenAM Agents Common Installer libraries
 
-The OpenSSO Agents Common installer libraries opensso-installtools.jar and 
-opensso-installtools-launcher.jar can be built from the OpenSSO Agents Common 
+The OpenAM Agents Common installer libraries opensso-installtools.jar and
+opensso-installtools-launcher.jar can be built from the OpenAM Agents Common
 Installer workspace, for example in opensso/products/installtools.
 
 Follow these steps to obtain the libraries:
-2.1.1 Check out the OpenSSO Agents Common installer workspace.
-2.1.2 Set JAVA_HOME to the location of JDK 1.5.
+2.1.1 Check out the OpenAM Agents Common installer workspace.
+2.1.2 Set JAVA_HOME to the location of JDK.
 2.1.3 At the root of the workspace, at opensso/products/installtools/, run: ant
 2.1.4 Copy the libraries opensso-installtools.jar, and opensso-installtools-launcher.jar 
 from the dist directory (opensso/products/installtools/built/dist) of the 
-OpenSSO Agents Common installer workspace into extlib directory in this 
+OpenAM Agents Common installer workspace into extlib directory in this
 workspace (opensso/products/j2eeagents/extlib). 
 
-%% 2.2 Obtaining OpenSSO ClientSDK library
+%% 2.2 Obtaining OpenAM ClientSDK library
 
-2.2.1 The OpenSSO ClientSDK library openssoclientsdk.jar can be obtained from
-the OpenSSO nightly build.
+2.2.1 The OpenAM ClientSDK library openssoclientsdk.jar can be obtained from
+the OpenAM nightly build.
 
 Follow these steps to obtain the library:
 2.2.1.1 Download the latest nightly build in ZIP format from:
@@ -127,16 +127,16 @@ Follow these steps to obtain the library:
 2.2.1.3 Copy the libraries/jars/openssoclientsdk.jar into opensso/products/j2eeagents/extlib
 directory.
 
-2.2.2 Alternatively the OpenSSO ClientSDK library openssoclientsdk.jar can be
-built from the OpenSSO workspace.
+2.2.2 Alternatively the OpenAM ClientSDK library openssoclientsdk.jar can be
+built from the OpenAM workspace.
 
 Follow these steps to obtain the library:
-2.2.2.1 Check out the OpenSSO workspace.
+2.2.2.1 Check out the OpenAM workspace.
 2.2.2.2 Set JAVA_HOME to the location of JDK 1.5.
 2.2.2.3 At the root of the workspace, run: ant server-nightly
 2.2.2.4 Copy the library openssoclientsdk.jar from the 
 opensso/products/federation/openfm/built/dist of
-the OpenSSO workspace into opensso/products/j2eeagents/extlib directory.
+the OpenAM workspace into opensso/products/j2eeagents/extlib directory.
 
 %% 2.3 Obtaining J2EE container specific libraries
 The J2EE Container specific libraries can be obtained from the J2EE 
@@ -145,7 +145,7 @@ container installation.
 2.3.1 Obtaining libraries for Sun Application Server 8.1/8.2/9.0/9.1/10
 Follow these steps to obtain the libraries for Sun Application Server 8.1 or 8.2 or 9.0 or 9.1 or 10:
 2.3.1.1 Install Sun Application Server 8.1 or 8.2 or 9.0 or 9.1 or 10
-2.3.1.2 If you are installing OpenSSO J2EE Agent on Sun Application Server 
+2.3.1.2 If you are installing OpenAM J2EE Agent on Sun Application Server
 2.3.1.3 In case of 8.1-9.1 copy the appserv-ext.jar and appserv-rt.jar from the lib directory of the 
 server installation into the opensso/products/j2eeagents/extlib/appserver/v9
 directory of this workspace.
@@ -178,12 +178,12 @@ into the opensso/products/j2eeagents/extlib/websphere/v61 directory of this work
 2.3.4 Obtaining libraries for JBoss Application Server 4.0.x/4.2.x 
 Follow these steps to obtain the libraries for JBoss Application Server 4.0.x/4.2.x :
 2.3.4.1 Install JBoss Application Server 4.0.x/4.2.x
-2.3.4.2 If you are installing OpenSSO J2EE Agent on JBoss Application Server 4.0.5/4.2.x 
+2.3.4.2 If you are installing OpenAM J2EE Agent on JBoss Application Server 4.0.5/4.2.x
 copy jboss-saaj.jar and jbosssx.jar from the lib directory
 of the JBoss4.2.x server installation and jbossweb-service.jar from the 
 <JBoss server installation directory>\server\default\deploy\jboss-web.deployer
 into the opensso/products/j2eeagents/extlib/jboss/v42.
-2.3.4.3 If you are installing OpenSSO J2EE Agent on JBoss Application Server 5.0.0 
+2.3.4.3 If you are installing OpenAM J2EE Agent on JBoss Application Server 5.0.0
 copy jbosssx.jar from the lib directory of the 
 JBoss5.0.x server installation and jboss-web-service.jar from the 
 <JBoss server installation directory>\server\default\deploy\jboss-web.deployer and 
@@ -192,7 +192,7 @@ jboss-saaj.jar from the lib directory of JBoss-4.2.3.GA into the opensso/product
 2.3.5 Obtaining libraries for Tomcat Server 6.0 
 Follow these steps to obtain the libraries for  Tomcat Server 6.0  :
 2.3.5.1 Install  Tomcat Server 6.0 
-2.3.5.2 If you are installing OpenSSO J2EE Agent on  Tomcat Server 6.0 , copy catalina.jar 
+2.3.5.2 If you are installing OpenAM J2EE Agent on  Tomcat Server 6.0 , copy catalina.jar
 from the lib directory of the server installation 
 into the opensso/products/j2eeagents/extlib/tomcat/v6.
 

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
-README file for Open Web Single Sign-On WAR
+README file for OpenAM Web Single Sign-On WAR
 ------------------------------------------------------------------------------
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
@@ -26,6 +26,8 @@ your own identifying information:
 
 $Id: README,v 1.3 2008/06/25 05:44:24 qcheng Exp $
 
+Portions Copyright 2013 ForgeRock AS
+
 ------------------------------------------------------------------------------
 Portions Copyrighted 2011 ForgeRock AS
 ------------------------------------------------------------------------------
@@ -40,9 +42,9 @@ Portions Copyrighted 2011 ForgeRock AS
 
 This WAR contains all the implementations for OpenAM server.
 After the WAR is built, there will be a WAR file, openam.war under the
-distribution directory, opensso/products/amserver/built/war/dist. Deploy it
+distribution directory, openam/products/amserver/built/war/dist. Deploy it
 on a J2EE compliant web container. Visit a configuration page with a web
-browser, click on a button to configure opensso server. Then server is
+browser, click on a button to configure openam server. Then server is
 ready for use.
 
 After you have authenticated to the server, you will be brought to an

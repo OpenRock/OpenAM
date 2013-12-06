@@ -27,6 +27,7 @@ README file for Open Web Single Sign-On - Web Agents
 #
 # $Id: README.txt,v 1.3 2009/06/26 21:35:23 robertis Exp $
 #
+# Portions Copyright 2013 ForgeRock AS
 #
 %% Contents:
     %% 1. Build requirements
@@ -101,8 +102,8 @@ Follow these steps to obtain the LIBXML2:
 2.2.1 Open the web page: http://www.zlatkovic.com/pub/libxml/
 2.2.2 Download libxml2-2.7.3.win32.zip
 2.2.3 Uncompress the zip file.
-2.2.4 cp <libxml2-install-dir>\include\libxml\* <opensso_webagent>\extlib\WINNT\libxml2\include\libxml2\libxml
-2.2.5 cp <libxml2-install-dir>\lib\* <opensso_webagent>\extlib\WINNT\libxml2\lib
+2.2.4 cp <libxml2-install-dir>\include\libxml\* <openam_webagent>\extlib\WINNT\libxml2\include\libxml2\libxml
+2.2.5 cp <libxml2-install-dir>\lib\* <openam_webagent>\extlib\WINNT\libxml2\lib
 
 %n2.3 Obtaining NSS 3.11 
 
@@ -111,9 +112,9 @@ Follow these steps to obtain the binaries:
 2.3.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_11_RTM/WINNT5.0_OPT.OBJ/
 2.3.2 Download nss-3.11.zip
 2.3.3 Uncompress the zip file. 
-2.3.4 cp nss-3.11\bin\* <opensso_webagent>\extlib\WINNT\nss\bin
-2.3.5 cp nss-3.11\include\* <opensso_webagent>\extlib\WINNT\nss\include
-2.3.6 cp nss-3.11\lib\* <opensso_webagent>\extlib\WINNT\nss\lib
+2.3.4 cp nss-3.11\bin\* <openam_webagent>\extlib\WINNT\nss\bin
+2.3.5 cp nss-3.11\include\* <openam_webagent>\extlib\WINNT\nss\include
+2.3.6 cp nss-3.11\lib\* <openam_webagent>\extlib\WINNT\nss\lib
 
 
 %% 2.4 Obtaining  NSPR 4.6.1
@@ -123,22 +124,22 @@ Follow these steps to obtain the binaries:
 2.4.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v4.6.1/WINNT5.0_OPT.OBJ/
 2.4.2 Download nspr-4.6.1.zip
 2.4.3 Uncompress the zip file. 
-2.4.4 cp <nspr-install-dir>\include\*.h <opensso_webagent>\extlib\WINNT\nspr\include
-2.4.5 cp -r <nspr-install-dir>\include\obsolete <opensso_webagent>\extlib\WINNT\nspr\include
-2.4.6 cp -r <nspr-install-dir>\include\private <opensso_webagent>\extlib\WINNT\nspr\include
-2.4.7 cp <nspr-install-dir>\lib\* <opensso_webagent>\extlib\WINNT\nspr\lib
+2.4.4 cp <nspr-install-dir>\include\*.h <openam_webagent>\extlib\WINNT\nspr\include
+2.4.5 cp -r <nspr-install-dir>\include\obsolete <openam_webagent>\extlib\WINNT\nspr\include
+2.4.6 cp -r <nspr-install-dir>\include\private <openam_webagent>\extlib\WINNT\nspr\include
+2.4.7 cp <nspr-install-dir>\lib\* <openam_webagent>\extlib\WINNT\nspr\lib
 
 %% 2.5 Download IIS Header files
 
 2.5.1 If building IIS 6 agent then 
 
     2.5.1.1 IIS6's HttpExt.h is needed.
-    2.5.1.2 cp HttpExt.h <opensso_webagent>\extlib\WINNT\iis6\include
+    2.5.1.2 cp HttpExt.h <openam_webagent>\extlib\WINNT\iis6\include
 
 
 %% 3. Building the workspace
 
-3.1 cd <opensso_webagent>
+3.1 cd <openam_webagent>
 
 ** Execute ant usage to get information about all the supported options.
 ** Make sure gmake is in the system PATH.

@@ -27,7 +27,7 @@ README file for Open Web Single Sign-On - Web Agents
 #
 # $Id: README.txt,v 1.1 2009/01/12 09:44:44 ranajitgh Exp $
 #
-#
+# Portions Copyright 2013 ForgeRock AS
 #
 %% Contents:
     %% 1. Build requirements
@@ -121,8 +121,8 @@ Follow these steps to obtain the LIBXML2:
 2.3.4 ./configure --prefix=<libxml2-install-dir>
 2.3.5 make
 2.3.6 make install
-2.3.7 cp <libxml2-install-dir>/include/libxml2/libxml/* <opensso_webagent>/extlib/SunOS/libxml2/include/libxml2/libxml
-2.3.8 cp <libxml2-install-dir>/lib/* <opensso_webagent>/extlib/SunOS/libxml2/lib
+2.3.7 cp <libxml2-install-dir>/include/libxml2/libxml/* <openam_webagent>/extlib/SunOS/libxml2/include/libxml2/libxml
+2.3.8 cp <libxml2-install-dir>/lib/* <openam_webagent>/extlib/SunOS/libxml2/lib
 
 %n2.4 Obtaining NSS 3.11
 
@@ -131,9 +131,9 @@ Follow these steps to obtain the binaries:
 2.4.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_11_RTM/SunOS5.8_OPT.OBJ/
 2.4.2 Download nss-3.11.tar.gz.
 2.4.3 Uncompress the the archive.
-2.4.4 cp nss-3.11/bin/* <opensso_webagent>/extlib/SunOS/nss/bin
-2.4.5 cp nss-3.11/include/* <opensso_webagent>/extlib/SunOS/nss/include
-2.4.6 cp nss-3.11/lib/* <opensso_webagent>/extlib/SunOS/nss/lib
+2.4.4 cp nss-3.11/bin/* <openam_webagent>/extlib/SunOS/nss/bin
+2.4.5 cp nss-3.11/include/* <openam_webagent>/extlib/SunOS/nss/include
+2.4.6 cp nss-3.11/lib/* <openam_webagent>/extlib/SunOS/nss/lib
 
 
 %% 2.5 Obtaining  NSPR 4.6.1
@@ -143,10 +143,10 @@ Follow these steps to obtain the binaries:
 2.5.1 Open the web page : ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v4.6.1/SunOS5.8_OPT.OBJ/
 2.5.2 Download nspr-4.6.1.tar.gz.
 2.5.3 Uncompress the the archive. 
-2.5.4 cp <nspr-install-dir>/include/*.h <opensso_webagent>/extlib/SunOS/nspr/include
-2.5.5 cp -r <nspr-install-dir>/include/obsolete <opensso_webagent>/extlib/SunOS/nspr/include
-2.5.6 cp -r <nspr-install-dir>/include/private <opensso_webagent>/extlib/SunOS/nspr/include
-2.5.7 cp <nspr-install-dir>/lib/* <opensso_webagent>/extlib/SunOS/nspr/lib
+2.5.4 cp <nspr-install-dir>/include/*.h <openam_webagent>/extlib/SunOS/nspr/include
+2.5.5 cp -r <nspr-install-dir>/include/obsolete <openam_webagent>/extlib/SunOS/nspr/include
+2.5.6 cp -r <nspr-install-dir>/include/private <openam_webagent>/extlib/SunOS/nspr/include
+2.5.7 cp <nspr-install-dir>/lib/* <openam_webagent>/extlib/SunOS/nspr/lib
 
 %% 2.6 Obtaining libpthread, libCstd, and libCrun
 
@@ -159,7 +159,7 @@ These will be available in /usr/lib in Solaris.
 2.7.3 Uncompress the the archive.
 2.7.4 Install the server.
 2.7.5 Goto server install directory.
-2.7.6 cp -rp <proxy40-install-dir>/plugin/include/* <opensso_webagent>/extlib/SunOS/proxy40/include
+2.7.6 cp -rp <proxy40-install-dir>/plugin/include/* <openam_webagent>/extlib/SunOS/proxy40/include
 
 %% 2.8 Obtaining OpenAM Agents Common Installer libraries
 

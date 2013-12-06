@@ -24,16 +24,18 @@
 
    $Id: README.wssagentszip,v 1.12 2009/08/11 07:14:42 mrudul_uchil Exp $
 
+   Portions Copyright 2013 ForgeRock AS
+
 -->
 
-OpenSSO Web Services Security Agents / Providers - Zip file
+OpenAM Web Services Security Agents / Providers - Zip file
 
 openssowssproviders.zip
-             |____ lib/openssoclientsdk.jar (complete OpenSSO clientsdk jar)
+             |____ lib/openssoclientsdk.jar (complete OpenAM clientsdk jar)
              |____ lib/openssowssproviders.jar (complete WSS Providers/Agents jar - currently supported on Glassfish / AS 9.1 only)
-             |____ lib/*.jar (other jar files required for OpenSSO client and WSS Providers/Agents)
-             |____ config/AMConfig.properties (complete OpenSSO client properties)
-             |____ config/OpenSSOJavaPermissions.txt (Java permissions for OpenSSO)
+             |____ lib/*.jar (other jar files required for OpenAM client and WSS Providers/Agents)
+             |____ config/AMConfig.properties (complete OpenAM client properties)
+             |____ config/OpenSSOJavaPermissions.txt (Java permissions for OpenAM)
              |____ resources/keystore.jks (client keystore file)
              |____ resources/.keypass (password file for key)
              |____ resources/.storepass (password file for keystore)

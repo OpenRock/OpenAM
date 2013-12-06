@@ -26,9 +26,11 @@ your own identifying information:
 
 $Id: README,v 1.5 2008/08/19 19:09:37 veiming Exp $
 
+Portions Copyright 2013 ForgeRock AS
+
 ------------------------------------------------------------------------------
 
 This directory contains a sample JKS keystore file. The file will be used as 
-default keystore after configuring the OpenSSO WAR.
+default keystore after configuring the OpenAM WAR.
 The keystore contains one key entry with alias name "test". Keystore 
 password and key password for the entry are "changeit".

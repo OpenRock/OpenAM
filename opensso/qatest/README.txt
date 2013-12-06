@@ -1,5 +1,5 @@
 ---------------------------------------------
-README file for executing QA test on OpenSSO
+README file for executing QA test on OpenAM
 ---------------------------------------------
 #
 # The contents of this file are subject to the terms
@@ -25,6 +25,7 @@ README file for executing QA test on OpenSSO
 #
 # Copyright 2007 Sun Microsystems Inc. All Rights Reserved
 #
+# Portions Copyright 2013 ForgeRock AS
 #
 
 All documents related to qatest can be found under:
