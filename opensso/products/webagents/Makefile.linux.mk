@@ -70,6 +70,10 @@ varnishi: $(VRNSHOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CC} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libvmod_am.so $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/../lib' -Wl,-rpath,'$$ORIGIN' -z origin $(VRNSHOBJS) -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a -lstdc++ $(EXT_LIBS)
 
+varnish302i: varnish_agent_302.o vcc_if_302.o
+	@echo "[*** Creating "$@" shared library ***]"
+	${CC} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libvmod_am.so $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/../lib' -Wl,-rpath,'$$ORIGIN' -z origin agents/source/varnish/varnish_agent_302.o agents/source/varnish/vcc_if_302.o -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a -lstdc++ $(EXT_LIBS)
+
 oiwsi: $(OIWSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libames6.so $(LDFLAGS) $(OIWSOBJS) -o agents/source/sjsws/libames6.so am/source/libamsdk.a $(EXT_LIBS)

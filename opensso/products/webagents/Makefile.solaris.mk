@@ -74,15 +74,9 @@ apache24i: $(APA24OBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} $(CFLAGS) -h libamapc24.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(APA24OBJS) -o agents/source/apache24/libamapc24.so -M agents/source/apache24/libamapc.mapfile am/source/libamsdk.a $(EXT_LIBS)
 
-ifeq ($(OS_MARCH), i86pc)
 varnishi: $(VRNSHOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} $(CFLAGS) -h libvmod_am.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(VRNSHOBJS) -R'$$ORIGIN/vmod_am_lib' -R'$$ORIGIN' -z origin -o agents/source/varnish/libvmod_am.so am/source/libamsdk.a $(EXT_LIBS)
-else
-varnishi:
-	@echo "[*** Creating "$@" shared library ***]"
-	@echo "Varnish is not supported on SPARC"
-endif
 
 oiwsi: $(OIWSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"

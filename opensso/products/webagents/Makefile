@@ -105,7 +105,14 @@ endif
 	@echo "[*** Compiling "$<" ***]"
 	$(CC) -c $(CFLAGS)  $< -o $@
 
+varnish_agent_302.o: agents/source/varnish/varnish_agent.c
+	@echo "[*** Compiling "$<" ***]"
+	$(CC) -c $(CFLAGS)  -Iextlib/Linux/varnish302_64/include -Iagents/source/varnish -DVARNISH302 $< -o agents/source/varnish/$@
 
+vcc_if_302.o: agents/source/varnish/vcc_if.c
+	@echo "[*** Compiling "$<" ***]"
+	$(CC) -c $(CFLAGS)  -Iextlib/Linux/varnish302_64/include -Iagents/source/varnish -DVARNISH302 $< -o agents/source/varnish/$@
+	
 version:
 	@echo "[***** Updating version.h *****]"
 	rm -fr am/source/version.h
@@ -123,15 +130,19 @@ version:
 	   -e 's%AGENT_ER_TEXT%%g' \
            -e 's%AGENT_FVB_TEXT%%g' < version.template > .version
 
-all: version libamsdk_static libamsdk apache20i apache22i apache24i varnishi oiwsi oipsi dominoi
+all: version libamsdk_static libamsdk apache20i apache22i apache24i varnishi cleanvarnish varnish302i oiwsi oipsi dominoi
 
 apache: version libamsdk_static libamsdk apache20i
 apache22: version libamsdk_static libamsdk apache22i
 apache24: version libamsdk_static libamsdk apache24i
 sjsws: version libamsdk_static libamsdk oiwsi
 proxy40: version libamsdk_static libamsdk oipsi
-varnish: version libamsdk_static libamsdk varnishi
+varnish: version libamsdk_static libamsdk cleanvarnish varnishi
+varnish302: version libamsdk_static libamsdk cleanvarnish varnish_agent_302.o vcc_if_302.o varnish302i
 domino: version libamsdk_static libamsdk dominoi
 	
 clean:
 	rm -fr built/dist built/apache built/apache22 built/apache24 built/proxy40 built/sjsws built/varnish am/source/version.h am/source/*.o agents/source/domino/*.so agents/source/domino/*.o agents/source/apache22/*.o agents/source/apache/*.o agents/source/proxy40/*.so agents/source/proxy40/*.o agents/source/sjsws/*.so agents/source/sjsws/*.o agents/source/apache24/*.o agents/source/apache/*.so agents/source/apache22/*.so agents/source/apache24/*.so agents/source/varnish/*.so agents/source/varnish/*.o am/source/*.so am/source/*.so.3 am/source/*.a am/source/crypt_util
+
+cleanvarnish:
+	rm -fr  agents/source/varnish/*.so agents/source/varnish/*.o
