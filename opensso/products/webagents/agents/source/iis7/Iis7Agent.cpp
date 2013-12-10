@@ -589,7 +589,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     status = get_request_url(pHttpContext, requestURL, origRequestURL,
             pathInfo, agent_config);
     // Handle notification
-    if ((status == AM_SUCCESS) && (B_TRUE == am_web_is_notification(requestURL.c_str(), agent_config))) {
+    if ((status == AM_SUCCESS) && (B_TRUE == am_web_is_notification(origRequestURL.c_str(), agent_config))) {
         std::string data = "";
         if (GetEntity(pHttpContext, data)) {
             am_web_handle_notification(data.c_str(), data.size(), agent_config);

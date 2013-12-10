@@ -1842,7 +1842,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 
     // Check whether the url is a notification url
     if ((status == AM_SUCCESS) &&
-         (B_TRUE == am_web_is_notification(requestURL, agent_config))) {
+         (B_TRUE == am_web_is_notification(origRequestURL, agent_config))) {
           const char* data = NULL;
           if (pECB->cbTotalBytes > 0) {
              data =  pECB->lpbData;
@@ -1888,7 +1888,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     // and dummy urls as those cases are handled by the agent.
     if (status == AM_SUCCESS) {
         char *dummyPtr = strstr(requestURL, POST_PRESERVE_URI);
-        if ((am_web_is_notification(requestURL, agent_config) != B_TRUE) &&
+        if ((am_web_is_notification(origRequestURL, agent_config) != B_TRUE) &&
             ( dummyPtr == NULL))
         {
             pECB->dwHttpStatusCode = getHttpStatusCode(pECB);
