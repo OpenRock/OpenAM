@@ -1222,8 +1222,18 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
         }
         if (status == AM_SUCCESS) {
             if (requestURL != NULL) {
+                char *url = requestURL;
+                am_web_log_debug("%s: constructed request url before normalization: %s", thisfunc, url);
+                /*find the end of url string*/
+                while (url && *url) ++url;
+                for (--url; requestURL < url; --url) {
+                    if (*url == '/') {
+                        /*erase (all) trailing slashes*/
+                        *url = 0;
+                    } else break;
+                }
                 requestURLStr.assign(requestURL);
-                am_web_log_debug("%s: Constructed request url: %s",
+                am_web_log_debug("%s: constructed request url: %s",
                         thisfunc, requestURLStr.c_str());
             }
             if (origRequestURL != NULL) {
