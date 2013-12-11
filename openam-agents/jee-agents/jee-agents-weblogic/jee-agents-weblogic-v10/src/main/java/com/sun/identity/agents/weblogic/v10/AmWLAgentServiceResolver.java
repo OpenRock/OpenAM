@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.agents.weblogic.v10;
 
@@ -72,9 +72,5 @@ public class AmWLAgentServiceResolver extends ServiceResolver {
      */
     public String getGlobalVerificationHandlerImpl() {
         return GenericExternalVerificationHandler.class.getName();
-    }
-
-    public boolean isLifeCycleMechanismAvailable() {
-        return true;
     }
 }

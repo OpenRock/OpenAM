@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.agents.tools.tomcat.v6;
 
@@ -42,7 +42,7 @@ public interface IConstants {
     public static final String FILTER_NAME = "Agent";
     public static final String FILTER_DISPLAY_NAME = FILTER_NAME;
     public static final String FILTER_DESCRIPTION =
-    	"SJS Access Manager Tomcat Policy Agent Filter";
+    	"OpenAM Tomcat Policy Agent Filter";
     public static final String FILTER_CLASS =
     	"com.sun.identity.agents.filter.AmAgentFilter";
     public static final String FILTER_URL_PATTERN = "/*";
@@ -77,8 +77,6 @@ public interface IConstants {
     public static final String ATTR_NAME_CLASSNAME = "className";
     public static final String ATTR_VALUE_SERVER_LIFECYCLE_CLASSNAME =
     	"org.apache.catalina.mbeans.ServerLifecycleListener";
-    public static final String ATTR_VALUE_LIFECYCLE_CLASSNAME =
-            "org.forgerock.agents.tomcat.v6.TomcatLifeCycleListener";
     public static final String ATTR_NAME_DESCRIPTORS = "descriptors";
     public static final String ATTR_VAL_AGENT_MBEAN_DESCRIPTOR =
     	"/com/sun/identity/agents/tomcat/v6/mbean-descriptor.xml";

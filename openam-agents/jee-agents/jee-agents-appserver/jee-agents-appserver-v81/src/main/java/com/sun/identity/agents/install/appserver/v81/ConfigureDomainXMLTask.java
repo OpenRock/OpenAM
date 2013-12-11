@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.agents.install.appserver.v81;
 
@@ -72,7 +72,6 @@ public class ConfigureDomainXMLTask extends DomainXMLBase implements ITask {
                     
                     if (instanceConfig != null) {
                         status &= addAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
-                        status &= addLifecycleModule(domainXMLDoc, serverInstanceName, stateAccess);
                         status = addAgentJavaConfig(domainXMLDoc, instanceConfig,
                                 stateAccess);
                         domainXMLDoc.setIndentDepth(2);
@@ -133,7 +132,6 @@ public class ConfigureDomainXMLTask extends DomainXMLBase implements ITask {
                             serverInstanceName);
                     if (instanceConfig != null) {
                         status &= removeAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
-                        status &= removeLifecycleModule(domainXMLDoc, serverInstanceName, stateAccess);
                         if (!VersionChecker.isGlassFishv3(stateAccess)) {
                             status = removeAgentClasspath(instanceConfig, stateAccess);
                         }

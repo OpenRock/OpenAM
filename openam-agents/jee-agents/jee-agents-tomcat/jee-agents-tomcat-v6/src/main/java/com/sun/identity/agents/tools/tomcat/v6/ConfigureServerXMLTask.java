@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.agents.tools.tomcat.v6;
 
@@ -62,146 +62,20 @@ public class ConfigureServerXMLTask extends ServerXMLBase implements ITask {
                         getServerXMLFile(stateAccess)));
             xmlDoc.setNoValueIndent();
 
-            // add the Agent realm and Mbean descriptor
-            // status = configureServerLifecycleListener(
-            //        xmlDoc,
-            //        stateAccess);
-
-                status = configureRealm(
-                        xmlDoc,
-                        stateAccess);
+            // add the Agent realm
+            status = configureRealm(
+                    xmlDoc,
+                    stateAccess);
             
         } catch (Exception ex) {
             Debug.log(
-                "ConfigureServerXMLTask.configureServerLifecycleListener(): "
+                "ConfigureServerXMLTask.execute(): "
                 + ex.getMessage(),
                 ex);
             status = false;
         }
 
         return status;
-    }
-
-    private boolean configureServerLifecycleListener(
-        XMLDocument xmlDoc,
-        IStateAccess stateAccess) {
-        boolean result = true;
-        boolean match = false;
-        XMLElement listener = null;
-
-        try {
-            ArrayList listenerElements = xmlDoc.getRootElement()
-                                               .getNamedChildElements(
-                    ELEMENT_LISTENER);
-            String classNameVal = null;
-            Iterator listenerIterator = listenerElements.iterator();
-
-            while (listenerIterator.hasNext()) {
-                listener = (XMLElement) listenerIterator.next();
-                classNameVal = listener.getAttributeValue(
-                        ATTR_NAME_CLASSNAME);
-
-                if ((classNameVal != null)
-                        && (classNameVal.trim()
-                                            .length() != 0)) {
-                    if (classNameVal.equalsIgnoreCase(
-                                ATTR_VALUE_SERVER_LIFECYCLE_CLASSNAME)) {
-                        match = true;
-
-                        break;
-                    }
-                }
-            } // end while
-
-            if (match) {
-                // Save the old value to be reinstated during unconfigure
-                boolean descriptorPresent = false;
-                String attrDesc = listener.getAttributeValue(
-                        ATTR_NAME_DESCRIPTORS);
-
-                if (attrDesc != null) {
-                    if (attrDesc.equalsIgnoreCase(
-                                ATTR_VAL_AGENT_MBEAN_DESCRIPTOR)) {
-                        stateAccess.put(
-                            ATTR_NAME_DESCRIPTORS,
-                            attrDesc); // save
-
-                        // old
-                        // data
-                        Debug.log(
-                            "ConfigureServerXMLTask." +
-                            "configureServerLifecycleListener: Descriptor "
-                            + attrDesc
-                            + " present! Replacing with Agent descriptor");
-                    } else {
-                        Debug.log(
-                            "ConfigureServerXMLTask." +
-                            "configureServerLifecycleListener: " +
-                            "Agent Descriptor " + attrDesc
-                            + " already present!");
-                        descriptorPresent = true;
-                    }
-                } else {
-                    Debug.log(
-                        "ConfigureServerXMLTask." +
-                        "configureServerLifecycleListener: " +
-                        "Descriptor not present");
-                }
-
-                if (!descriptorPresent) {
-                    listener.updateAttribute(
-                        ATTR_NAME_DESCRIPTORS,
-                        ATTR_VAL_AGENT_MBEAN_DESCRIPTOR);
-                }
-
-                stateAccess.put(
-                    KEY_SERVER_LIFECYCLE_ELEM_EXISTS,
-                    STR_VALUE_TRUE);
-            } else {
-                ArrayList serviceElements = xmlDoc.getRootElement()
-                                                  .getNamedChildElements(
-                        ELEMENT_SERVICE);
-
-                if ((serviceElements != null)
-                        && (serviceElements.size() > 0)) {
-                    XMLElement serverLifeCycleElement = xmlDoc.newElement(
-                            ELEMENT_LISTENER);
-
-                    serverLifeCycleElement.updateAttribute(
-                        ATTR_NAME_CLASSNAME,
-                        ATTR_VALUE_SERVER_LIFECYCLE_CLASSNAME);
-                    serverLifeCycleElement.updateAttribute(
-                        ATTR_NAME_DESCRIPTORS,
-                        ATTR_VAL_AGENT_MBEAN_DESCRIPTOR);
-
-                    xmlDoc.getRootElement()
-                          .addChildElementAt(
-                        serverLifeCycleElement,
-                        0);
-
-                    stateAccess.put(
-                        KEY_SERVER_LIFECYCLE_ELEM_EXISTS,
-                        STR_VALUE_FALSE);
-                } else {
-                    Debug.log(
-                        "ConfigureServerXMLTask." +
-                        "ConfigureServerLifecycleListener: No service " +
-                        "element found! " + "Mbean descriptor not added");
-                }
-            }
-
-            XMLElement lifeCycleElement = xmlDoc.newElement(ELEMENT_LISTENER);
-            lifeCycleElement.updateAttribute(ATTR_NAME_CLASSNAME, ATTR_VALUE_LIFECYCLE_CLASSNAME);
-            xmlDoc.getRootElement().addChildElementAt(lifeCycleElement, 0);
-        } catch (Exception ex) {
-            Debug.log(
-                "ConfigureServerXMLTask.configureServerLifecycleListener(): "
-                + ex.getMessage(),
-                ex);
-            result = false;
-        }
-
-        return result;
     }
 
     private boolean configureRealm(
@@ -321,7 +195,7 @@ public class ConfigureServerXMLTask extends ServerXMLBase implements ITask {
             xmlDoc.store();
         } catch (Exception ex) {
             Debug.log(
-                "ConfigureServerXMLTask.configureServerLifecycleListener(): "
+                "ConfigureServerXMLTask.configureRealm(): "
                 + "encountered exception " + ex.getMessage(),
                 ex);
             result = false;

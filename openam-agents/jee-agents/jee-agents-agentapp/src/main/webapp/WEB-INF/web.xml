@@ -21,9 +21,6 @@
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>agentapp</display-name>
-    <listener>
-        <listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
-    </listener>
     <filter>
         <description>OpenAM JavaEE Policy Agent Filter</description>
         <display-name>Agent</display-name>

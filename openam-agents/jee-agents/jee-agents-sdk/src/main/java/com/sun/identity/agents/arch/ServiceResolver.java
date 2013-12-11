@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.agents.arch;
 
@@ -545,12 +545,6 @@ public abstract class ServiceResolver {
     
     protected boolean isEJBContextAvailable() {
         return _ejbContextAvailable;
-    }
-
-    public boolean isLifeCycleMechanismAvailable() {
-        //by default we return with false, because most of the agents does not
-        //support this mechanism
-        return false;
     }
     
     private static boolean _ejbContextAvailable = false;

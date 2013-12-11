@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.agents.tomcat.v6;
 
@@ -75,9 +75,5 @@ public class AmTomcatAgentServiceResolver extends ServiceResolver {
      */
     public String getGlobalVerificationHandlerImpl() {
         return GenericExternalVerificationHandler.class.getName();
-    }
-
-    public boolean isLifeCycleMechanismAvailable() {
-        return true;
     }
 }

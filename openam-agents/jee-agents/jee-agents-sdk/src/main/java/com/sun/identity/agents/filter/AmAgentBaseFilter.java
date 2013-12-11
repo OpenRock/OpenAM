@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.agents.filter;
 
@@ -49,8 +49,6 @@ import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.ISystemAccess;
 import com.sun.identity.agents.common.IHttpServletRequestHelper;
 import com.sun.identity.common.ShutdownManager;
-import org.forgerock.openam.agents.common.CommonLifeCycleListener;
-
 
 /**
  * The base class for agent filter
@@ -155,17 +153,15 @@ public abstract class AmAgentBaseFilter implements Filter
     }
 
     public void destroy() {
-        if (!AgentConfiguration.getServiceResolver().isLifeCycleMechanismAvailable()) {
-            ISystemAccess sysAccess = AmFilterManager.getSystemAccess();
-            sysAccess.logWarning("Unable to find LifeCycle mechanism for this "
-                    + "type of application server. Hot-deployment will not work. See "
-                    + "OPENAM-390 for more details.");
-            // If there is no lifecycle mechanism bound to the application server
-            // then we should call the shutdownmechanism from the filter.
-            // NOTE: without lifecycle mechanism an application undeployment
-            // will cause the systemtimerpools to shutdown causing errors with
-            // further usage. See OPENAM-390 for more details.
-            CommonLifeCycleListener.shutdown();
+
+        // Let any registered components of the ShutdownManager know to shutdown.
+        ShutdownManager shutdownMan = ShutdownManager.getInstance();
+        if (shutdownMan.acquireValidLock()) {
+            try {
+                shutdownMan.shutdown();
+            } finally {
+                shutdownMan.releaseLockAndNotify();
+            }
         }
     }
     

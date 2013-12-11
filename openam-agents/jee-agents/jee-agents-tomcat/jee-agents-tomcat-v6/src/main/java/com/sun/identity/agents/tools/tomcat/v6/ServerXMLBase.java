@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.agents.tools.tomcat.v6;
 
@@ -54,12 +54,9 @@ public class ServerXMLBase implements IConstants, IConfigKeys {
             xmlDoc.setValueIndent();
 
             // remove the realm
-            status = unconfigureServerLifecycleListener(
-                    xmlDoc,
-                    stateAccess);
             status = unconfigureRealm(
                     xmlDoc,
-                    stateAccess) && status;
+                    stateAccess);
             xmlDoc.store();
         } catch (Exception e) {
             Debug.log(
@@ -68,86 +65,6 @@ public class ServerXMLBase implements IConstants, IConfigKeys {
         }
 
         return status;
-    }
-
-    private boolean unconfigureServerLifecycleListener(
-        XMLDocument xmlDoc,
-        IStateAccess stateAccess) {
-        boolean result = true;
-        boolean match = false;
-        XMLElement listener = null;
-
-        try {
-            String lifeCycleElemExists = (String) stateAccess.get(
-                    KEY_SERVER_LIFECYCLE_ELEM_EXISTS);
-            ArrayList<XMLElement> listenerElements = xmlDoc.getRootElement().getNamedChildElements(
-                    ELEMENT_LISTENER);
-
-            if ((lifeCycleElemExists != null)
-                    && (lifeCycleElemExists.length() > 0)) {
-
-                String classNameVal = null;
-                Iterator<XMLElement> listenerIterator = listenerElements.iterator();
-
-                while (listenerIterator.hasNext()) {
-                    listener = listenerIterator.next();
-                    classNameVal = listener.getAttributeValue(
-                            ATTR_NAME_CLASSNAME);
-
-                    if ((classNameVal != null)
-                            && (classNameVal.trim()
-                                                .length() != 0)) {
-                        if (classNameVal.equalsIgnoreCase(
-                                    ATTR_VALUE_SERVER_LIFECYCLE_CLASSNAME)) {
-                            match = true;
-                            Debug.log(
-                                "ServerXMLBase." +
-                                "unconfigureServerLifecycleListener(): " +
-                                "Agent Mbean Listener element found");
-
-                            break;
-                        }
-                    }
-                } // end while
-
-                if (match) {
-                    if (lifeCycleElemExists.equalsIgnoreCase(
-                                STR_VALUE_TRUE)) {
-                        String descAttr = (String) stateAccess.get(
-                                ATTR_NAME_DESCRIPTORS);
-
-                        if ((descAttr != null) && (descAttr.length() > 0)) {
-                            listener.updateAttribute(
-                                ATTR_NAME_DESCRIPTORS,
-                                descAttr);
-                        } else {
-                            listener.removeAttribute(
-                                ATTR_NAME_DESCRIPTORS);
-                        }
-                    } else {
-                        listener.delete();
-                    }
-                }
-            }
-            for (XMLElement elem : listenerElements) {
-                String className = elem.getAttributeValue(ATTR_NAME_CLASSNAME);
-
-                if (className != null) {
-                    if (className.equals(ATTR_VALUE_LIFECYCLE_CLASSNAME)) {
-                        elem.delete();
-                        break;
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            Debug.log(
-                "ServerXMLBase.unconfigureServerLifecycleListener(): "
-                + " encountered exception " + ex.getMessage(),
-                ex);
-            result = false;
-        }
-
-        return result;
     }
 
     private boolean unconfigureRealm(

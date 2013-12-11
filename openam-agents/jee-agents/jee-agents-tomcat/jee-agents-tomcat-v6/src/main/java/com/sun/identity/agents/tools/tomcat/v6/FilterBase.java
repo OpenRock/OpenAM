@@ -25,6 +25,9 @@
  * $Id: FilterBase.java,v 1.2 2008/11/28 12:36:21 saueree Exp $
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.agents.tools.tomcat.v6;
 
 import com.sun.identity.install.tools.util.Debug;
@@ -151,7 +154,7 @@ public class FilterBase implements IConstants, IConfigKeys {
                 result = true;
                 Debug.log(
                     "FilterBase:hasAgentFilterNameElement(): " +
-                    "SJS Tomcat Agent Filter has been configured for " +
+                    "OpenAM Tomcat Agent Filter has been configured for " +
                     "this web.xml file");
             }
         }

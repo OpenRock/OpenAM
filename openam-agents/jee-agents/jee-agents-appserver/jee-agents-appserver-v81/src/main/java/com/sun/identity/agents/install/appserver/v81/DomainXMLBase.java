@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.agents.install.appserver.v81;
 
@@ -157,67 +157,6 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants 
 
         return status;
     }
-
-    public boolean addLifecycleModule(XMLDocument domainXMLDoc, String serverInstanceName, IStateAccess stateAccess) throws Exception {
-        boolean status = true;
-
-    	// Obtain the domain root <domain> element
-        XMLElement domainRoot = domainXMLDoc.getRootElement();
-        // Get the <applications> element
-        XMLElement applicationsElement = getUniqueElement(
-                STR_APPLICATIONS_ELEMENT, domainRoot);
-        
-        XMLElement serverElement = getServer(domainRoot, serverInstanceName);
-
-        if (applicationsElement != null && serverElement != null) {
-            // Create lifecycleModule element
-            XMLElement lifecycleModule = domainXMLDoc.newElementFromXMLFragment(
-            		getLifecycleModuleStanza(stateAccess));
-            applicationsElement.addChildElementAt(lifecycleModule, 0, true);
-
-            // Create application reference
-            XMLElement applicationRef = domainXMLDoc.newElementFromXMLFragment(getLifecycleModuleApplicationRef(stateAccess));
-            serverElement.addChildElementAt(applicationRef,  0, true);
-        } else {
-            Debug.log("DomainXMLBase.addLifecycleModule() - Error: "
-                    + "Unable to add lifecycleModule. Missing '"
-                    + STR_APPLICATIONS_ELEMENT + "' or 'server' element in server.xml");
-            status = false;
-        }
-
-        return status;
-    }
-    
-    
-    private String getLifecycleModuleStanza(IStateAccess stateAccess) {
-    	
-        StringBuilder sb = new StringBuilder();
-
-        if (VersionChecker.isGlassFishv3(stateAccess)) {
-	        sb.append("<application name=\"" + STR_AGENT_LIFECYCLE_MODULE + "\" object-type=\"user\">");
-	        sb.append("<property name=\"is-failure-fatal\" value=\"false\"></property>");
-	        sb.append("<property name=\"class-name\" value=\"" + STR_AGENT_LIFECYCLE_MODULE_CLASS + "\"></property>");
-	        sb.append("<property name=\"isLifecycle\" value=\"true\"></property>");
-	        sb.append("</application>");
-        } else {
-	        sb.append("<lifecycle-module name=\"" + STR_AGENT_LIFECYCLE_MODULE + "\" ");
-	        sb.append("class-name=\"" + STR_AGENT_LIFECYCLE_MODULE_CLASS + "\" ");
-	        sb.append("is-failure-fatal=\"false\" ");
-	        sb.append("object-type=\"user\"/>");
-        	
-        }
-        return sb.toString();
-    }
-    
-    private String getLifecycleModuleApplicationRef(IStateAccess stateAccess) {
-    	
-        if (VersionChecker.isGlassFishv3(stateAccess)) {
-        	return "<application-ref ref=\"" + STR_AGENT_LIFECYCLE_MODULE + "\" virtual-servers=\"server\"></application-ref>";
-        } else {
-        	return "<application-ref disable-timeout-in-minutes=\"30\" enabled=\"true\" lb-enabled=\"false\" ref=\"" + STR_AGENT_LIFECYCLE_MODULE + "\"/>";
-        }
-    }
-    
     
     public boolean removeAgentClasspath(XMLElement instanceConfig,
             IStateAccess stateAccess) throws Exception {
@@ -336,36 +275,6 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants 
         }
         return status;
     }
-    
-    public boolean removeLifecycleModule(XMLDocument domainXMLDoc, String serverInstanceName, IStateAccess stateAccess) throws Exception {
-        boolean status = true;
-
-    	// Obtain the domain root <domain> element
-        XMLElement domainRoot = domainXMLDoc.getRootElement();
-        // Get the <applications> element
-        XMLElement applicationsElement = getUniqueElement(
-                STR_APPLICATIONS_ELEMENT, domainRoot);
-        
-        XMLElement serverElement = getServer(domainRoot, serverInstanceName);
-        
-        if (applicationsElement != null && serverElement != null) {
-	        XMLElement lifecycleModuleElement = getLifecycleModule(applicationsElement, stateAccess);
-	        if (lifecycleModuleElement != null) {
-	        	lifecycleModuleElement.delete();
-	        }
-	       	
-	        XMLElement applicationRef = getLifecycleModuleReference(serverElement);
-	        if (applicationRef != null) {
-	        	applicationRef.delete();
-	        }
-        } else {
-            Debug.log("DomainXMLBase.removeLifecycleModule() - Error: "
-                    + "Unable to remove lifecycleModule. Missing '"
-                    + STR_APPLICATIONS_ELEMENT + "' or 'server' element in server.xml");
-            status = false;
-        }
-        return status;
-    }
 
     public String getInstanceConfigName(XMLElement domainRoot, String serverName) {
         
@@ -403,25 +312,6 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants 
         return getElement(securityService, STR_AUTH_REALM_ELEMENT,
                 STR_NAME_ATTR, STR_AGENT_REALM);
     }
-    
-    private XMLElement getLifecycleModule(XMLElement applications, IStateAccess stateAccess) {
-    	
-    	String moduleElement = null;
-    	
-    	if (VersionChecker.isGlassFishv3(stateAccess)) {
-    		moduleElement = STR_APPLICATION_ELEMENT_V3;
-    	} else {
-    		moduleElement = STR_APPLICATION_ELEMENT_V2;
-    	}
-
-    	return getElement(applications, moduleElement,
-                STR_NAME_ATTR, STR_AGENT_LIFECYCLE_MODULE);
-    }
-    
-    private XMLElement getLifecycleModuleReference(XMLElement server) {
-    	return getElement(server, STR_APPLICATION_REF_ELEMENT, STR_REF_ATTR, STR_AGENT_LIFECYCLE_MODULE);
-    }
-    
 
     public XMLElement getElement(XMLElement parent, String elementName,
             String attrName, String attrValue) {
@@ -576,8 +466,6 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants 
     public static final String STR_AGENT_JAR = "agent.jar";
     public static final String STR_FM_CLIENT_SDK_JAR = "openssoclientsdk.jar";
     public static final String STR_AGENT_REALM = "agentRealm";
-    public static final String STR_AGENT_LIFECYCLE_MODULE = "ASLifeCycleListener";
-    public static final String STR_AGENT_LIFECYCLE_MODULE_CLASS="org.forgerock.agents.appserver.v81.ASLifeCycleListener";
     
     public static final String STR_JAAS_CONTEXT = "jaas-context";
     public static final String STR_SERVER_INSTANCE_NAME_KEY = "INSTANCE_NAME";
