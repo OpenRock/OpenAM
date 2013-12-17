@@ -27,8 +27,10 @@
  */
 /*
  * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
+#include "internal_macros.h"
 #include "log_service.h"
 #include "log_record.h"
 #include "xml_tree.h"
@@ -322,6 +324,15 @@ am_status_t LogService::addLogDetails(const std::string& logName,
     am_status_t status = AM_SUCCESS;
     char *msg = NULL;
     bool lock_status = false;
+	time_t now = time(0);
+    char time_string[50];
+    struct tm tm;
+#ifdef _MSC_VER
+    localtime_s(&tm, &now);
+#else
+    localtime_r(&now, &tm);
+#endif
+    strftime(time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", &tm);
 
     if ((lock_status = mLock.lock()) == false) {
         Log::log(logModule, Log::LOG_ERROR, "LogService::addLogDetails() failed to acquire the lock");
@@ -400,6 +411,12 @@ am_status_t LogService::addLogDetails(const std::string& logName,
             remoteBodyChunkList.push_back(BodyChunk(valueStr));
             remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoValueSuffix)));
         }
+        remoteBodyChunkList.push_back(logInfoKeyPrefixChunk);
+        remoteBodyChunkList.push_back(BodyChunk("TIME"));
+        remoteBodyChunkList.push_back(logInfoKeySuffixChunk);
+        remoteBodyChunkList.push_back(logInfoValuePrefixChunk);
+        remoteBodyChunkList.push_back(BodyChunk(time_string));
+        remoteBodyChunkList.push_back(logInfoValueSuffixChunk);
 
         remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoMapSuffix)));
         remoteBodyChunkList.push_back(BodyChunk(std::string(logRecordSuffix)));
