@@ -411,12 +411,12 @@ am_status_t LogService::addLogDetails(const std::string& logName,
             remoteBodyChunkList.push_back(BodyChunk(valueStr));
             remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoValueSuffix)));
         }
-        remoteBodyChunkList.push_back(logInfoKeyPrefixChunk);
+        remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoKeyPrefix)));
         remoteBodyChunkList.push_back(BodyChunk("TIME"));
-        remoteBodyChunkList.push_back(logInfoKeySuffixChunk);
-        remoteBodyChunkList.push_back(logInfoValuePrefixChunk);
+        remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoKeySuffix)));
+        remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoValuePrefix)));
         remoteBodyChunkList.push_back(BodyChunk(time_string));
-        remoteBodyChunkList.push_back(logInfoValueSuffixChunk);
+        remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoValueSuffix)));
 
         remoteBodyChunkList.push_back(BodyChunk(std::string(logInfoMapSuffix)));
         remoteBodyChunkList.push_back(BodyChunk(std::string(logRecordSuffix)));
