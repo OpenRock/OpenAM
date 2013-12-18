@@ -170,12 +170,12 @@ iis7i	: iis7.obj
 #
 
 apache.obj : $(AM_APA_SRC)
-	$(CC) $(CFLAGS) /I"extlib\WINNT\apache\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DEAPI /DUSE_EXPAT /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache /Foagents\source\apache\ /Tc $(AM_APA_SRC)
+	$(CC) $(CFLAGS) /I"extlib\WINNT\apache\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache /Foagents\source\apache\ /Tc $(AM_APA_SRC)
 
 apachei : apache.obj
 	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache\lib" $(DEP_LIBPATH) /DEF:"agents\source\apache\libamapc.def" \
 		/PDB:"agents\source\apache\libamapc2.pdb" \
-		/DLL /OUT:agents\source\apache\libamapc2.dll agents\source\apache\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr.lib libapriconv.lib libhttpd.lib
+		/DLL /OUT:agents\source\apache\libamapc2.dll agents\source\apache\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr.lib libhttpd.lib
 
 apache22.obj : $(AM_APA22_SRC)
 	$(CC) $(CFLAGS) /I"extlib\WINNT\apache22\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /Iagents\source\apache22 /Foagents\source\apache22\ /Tc $(AM_APA22_SRC)
