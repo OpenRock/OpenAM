@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+# Copyright (c) 2013-2014 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -32,7 +32,7 @@ AGENT_MICRO_VER := 0
 AGENT_RELEASE_NAME := SNAPSHOT
 
 AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER).$(AGENT_MICRO_VER)
-ifdef $(AGENT_RELEASE_NAME)
+ifdef AGENT_RELEASE_NAME
  AGENT_VER := $(AGENT_VER)-$(AGENT_RELEASE_NAME)
 endif
 
