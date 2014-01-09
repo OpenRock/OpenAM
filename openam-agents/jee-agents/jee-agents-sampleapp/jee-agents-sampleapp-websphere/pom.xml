@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -30,11 +30,6 @@
     <name>OpenAM JavaEE Policy Agents SampleApp Websphere</name>
     <description>OpenAM JavaEE Policy Agents SampleApp Websphere</description>
     <artifactId>jee-agents-sampleapp-websphere</artifactId>
-
-    <properties>
-        <jee-agents.properties>../../jee-agents.properties</jee-agents.properties>
-    </properties>
-
     <packaging>pom</packaging>
 
     <modules>

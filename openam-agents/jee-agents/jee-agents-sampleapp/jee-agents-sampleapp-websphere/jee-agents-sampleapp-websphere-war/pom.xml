@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -30,10 +30,6 @@
     <name>OpenAM JavaEE Policy Agents SampleApp Websphere WAR</name>
     <description>OpenAM JavaEE Policy Agents SampleApp Websphere WAR</description>
     <artifactId>jee-agents-sampleapp-websphere-war</artifactId>
-
-    <properties>
-        <jee-agents.properties>../../../jee-agents.properties</jee-agents.properties>
-    </properties>
 
     <packaging>war</packaging>
 
@@ -84,17 +80,16 @@
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sampleapp-webservlet</artifactId>
-            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sampleapp-ejbservlet</artifactId>
-            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sampleapp-ejb</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

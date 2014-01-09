@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -31,10 +31,6 @@
     <description>OpenAM JavaEE Policy Agents Distribution Appserver v10</description>
     <artifactId>jee-agents-distribution-appserver-v10</artifactId>
     <packaging>pom</packaging>
-
-    <properties>
-        <jee-agents.properties>../../jee-agents.properties</jee-agents.properties>
-    </properties>
 
      <!-- Build -->
      <build>
@@ -89,16 +85,27 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-agentapp</artifactId>
+            <type>war</type>
+        </dependency>
          <dependency>
              <groupId>org.forgerock.openam.agents</groupId>
              <artifactId>jee-agents-appserver-v81</artifactId>
-             <version>${project.version}</version>
          </dependency>
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sampleapp-appserver-ear</artifactId>
-            <version>${project.version}</version>
             <type>ear</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -32,9 +32,6 @@
     <description>OpenAM JavaEE Policy Agents JBoss Common</description>
     <artifactId>jee-agents-jboss-common</artifactId>
     <packaging>jar</packaging>
-    <properties>
-        <jee-agents.properties>../../jee-agents.properties</jee-agents.properties>
-    </properties>
 
     <!-- Build -->
     <build>
@@ -74,35 +71,14 @@
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sdk</artifactId>
-            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-installtools</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-security</artifactId>
-            <version>6.1.0.Final</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>trove</groupId>
-                    <artifactId>trove</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>apache-log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jpl-pattern</groupId>
-                    <artifactId>jpl-pattern</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jpl-util</groupId>
-                    <artifactId>jpl-util</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.security</groupId>
-                    <artifactId>jacc</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 </project>

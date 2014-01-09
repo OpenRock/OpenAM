@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -32,9 +32,6 @@
     <description>OpenAM JavaEE Policy Agents Websphere Common</description>
     <artifactId>jee-agents-websphere-common</artifactId>
     <packaging>jar</packaging>
-    <properties>
-        <jee-agents.properties>../../jee-agents.properties</jee-agents.properties>
-    </properties>
 
     <!-- Build -->
     <build>
@@ -74,14 +71,22 @@
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sdk</artifactId>
-            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-installtools</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-clientsdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>websphere</groupId>
             <artifactId>com.ibm.ws.runtime</artifactId>
-            <version>${com.ibm.ws.runtime.v61.version}</version>
-            <scope>system</scope>
-            <systemPath>${websphere.libraries.v61.system.path}/com.ibm.ws.runtime_${com.ibm.ws.runtime.v61.version}.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

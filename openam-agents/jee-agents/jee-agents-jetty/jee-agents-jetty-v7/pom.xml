@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -32,9 +32,6 @@
     <description>OpenAM JavaEE Policy Agents Jetty v7</description>
     <artifactId>jee-agents-jetty-v7</artifactId>
     <packaging>jar</packaging>
-    <properties>
-        <jee-agents.properties>../../jee-agents.properties</jee-agents.properties>
-    </properties>
 
     <!-- Build -->
     <build>
@@ -83,6 +80,7 @@
                     <artifactSet>
                         <includes>
                             <include>org.forgerock.openam.agents:jee-agents-sdk</include>
+                            <include>external:esapiport</include>
                         </includes>
                     </artifactSet>
                 </configuration>
@@ -93,12 +91,14 @@
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sdk</artifactId>
-            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-installtools</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-plus</artifactId>
-            <version>7.6.11.v20130520</version>
         </dependency>
     </dependencies>
 </project>

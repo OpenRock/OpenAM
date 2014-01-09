@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -30,10 +30,6 @@
     <name>OpenAM JavaEE Policy Agents SampleApp JSR196 EJB</name>
     <description>OpenAM JavaEE Policy Agents SampleApp JSR196 EJB</description>
     <artifactId>jee-agents-sampleapp-jsr196-ejb</artifactId>
-
-    <properties>
-        <jee-agents.properties>../../../jee-agents.properties</jee-agents.properties>
-    </properties>
 
     <packaging>jar</packaging>
 
@@ -72,7 +68,7 @@
         <dependency>
             <groupId>org.forgerock.openam.agents</groupId>
             <artifactId>jee-agents-sampleapp-ejb</artifactId>
-            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>

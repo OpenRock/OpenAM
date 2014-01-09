@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -31,14 +31,6 @@
     <description>OpenAM JavaEE Policy Agents Weblogic</description>
     <artifactId>jee-agents-weblogic</artifactId>
     <packaging>pom</packaging>
-
-    <properties>
-        <jee-agents.properties>../jee-agents.properties</jee-agents.properties>
-        <weblogic.libraries.v10.system.path>/var/tmp/extlib/weblogic/v10</weblogic.libraries.v10.system.path>
-        <com.bea.core.common.security.api.v10.version>1.0.0.0_5-1-0-0</com.bea.core.common.security.api.v10.version>
-        <com.bea.core.weblogic.security.auth.v10.version>1.0.0.0</com.bea.core.weblogic.security.auth.v10.version>
-        <com.bea.core.weblogic.security.v10.version>1.0.0.0_5-1-0-0</com.bea.core.weblogic.security.v10.version>
-    </properties>
 
     <modules>
         <!-- Weblogic Modules -->
