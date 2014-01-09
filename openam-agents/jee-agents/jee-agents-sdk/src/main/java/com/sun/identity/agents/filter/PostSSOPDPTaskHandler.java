@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -31,7 +31,8 @@ import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.common.IPDPCache;
 import com.sun.identity.agents.common.IPDPCacheEntry;
-import com.sun.identity.shared.encode.URLEncDec;
+import org.owasp.esapi.ESAPI;
+
 import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 
@@ -209,8 +210,8 @@ implements IPostSSOPDPTaskHandler, IPDPTaskConstants {
         StringBuilder result = new StringBuilder();
         if (values != null && values.length > 0) {
             for (int i = 0; i < values.length; i++) {
-                result.append(String.format(HTML_FORM_INPUT_FIELD,
-                                    name, values[i]));
+                String value = ESAPI.encoder().encodeForHTMLAttribute(values[i]);
+                result.append(String.format(HTML_FORM_INPUT_FIELD, name, value));
             }
         }
         return result;
