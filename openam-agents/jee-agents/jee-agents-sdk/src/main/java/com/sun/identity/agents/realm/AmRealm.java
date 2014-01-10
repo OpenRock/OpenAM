@@ -25,7 +25,9 @@
  * $Id: AmRealm.java,v 1.9 2008/07/25 00:49:29 huacui Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.realm;
 
 import java.util.ArrayList;
@@ -39,7 +41,6 @@ import java.util.StringTokenizer;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.agents.arch.AgentConfiguration;
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.common.CommonFactory;
@@ -78,6 +79,7 @@ public class AmRealm extends AmRealmBase implements IAmRealm {
         if (isPrivilegedAttributeMappingEnabled()) {
             initPrivilegedAttributeMap();
         }
+        initShortNameMode();
         if (isLogMessageEnabled()) {
             logMessage("AmRealm.initialize: Initialized.");
         }
@@ -215,14 +217,15 @@ public class AmRealm extends AmRealmBase implements IAmRealm {
                                             types[i].getName().toLowerCase(),
                                             toLowerCaseStat);
                                 }
-                                Set memberships = user.getMemberships(types[i]);
-                                if (memberships != null &&
-                                        memberships.size() > 0) {
-                                    Iterator mIt = memberships.iterator();
-                                    String origUUID = null;
-                                    while (mIt.hasNext()) {
-                                        origUUID = IdUtils.getUniversalId(
-                                                    (AMIdentity) mIt.next());
+                                Set<AMIdentity> memberships = user.getMemberships(types[i]);
+                                if (memberships != null) {
+                                    for (AMIdentity membership : memberships) {
+                                        String origUUID;
+                                        if (shortNameMode) {
+                                            origUUID = membership.getName();
+                                        } else {
+                                            origUUID = IdUtils.getUniversalId(membership);
+                                        }
                                         if (toLowerCaseStat.booleanValue()) {
                                             origUUID = origUUID.toLowerCase();
                                         }
@@ -230,12 +233,8 @@ public class AmRealm extends AmRealmBase implements IAmRealm {
                                         String mappedId = getPrivilegedMappedAttribute(origUUID);
                                         attributeSet.add(mappedId);
 
-                                        String universalId = 
-                                            getUniquePartOfUuid(origUUID);
-                                        if (!origUUID.equalsIgnoreCase(universalId)) {
-                                            if (toLowerCaseStat.booleanValue()) {
-                                                universalId = universalId.toLowerCase();
-                                            }
+                                        String universalId = getUniquePartOfUuid(origUUID);
+                                        if (!origUUID.equals(universalId)) {
                                             attributeSet.add(universalId);
                                             mappedId = getPrivilegedMappedAttribute(universalId);
                                             attributeSet.add(mappedId);
@@ -565,7 +564,14 @@ public class AmRealm extends AmRealmBase implements IAmRealm {
             }
         }
     }
-    
+
+    private void initShortNameMode() {
+        shortNameMode = getConfigurationBoolean(CONFIG_SHORTENED_PRIVILEGED_ATTR, false);
+        if (isLogMessageEnabled()) {
+            logMessage("AmRealm.initShortNameMode: shortened privileged attribute enabled: " + shortNameMode);
+        }
+    }
+
     private boolean isAttributeFetchEnabled() {
         return getPrivilegedAttributeTypes().length > 0;
     }
@@ -670,8 +676,8 @@ public class AmRealm extends AmRealmBase implements IAmRealm {
     private ISSOTokenValidator _ssoTokenValidator;
     private IdType[] _privilegedAttributeTypes;
     private HashMap _privilegedAttributeTypeCases = new HashMap();
+    private boolean shortNameMode;
     private String[] _sessionAttributes;
     private Map _privilegedAttributeMap = null;
     private boolean _privilegedAttributeMappingEnabled;
 }
-

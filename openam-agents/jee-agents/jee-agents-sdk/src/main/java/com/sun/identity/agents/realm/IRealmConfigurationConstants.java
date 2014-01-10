@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.realm;
 
 /**
@@ -59,4 +62,6 @@ public interface IRealmConfigurationConstants {
     
     public static final String CONFIG_PRIVILEGED_SESSION_ATTR_LIST =
         "privileged.session.attribute";
+
+    public static final String CONFIG_SHORTENED_PRIVILEGED_ATTR = "shortened.privileged.attribute";
 }
