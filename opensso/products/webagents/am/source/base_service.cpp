@@ -446,7 +446,7 @@ am_status_t BaseService::doHttpPost(const ServiceInfo& service,
         } else if (Http::FORBIDDEN == httpStatus) {
             status = AM_ACCESS_DENIED;
         } else {
-            Log::log(logModule, Log::LOG_WARNING,
+            Log::log(logModule, Log::LOG_ERROR,
                     "BaseService::doHttpPost() failed, HTTP error = %d",
                     httpStatus);
             status = AM_HTTP_ERROR;
