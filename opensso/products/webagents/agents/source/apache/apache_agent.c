@@ -949,6 +949,7 @@ static am_status_t get_request_url(request_rec *r, char **requestURL) {
         status = AM_FAILURE;
     } else {
         char *url = *requestURL;
+#ifdef OPENAM_2969
         am_web_log_debug("%s: request url before normalization: %s", thisfunc, url);
         /*find the end of url string*/
         while (url && *url) ++url;
@@ -958,6 +959,7 @@ static am_status_t get_request_url(request_rec *r, char **requestURL) {
                 *url = 0;
             } else break;
         }
+#endif
     }
     am_web_log_debug("%s: returning request url: %s", thisfunc, *requestURL);
     return status;

@@ -740,6 +740,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
         status = AM_FAILURE;
     } else {
         char *tmp = (char *) url;
+#ifdef OPENAM_2969
         am_web_log_debug("%s: request url before normalization: %s", thisfunc, url);
         /*find the end of url string*/
         while (tmp && *tmp) ++tmp;
@@ -749,6 +750,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
                 *tmp = 0;
             } else break;
         }
+#endif
         am_web_log_debug("%s: request url: %s", thisfunc, url);
     }
 

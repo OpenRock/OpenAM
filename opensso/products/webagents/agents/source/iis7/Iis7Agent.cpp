@@ -1223,6 +1223,7 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
         if (status == AM_SUCCESS) {
             if (requestURL != NULL) {
                 char *url = requestURL;
+#ifdef OPENAM_2969
                 am_web_log_debug("%s: constructed request url before normalization: %s", thisfunc, url);
                 /*find the end of url string*/
                 while (url && *url) ++url;
@@ -1232,6 +1233,7 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
                         *url = 0;
                     } else break;
                 }
+#endif
                 requestURLStr.assign(requestURL);
                 am_web_log_debug("%s: constructed request url: %s",
                         thisfunc, requestURLStr.c_str());
