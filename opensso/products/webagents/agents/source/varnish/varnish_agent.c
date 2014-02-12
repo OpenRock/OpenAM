@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2012-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,7 +34,7 @@
 #include <unistd.h>
 
 #include <vrt.h>
-#include <bin/varnishd/cache.h>
+#include <cache.h>
 #include <vct.h>
 #include <vcc_if.h>
 
@@ -491,10 +491,7 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 break;
             case AM_WEB_RESULT_REDIRECT:
                 am_add_header(rec, "Location", data);
-                am_add_header(rec, "Content-Type", "text/html");
-                am_custom_response(rec, 302, (char *) am_vmod_printf(rec->s, "<head><title>Document Moved</title></head>\n"
-                        "<body><h1>Object Moved</h1>This document may be found "
-                        "<a href=\"%s\">here</a></body>", data));
+                am_custom_response(rec, 302, NULL);
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_FORBIDDEN:
@@ -507,6 +504,12 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 rec->status = 500;
                 am_add_header(rec, "Content-Type", "text/plain");
                 am_custom_response(rec, 500, "500 Internal Server Error");
+                *ret = DONE;
+                break;
+            case AM_WEB_RESULT_NOT_IMPLEMENTED:
+                rec->status = 501;
+                am_add_header(rec, "Content-Type", "text/plain");
+                am_custom_response(rec, 501, "501 Not Implemented");
                 *ret = DONE;
                 break;
             default:
@@ -850,6 +853,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
         req_params.method = method;
         req_params.path_info = ""; // N/A in Varnish
         req_params.cookie_header_val = (char *) get_req_header(r, "Cookie");
+        req_params.content_type = (char *) get_req_header(r, "Content-Type");
         req_func.get_post_data.func = content_read;
         req_func.get_post_data.args = args;
         req_func.free_post_data.func = NULL;

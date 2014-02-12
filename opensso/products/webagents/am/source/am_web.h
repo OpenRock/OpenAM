@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef AM_WEB_H
@@ -374,11 +374,12 @@ typedef enum {
 } am_web_req_method_t;
 
 typedef enum {
-    AM_WEB_RESULT_OK,               /* access check was OK */
-    AM_WEB_RESULT_OK_DONE,          /* OK and handled (for ex. notification) */
-    AM_WEB_RESULT_FORBIDDEN,        /* access forbidden */
-    AM_WEB_RESULT_REDIRECT,         /* redirected */
-    AM_WEB_RESULT_ERROR             /* internal error */
+    AM_WEB_RESULT_OK, /* access check was OK */
+    AM_WEB_RESULT_OK_DONE, /* OK and handled (for ex. notification) */
+    AM_WEB_RESULT_FORBIDDEN, /* access forbidden */
+    AM_WEB_RESULT_REDIRECT, /* redirected */
+    AM_WEB_RESULT_ERROR, /* internal error */
+    AM_WEB_RESULT_NOT_IMPLEMENTED /* not implemented error */
 } am_web_result_t;
 
 typedef struct {
@@ -389,6 +390,7 @@ typedef struct {
     char *client_ip;                /* client IP if any */
     char *client_hostname;          /* client hostname if any */
     char *cookie_header_val;	    /* the cookie header value if any */
+    char *content_type; 	    /* the content_type header value if any */
     void *reserved;		    /* reserved - do not set this */
 } am_web_request_params_t;
 

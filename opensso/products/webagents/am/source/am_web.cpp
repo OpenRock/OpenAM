@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 #ifdef _MSC_VER
@@ -5070,28 +5070,30 @@ am_web_method_str_to_num(const char *method_str) {
 }
 
 extern "C" AM_WEB_EXPORT const char *
-am_web_result_num_to_str(am_web_result_t result)
-{
-    char *resultName = const_cast<char*>("UNKNOWN");
-    switch(result) {
-    case AM_WEB_RESULT_OK:
-	resultName = const_cast<char *>("AM_WEB_RESULT_OK");
-	break;
-    case AM_WEB_RESULT_OK_DONE:
-	resultName = const_cast<char *>("AM_WEB_RESULT_OK_DONE");
-	break;
-    case AM_WEB_RESULT_FORBIDDEN:
-	resultName = const_cast<char *>("AM_WEB_RESULT_FORBIDDEN");
-	break;
-    case AM_WEB_RESULT_REDIRECT:
-	resultName = const_cast<char *>("AM_WEB_RESULT_REDIRECT");
-	break;
-    case AM_WEB_RESULT_ERROR:
-	resultName = const_cast<char *>("AM_WEB_RESULT_ERROR");
-	break;
-    default:
-	resultName = const_cast<char *>("Unknown result code");
-	break;
+am_web_result_num_to_str(am_web_result_t result) {
+    char *resultName = const_cast<char*> ("UNKNOWN");
+    switch (result) {
+        case AM_WEB_RESULT_OK:
+            resultName = const_cast<char *> ("AM_WEB_RESULT_OK");
+            break;
+        case AM_WEB_RESULT_OK_DONE:
+            resultName = const_cast<char *> ("AM_WEB_RESULT_OK_DONE");
+            break;
+        case AM_WEB_RESULT_FORBIDDEN:
+            resultName = const_cast<char *> ("AM_WEB_RESULT_FORBIDDEN");
+            break;
+        case AM_WEB_RESULT_REDIRECT:
+            resultName = const_cast<char *> ("AM_WEB_RESULT_REDIRECT");
+            break;
+        case AM_WEB_RESULT_ERROR:
+            resultName = const_cast<char *> ("AM_WEB_RESULT_ERROR");
+            break;
+        case AM_WEB_RESULT_NOT_IMPLEMENTED:
+            resultName = const_cast<char *> ("AM_WEB_RESULT_NOT_IMPLEMENTED");
+            break;
+        default:
+            resultName = const_cast<char *> ("Unknown result code");
+            break;
     }
     return resultName;
 }
@@ -6205,6 +6207,33 @@ get_sso_token(am_web_request_params_t *req_params,
     return sts;
 }
 
+static char *stristr(char *ch1, char *ch2) {
+    char *chN1, *chN2;
+    char *chNdx;
+    char *chRet = NULL;
+    if (!ch1 || !ch2) return NULL;
+    chN1 = strdup(ch1);
+    chN2 = strdup(ch2);
+    if (chN1 && chN2) {
+        chNdx = chN1;
+        while (*chNdx) {
+            *chNdx = (char) tolower(*chNdx);
+            chNdx++;
+        }
+        chNdx = chN2;
+        while (*chNdx) {
+            *chNdx = (char) tolower(*chNdx);
+            chNdx++;
+        }
+        chNdx = strstr(chN1, chN2);
+        if (chNdx)
+            chRet = ch1 + (chNdx - chN1);
+    }
+    if (chN1) free(chN1);
+    if (chN2) free(chN2);
+    return chRet;
+}
+
 /**
  * do actual access check processing and get web result with redirect url
  * all input arguments should already be checked to be OK (not null, etc.)
@@ -6396,6 +6425,38 @@ process_request(am_web_request_params_t *req_params,
                         }
                     }
                     if (pds == AM_SUCCESS) {
+                        char *cntty = req_params->content_type;
+                        std::string response = post_data;
+                        if (stristr(cntty, (char *) "multipart/form-data") == NULL &&
+                                stristr(cntty, (char *) "application/x-www-form-urlencoded") == NULL) {
+                            am_web_log_error("%s: unsupported content type (%s)", thisfunc, cntty);
+                            pds = AM_INVALID_RESOURCE_FORMAT;
+                            result = AM_WEB_RESULT_NOT_IMPLEMENTED;
+                        } else {
+                            size_t c1 =
+#ifdef __sun
+                                    0;
+                                    std::count(response.begin(), response.end(), '=', c1);
+#else
+                                    std::count(response.begin(), response.end(), '=');
+#endif
+
+                            size_t c2 =
+#ifdef __sun
+                                    0;
+                                    std::count(response.begin(), response.end(), '&', c2);
+#else 
+                                    std::count(response.begin(), response.end(), '&');
+#endif
+
+                            if (response != AM_WEB_EMPTY_POST && (c1 == 0 || (c1 != (c2 + 1)))) {
+                                am_web_log_error("%s: invalid '%s' data (%s)", thisfunc, cntty, response.c_str());
+                                        pds = AM_INVALID_RESOURCE_FORMAT;
+                                        result = AM_WEB_RESULT_NOT_IMPLEMENTED;
+                            }
+                        }
+                    }
+                    if (pds == AM_SUCCESS) {
                         pds = req_func->reg_postdata.func(req_func->reg_postdata.args,
                             pu->post_time_key, pu->action_url, post_data, (*agentConfigPtr)->postcacheentry_life);
                     }
@@ -6416,7 +6477,7 @@ process_request(am_web_request_params_t *req_params,
                                 req_func,
                                 &redirect_url,
                                 &advice_response, agent_config);
-                    } else {
+                    } else if (pds != AM_INVALID_RESOURCE_FORMAT) {
                         /*pdp cache entry registration failed, do not do dummypost*/
                         result = process_access_redirect(req_params->url, orig_method,
                                 sts, policy_result,

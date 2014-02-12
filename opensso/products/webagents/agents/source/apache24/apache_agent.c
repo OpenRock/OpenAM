@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 #include <limits.h>
@@ -925,6 +925,9 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
             case AM_WEB_RESULT_ERROR:
                 *apache_ret = HTTP_INTERNAL_SERVER_ERROR;
                 break;
+            case AM_WEB_RESULT_NOT_IMPLEMENTED:
+                *apache_ret = HTTP_NOT_IMPLEMENTED ;
+                break;
             default:
                 am_web_log_error("%s: Unrecognized process result %d.", thisfunc, http_result);
                 *apache_ret = HTTP_INTERNAL_SERVER_ERROR;
@@ -1400,6 +1403,7 @@ int agent_check_access(request_rec *r) {
         req_params.path_info = r->path_info;
         req_params.cookie_header_val =
                 (char *) apr_table_get(r->headers_in, "Cookie");
+        req_params.content_type = (char *) apr_table_get(r->headers_in, "Content-Type");
         req_func.get_post_data.func = content_read;
         req_func.get_post_data.args = args;
         // no free_post_data
