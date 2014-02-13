@@ -89,6 +89,8 @@
 #include "naming_valid.h"
 #include "version.h"
 
+extern "C" char *read_naming_value(const char *key, int iid);
+
 USING_PRIVATE_NAMESPACE
 
 /*
@@ -524,6 +526,33 @@ static slist_t match_conditional_url(const char *request_url, smap_t& vm) {
     return ret;
 }
 
+static int get_failover_index(size_t nms) {
+    int current_index = -1;
+    if (boot_info.url_validation_level < 2 && nms > 1) {
+        /* validation is enabled and number of servers is more than one */
+#define AM_NAMING_LOCK ".am_naming_lock"
+        char *current_value = read_naming_value(AM_NAMING_LOCK, Log::getLockId());
+        if (current_value != NULL) {
+            current_index = strtol(current_value, NULL, 10);
+            if (current_index < 0 || errno == ERANGE) {
+                current_index = 0;
+            } else {
+                am_web_log_max_debug("get_failover_index(): will be using url index: %d",
+                        current_index);
+            }
+            free(current_value);
+        } else {
+            current_index = 0;
+        }
+        if ((size_t) current_index >= nms) {
+            am_web_log_warning("get_failover_index(): invalid url index: %d (out of %d); validation results ignored.",
+                    current_index, nms);
+            current_index = -1;
+        }
+    }
+    return current_index;
+}
+
 static Utils::url_info_t *find_active_login_server(const char *request_url, void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
             (AgentConfigurationRefCntPtr*) agent_config;
@@ -546,8 +575,20 @@ static Utils::url_info_t *find_active_login_server(const char *request_url, void
             am_web_log_max_debug("find_active_login_server(): conditional login url is available, will try to match request URL: %s", request_url);
             if (request_url != NULL) {
                 slist_t cond_login_url_l = match_conditional_url(request_url, (*agentConfigPtr)->cond_login_url);
+                int j = -1, current_index = -1;
+                current_index = get_failover_index(cond_login_url_l.size());
                 for (slist_t::const_iterator ur = cond_login_url_l.begin(); ur != cond_login_url_l.end(); ++ur) {
                     std::string const& str = *ur;
+                    if (current_index != -1) {
+                        if ((++j) != current_index) {
+                            am_web_log_max_debug("find_active_login_server(): skipping url(%d) %s",
+                                    j, str.c_str());
+                            continue;
+                        } else {
+                            am_web_log_max_debug("find_active_login_server(): using url(%d) %s",
+                                    j, str.c_str());
+                        }
+                    }
                     am_web_log_max_debug("find_active_login_server(): conditional login found matching server: %s", str.c_str());
                     result = (Utils::url_info_t*)malloc(sizeof (Utils::url_info_t));
                     if (Utils::parse_url(str.c_str(), str.length(), result, AM_TRUE) == AM_SUCCESS) {
@@ -574,7 +615,19 @@ static Utils::url_info_t *find_active_login_server(const char *request_url, void
         if ((*agentConfigPtr)->cond_login_url.empty() || result == URL_INFO_PTR_NULL) {
             am_web_log_max_debug("find_active_login_server(): conditional login url is not available");
             if ((*agentConfigPtr)->ignore_server_check == AM_FALSE) {
+                int j = -1, current_index = -1;
+                current_index = get_failover_index(url_list->size);
                 for (i = 0; i < url_list->size; ++i) {
+                    if (current_index != -1) {
+                        if ((++j) != current_index) {
+                            am_web_log_max_debug("find_active_login_server(): skipping url(%d) %s",
+                                    j, url_list->list[i].url);
+                            continue;
+                        } else {
+                            am_web_log_max_debug("find_active_login_server(): using url(%d) %s",
+                                    j, url_list->list[i].url);
+                        }
+                    }
                     am_web_log_max_debug("find_active_login_server(): trying server: %s", url_list->list[i].url);
                     if (is_server_alive(&url_list->list[i], agent_config)) {
                         result = &url_list->list[i];
@@ -582,7 +635,13 @@ static Utils::url_info_t *find_active_login_server(const char *request_url, void
                     }
                 }
             } else {
-                result = &url_list->list[i];
+                int current_index = -1;
+                current_index = get_failover_index(url_list->size);
+                if (current_index != -1) {
+                    result = &url_list->list[current_index];
+                } else {
+                    result = &url_list->list[i];
+                }
             }
         } 
 
@@ -595,39 +654,55 @@ static Utils::url_info_t *find_active_login_server(const char *request_url, void
     return result;
 }
 
-
-static Utils::url_info_t *find_active_logout_server(void* agent_config) 
-{
+static Utils::url_info_t *find_active_logout_server(void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
 
 
     Utils::url_info_t *result = URL_INFO_PTR_NULL;
     unsigned int i = 0;
     Utils::url_info_list_t *url_list = NULL;
 
-    if(initialized == AM_TRUE) {
-	(*agentConfigPtr)->lock->lock();
+    if (initialized == AM_TRUE) {
+        (*agentConfigPtr)->lock->lock();
 
-    url_list = &(*agentConfigPtr)->logout_url_list;
+        url_list = &(*agentConfigPtr)->logout_url_list;
 
-	if ((*agentConfigPtr)->ignore_server_check == AM_FALSE) {
-	    for (i = 0; i < url_list->size; ++i) {
-		    am_web_log_max_debug("find_active_logout_server(): "
-		    "Trying server: %s", url_list->list[i].url);
-		    if (is_server_alive(&url_list->list[i], agent_config)) {
-			    result = &url_list->list[i];
-			    break;
-		    }
-	    }
-	} else {
-	    result = &url_list->list[i];
-	}
+        if ((*agentConfigPtr)->ignore_server_check == AM_FALSE) {
+            int j = -1, current_index = -1;
+            current_index = get_failover_index(url_list->size);
+            for (i = 0; i < url_list->size; ++i) {
+                if (current_index != -1) {
+                    if ((++j) != current_index) {
+                        am_web_log_max_debug("find_active_logout_server(): skipping url(%d) %s",
+                                j, url_list->list[i].url);
+                        continue;
+                    } else {
+                        am_web_log_max_debug("find_active_logout_server(): using url(%d) %s",
+                                j, url_list->list[i].url);
+                    }
+                }
+                am_web_log_max_debug("find_active_logout_server(): "
+                        "Trying server: %s", url_list->list[i].url);
+                if (is_server_alive(&url_list->list[i], agent_config)) {
+                    result = &url_list->list[i];
+                    break;
+                }
+            }
+        } else {
+            int current_index = -1;
+            current_index = get_failover_index(url_list->size);
+            if (current_index != -1) {
+                result = &url_list->list[current_index];
+            } else {
+                result = &url_list->list[i];
+            }
+        }
 
-	(*agentConfigPtr)->lock->unlock();
+        (*agentConfigPtr)->lock->unlock();
     } else {
-	am_web_log_error("find_active_logout_server(): "
-			 "Library not initialized.");
+        am_web_log_error("find_active_logout_server(): "
+                "Library not initialized.");
     }
 
     return result;
@@ -4699,64 +4774,72 @@ am_web_is_cookie_present(const char *cookie, const char *value,
 
 extern "C" AM_WEB_EXPORT boolean_t
 am_web_is_logout_url(const char *url,
-                     void* agent_config)
-{
+        void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
 
     const char *thisfunc = "am_web_is_logout_url";
     boolean_t found = B_FALSE;
     if (NULL != url && '\0' != url[0]) {
-	try {
-	    // normalize the given url before comparison.
-	    URL url_obj(url);
-	    // override protocol/host/port if configured.
-	    (void)overrideProtoHostPort(url_obj, agent_config);
-	    std::string url_str;
-	    url_obj.getURLString(url_str);
-	    const char *norm_url = url_str.c_str();
-	    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-		     "%s(%s): normalized URL %s.\n", thisfunc, url, norm_url);
-	    unsigned int i;
-	    for (i = 0;
-		(i < (*agentConfigPtr)->logout_url_list.size) && (B_FALSE == found);
-		 i++) {
-		am_resource_traits_t rsrcTraits;
-		populate_am_resource_traits(rsrcTraits, agent_config);
-		am_resource_match_t match_status;
-		boolean_t usePatterns =
-		    (*agentConfigPtr)->logout_url_list.list[i].has_patterns==AM_TRUE? B_TRUE:B_FALSE;
-		match_status = am_policy_compare_urls(
-		    &rsrcTraits, (*agentConfigPtr)->logout_url_list.list[i].url, norm_url, usePatterns);
-		if (match_status == AM_EXACT_MATCH ||
-		    match_status == AM_EXACT_PATTERN_MATCH) {
-		    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-			"%s(%s): matched '%s' entry in logout url list",
-			thisfunc, url, (*agentConfigPtr)->logout_url_list.list[i].url);
-		    found = B_TRUE;
-		    break;
-		}
-	    }
-	}
-	catch (InternalException& exi) {
-	    am_web_log_error("%s: Internal exception encountered: %s.",
-			     thisfunc, exi.getMessage());
-	    found = B_FALSE;
-	}
-	catch (std::bad_alloc& exb) {
-	    am_web_log_error("%s: Bad Alloc exception encountered: %s.",
-			     thisfunc, exb.what());
-	    found = B_FALSE;
-	}
-	catch (std::exception& exs) {
-	    am_web_log_error("%s: Exception encountered: %s.",
-			     thisfunc, exs.what());
-	    found = B_FALSE;
-	}
-	catch (...) {
-	    am_web_log_error("%s: Unknown exception encountered.",thisfunc);
-	    found = B_FALSE;
-	}
+        try {
+            // normalize the given url before comparison.
+            URL url_obj(url);
+            // override protocol/host/port if configured.
+            (void) overrideProtoHostPort(url_obj, agent_config);
+            std::string url_str;
+            url_obj.getURLString(url_str);
+            const char *norm_url = url_str.c_str();
+            Log::log(boot_info.log_module, Log::LOG_DEBUG,
+                    "%s(%s): normalized URL %s.\n", thisfunc, url, norm_url);
+            unsigned int i;
+            int j = -1, current_index = -1;
+            current_index = get_failover_index((*agentConfigPtr)->logout_url_list.size);
+            for (i = 0; (i < (*agentConfigPtr)->logout_url_list.size) && (B_FALSE == found);
+                    i++) {
+                am_resource_traits_t rsrcTraits;
+                populate_am_resource_traits(rsrcTraits, agent_config);
+                am_resource_match_t match_status;
+                boolean_t usePatterns =
+                        (*agentConfigPtr)->logout_url_list.list[i].has_patterns == AM_TRUE ? B_TRUE : B_FALSE;
+
+                if (current_index != -1) {
+                    if ((++j) != current_index) {
+                        am_web_log_max_debug("%s(): skipping url(%d) %s",
+                                thisfunc, j, (*agentConfigPtr)->logout_url_list.list[i].url);
+                        continue;
+                    } else {
+                        am_web_log_max_debug("%s(): using url(%d) %s",
+                                thisfunc, j, (*agentConfigPtr)->logout_url_list.list[i].url);
+                    }
+                }
+
+                match_status = am_policy_compare_urls(
+                        &rsrcTraits, (*agentConfigPtr)->logout_url_list.list[i].url, norm_url, usePatterns);
+                if (match_status == AM_EXACT_MATCH ||
+                        match_status == AM_EXACT_PATTERN_MATCH) {
+                    Log::log(boot_info.log_module, Log::LOG_DEBUG,
+                            "%s(%s): matched '%s' entry in logout url list",
+                            thisfunc, url, (*agentConfigPtr)->logout_url_list.list[i].url);
+                    found = B_TRUE;
+                    break;
+                }
+            }
+        } catch (InternalException& exi) {
+            am_web_log_error("%s: Internal exception encountered: %s.",
+                    thisfunc, exi.getMessage());
+            found = B_FALSE;
+        } catch (std::bad_alloc& exb) {
+            am_web_log_error("%s: Bad Alloc exception encountered: %s.",
+                    thisfunc, exb.what());
+            found = B_FALSE;
+        } catch (std::exception& exs) {
+            am_web_log_error("%s: Exception encountered: %s.",
+                    thisfunc, exs.what());
+            found = B_FALSE;
+        } catch (...) {
+            am_web_log_error("%s: Unknown exception encountered.", thisfunc);
+            found = B_FALSE;
+        }
     }
     return found;
 }
@@ -4793,14 +4876,27 @@ am_web_is_agent_logout_url(const char *url,
                             norm_url, (*agentConfigPtr)->alogout_regex);
                 }
             } else {
-                for (i = 0;
-                        (i < (*agentConfigPtr)->agent_logout_url_list.size) && (B_FALSE == found);
+                int j = -1, current_index = -1;
+                current_index = get_failover_index((*agentConfigPtr)->agent_logout_url_list.size);
+                for (i = 0; (i < (*agentConfigPtr)->agent_logout_url_list.size) && (B_FALSE == found);
                         i++) {
                     am_resource_traits_t rsrcTraits;
                     populate_am_resource_traits(rsrcTraits, agent_config);
                     am_resource_match_t match_status;
                     boolean_t usePatterns =
                             (*agentConfigPtr)->agent_logout_url_list.list[i].has_patterns == AM_TRUE ? B_TRUE : B_FALSE;
+
+                    if (current_index != -1) {
+                        if ((++j) != current_index) {
+                            am_web_log_max_debug("%s(): skipping url(%d) %s",
+                                    thisfunc, j, (*agentConfigPtr)->agent_logout_url_list.list[i].url);
+                            continue;
+                        } else {
+                            am_web_log_max_debug("%s(): using url(%d) %s",
+                                    thisfunc, j, (*agentConfigPtr)->agent_logout_url_list.list[i].url);
+                        }
+                    }
+
                     match_status = am_policy_compare_urls(
                             &rsrcTraits, (*agentConfigPtr)->agent_logout_url_list.list[i].url, norm_url, usePatterns);
                     if (match_status == AM_EXACT_MATCH ||
