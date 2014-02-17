@@ -26,10 +26,11 @@
  *
  */ 
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <iterator>
+#include "am_web.h"
 #include "url.h"
 #include "internal_exception.h"
 
@@ -341,13 +342,15 @@ void URL::parseURLStrNew(const std::string &urlString,
 				    AM_INVALID_RESOURCE_FORMAT);
 	}
     }
-
     // 4. parse query
+    if (query_ptr != NULL && strlen(query_ptr) == 1) {
+        query = "?";
+    }
     if (query_ptr != NULL && query_ptr[1] != '\0') {
         query.reserve(strlen(query_ptr));
         query.append(query_ptr);
         checkQueryFormat();
-	splitQParams(&query_ptr[1]);
+        splitQParams(&query_ptr[1]);
     }
 }
 
@@ -584,6 +587,8 @@ std::string URL::get_canonicalized_query_parameter_string() const
                 }
             }
         }
+    } else if (query == "?") {
+        retVal.append("?");
     }
     return retVal;
 }
