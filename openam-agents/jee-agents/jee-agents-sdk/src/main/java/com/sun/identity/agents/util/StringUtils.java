@@ -24,6 +24,7 @@
  *
  * $Id: StringUtils.java,v 1.3 2008/08/30 01:40:55 huacui Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.agents.util;
@@ -38,7 +39,7 @@ import com.sun.identity.agents.arch.AgentException;
  * A util class to manage a query string
  */
 public class StringUtils {
-    
+
     public static String removePathInfo(HttpServletRequest request) {
         if (request == null) {
             return null;
@@ -48,7 +49,7 @@ public class StringUtils {
         int serverPort = request.getServerPort();
         String requestURI = request.getRequestURI();
         String pathInfo = request.getPathInfo();
-        String query = request.getQueryString();      
+        String query = request.getQueryString();
         if ((pathInfo != null) && (pathInfo.length() != 0)) {
             int index = requestURI.lastIndexOf(pathInfo);
             requestURI = requestURI.substring(0, index);
@@ -68,17 +69,17 @@ public class StringUtils {
         }
         return sb.toString();
     }
-    
+
    /**
     * Removes the specified parameter from the query string and returns the
     * updated query string.
-    * 
+    *
     * @param rawQueryString
     * @param parameterName
     * @return
     */
-    public static String removeQueryParameter(String queryString, 
-            String parameterName) 
+    public static String removeQueryParameter(String queryString,
+            String parameterName)
     {
         String result = getCanonicalQueryString(queryString);
         while (hasQueryParameter(result, parameterName)) {
@@ -107,7 +108,7 @@ public class StringUtils {
         }
         return result;
     }
-    
+
    /**
     * Returns <code>true</code> if the given query string has a parameter
     * with a name specified by <code>parameterName</code> argument.
@@ -115,8 +116,8 @@ public class StringUtils {
     * @param parameterName
     * @return
     */
-    public static boolean hasQueryParameter(String queryString, 
-            String parameterName) 
+    public static boolean hasQueryParameter(String queryString,
+            String parameterName)
     {
         boolean result = false;
         if (queryString != null && queryString.trim().length() > 0) {
@@ -134,10 +135,10 @@ public class StringUtils {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
    /**
     * Returns the value of the named query parameter from the given
     * query string.
@@ -145,8 +146,8 @@ public class StringUtils {
     * @param parameterName
     * @return
     */
-    public static String getQueryParameter(String rawQueryString, 
-            String parameterName) 
+    public static String getQueryParameter(String rawQueryString,
+            String parameterName)
     {
         String result = null;
         String value = null;
@@ -155,8 +156,8 @@ public class StringUtils {
             String name = parameterName + "=";
             int index = queryString.indexOf(name);
             if (index != -1) {
-                if (index == 0 || (index > 0 && 
-                        queryString.charAt(index-1) == '&')) 
+                if (index == 0 || (index > 0 &&
+                        queryString.charAt(index-1) == '&'))
                     {
                         int start = index + parameterName.length();
                         if (start < queryString.length() - 1) {
@@ -175,7 +176,7 @@ public class StringUtils {
         }
         return result;
     }
-    
+
     private static String getCanonicalQueryString(String queryString) {
         String result = null;
         if (queryString != null) {
@@ -188,12 +189,9 @@ public class StringUtils {
                     queryString = queryString.substring(1);
                 }
             }
-            
-            if (queryString.trim().length() > 0) {
-                result = queryString.trim();
-            }
+            result = queryString.trim();
         }
-        
+
         return result;
     }
 
@@ -218,34 +216,34 @@ public class StringUtils {
             loc = loc + toLen;
         }
     }
-    
-    public static String replaceChars(String replaceStr, char[] oldChars, 
+
+    public static String replaceChars(String replaceStr, char[] oldChars,
             char newChar)
     {
         String returnStr = replaceStr;
-        if (replaceStr != null && oldChars != null) {                
-            char[] replaceStrChar = replaceStr.toCharArray();        
+        if (replaceStr != null && oldChars != null) {
+            char[] replaceStrChar = replaceStr.toCharArray();
             int l1 = replaceStrChar.length;
             int l2 = oldChars.length;
-            for (int i=0; i<l1; i++) {            
+            for (int i=0; i<l1; i++) {
                 for (int j=0; j<l2; j++) {
                     if (replaceStrChar[i] == oldChars[j]) {
                         replaceStrChar[i] = newChar;
                         break;
                     }
-                }            
+                }
             }
             returnStr = new String(replaceStrChar);
         }
         return returnStr;
     }
-    
+
     public static void main(String args[]) {
         String replaceStr = "/opt/App Server/test=abc/file.xml";
         char[] charsToReplace = { ' ', '=' };
         char replaceWith = '-';
-        System.out.println("Original String = " + replaceStr); 
-        System.out.println("Final String = " + replaceChars(replaceStr, 
+        System.out.println("Original String = " + replaceStr);
+        System.out.println("Final String = " + replaceChars(replaceStr,
                 charsToReplace, replaceWith));
     }
 }
