@@ -26,7 +26,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.agents.filter;
 
@@ -38,9 +38,9 @@ import com.sun.identity.agents.arch.AgentConfiguration;
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.common.ILibertyAuthnResponseHelper;
+import com.sun.identity.shared.encode.CookieUtils;
 
-public class CDSSOResultTaskHandler extends AmFilterTaskHandler
-implements ICDSSOResultTaskHandler {
+public class CDSSOResultTaskHandler extends AmFilterTaskHandler implements ICDSSOResultTaskHandler {
 
     private static final String DEFAULT_GOTO_URL = "openam.agent.default_goto_url";
 
@@ -135,15 +135,15 @@ implements ICDSSOResultTaskHandler {
         }
         HttpServletResponse response = cxt.getHttpServletResponse();
         Cookie[] cookies = getCDSSOContext().createSSOTokenCookie(tokenStr);
-        if (cookies != null && cookies.length > 0) {
-            for(int i = 0; i < cookies.length; i++) {
-                response.addCookie(cookies[i]);
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                CookieUtils.addCookieToResponse(response, cookie);
             }
         } else {
             logError("processQueryParamAndSetCookies : no SSO Token cookie created");
         }
         // Remove the temporary CDSSO Cookie
-        response.addCookie(getCDSSOContext().getRemoveCDSSOCookie());
+        CookieUtils.addCookieToResponse(response, getCDSSOContext().getRemoveCDSSOCookie());
         AmFilterResult result = getRedirectResult(cxt, cdssoTokens);
 
         return result;
@@ -175,16 +175,16 @@ implements ICDSSOResultTaskHandler {
                 cdssoContext.getProviderID(cxt));
 
             Cookie[] cookies = cdssoContext.createSSOTokenCookie(tokenStr);
-            if (cookies != null && cookies.length > 0) {
-                for(int i = 0; i < cookies.length; i++) {
-                    response.addCookie(cookies[i]);
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    CookieUtils.addCookieToResponse(response, cookie);
                 }
             } else {
                logError("processAuthnResponseAndSetCookies : no SSO Token cookie created");
             }
 
             // Remove the temporary CDSSO Cookie
-            response.addCookie(cdssoContext.getRemoveCDSSOCookie());
+            CookieUtils.addCookieToResponse(response, cdssoContext.getRemoveCDSSOCookie());
             result = getRedirectResult(cxt, cdssoTokens);
         } catch (AgentException ae) {
             logError("CDSSOResultTaskHandler : One or more AuthnResponse "

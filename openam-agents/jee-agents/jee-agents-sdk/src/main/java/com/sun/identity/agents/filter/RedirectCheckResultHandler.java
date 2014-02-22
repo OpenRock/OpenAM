@@ -25,21 +25,22 @@
  * $Id: RedirectCheckResultHandler.java,v 1.2 2008/06/25 05:51:48 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import java.util.StringTokenizer;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
-import com.sun.identity.agents.util.IUtilConstants;
 import com.sun.identity.agents.util.NameValuePair;
 
 import com.sun.identity.agents.arch.ServiceFactory;
 import com.sun.identity.agents.arch.ICrypt;
+import com.sun.identity.shared.encode.CookieUtils;
 
 
 /**
@@ -196,10 +197,8 @@ public class RedirectCheckResultHandler extends AmFilterResultHandler
                         lastCounter);
             }
             
-            Cookie cookie = new Cookie(getRedirectCounterCookieName(),
-                    getRedirectCounterCookieValue(++value, url));
-            cookie.setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-            response.addCookie(cookie);
+            CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(getRedirectCounterCookieName(),
+                    getRedirectCounterCookieValue(++value, url)));
         } catch (Exception ex) {
             throw new AgentException(
                     "Failed to set redirect counter value", ex);

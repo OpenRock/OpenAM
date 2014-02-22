@@ -25,12 +25,11 @@
  * $Id: CookieResetHelper.java,v 1.2 2008/06/25 05:51:39 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.common;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.HashSet;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -39,15 +38,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.SurrogateBase;
-import com.sun.identity.agents.util.CookieUtils;
+import com.sun.identity.agents.util.IUtilConstants;
 import com.sun.identity.agents.util.RequestDebugUtils;
+import com.sun.identity.shared.encode.CookieUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class handles Cookie Reset
  *
  */
-public class CookieResetHelper extends SurrogateBase
-        implements ICookieResetHelper {
+public class CookieResetHelper extends SurrogateBase implements ICookieResetHelper {
     
     public CookieResetHelper(Module module) {
         super(module);
@@ -57,19 +59,15 @@ public class CookieResetHelper extends SurrogateBase
         return isCookieResetEnabled();
     }
     
-    public int doCookiesReset(HttpServletRequest request,
-            HttpServletResponse response) {
+    public int doCookiesReset(HttpServletRequest request, HttpServletResponse response) {
         int count = 0;
         if (isCookieResetEnabled()) {
-            Iterator it = getCookieResetList().iterator();
-            Map reqCookieMap = CookieUtils.getRequestCookies(request);
-            while (it.hasNext()) {
-                Cookie nextCookie = (Cookie) it.next();
+            Map<String, String> reqCookieMap = CookieUtils.getRequestCookies(request);
+            for (Cookie nextCookie : getCookieResetList()) {
                 if (reqCookieMap.containsKey(nextCookie.getName())) {
-                    response.addCookie(nextCookie);
+                    CookieUtils.addCookieToResponse(response, nextCookie);
                     if (isLogMessageEnabled()) {
-                        logMessage("CookieResetHelper: reset cookie: "
-                                + RequestDebugUtils.getDebugString(nextCookie));
+                        logMessage("CookieResetHelper: reset cookie: " + RequestDebugUtils.getDebugString(nextCookie));
                     }
                     count++;
                 }
@@ -80,21 +78,18 @@ public class CookieResetHelper extends SurrogateBase
     
     public void initialize(ICookieResetInitializer cookieResetInitializer) {
         
-        ArrayList cookieResetList = new ArrayList();
-        HashSet cookieNames = cookieResetInitializer.getCookieNames();
-        Map cookieDomains = cookieResetInitializer.getCookieDomains();
-        Map cookiePaths = cookieResetInitializer.getCookiePaths();
-        
-        Iterator it = cookieNames.iterator();
-        while (it.hasNext()) {
-            String cookieName = (String) it.next();
-            String domain = (String) cookieDomains.get(cookieName);
-            String path = (String) cookiePaths.get(cookieName);
-            Cookie resetCookie = CookieUtils.getExpiredCookie(
-                    cookieName, domain, path);
+        List<Cookie> cookieResetList = new ArrayList<Cookie>();
+        Set<String> cookieNames = cookieResetInitializer.getCookieNames();
+        Map<String, String> cookieDomains = cookieResetInitializer.getCookieDomains();
+        Map<String, String> cookiePaths = cookieResetInitializer.getCookiePaths();
+
+        for (String cookieName : cookieNames) {
+            String domain = cookieDomains.get(cookieName);
+            String path = cookiePaths.get(cookieName);
+            Cookie resetCookie = CookieUtils.newCookie(cookieName, IUtilConstants.COOKIE_RESET_STRING, 0, path,
+                    domain);
             if (isLogMessageEnabled()) {
-                logMessage("CookieResetHelper: Reset Cookie -> "
-                        + RequestDebugUtils.getDebugString(resetCookie));
+                logMessage("CookieResetHelper: Reset Cookie -> " + RequestDebugUtils.getDebugString(resetCookie));
             }
             cookieResetList.add(resetCookie);
         }
@@ -111,16 +106,16 @@ public class CookieResetHelper extends SurrogateBase
         _cookieResetEnabled = flag;
     }
     
-    private ArrayList getCookieResetList() {
+    private List<Cookie> getCookieResetList() {
         return _cookieResetList;
     }
     
-    private void setCookieResetList(ArrayList list) {
+    private void setCookieResetList(List<Cookie> list) {
         _cookieResetList = list;
     }
     
     private boolean _cookieResetEnabled;
-    private ArrayList _cookieResetList;
+    private List<Cookie> _cookieResetList;
 }
 
 

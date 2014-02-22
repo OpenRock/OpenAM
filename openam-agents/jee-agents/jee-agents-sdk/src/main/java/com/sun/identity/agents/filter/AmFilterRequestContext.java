@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.agents.filter;
 
@@ -35,7 +35,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,10 +44,10 @@ import com.sun.identity.agents.common.IHttpServletRequestHelper;
 import com.sun.identity.agents.common.IURLFailoverHelper;
 import com.sun.identity.agents.common.SSOValidationResult;
 import com.sun.identity.agents.policy.AmWebPolicyResult;
-import com.sun.identity.agents.util.CookieUtils;
 import com.sun.identity.agents.util.IUtilConstants;
 import com.sun.identity.agents.util.NameValuePair;
 import com.sun.identity.agents.util.StringUtils;
+import com.sun.identity.shared.encode.CookieUtils;
 
 /**
  * A <code>AmFilterRequestContext</code> encapsulates all request and response
@@ -69,11 +68,11 @@ public class AmFilterRequestContext implements IUtilConstants {
      * the currently available logout URL in cases where necessary.
      * @param isFormLoginRequest a boolean indicating if the current request is
      * that for a J2EE Form based login.
-     * @param accessDeniedURI the URI to be used for denying access to the 
+     * @param accessDeniedURI the URI to be used for denying access to the
      * requested resource.
      * @param amFilter the instance of <code>AmFilter</code> that is creating
      * this particular request context.
-     * @param filterMode the mode in which the <code>AmFilter</code> is 
+     * @param filterMode the mode in which the <code>AmFilter</code> is
      * operating during the execution of this request.
      */
     public AmFilterRequestContext(HttpServletRequest request,
@@ -85,7 +84,7 @@ public class AmFilterRequestContext implements IUtilConstants {
                            String accessDeniedURI,
                            AmFilter amFilter,
                            AmFilterMode filterMode,
-                           String agentHost, int agentPort, 
+                           String agentHost, int agentPort,
                            String agentProtocol)
     {
         setRequest(request);
@@ -160,9 +159,9 @@ public class AmFilterRequestContext implements IUtilConstants {
         }
         return _destinationURL;
     }
-    
+
     /**
-     * Returns the value of the actual destination url in the case 
+     * Returns the value of the actual destination url in the case
      * of a form login request. This information is not available
      * for all agents.
      *
@@ -170,22 +169,22 @@ public class AmFilterRequestContext implements IUtilConstants {
      */
     public String getGotoFormLoginURL() {
         return _gotoFormLoginURL;
-    }    
-    
+    }
+
     /**
      * Returns the value of actual canocialized destination URL that the
      * user intended to access without the SSO token in the query parameter
      * so that it can be used to evaluate policies where necessary.
-     * 
-     * @return the canocialized destination URL as submitted by the user 
-     * without the SSO token in the query parameter if it was present in 
+     *
+     * @return the canocialized destination URL as submitted by the user
+     * without the SSO token in the query parameter if it was present in
      * the original URL.
      */
     public String getPolicyDestinationURL() {
         if (_policyDestinationURL == null) {
             initPolicyDestinationURL();
         }
-        
+
         return _policyDestinationURL;
     }
 
@@ -205,7 +204,7 @@ public class AmFilterRequestContext implements IUtilConstants {
         if (getCookieMap() == null) {
             initCookieMap();
         }
-        return (String) getCookieMap().get(cookieName);
+        return getCookieMap().get(cookieName);
     }
 
     /**
@@ -226,10 +225,10 @@ public class AmFilterRequestContext implements IUtilConstants {
    /**
     * Returns the value of the GOTO parameter to be used for post authentication
     * redirect by the authentication service. If the request is a form login
-    * request, the return value will point to the application context root. 
-    * Otherwise the return value will be a complete URL of the requested 
+    * request, the return value will point to the application context root.
+    * Otherwise the return value will be a complete URL of the requested
     * resource.
-    * 
+    *
     * @return the URL to which the user will be redirected after successful
     * authentication.
     */
@@ -245,7 +244,7 @@ public class AmFilterRequestContext implements IUtilConstants {
         } else {
             gotoURL = getDestinationURL();
         }
-        
+
         return gotoURL;
     }
 
@@ -266,7 +265,7 @@ public class AmFilterRequestContext implements IUtilConstants {
     {
         return getAuthRedirectURL(amWebPolicyResult, null);
     }
-    
+
     public String getAuthRedirectURL(String gotoURL) throws AgentException {
         return getAuthRedirectURL(null, gotoURL);
     }
@@ -332,11 +331,11 @@ public class AmFilterRequestContext implements IUtilConstants {
 
     /**
      * Returns a URL that can be used to logout the user from the
-     * OpenSSO server and redirect the user to a specific URL. 
-     * @param gotoURL the redirect URL after logging out 
-     * @return a String representation of a URL that can be used to 
-     * logout the user from the OpenSSO server and redirect 
-     * the user to the gotoURL. 
+     * OpenSSO server and redirect the user to a specific URL.
+     * @param gotoURL the redirect URL after logging out
+     * @return a String representation of a URL that can be used to
+     * logout the user from the OpenSSO server and redirect
+     * the user to the gotoURL.
      */
     public String getLogoutURL(String gotoURL) {
         String logoutURL = null;
@@ -345,10 +344,10 @@ public class AmFilterRequestContext implements IUtilConstants {
         } catch (AgentException ae) {
             return null;
         }
-      
+
         if (logoutURL == null) {
             return null;
-        } 
+        }
 
         StringBuffer buff = new StringBuffer();
         buff.append(logoutURL);
@@ -465,7 +464,7 @@ public class AmFilterRequestContext implements IUtilConstants {
     }
 
     /**
-     * Returns an <code>AmFilterResult</code> instance that represents a server error 
+     * Returns an <code>AmFilterResult</code> instance that represents a server error
      * result for filter processing.
      *
      * @return an <code>AmFilterResult</code> to indicate a server error
@@ -569,9 +568,8 @@ public class AmFilterRequestContext implements IUtilConstants {
      * @param path the path of the cookie to be expired
      */
     public void expireCookie(String cookieName, String domain, String path) {
-        Cookie expiredCookie =
-            CookieUtils.getExpiredCookie(cookieName, domain, path);
-        getHttpServletResponse().addCookie(expiredCookie);
+        CookieUtils.addCookieToResponse(getHttpServletResponse(), CookieUtils.newCookie(cookieName,
+                IUtilConstants.COOKIE_RESET_STRING, 0, path, domain));
     }
 
     /**
@@ -664,7 +662,7 @@ public class AmFilterRequestContext implements IUtilConstants {
 
         return _accessDeniedURL;
     }
-    
+
     /**
      * Returns the base URL for this request. The base URL simply specifies the
      * protocol, host and port information and does not contain any URI or
@@ -677,7 +675,7 @@ public class AmFilterRequestContext implements IUtilConstants {
     		initBaseURL();
     	}
     	return _baseURL;
-    }    
+    }
 
     /**
      * Sets the <code>IHttpServletRequestHelper</code> instance where needed.
@@ -692,7 +690,7 @@ public class AmFilterRequestContext implements IUtilConstants {
                     helper.getUserAttributes());
         }
     }
-    
+
    /**
     * Sets a <code>Map</code> that contains the response attributes as evaluated
     * by the remote policy.
@@ -701,12 +699,12 @@ public class AmFilterRequestContext implements IUtilConstants {
     public void setPolicyResponseAttributes(Map responseAttributes) {
         _policyResponseAttributes = responseAttributes;
     }
-    
+
    /**
     * Returns the response attributes associated with the current request as
-    * determined by remote policy evaluation. This method can return 
+    * determined by remote policy evaluation. This method can return
     * <code>null</code> if no attributes have been set.
-    * 
+    *
     * @return
     */
     public Map getPolicyResponseAttributes() {
@@ -722,17 +720,17 @@ public class AmFilterRequestContext implements IUtilConstants {
      * that may be used by various task handlers downstream to facilitate the
      * further processing of the request.
      */
-    public void setSSOValidationResult(SSOValidationResult ssoValidationResult) 
+    public void setSSOValidationResult(SSOValidationResult ssoValidationResult)
     {
         _ssoValidationResult = ssoValidationResult;
     }
-    
+
     public boolean isAuthenticated() {
     	boolean result = false;
     	if (_ssoValidationResult != null && _ssoValidationResult.isValid()) {
     		result = true;
     	}
-    	
+
     	return result;
     }
 
@@ -750,23 +748,22 @@ public class AmFilterRequestContext implements IUtilConstants {
         setAccessDeniedURL(getBaseURL() + getAccessDeniedURI());
     }
 
-    private Map getCookieMap() {
+    private Map<String, String> getCookieMap() {
         return _cookieMap;
     }
 
-    private void setCookieMap(Map cookieMap) {
+    private void setCookieMap(Map<String, String> cookieMap) {
         _cookieMap = cookieMap;
     }
 
     private void initCookieMap() {
-        setCookieMap(
-            CookieUtils.getRequestCookies(getHttpServletRequest()));
+        setCookieMap(CookieUtils.getRequestCookies(getHttpServletRequest()));
     }
 
     private void setDestinationURL(String url) {
         _destinationURL = url;
     }
-    
+
     public void setGotoFormLoginURL(String url) throws AgentException {
         try {
             URL u = new URL(url);
@@ -774,8 +771,8 @@ public class AmFilterRequestContext implements IUtilConstants {
         } catch (MalformedURLException me) {
             throw new AgentException("Invalid form login url" + url, me);
         }
-    }    
-    
+    }
+
     private void setPolicyDestinationURL(String url) {
         _policyDestinationURL = url;
     }
@@ -800,10 +797,10 @@ public class AmFilterRequestContext implements IUtilConstants {
 
         setDestinationURL(buff.toString());
     }
-    
+
     private void initPolicyDestinationURL() {
         String queryString = StringUtils.removeQueryParameter(
-                getHttpServletRequest().getQueryString(), 
+                getHttpServletRequest().getQueryString(),
                 AgentConfiguration.getSSOTokenName());
         StringBuffer buff = new StringBuffer();
         buff.append(getBaseURL());
@@ -907,7 +904,7 @@ public class AmFilterRequestContext implements IUtilConstants {
         _applicationContextURL = getBaseURL() +
             getHttpServletRequest().getContextPath();
     }
-    
+
     /**
      * Sets the base URL for this request. The base URL simply specifies the
      * protocol, host and port information and does not contain any URI or
@@ -918,27 +915,27 @@ public class AmFilterRequestContext implements IUtilConstants {
     private void setBaseURL(String baseURL) {
     	_baseURL = baseURL;
     }
-    
+
     private void setAgentHost(String agentHost) {
         _agentHost = agentHost;
     }
-    
+
     public String getAgentHost() {
         return _agentHost;
     }
-    
+
     private void setAgentPort(int agentPort) {
         _agentPort = agentPort;
     }
-    
+
     public int getAgentPort() {
         return _agentPort;
     }
-    
+
     private void setAgentProtocol(String agentProtocol) {
         _agentProtocol = agentProtocol;
     }
-    
+
     public String getAgentProtocol() {
         return _agentProtocol;
     }
@@ -949,7 +946,7 @@ public class AmFilterRequestContext implements IUtilConstants {
     private String _destinationURL;
     private String _gotoFormLoginURL;
     private String _policyDestinationURL;
-    private Map _cookieMap;
+    private Map<String, String> _cookieMap;
     private IURLFailoverHelper _loginURLFailoverHelper;
     private IURLFailoverHelper _logoutURLFailoverHelper;
     private boolean _isFormLoginRequestFlag;

@@ -26,7 +26,7 @@
  *
  */
  /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.agents.filter;
@@ -42,6 +42,7 @@ import com.sun.identity.agents.arch.ServiceFactory;
 import com.sun.identity.agents.common.ISSOTokenValidator;
 import com.sun.identity.agents.common.SSOValidationResult;
 import com.sun.identity.agents.common.ICookieResetHelper;
+import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.agents.filter.PDPInitHelper;
 
 /**
@@ -238,9 +239,7 @@ implements ISSOTaskHandler {
                                    + request.getRequestURI());
                     }
 
-                    response.addCookie(
-                        getSSOContext().getNextLoginAttemptCookie(
-                        loginAttempt));
+                    CookieUtils.addCookieToResponse(response, getSSOContext().getNextLoginAttemptCookie(loginAttempt));
                     result = ctx.getAuthRedirectResult();
                 } else {
 

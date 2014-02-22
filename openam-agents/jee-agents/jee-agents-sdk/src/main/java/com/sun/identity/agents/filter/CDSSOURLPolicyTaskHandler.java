@@ -24,7 +24,9 @@
  *
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.policy.AmWebPolicyResult;
+import com.sun.identity.shared.encode.CookieUtils;
 
 /**
  * <p>
@@ -89,11 +92,11 @@ implements ICDSSOURLPolicyTaskHandler {
          
         String authnRequestID = cdssoContext.getSAMLHelper().generateID(); 
                        
-        response.addCookie(cdssoContext.createCDSSOCookie(gotoURL, 
-            request.getMethod(), authnRequestID));   
+        CookieUtils.addCookieToResponse(response,
+                cdssoContext.createCDSSOCookie(gotoURL, request.getMethod(), authnRequestID));
                   
         // Reset the Original SSOToken
-        response.addCookie(cdssoContext.getRemoveSSOTokenCookie());
+        CookieUtils.addCookieToResponse(response, cdssoContext.getRemoveSSOTokenCookie());
        
         AmFilterResult result = null;
         if (cdssoContext.isAuthnResponseEnabled()) {

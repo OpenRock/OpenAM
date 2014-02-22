@@ -26,7 +26,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.agents.filter;
 
@@ -53,6 +53,7 @@ import com.sun.identity.agents.policy.AmWebPolicyResult;
 import com.sun.identity.agents.util.IUtilConstants;
 import com.sun.identity.agents.util.NameValuePair;
 import com.sun.identity.agents.util.SAMLUtils;
+import com.sun.identity.shared.encode.CookieUtils;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -273,25 +274,17 @@ public class CDSSOContext extends SSOContext implements ICDSSOContext {
                                      String accessMethod,
                                      String authnRequestID) throws AgentException
     {
-        // To keep track of the request and responses, we add the
-        // authn requestID to the the cookie
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(gotoURL).append("|").append(accessMethod);
         sb.append("|").append(authnRequestID);
         String value = getCryptUtil().encrypt(sb.toString());
 
         value = URLEncoder.encode(value);
-        Cookie cookie = new Cookie(getCDSSOCookieName(), value);
-        cookie.setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-
-        return cookie;
+        return CookieUtils.newCookie(getCDSSOCookieName(), value);
     }
 
     public Cookie getRemoveCDSSOCookie() {
-        Cookie cookie = new Cookie(getCDSSOCookieName(), "reset");
-        cookie.setMaxAge(0);
-        cookie.setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-        return cookie;
+        return CookieUtils.newCookie(getCDSSOCookieName(), IUtilConstants.COOKIE_RESET_STRING, 0);
     }
 
     public String[] parseCDSSOCookieValue(String cdssoCookie)

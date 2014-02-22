@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 package com.sun.identity.agents.filter;
 
 import java.util.Map;
@@ -34,12 +33,11 @@ import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.arch.ServiceFactory;
 import com.sun.identity.agents.common.IPDPCache;
 import com.sun.identity.agents.common.IPDPCacheEntry;
-import com.sun.identity.agents.util.IUtilConstants;
+import com.sun.identity.shared.encode.CookieUtils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -135,11 +133,8 @@ implements IInitialPDPTaskHandler, IPDPTaskConstants {
                 redirectURL.append('?');
                 redirectURL.append(_pdpStickySessionModeValue);
             } else {
-
-                Cookie cookie = new Cookie(_pdpStickySessionLBKeyName,
-                                            _pdpStickySessionLBKeyValue);
-                cookie.setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-                response.addCookie(cookie);
+                CookieUtils.addCookieToResponse(response,
+                        CookieUtils.newCookie(_pdpStickySessionLBKeyName, _pdpStickySessionLBKeyValue));
             }
 
             //store EntryCache in the Cache

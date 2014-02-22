@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.common;
 
 import java.net.URLDecoder;
@@ -152,10 +154,10 @@ public class SSOTokenValidator extends SurrogateBase
     public String getSSOTokenValue(HttpServletRequest request) {
         String rawValue = null;
         Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (int i=0; i<cookies.length; i++) {
-                if (cookies[i].getName().equals(getSSOTokenName())) {
-                    rawValue = cookies[i].getValue();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(getSSOTokenName())) {
+                    rawValue = cookie.getValue();
                 }
             }
         }

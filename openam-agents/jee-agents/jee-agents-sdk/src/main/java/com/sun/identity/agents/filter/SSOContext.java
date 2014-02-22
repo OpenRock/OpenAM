@@ -25,11 +25,10 @@
  * $Id: SSOContext.java,v 1.6 2009/02/03 08:33:21 bakka Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
-
-import java.net.URLEncoder;
-import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
@@ -43,13 +42,16 @@ import com.sun.identity.agents.common.ISSOTokenValidator;
 import com.sun.identity.agents.util.IUtilConstants;
 import com.sun.identity.agents.arch.ServiceFactory;
 import com.sun.identity.agents.arch.ICrypt;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A <code>SSOContext</code> encapsulates all the configuration and
  * intializations.
  */
-public class SSOContext extends AgentBase
-        implements IFilterConfigurationConstants, ISSOContext {
+public class SSOContext extends AgentBase implements IFilterConfigurationConstants, ISSOContext {
 
     public SSOContext(Manager manager) {
         super(manager);
@@ -123,16 +125,12 @@ public class SSOContext extends AgentBase
         return result;
     }
 
-    public Cookie getNextLoginAttemptCookie(int currentValue)
-    throws AgentException {
-
-        String counterCookienName = getLoginCounterCookieName();
-        String value =
-                getCryptUtil().encrypt(String.valueOf(currentValue + 1) + ":"
+    public Cookie getNextLoginAttemptCookie(int currentValue) throws AgentException {
+        String counterCookieName = getLoginCounterCookieName();
+        String value = getCryptUtil().encrypt(String.valueOf(currentValue + 1) + ":"
                 + String.valueOf(System.currentTimeMillis()));
-        Cookie nextLoginAttemptCookie = new Cookie(counterCookienName, value);
-        nextLoginAttemptCookie.setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-        return nextLoginAttemptCookie;
+
+        return CookieUtils.newCookie(counterCookieName, value);
     }
 
     /**
@@ -141,44 +139,36 @@ public class SSOContext extends AgentBase
      * @return a SSO Tokem Cookie
      */
     public Cookie[] createSSOTokenCookie(String tokenValue) {
-        Cookie[] cookies;
         String[] domains = getConfigurationStrings(CONFIG_CDSSO_DOMAIN);
         boolean isSecure = getConfigurationBoolean(CONFIG_CDSSO_SECURE_ENABLED);
-        
+
         int nbDomains = 0;
-        if (domains != null && domains.length > 0) {
+        if (domains != null) {
             nbDomains = domains.length;
         }
-        
+
         if (tokenValue.indexOf("%") < 0){
-            tokenValue = URLEncoder.encode(tokenValue);         
-        }        
-        
-        if (nbDomains == 0) {
-            cookies = new Cookie[1];
-            cookies[0] = new Cookie(AgentConfiguration.getSSOTokenName(),
-                tokenValue);
-            cookies[0].setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-            cookies[0].setSecure(isSecure);
-        } else {
-            cookies = new Cookie[nbDomains];
-            for(int i = 0; i < nbDomains; i++) {
-                cookies[i] = new Cookie(AgentConfiguration.getSSOTokenName(),
-                    tokenValue);
-                cookies[i].setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-                cookies[i].setDomain(domains[i]);
-                cookies[i].setSecure(isSecure);
-            }
+            tokenValue = URLEncDec.encode(tokenValue);
         }
-        return cookies;
+
+        if (nbDomains == 0) {
+            Cookie cookie = CookieUtils.newCookie(AgentConfiguration.getSSOTokenName(), tokenValue);
+            cookie.setSecure(isSecure);
+            return new Cookie[]{cookie};
+        } else {
+            List<Cookie> cookies = new ArrayList<Cookie>(nbDomains);
+            for (String domain : domains) {
+                Cookie cookie = CookieUtils.newCookie(AgentConfiguration.getSSOTokenName(), tokenValue,
+                        IUtilConstants.DEFAULT_COOKIE_PATH, domain);
+                cookie.setSecure(isSecure);
+                cookies.add(cookie);
+            }
+            return cookies.toArray(new Cookie[nbDomains]);
+        }
     }
     
     public Cookie getRemoveSSOTokenCookie() {
-        Cookie cookie = new Cookie(AgentConfiguration.getSSOTokenName(),
-                IUtilConstants.COOKIE_RESET_STRING);
-        cookie.setMaxAge(0);
-        cookie.setPath(IUtilConstants.DEFAULT_COOKIE_PATH);
-        return cookie;
+        return CookieUtils.newCookie(AgentConfiguration.getSSOTokenName(), IUtilConstants.COOKIE_RESET_STRING, 0);
     }
 
     public boolean isSSOCacheEnabled() {

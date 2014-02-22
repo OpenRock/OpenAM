@@ -24,7 +24,9 @@
  *
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
+import com.sun.identity.shared.encode.CookieUtils;
 
 public class CDSSOTaskHandler extends SSOTaskHandler 
 implements ICDSSOTaskHandler {
@@ -128,16 +131,15 @@ implements ICDSSOTaskHandler {
         String authnRequestID = "";                            
         if (loginAttempt == 0) { // Set the request ID
             String gotoURL = ctx.populateGotoParameterValue();
-            authnRequestID =  cdssoContext.getSAMLHelper().generateID();        
-            response.addCookie(cdssoContext.createCDSSOCookie(gotoURL, 
-                request.getMethod(), authnRequestID));
+            authnRequestID = cdssoContext.getSAMLHelper().generateID();
+            CookieUtils.addCookieToResponse(response,
+                    cdssoContext.createCDSSOCookie(gotoURL, request.getMethod(), authnRequestID));
         } else {
             // Get the requestID from the cookie set previously
             authnRequestID = cdssoContext.getAuthnRequestID(ctx);                            
         }
-        
-        response.addCookie(cdssoContext.getNextLoginAttemptCookie(
-            loginAttempt));
+
+        CookieUtils.addCookieToResponse(response, cdssoContext.getNextLoginAttemptCookie(loginAttempt));
                     
         return cdssoContext.getRedirectResult(ctx, null, authnRequestID);     
     }
@@ -152,10 +154,10 @@ implements ICDSSOTaskHandler {
         HttpServletRequest request = ctx.getHttpServletRequest();
         HttpServletResponse response = ctx.getHttpServletResponse();
         
-        String authnRequestID = cdssoContext.getSAMLHelper().generateID(); 
-                       
-        response.addCookie(cdssoContext.createCDSSOCookie(gotoURL, 
-            request.getMethod(), authnRequestID));                                    
+        String authnRequestID = cdssoContext.getSAMLHelper().generateID();
+
+        CookieUtils.addCookieToResponse(response,
+                cdssoContext.createCDSSOCookie(gotoURL, request.getMethod(), authnRequestID));
 
         return cdssoContext.getRedirectResult(ctx, null, authnRequestID);        
     }

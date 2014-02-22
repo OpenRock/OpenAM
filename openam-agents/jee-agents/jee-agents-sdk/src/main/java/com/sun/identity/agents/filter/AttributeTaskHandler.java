@@ -25,7 +25,9 @@
  * $Id: AttributeTaskHandler.java,v 1.2 2008/06/25 05:51:44 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import java.net.URLEncoder;
@@ -40,9 +42,9 @@ import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.common.CommonFactory;
 import com.sun.identity.agents.common.IHttpServletRequestHelper;
-import com.sun.identity.agents.util.CookieUtils;
 import com.sun.identity.agents.arch.ServiceFactory;
 import com.sun.identity.agents.arch.ICrypt;
+import com.sun.identity.shared.encode.CookieUtils;
 
 /**
  * The attribute task handler of agent filter
@@ -171,17 +173,15 @@ public abstract class AttributeTaskHandler extends AmFilterTaskHandler {
                                     + "Attribute " + nextName + "="
                                     + nextValue + " as cookie");
                         }
-                        response.addCookie(CookieUtils.getResponseCookie(
-                                nextName, nextValue));
+                        CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(nextName, nextValue));
                         count++;
                     }
                 } else {
-                    Map requestCookies = CookieUtils.getRequestCookies(ctx
-                            .getHttpServletRequest());
+                    Map<String, String> requestCookies = CookieUtils.getRequestCookies(
+                            ctx.getHttpServletRequest());
                     if (requestCookies.containsKey(nextName)) {
                         if (isLogMessageEnabled()) {
-                            logMessage("AttributeTaskHandler: Reseting"
-                                    + " Attribute " + nextName);
+                            logMessage("AttributeTaskHandler: Resetting Attribute " + nextName);
                         }
                         ctx.expireCookie(nextName);
                         count++;
