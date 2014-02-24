@@ -71,6 +71,17 @@ typedef struct {
     const char *notes;
 } request_data_t;
 
+static int am_ws_valid(struct sess *sp) {
+    if (sp == NULL || sp->magic != SESS_MAGIC || sp->wrk == NULL ||
+            sp->wrk->ws == NULL || sp->wrk->ws->magic != WS_MAGIC) {
+#define WS_MEM_ERR "am_ws_valid(): workspace memory error"
+        LOG_E(WS_MEM_ERR"\n");
+        am_web_log_error(WS_MEM_ERR);
+        return 0;
+    }
+    return 1;
+}
+
 static const char * am_vmod_printf(struct sess *sp, const char * format, ...) {
     char *p;
     unsigned int u, v;
@@ -247,7 +258,7 @@ void vmod_done(struct sess *sp, struct vmod_priv *priv) {
     int status;
     const char* ct = "\015Content-Type:";
     request_data_t *sd = (request_data_t *) priv->priv;
-    if (sd != NULL) {
+    if (sd != NULL && am_ws_valid(sp)) {
         struct var *v;
         struct var_head *vh = sd->headers_out;
 
@@ -281,7 +292,7 @@ void vmod_done(struct sess *sp, struct vmod_priv *priv) {
 
 void vmod_ok(struct sess *sp, struct vmod_priv *priv) {
     request_data_t *sd = (request_data_t *) priv->priv;
-    if (sd != NULL) {
+    if (sd != NULL && am_ws_valid(sp)) {
         struct var *v;
         struct var_head *vh = sd->headers_out;
 
@@ -302,13 +313,12 @@ static am_status_t content_read(void **args, char **body) {
     const char thisfunc[] = "content_read()";
     am_status_t status = AM_FAILURE;
     int re, buf_size, rsize;
-    char *cl_ptr, buf[2048];
+    char *cl_ptr, buf[4096];
     unsigned long cl, ocl;
-    if (args == NULL || (r = args[0]) == NULL) {
+    if (args == NULL || (r = args[0]) == NULL || !am_ws_valid(r->s)) {
         am_web_log_error("%s: invalid arguments", thisfunc);
         return AM_INVALID_ARGUMENT;
     } else {
-        CHECK_OBJ_NOTNULL(r->s, SESS_MAGIC);
         *body = NULL;
         cl_ptr = VRT_GetHdr(r->s, HDR_REQ, "\017Content-Length:");
         ocl = cl = cl_ptr ? strtoul(cl_ptr, NULL, 10) : 0;
@@ -320,6 +330,14 @@ static am_status_t content_read(void **args, char **body) {
             if (r->s->htc->pipeline.b != NULL && Tlen(r->s->htc->pipeline) == cl) {
                 *body = r->s->htc->pipeline.b;
             } else {
+
+                if (!r->s->htc->rxbuf.b || !r->s->htc->rxbuf.e || r->s->htc->rxbuf.b > r->s->htc->rxbuf.e) {
+                    *body = NULL;
+                    LOG_E("content_read(): invalid rxbuf data\n");
+                    am_web_log_error("%s: memory allocation failure", thisfunc);
+                    return AM_FAILURE;
+                }
+
                 int rxbuf_size = Tlen(r->s->htc->rxbuf);
 
                 /*do ws memory allocation*/
@@ -376,7 +394,7 @@ static am_status_t content_read(void **args, char **body) {
 }
 
 static const char* get_req_header(request_data_t* r, const char* key) {
-    if (r == NULL || r->s == NULL) {
+    if (r == NULL || r->s == NULL || !am_ws_valid(r->s)) {
         am_web_log_error("get_req_header(): invalid arguments");
         return NULL;
     }
@@ -386,7 +404,7 @@ static const char* get_req_header(request_data_t* r, const char* key) {
 static am_status_t set_header_in_request(void **args, const char *key, const char *value) {
     am_status_t sts = AM_SUCCESS;
     request_data_t * r = (request_data_t *) args[0];
-    if (r == NULL || key == NULL) {
+    if (r == NULL || key == NULL || !am_ws_valid(r->s)) {
         am_web_log_error("set_header_in_request(): invalid arguments");
         sts = AM_INVALID_ARGUMENT;
     } else {
@@ -403,7 +421,7 @@ static am_status_t set_cookie(const char *header, void **args) {
     char *currentCookies;
     if (header != NULL && args != NULL) {
         request_data_t *r = (request_data_t *) args[0];
-        if (r == NULL) {
+        if (r == NULL || !am_ws_valid(r->s)) {
             am_web_log_error("set_cookie(): invalid arguments");
         } else {
             am_add_header(r, "Set-Cookie", header);
@@ -443,7 +461,7 @@ static am_status_t set_user(void **args, const char *user) {
 
 static void am_custom_response(request_data_t *rec, int status, char *data) {
     rec->status = status;
-    rec->body = data != NULL ? am_vmod_printf(rec->s, "%s", data) : NULL;
+    rec->body = data != NULL && am_ws_valid(rec->s) ? am_vmod_printf(rec->s, "%s", data) : NULL;
 }
 
 static am_status_t set_method(void **args, am_web_req_method_t method) {
@@ -451,7 +469,7 @@ static am_status_t set_method(void **args, am_web_req_method_t method) {
     struct sess* sp = NULL;
     am_status_t sts = AM_SUCCESS;
     if (args == NULL || (rec = (request_data_t *) args[0]) == NULL ||
-            (sp = rec->s) == NULL || sp->http == NULL) {
+            (sp = rec->s) == NULL || sp->http == NULL || !am_ws_valid(rec->s)) {
         am_web_log_error("set_method(): invalid arguments");
         sts = AM_INVALID_ARGUMENT;
     } else {
@@ -467,6 +485,7 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
     am_status_t sts = AM_SUCCESS;
     int *ret = NULL;
     int len = 0;
+    char clen[13];
 
     if (args == NULL || (rec = (request_data_t *) args[0]) == NULL || (ret = (int *) args[1]) == NULL ||
             ((http_result == AM_WEB_RESULT_OK_DONE || http_result == AM_WEB_RESULT_REDIRECT) &&
@@ -480,9 +499,11 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 break;
             case AM_WEB_RESULT_OK_DONE:
                 if (data && ((len = strlen(data)) > 0)) {
+                    memset(&clen[0], 0x00, sizeof (clen));
+                    snprintf(clen, sizeof (clen), "%d", len);
                     rec->status = 200;
                     am_add_header(rec, "Content-Type", "text/html");
-                    am_add_header(rec, "Content-Length", am_vmod_printf(rec->s, "%d", len));
+                    am_add_header(rec, "Content-Length", clen);
                     am_custom_response(rec, 200, data);
                     *ret = DONE;
                 } else {
@@ -664,7 +685,7 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
 static am_status_t set_notes_in_request(void **args, const char *key, const char *values) {
     request_data_t *r = NULL;
     am_status_t sts = AM_SUCCESS;
-    if (args == NULL || (r = (request_data_t *) args[0]) == NULL || key == NULL) {
+    if (args == NULL || (r = (request_data_t *) args[0]) == NULL || key == NULL || !am_ws_valid(r->s)) {
         am_web_log_error("set_notes_in_request(): invalid arguments");
         sts = AM_INVALID_ARGUMENT;
     } else {
@@ -679,7 +700,7 @@ static am_status_t set_notes_in_request(void **args, const char *key, const char
 
 static const char *get_query_string(request_data_t *r, const char *url) {
     char *ptr = NULL;
-    if (r != NULL && url != NULL) {
+    if (r != NULL && url != NULL && am_ws_valid(r->s)) {
         ptr = strstr(url, "?");
         if (ptr != NULL) {
             return am_vmod_printf(r->s, "%s", ptr + 1);
@@ -710,10 +731,8 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
 
-    CHECK_OBJ_NOTNULL(sp, SESS_MAGIC);
-
     r = (request_data_t *) priv->priv;
-    if (r == NULL) {
+    if (r == NULL || !am_ws_valid(sp)) {
         send_deny(r);
         return 0;
     }
@@ -730,9 +749,9 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
     am_web_log_debug("Begin process %s request, proto: %s, host: %s, port: %d, uri: %s", req_method, proto, host, port, uri);
 
     if (proto == NULL) {
-        url = am_vmod_printf(r->s, "http://%s%s", host, uri);
+        url = am_ws_valid(r->s) ? am_vmod_printf(r->s, "http://%s%s", host, uri) : NULL;
     } else {
-        url = am_vmod_printf(r->s, "%s://%s%s", proto, host, uri);
+        url = am_ws_valid(r->s) ? am_vmod_printf(r->s, "%s://%s%s", proto, host, uri) : NULL;
     }
 
     if (url == NULL) {
