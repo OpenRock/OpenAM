@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -112,6 +112,11 @@
 
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+
+        <!-- License to pull into distribution -->
+        <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
+        <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
+        <forgerock.license.version>1.0.0</forgerock.license.version>
     </properties>
 
     <!-- Profiles -->
@@ -148,6 +153,23 @@
                     <value>true</value>
                 </property>
             </activation>
+        </profile>
+        <!-- When building an Enterprise binary download, include the correct binary license terms. -->
+        <profile>
+            <!-- Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
+            <id>binary-licensing</id>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
+            <properties>
+                <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
+                <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
+                <forgerock.license.version>1.0.0</forgerock.license.version>
+            </properties>
         </profile>
     </profiles>
 

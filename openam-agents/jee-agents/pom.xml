@@ -40,6 +40,10 @@
         <com.bea.core.common.security.api.v10.version>1.0.0.0_5-1-0-0</com.bea.core.common.security.api.v10.version>
         <com.bea.core.weblogic.security.auth.v10.version>1.0.0.0</com.bea.core.weblogic.security.auth.v10.version>
         <com.bea.core.weblogic.security.v10.version>1.0.0.0_5-1-0-0</com.bea.core.weblogic.security.v10.version>
+
+        <!-- Guice -->
+        <guice.version>3.0</guice.version>
+        <forgerock.guice.version>1.0.0</forgerock.guice.version>
     </properties>
     <modules>
         <!-- OpenAM JavaEE Policy Agent Modules -->
@@ -467,6 +471,38 @@
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-installtools</artifactId>
                 <version>${openam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-core</artifactId>
+                <version>${openam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-manager-cli</artifactId>
+                <version>${openam.version}</version>
+            </dependency>
+
+            <!-- Guice -->
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-core</artifactId>
+                <version>${forgerock.guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+            </dependency>
+            <dependency>
+                <groupId>aopalliance</groupId>
+                <artifactId>aopalliance</artifactId>
+                <version>1.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

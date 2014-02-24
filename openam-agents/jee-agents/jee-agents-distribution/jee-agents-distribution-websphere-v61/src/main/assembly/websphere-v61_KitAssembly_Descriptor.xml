@@ -34,6 +34,14 @@
             <includes>
                 <include>org.forgerock.openam:openam-installtools</include>
                 <include>org.forgerock.openam:openam-installtools-launcher</include>
+                <include>org.forgerock.openam:openam-license-core</include>
+                <include>org.forgerock.openam:openam-license-manager-cli</include>
+                <include>org.forgerock.commons:forgerock-guice-core</include>
+                <include>com.google.inject:guice</include>
+                <include>javax.inject:javax.inject</include>
+                <include>aopalliance:aopalliance</include>
+                <include>org.slf4j:slf4j-api</include>
+                <include>org.slf4j:slf4j-nop</include>
             </includes>
             <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
@@ -72,11 +80,23 @@
             </includes>
             <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
+        <dependencySet>
+            <outputFileNameMapping>license.txt</outputFileNameMapping>
+            <outputDirectory>legal-notices</outputDirectory>
+            <includes>
+                <include>${forgerock.license.groupId}:${forgerock.license.artifactId}:txt</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>${project.basedir}/../../legal</directory>
+            <excludes>
+                <exclude>license.txt</exclude>
+                <exclude>README.TXT</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <outputDirectory>bin</outputDirectory>
@@ -130,6 +150,9 @@
         <file>
             <outputDirectory>sampleapp</outputDirectory>
             <source>${project.basedir}/src/main/assembly/sampleapp/readme.txt</source>
+        </file>
+        <file>
+            <source>${project.basedir}/../../legal/README.TXT</source>
         </file>
     </files>
 </assembly>
