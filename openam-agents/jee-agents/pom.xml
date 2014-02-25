@@ -482,6 +482,11 @@
                 <artifactId>openam-license-manager-cli</artifactId>
                 <version>${openam.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-shared</artifactId>
+                <version>${openam.version}</version>
+            </dependency>
 
             <!-- Guice -->
             <dependency>
