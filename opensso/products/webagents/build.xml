@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010 - 2013 ForgeRock Inc
+    Portions Copyrighted 2010-2014 ForgeRock AS
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -37,9 +37,11 @@
     <!-- overridable properties -->
     <!-- build.debug is used for c code. valid values are: optimize, full -->
     <property name="build.debug" value="optimize"/>
-
-
-    <import file="../products.xml" />
+    <property name="webagents.base.dir" value="."/>
+    <property name="prd.nightly.dist.dir" value="dist"/>
+    <property name="target.jdk.set" value="1.6"/>
+    <property name="build.sysclasspath" value="ignore"/>
+    
     <import file="webagents.xml" />
 
     <tstamp>
