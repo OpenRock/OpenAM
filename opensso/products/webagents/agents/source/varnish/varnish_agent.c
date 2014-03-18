@@ -152,30 +152,45 @@ static struct var * am_get_var(struct var_head *vh, const char *name) {
 }
 
 static struct var * am_get_var_alloc(struct var_head *vh, const char *name, struct sess *sp) {
-    struct var *v;
+    struct var *v = NULL;
     v = am_get_var(vh, name);
     if (!v) {
-        v = (struct var*) WS_Alloc(sp->ws, sizeof (struct var));
-        AN(v);
-        v->name = WS_Dup(sp->ws, name);
-        AN(v->name);
-        VTAILQ_INSERT_HEAD(&vh->vars, v, list);
+        if (am_ws_valid(sp)) {
+            v = (struct var*) WS_Alloc(sp->ws, sizeof (struct var));
+            if (v != NULL) {
+                v->name = WS_Dup(sp->ws, name);
+                if (v->name != NULL) {
+                    VTAILQ_INSERT_HEAD(&vh->vars, v, list);
+                } else {
+                    LOG_E("am_get_var_alloc failed. memory allocation error (WS_Dup)\n");
+                    am_web_log_error("am_get_var_alloc() memory allocation error");
+                }
+            } else {
+                LOG_E("am_get_var_alloc failed. memory allocation error (WS_Alloc)\n");
+                am_web_log_error("am_get_var_alloc() memory allocation error");
+            }
+        }
     }
     return v;
 }
 
-static void am_add_header(request_data_t *sd, const char *name, const char *value) {
-    struct var *v;
-    if (sd != NULL) {
+static int am_add_header(request_data_t *sd, const char *name, const char *value) {
+    int status = 0;
+    struct var *v = NULL;
+    if (sd != NULL && am_ws_valid(sd->s)) {
         v = am_get_var_alloc(sd->headers_out, name, sd->s);
-        if (value != NULL) {
-            v->value = WS_Dup(sd->s->ws, value);
-        } else {
-            v->value = NULL;
+        if (v != NULL) {
+            if (value != NULL) {
+                v->value = WS_Dup(sd->s->ws, value);
+            } else {
+                v->value = NULL;
+            }
+            status = 1;
         }
     } else {
         LOG_E("am_add_header failed. vmod private data is NULL\n");
     }
+    return status;
 }
 
 static void am_vmod_free(void *d) {
@@ -424,14 +439,14 @@ static am_status_t set_cookie(const char *header, void **args) {
         if (r == NULL || !am_ws_valid(r->s)) {
             am_web_log_error("set_cookie(): invalid arguments");
         } else {
-            am_add_header(r, "Set-Cookie", header);
+            int status = am_add_header(r, "Set-Cookie", header);
             if ((currentCookies = (char *) get_req_header(r, "Cookie")) == NULL) {
                 set_header_in_request(args, "Cookie", header);
             } else {
                 set_header_in_request(args, "Cookie",
                         am_vmod_printf(r->s, "%s;%s", header, currentCookies));
             }
-            ret = AM_SUCCESS;
+            ret = status ? AM_SUCCESS : AM_NO_MEMORY;
         }
     }
     return ret;
@@ -447,8 +462,8 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
         if (values == NULL) {
             sts = set_cookie(key, args);
         } else {
-            am_add_header(r, key, values);
-            sts = AM_SUCCESS;
+            int status = am_add_header(r, key, values);
+            sts = status ? AM_SUCCESS : AM_NO_MEMORY;
         }
     }
     return sts;
@@ -502,8 +517,8 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                     memset(&clen[0], 0x00, sizeof (clen));
                     snprintf(clen, sizeof (clen), "%d", len);
                     rec->status = 200;
-                    am_add_header(rec, "Content-Type", "text/html");
-                    am_add_header(rec, "Content-Length", clen);
+                    if (!am_add_header(rec, "Content-Type", "text/html")) return AM_NO_MEMORY;
+                    if (!am_add_header(rec, "Content-Length", clen)) return AM_NO_MEMORY;
                     am_custom_response(rec, 200, data);
                     *ret = DONE;
                 } else {
@@ -511,32 +526,32 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 }
                 break;
             case AM_WEB_RESULT_REDIRECT:
-                am_add_header(rec, "Location", data);
+                if (!am_add_header(rec, "Location", data)) return AM_NO_MEMORY;
                 am_custom_response(rec, 302, NULL);
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_FORBIDDEN:
                 rec->status = 403;
-                am_add_header(rec, "Content-Type", "text/plain");
+                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
                 am_custom_response(rec, 403, "403 Forbidden");
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_ERROR:
                 rec->status = 500;
-                am_add_header(rec, "Content-Type", "text/plain");
+                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
                 am_custom_response(rec, 500, "500 Internal Server Error");
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_NOT_IMPLEMENTED:
                 rec->status = 501;
-                am_add_header(rec, "Content-Type", "text/plain");
+                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
                 am_custom_response(rec, 501, "501 Not Implemented");
                 *ret = DONE;
                 break;
             default:
                 am_web_log_error("%s: Unrecognized process result %d", thisfunc, http_result);
                 rec->status = 500;
-                am_add_header(rec, "Content-Type", "text/plain");
+                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
                 am_custom_response(rec, 500, "500 Internal Server Error");
                 *ret = DONE;
                 break;
