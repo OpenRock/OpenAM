@@ -27,7 +27,7 @@
 -->
 
 <!--
-Portions Copyrighted 2010 - 2013 ForgeRock Inc
+Portions Copyrighted 2010-2014 ForgeRock AS
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -191,7 +191,7 @@ Portions Copyrighted 2010 - 2013 ForgeRock Inc
             <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
             <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
             <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
-            <zipfileset prefix="web_agents/varnish" dir="${webagents.basedir}/legal/" includes="license.txt"/>
+            <zipfileset dir="${webagents.basedir}/extlib/${build.os.ext}/legal-notices/" includes="license.txt" fullpath="web_agents/varnish/legal-notices/license.txt"/>
         </zip>
         <checksum file="${webagents.dist.dir}/${containername}_v30_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
                   algorithm="SHA" fileext=".sha" />  
@@ -203,7 +203,7 @@ Portions Copyrighted 2010 - 2013 ForgeRock Inc
             <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
             <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
             <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
-            <zipfileset prefix="web_agents/varnish" dir="${webagents.basedir}/legal/" includes="license.txt"/>
+            <zipfileset dir="${webagents.basedir}/extlib/${build.os.ext}/legal-notices/" includes="license.txt" fullpath="web_agents/varnish/legal-notices/license.txt"/>
         </zip>
         <checksum file="${webagents.dist.dir}/${containername}_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
                   algorithm="SHA" fileext=".sha" />  
