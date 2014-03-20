@@ -153,22 +153,19 @@ static struct var * am_get_var(struct var_head *vh, const char *name) {
 
 static struct var * am_get_var_alloc(struct var_head *vh, const char *name, struct sess *sp) {
     struct var *v = NULL;
-    v = am_get_var(vh, name);
-    if (!v) {
-        if (am_ws_valid(sp)) {
-            v = (struct var*) WS_Alloc(sp->ws, sizeof (struct var));
-            if (v != NULL) {
-                v->name = WS_Dup(sp->ws, name);
-                if (v->name != NULL) {
-                    VTAILQ_INSERT_HEAD(&vh->vars, v, list);
-                } else {
-                    LOG_E("am_get_var_alloc failed. memory allocation error (WS_Dup)\n");
-                    am_web_log_error("am_get_var_alloc() memory allocation error");
-                }
+    if (am_ws_valid(sp)) {
+        v = (struct var*) WS_Alloc(sp->ws, sizeof (struct var));
+        if (v != NULL) {
+            v->name = WS_Dup(sp->ws, name);
+            if (v->name != NULL) {
+                VTAILQ_INSERT_TAIL(&vh->vars, v, list);
             } else {
-                LOG_E("am_get_var_alloc failed. memory allocation error (WS_Alloc)\n");
+                LOG_E("am_get_var_alloc failed. memory allocation error (WS_Dup)\n");
                 am_web_log_error("am_get_var_alloc() memory allocation error");
             }
+        } else {
+            LOG_E("am_get_var_alloc failed. memory allocation error (WS_Alloc)\n");
+            am_web_log_error("am_get_var_alloc() memory allocation error");
         }
     }
     return v;
