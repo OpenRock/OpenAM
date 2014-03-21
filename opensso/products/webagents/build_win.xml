@@ -405,6 +405,8 @@
               tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
               tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
+              tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
     </target>
 
     <target name="postnightly">
