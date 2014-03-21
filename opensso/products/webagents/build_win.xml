@@ -196,6 +196,7 @@
     <target name="all64" depends="get-arch" unless="is64bit">
         <antcall target="iis6" />
         <antcall target="iis7" />
+        <antcall target="apache24" />
         <antcall target="sdk" />
         <antcall target="jsFiles64" />
     </target>
