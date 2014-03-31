@@ -609,7 +609,7 @@ SSOTokenService::destroySession(const ServiceInfo& serviceInfo,
     catch (...) {
 	Log::log(mLogID, Log::LOG_ERROR,
                  "SSOTokenService::destroySession(): "
-		 "Unknown exception %d for SSO Token ID %s.",
+		 "Unknown exception for SSO Token ID %s.",
 		 ssoTokenID.c_str());
 	sts = AM_FAILURE;
     }

@@ -673,7 +673,7 @@ am_sso_validate_token(const am_sso_token_handle_t sso_token_handle)
 	}
 	catch (...) {
 	    Log::log(ssoHdlModule, Log::LOG_ERROR,
-		     "%s: Unknown exception encountered.");
+		     "Unknown exception encountered.");
 	    sts = AM_FAILURE;
 	}
     }

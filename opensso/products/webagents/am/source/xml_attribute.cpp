@@ -108,13 +108,13 @@ void XMLAttribute::log(Log::ModuleId logModule, Log::Level level,
 
 	    if (value) {
 		Log::log(logModule, level,
-			 "%*sAttribute = %s, value = %s",
-			 depth * 2 + 1, "", attrPtr->name, value);
+			 "Attribute = %s, value = %s",
+			 attrPtr->name, value);
 		xmlFree(value);
 	    } else {
 		Log::log(logModule, level,
-			 "%*sAttribute = %s, unable to get value",
-			 depth * 2 + 1, "", attrPtr->name);
+			 "Attribute = %s, unable to get value",
+			 attrPtr->name);
 	    }
 	} else {
 	    Log::log(logModule, level,"XMLAttribute::log() invalid attribute");

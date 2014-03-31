@@ -407,7 +407,7 @@ void PolicyService::addEnvParameters(const KeyValueMap& envParameters,
 	Log::log(logModule, Log::LOG_WARNING,
 		 "PolicyService::addEnvParameters() data shorter than "
 		 "buffer (%u < %u)", curLen, avpBufferLen);
-	Log::log(logModule, Log::LOG_WARNING, "%.*s", curLen, avpBuffer);
+	Log::log(logModule, Log::LOG_WARNING, "(%d) %s", curLen, avpBuffer);
     }
 
     request.getBodyChunkList().push_back(BodyChunk(avpBuffer, curLen));

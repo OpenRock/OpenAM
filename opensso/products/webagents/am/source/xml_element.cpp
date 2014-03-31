@@ -277,11 +277,10 @@ void XMLElement::walkTree(Log::ModuleId logModule, Log::Level level,
 
 	if (XMLElement::ELEMENT_NODE == nodeType) {
 	    if (node.nodePtr->name) {
-		Log::log(logModule, level, "%*sElement = %s", depth * 2, "",
+		Log::log(logModule, level, "Element = %s", 
 			 node.nodePtr->name);
 	    } else {
-		Log::log(logModule, level, "%*sElement, unamed",
-			 depth * 2, "");
+		Log::log(logModule, level, "Element, unnamed");
 	    }
 
 	    for (attr = node.getFirstAttribute(); attr.isValid();attr.next()) {
@@ -292,33 +291,30 @@ void XMLElement::walkTree(Log::ModuleId logModule, Log::Level level,
 	} else if (XMLElement::CDATA_NODE == nodeType) {
 	    value = xmlNodeGetContent(node.nodePtr);
 	    if (value) {
-		Log::log(logModule, level, "%*sCDATA = '%s'", depth * 2, "",
+		Log::log(logModule, level, "CDATA = '%s'", 
 			 value);
 		xmlFree(value);
 	    } else {
-		Log::log(logModule, level, "%*sCDATA unable to retrieve value",
-			 depth * 2, "");
+		Log::log(logModule, level, "CDATA unable to retrieve value");
 	    }
 	} else if (XMLElement::TEXT_NODE == nodeType) {
 	    value = xmlNodeGetContent(node.nodePtr);
 	    if (value) {
-		Log::log(logModule, level, "%*sTEXT = '%s'", depth * 2, "",
-			 value);
+		Log::log(logModule, level, "TEXT = '%s'", value);
 		xmlFree(value);
 	    } else {
-		Log::log(logModule, level, "%*sTEXT unable to retrieve value",
-			 depth * 2, "");
+		Log::log(logModule, level, "TEXT unable to retrieve value");
 	    }
 	} else {
 	    value = xmlNodeGetContent(node.nodePtr);
 	    if (value) {
-		Log::log(logModule, level, "%*sType = %d, value = %s",
-			 depth * 2, "", nodeType, value);
+		Log::log(logModule, level, "Type = %d, value = %s",
+			 nodeType, value);
 		xmlFree(value);
 	    } else {
 		Log::log(logModule, level,
-			 "%*sType = %d, unable to retrieve value",
-			 depth * 2, "", nodeType);
+			 "Type = %d, unable to retrieve value",
+			 nodeType);
 	    }
 	}
 

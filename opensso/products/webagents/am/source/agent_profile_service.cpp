@@ -1092,7 +1092,7 @@ am_status_t AgentProfileService::validateAgentSSOToken() {
     }
     catch (...) {
         Log::log(logModule, Log::LOG_ERROR,
-                 "%s: Unknown exception encountered.");
+                 "Unknown exception encountered.");
         sts = AM_FAILURE;
     }
 

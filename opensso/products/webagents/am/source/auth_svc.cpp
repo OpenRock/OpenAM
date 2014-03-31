@@ -2173,7 +2173,7 @@ AuthService::processLoginStatus(AuthContext &auth_ctx,
                 else {
                     Log::log(logID, Log::LOG_ERROR,
                         "AuthService::processLoginStatus() "
-                        "Exception (with no error code) fround in "
+                        "Exception (with no error code) found in "
                         "server response.");
                     throw InternalException(
                         "AuthService::processLoginStatus()",

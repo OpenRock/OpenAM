@@ -2263,7 +2263,7 @@ am_web_is_access_allowed(const char *sso_token,
                             }
                         } else {
                             am_web_log_error("%s: failed to allocate"
-                              "%d bytes for encodedUrl",encodedUrlSize);
+                              "%d bytes for encodedUrl", thisfunc, encodedUrlSize);
                         }
                     } 
                     if (AM_TRUE == isNotEnforced || (isAgentLogoutURL == AM_TRUE) || 
@@ -2309,7 +2309,7 @@ am_web_is_access_allowed(const char *sso_token,
                                 status = AM_FAILURE;
                             } catch (...) {
                                 am_web_log_error("%s(%s,%s): Unknown Exception "
-                                             "while checking policy results: %s",
+                                             "while checking policy results",
                                              thisfunc, url, action_name);
                                 status = AM_FAILURE;
                             }
@@ -2513,7 +2513,7 @@ am_web_handle_notification(const char *data,
     XMLTree::Init xt;
     
     Log::log(boot_info.log_module, Log::LOG_DEBUG,
-	     "am_web_handle_notification() data is: %.*s", data_length,
+	     "am_web_handle_notification() data is: (%d) %s", data_length,
 	     data);
 
     if((*agentConfigPtr)->configChangeNotificationEnable) {
@@ -2530,7 +2530,7 @@ am_web_handle_notification(const char *data,
     if (AM_SUCCESS != status) {
 	am_web_log_error("am_web_handle_notification() error processing "
 			"notification: status = %s (%d), notification data = "
-			"%.*s", am_status_to_string(status), status,
+			"(%d) %s", am_status_to_string(status), status,
 			data_length, data);
     }
 }
@@ -3732,7 +3732,7 @@ am_web_result_attr_map_set(
                                               new_str_size);
                                retVal = setFunc(keyRef.c_str(), new_str, args);
                            } else {
-                               am_web_log_error("%s: failed to allocate"
+                               am_web_log_error("failed to allocate"
                                                 "%d bytes for new_str",
                                                 new_str_size);
                           }
@@ -3794,7 +3794,7 @@ am_web_result_attr_map_set(
                        values.erase(t);
                        Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
                                "%s: Calling container-specific cookie setter "
-                               "function. %d", thisfunc);
+                               "function", thisfunc);
 
                        cookie_name.append(const_cast<char*>(keyRef.c_str()));
                        attr_cookie.name =
@@ -6424,7 +6424,7 @@ process_request(am_web_request_params_t *req_params,
                     strcpy(data_buf, post_data_cache);
                     char *lbCookieHeader = NULL;
                     if (am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_TRUE, agent_config) != AM_NO_MEMORY) {
-                        am_web_log_debug("%s: setting LB cookie for post data preservation to null.", thisfunc, lbCookieHeader);
+                        am_web_log_debug("%s: setting LB cookie for post data preservation (%s)", thisfunc, lbCookieHeader);
                         req_func->add_header_in_response.func(req_func->add_header_in_response.args, lbCookieHeader, NULL);
                     }
                     if (lbCookieHeader != NULL) {

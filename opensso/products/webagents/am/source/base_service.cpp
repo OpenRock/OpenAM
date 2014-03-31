@@ -340,7 +340,7 @@ BaseService::doRequest(const ServiceInfo& service,
                         operation = "receiving from";
                         status = response.readAndParse(logModule, conn);
                         if (AM_SUCCESS == status) {
-                            Log::log(logModule, Log::LOG_MAX_DEBUG, "%.*s",
+                            Log::log(logModule, Log::LOG_MAX_DEBUG, "(%d) %s",
                                     response.getBodyLen(), response.getBodyPtr());
                         }
                     }

@@ -90,9 +90,10 @@ class URL {
     }
 
     inline void setProtocol(const std::string& newProtocol) {
-	protocol = whichProtocol(newProtocol);
-	port = defaultPort[protocol];
-	portStr = defaultPortStr[protocol];
+        URL::Protocol p = whichProtocol(newProtocol);
+	protocol = p;
+	port = defaultPort[p];
+	portStr = defaultPortStr[p];
     }
 
     inline void setURI(const std::string& newURI) {

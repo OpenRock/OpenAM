@@ -57,8 +57,8 @@ BEGIN_PRIVATE_NAMESPACE
 
 #if defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(AIX)
 inline bool matchesXMLString(const std::string& str1, const xmlChar *str2) {
-    return (0 == strcasecmp(str1.c_str(),
-            reinterpret_cast<const char *> (str2)));
+    return str2 ? (0 == strcasecmp(str1.c_str(), 
+            reinterpret_cast<const char *> (str2))) : false;
 }
 #elif defined(_MSC_VER)
 

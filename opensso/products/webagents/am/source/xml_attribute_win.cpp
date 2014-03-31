@@ -82,8 +82,8 @@ void XMLAttribute::log(Log::ModuleId logModule, Log::Level level,
                 value = bstrToString(bval);
             }
             Log::log(logModule, level,
-			 "%*sAttribute = %s, value = %s",
-			 depth * 2 + 1, "", name.c_str(), value.c_str());
+			 "Attribute = %s, value = %s",
+			 name.c_str(), value.c_str());
         } else {
             Log::log(logModule, level, "XMLAttribute::log() invalid attribute");
         }

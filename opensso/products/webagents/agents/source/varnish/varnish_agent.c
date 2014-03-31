@@ -42,428 +42,577 @@
 
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
-#define LOG_E(...)              fprintf(stderr, __VA_ARGS__);
+#ifdef DEBUG
+#define LOG_E(...)         log_file(__VA_ARGS__)
+#else
+#define LOG_E(...)         {}
+#endif
+#define THREAD_ID             (void *)(uintptr_t)pthread_self()
+#define HTTP_HEADER_UNSET       1
+#define HTTP_HEADER_SET         0
+#define HTTP_HEADER_MAX_LEN     256
+#define bprintf(buf, fmt, ...)						\
+	do {								\
+		assert(snprintf(buf, sizeof buf, fmt, __VA_ARGS__)	\
+		    < sizeof buf);					\
+	} while (0)
 
-static pthread_mutex_t init_mutex = PTHREAD_MUTEX_INITIALIZER;
+struct request {
+    unsigned int xid;
+    void *value;
+    VTAILQ_ENTRY(request) list;
+};
 
-struct var {
+typedef struct {
+    unsigned int magic;
+#define VMOD_AM_R_MAGIC 0x54F43E2F
+    VTAILQ_HEAD(, request) vars;
+} request_list_t;
+
+struct header {
+    int type;
+    int unset;
+    enum gethdr_e where;
     char *name;
     char *value;
-    VTAILQ_ENTRY(var) list;
+    VTAILQ_ENTRY(header) list;
 };
 
-struct var_head {
+typedef struct {
     unsigned int magic;
-#define VMOD_AM_MAGIC 0x53F43E2F
-    VTAILQ_HEAD(, var) vars;
-};
+#define VMOD_AM_H_MAGIC 0x53F43E2F
+    VTAILQ_HEAD(, header) vars;
+} header_list_t;
 
 typedef enum {
     OK = 0,
-    DONE = 1,
+    DONE,
 } ret_status;
 
 typedef struct {
     struct sess *s;
     int status;
-    struct var_head *headers_out;
-    const char *body;
-    const char *notes;
+    unsigned int key;
+    header_list_t *headers;
+    char *body;
+    char *notes;
+    unsigned int xid;
 } request_data_t;
 
-static int am_ws_valid(struct sess *sp) {
-    if (sp == NULL || sp->magic != SESS_MAGIC || sp->wrk == NULL ||
-            sp->wrk->ws == NULL || sp->wrk->ws->magic != WS_MAGIC) {
-#define WS_MEM_ERR "am_ws_valid(): workspace memory error"
-        LOG_E(WS_MEM_ERR"\n");
-        am_web_log_error(WS_MEM_ERR);
-        return 0;
-    }
-    return 1;
-}
+static pthread_mutex_t init_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_once_t thread_once = PTHREAD_ONCE_INIT;
+static pthread_key_t thread_key;
+static int n_init = 0;
 
-static const char * am_vmod_printf(struct sess *sp, const char * format, ...) {
-    char *p;
-    unsigned int u, v;
-    va_list args;
-    u = WS_Reserve(sp->wrk->ws, 0);
-    p = sp->wrk->ws->f;
-    va_start(args, format);
-    v = vsnprintf(p, u, format, args);
-    va_end(args);
-    v++;
-    if (v > u) {
-        WS_Release(sp->wrk->ws, 0);
-        return NULL;
-    }
-    WS_Release(sp->wrk->ws, v);
-    return p;
-}
-
-static void am_vmod_set_header(struct sess *sp, enum gethdr_e where, int unset, const char *hdr,
-        const char *p, ...) {
-    struct http *hp;
-    va_list ap;
-    char *b;
-    switch (where) {
-        case HDR_REQ:
-            hp = sp->http;
-            break;
-        case HDR_RESP:
-            hp = sp->wrk->resp;
-            break;
-        case HDR_OBJ:
-            hp = sp->obj->http;
-            break;
-        case HDR_BEREQ:
-            hp = sp->wrk->bereq;
-            break;
-        case HDR_BERESP:
-            hp = sp->wrk->beresp;
-            break;
-        default:
-            return;
-    }
-    if (p == NULL) {
-        http_Unset(hp, hdr);
-    } else {
-        va_start(ap, p);
-        b = VRT_String(hp->ws, hdr + 1, p, ap);
-        if (b == NULL) {
-            LOG_E("am_vmod_set_header failed. error allocating memory for %s header\n", hdr + 1);
-        } else {
-            if (unset) http_Unset(hp, hdr);
-            http_SetHeader(sp->wrk, sp->fd, hp, b);
+static void log_file(const char *format, ...) {
+    FILE *fin = fopen("/tmp/vmod_am.log", "a+");
+    if (fin != NULL) {
+        if (format != NULL) {
+            struct timespec ts;
+            struct tm now;
+            unsigned short msec = 0;
+            char tz[8];
+            char time_string[25];
+            char time_string_tz[50];
+            clock_gettime(CLOCK_REALTIME, &ts);
+            msec = ts.tv_nsec / 1000000;
+            localtime_r(&ts.tv_sec, &now);
+            strftime(time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", &now);
+            strftime(tz, sizeof (tz), "%z", &now);
+            snprintf(time_string_tz, sizeof (time_string_tz), "%s.%03d %s   ", time_string, msec, tz);
+            va_list args;
+            va_start(args, format);
+            fprintf(fin, time_string_tz);
+            vfprintf(fin, format, args);
+            fprintf(fin, "\n");
+            va_end(args);
         }
-        va_end(ap);
+        fclose(fin);
     }
 }
 
-static struct var * am_get_var(struct var_head *vh, const char *name) {
-    struct var *v;
-    if (!name)
-        return NULL;
-
-    VTAILQ_FOREACH(v, &vh->vars, list) {
-        if (v->name && strcmp(v->name, name) == 0)
-            return v;
-    }
-    return NULL;
-}
-
-static struct var * am_get_var_alloc(struct var_head *vh, const char *name, struct sess *sp) {
-    struct var *v = NULL;
-    if (am_ws_valid(sp)) {
-        v = (struct var*) WS_Alloc(sp->ws, sizeof (struct var));
-        if (v != NULL) {
-            v->name = WS_Dup(sp->ws, name);
-            if (v->name != NULL) {
-                VTAILQ_INSERT_TAIL(&vh->vars, v, list);
-            } else {
-                LOG_E("am_get_var_alloc failed. memory allocation error (WS_Dup)\n");
-                am_web_log_error("am_get_var_alloc() memory allocation error");
-            }
-        } else {
-            LOG_E("am_get_var_alloc failed. memory allocation error (WS_Alloc)\n");
-            am_web_log_error("am_get_var_alloc() memory allocation error");
-        }
-    }
-    return v;
-}
-
-static int am_add_header(request_data_t *sd, const char *name, const char *value) {
-    int status = 0;
-    struct var *v = NULL;
-    if (sd != NULL && am_ws_valid(sd->s)) {
-        v = am_get_var_alloc(sd->headers_out, name, sd->s);
-        if (v != NULL) {
-            if (value != NULL) {
-                v->value = WS_Dup(sd->s->ws, value);
-            } else {
-                v->value = NULL;
-            }
-            status = 1;
-        }
-    } else {
-        LOG_E("am_add_header failed. vmod private data is NULL\n");
-    }
-    return status;
-}
-
-static void am_vmod_free(void *d) {
-    request_data_t *sd = (request_data_t *) d;
-    if (sd != NULL) {
-        struct var *v, *v2;
-        struct var_head *vh = sd->headers_out;
-
-        VTAILQ_INIT(&vh->vars);
-
-        VTAILQ_FOREACH_SAFE(v, &vh->vars, list, v2) {
-            VTAILQ_REMOVE(&vh->vars, v, list);
-        }
-        vh->magic = 0;
-
-        free(sd->headers_out);
-        sd->headers_out = NULL;
-        sd->body = NULL;
-        sd->notes = NULL;
-        free(sd);
-    }
-    sd = NULL;
-}
-
-int init_am(struct vmod_priv *priv, const struct VCL_conf *conf) {
-    return 0;
-}
-
-void vmod_init(struct sess *sp, struct vmod_priv *priv, const char *agent_bootstrap_file, const char *agent_config_file) {
-    request_data_t *sd;
-    am_status_t status = AM_FAILURE;
-    boolean_t init = B_FALSE;
+static void fini_am(void *priv) {
+    LOG_E("fini_am() %d", n_init);
+    assert(priv == &n_init);
     AZ(pthread_mutex_lock(&init_mutex));
-    if (priv->priv == NULL) {
-        if (agent_bootstrap_file == NULL || agent_config_file == NULL ||
-                access(agent_bootstrap_file, R_OK) != 0 || access(agent_config_file, R_OK) != 0 ||
-                am_web_init(agent_bootstrap_file, agent_config_file) != AM_SUCCESS) {
-            LOG_E("am_web_init failed. can't access bootstrap|configuration file.\n");
-        } else {
-            if ((status = am_agent_init(&init)) != AM_SUCCESS) {
-                const char *sts = am_status_to_string(status);
-                LOG_E("am_agent_init failed: %s (%d)\n", sts != NULL ? sts : "N/A", status);
-            } else {
-                sd = (request_data_t *) malloc(sizeof (request_data_t));
-                AN(sd);
-                sd->headers_out = (struct var_head *) malloc(sizeof (struct var_head));
-                AN(sd->headers_out);
-                sd->headers_out->magic = VMOD_AM_MAGIC;
-                VTAILQ_INIT(&sd->headers_out->vars);
-                sd->s = sp;
-                priv->priv = (void *) sd;
-                priv->free = am_vmod_free;
-            }
-        }
+    assert(n_init > 0);
+    n_init--;
+    if (n_init == 0) {
+        am_web_cleanup();
+        am_shutdown_nss();
     }
     AZ(pthread_mutex_unlock(&init_mutex));
 }
 
-void vmod_request_cleanup(struct sess *sp, struct vmod_priv *priv) {
-    struct var *v, *v2;
-    request_data_t *sd = (request_data_t *) priv->priv;
-    if (sd != NULL) {
-        struct var_head *vh = sd->headers_out;
+static void delete_key(void *k) {
+    LOG_E("vmod_delete_worker_key() (%p)", THREAD_ID);
+    free(k);
+}
 
-        VTAILQ_FOREACH_SAFE(v, &vh->vars, list, v2) {
-            VTAILQ_REMOVE(&vh->vars, v, list);
-        }
-        sd->body = NULL;
-        sd->notes = NULL;
+static void make_key() {
+    pthread_key_create(&thread_key, delete_key);
+    LOG_E("vmod_make_worker_key()");
+}
+
+request_data_t *get_request_data(struct sess *sp) {
+    request_list_t *rl = NULL;
+    request_data_t *r = NULL;
+
+    if (sp == NULL) {
+        LOG_E("get_request_data() ***ERROR*** sess is NULL (%p)", THREAD_ID);
+        return NULL;
+    }
+
+    if ((rl = pthread_getspecific(thread_key)) == NULL) {
+        struct request *rld;
+
+        LOG_E("get_request_data() ***CREATE*** key %u (%p)", sp->xid, THREAD_ID);
+
+        rl = (request_list_t *) malloc(sizeof (request_list_t));
+        assert(rl != NULL);
+
+        rl->magic = VMOD_AM_R_MAGIC;
+        VTAILQ_INIT(&rl->vars);
+
+        rld = (struct request *) WS_Alloc(sp->ws, sizeof (struct request));
+        assert(rld != NULL);
+
+        rld->xid = sp->xid;
+
+        r = (request_data_t *) WS_Alloc(sp->ws, sizeof (request_data_t));
+        assert(r != NULL);
+
+        r->s = sp;
+        r->status = 0;
+        r->xid = rld->xid;
+        r->body = NULL;
+        r->notes = NULL;
+        r->headers = (header_list_t *) WS_Alloc(sp->ws, sizeof (header_list_t));
+        assert(r->headers != NULL);
+
+        r->headers->magic = VMOD_AM_H_MAGIC;
+        VTAILQ_INIT(&r->headers->vars);
+
+        rld->value = r;
+        VTAILQ_INSERT_TAIL(&rl->vars, rld, list);
+
+        pthread_setspecific(thread_key, rl);
+
     } else {
-        LOG_E("am_vmod_request_cleanup failed. vmod private data is NULL\n");
+        struct request *v, *rld;
+
+        LOG_E("get_request_data() ***FETCH*** key %u (%p)", sp->xid, THREAD_ID);
+
+        if (rl == NULL || sp == NULL) {
+            LOG_E("get_request_data() ***FETCH FAILED*** key %u (%p)", sp ? sp->xid : 0, THREAD_ID);
+            return NULL;
+        }
+
+        VTAILQ_FOREACH(v, &rl->vars, list) {
+            if (v != NULL && sp != NULL && v->xid == sp->xid) {
+                LOG_E("get_request_data() ***FOUND*** key %u (%p)", sp->xid, THREAD_ID);
+                return (request_data_t *) v->value;
+            }
+        }
+
+        LOG_E("get_request_data() ***UPDATE*** key %u (%p)", sp->xid, THREAD_ID);
+
+        rld = (struct request *) WS_Alloc(sp->ws, sizeof (struct request));
+        assert(rld != NULL);
+
+        rld->xid = sp->xid;
+
+        r = (request_data_t *) WS_Alloc(sp->ws, sizeof (request_data_t));
+        assert(r != NULL);
+
+        r->s = sp;
+        r->status = 0;
+        r->xid = rld->xid;
+        r->body = NULL;
+        r->notes = NULL;
+        r->headers = (header_list_t *) WS_Alloc(sp->ws, sizeof (header_list_t));
+        assert(r->headers != NULL);
+
+        r->headers->magic = VMOD_AM_H_MAGIC;
+        VTAILQ_INIT(&r->headers->vars);
+
+        rld->value = r;
+        VTAILQ_INSERT_TAIL(&rl->vars, rld, list);
+    }
+
+    return r;
+}
+
+static void am_add_header(request_data_t *r, const char *name, const char *value, int type, int unset, enum gethdr_e where) {
+    struct header *h;
+    if (r != NULL && r->headers != NULL && name != NULL) {
+        size_t nl = strlen(name);
+        h = (struct header *) WS_Alloc(r->s->ws, sizeof (struct header));
+        assert(h != NULL);
+        h->type = type;
+        h->unset = unset;
+        h->where = where;
+        h->name = WS_Dup(r->s->ws, name);
+        assert(h->name != NULL);
+        h->name[nl] = '\0';
+        /*http_SetHeader requires both h->name as (varnish) header and h->value as header + value*/
+        if (value != NULL) {
+            size_t hl = strlen(name + 1) + strlen(value) + 1;
+            char *hv = WS_Alloc(r->s->ws, hl + 1);
+            assert(hv != NULL);
+            strcpy(hv, name + 1);
+            strcat(hv, " ");
+            strcat(hv, value);
+            hv[hl] = '\0';
+            h->value = hv;
+        } else {
+            h->value = NULL;
+        }
+        VTAILQ_INSERT_TAIL(&r->headers->vars, h, list);
+    }
+}
+
+static struct http *get_sess_http(struct sess *sp, enum gethdr_e where) {
+    switch (where) {
+        case HDR_REQ:
+            return sp->http;
+        case HDR_RESP:
+            return sp->wrk->resp;
+        case HDR_OBJ:
+            return sp->obj->http;
+        case HDR_BEREQ:
+            return sp->wrk->bereq;
+        case HDR_BERESP:
+            return sp->wrk->beresp;
+        default:
+            return NULL;
+    }
+}
+
+static void am_custom_response(request_data_t *r, int status, char *data) {
+    r->status = status;
+    r->body = data != NULL ? WS_Dup(r->s->ws, data) : NULL;
+}
+
+static void send_deny(request_data_t *r, int type) {
+    am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 403, "403 Forbidden");
+}
+
+static void send_ok(request_data_t *r, int type) {
+    am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 200, "OK");
+}
+
+static void send_error(request_data_t *r, int type) {
+    am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 500, "500 Internal Server Error");
+}
+
+static void send_error_not_implemented(request_data_t *r, int type) {
+    am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 501, "501 Not Implemented");
+}
+
+static void send_redirect(request_data_t *r, char *location) {
+    am_add_header(r, "\011Location:", location, DONE, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 302, NULL);
+}
+
+int init_am(struct vmod_priv *priv, const struct VCL_conf *conf) {
+    LOG_E("init_am %d", n_init);
+    pthread_once(&thread_once, make_key);
+    priv->priv = &n_init;
+    priv->free = fini_am;
+    AZ(pthread_mutex_lock(&init_mutex));
+    if (n_init == 0) {
+        /* First use - setup global state */
+    }
+    n_init++;
+    AZ(pthread_mutex_unlock(&init_mutex));
+    return 0;
+}
+
+void vmod_init(struct sess *sp, struct vmod_priv *priv, const char *agent_bootstrap_file, const char *agent_config_file) {
+    LOG_E("vmod_init %d", n_init);
+    AZ(pthread_mutex_lock(&init_mutex));
+    if (n_init == 1) {
+        if (agent_bootstrap_file == NULL || agent_config_file == NULL ||
+                access(agent_bootstrap_file, R_OK) != 0 || access(agent_config_file, R_OK) != 0 ||
+                am_web_init(agent_bootstrap_file, agent_config_file) != AM_SUCCESS) {
+            fprintf(stderr, "am_web_init failed. can't access bootstrap|configuration file.\n");
+            LOG_E("am_web_init failed. can't access bootstrap|configuration file.");
+        } else {
+            am_status_t status = AM_FAILURE;
+            boolean_t init = B_FALSE;
+            if ((status = am_agent_init(&init)) != AM_SUCCESS) {
+                const char *status_s = am_status_to_string(status);
+                fprintf(stderr, "am_agent_init failed: %s (%d)\n", status_s ? status_s : "N/A", status);
+                LOG_E("am_agent_init failed: %s (%d)", status_s ? status_s : "N/A", status);
+            } else {
+                char **v = (char **) malloc(4 * sizeof (char *));
+                if (v != NULL) {
+                    am_agent_version(v);
+                    fprintf(stderr, "am_agent_init OpenAM WPA/%s success\n", v[0]);
+                    LOG_E("am_agent_init OpenAM WPA/%s success", v[0]);
+                    free(v);
+                } else {
+                    LOG_E("am_agent_init success");
+                }
+            }
+        }
+    }
+    n_init++;
+    AZ(pthread_mutex_unlock(&init_mutex));
+}
+
+void vmod_request_cleanup(struct sess *sp, struct vmod_priv *priv) {
+    struct header *v, *v1;
+    struct request *vr, *vr1;
+    request_list_t *rl = pthread_getspecific(thread_key);
+    request_data_t *r = get_request_data(sp);
+
+    assert(r != NULL);
+    assert(rl != NULL);
+
+    LOG_E("vmod_request_cleanup() %u %u", sp->xid, r->xid);
+
+    /*clean up request data headers*/
+    VTAILQ_FOREACH_SAFE(v, &r->headers->vars, list, v1) {
+        VTAILQ_REMOVE(&r->headers->vars, v, list);
+    }
+
+    r->headers->magic = VMOD_AM_H_MAGIC;
+    VTAILQ_INIT(&r->headers->vars);
+    r->xid = 0;
+
+    /*remove request key from thread-local request list*/
+    VTAILQ_FOREACH_SAFE(vr, &rl->vars, list, vr1) {
+        if (vr != NULL && vr->xid == sp->xid) {
+            LOG_E("vmod_request_cleanup() ***REMOVING*** key %u (%p)", sp->xid, THREAD_ID);
+            VTAILQ_REMOVE(&rl->vars, vr, list);
+            break;
+        }
     }
 }
 
 void vmod_cleanup(struct sess *sp, struct vmod_priv *priv) {
+    LOG_E("vmod_cleanup");
     am_web_cleanup();
 }
 
 void vmod_done(struct sess *sp, struct vmod_priv *priv) {
+    struct header *v, *v1;
     int status;
-    const char* ct = "\015Content-Type:";
-    request_data_t *sd = (request_data_t *) priv->priv;
-    if (sd != NULL && am_ws_valid(sp)) {
-        struct var *v;
-        struct var_head *vh = sd->headers_out;
+    request_data_t *r = get_request_data(sp);
+    assert(r != NULL);
+    if (sp->xid == r->xid) {
 
-        VTAILQ_FOREACH(v, &vh->vars, list) {
-            if (v->value != NULL && v->value[0] != '\0')
-                am_vmod_set_header(sp, HDR_OBJ, 0,
-                    am_vmod_printf(sp, "%c%s:", (int) strlen(v->name) + 1, v->name),
-                    v->value, vrt_magic_string_end);
+        LOG_E("vmod_done() %u", r->xid);
+
+        status = r->status;
+        if (status < 100 || status > 999) {
+            status = 503;
         }
 
-        if ((status = sd->status) != 0) {
-            if (status < 100 || status > 999) {
-                status = 503;
+        VTAILQ_FOREACH_SAFE(v, &r->headers->vars, list, v1) {
+            if (v != NULL && v->type == DONE) {
+                struct http *hp = get_sess_http(sp, v->where);
+                assert(hp != NULL);
+                http_PutStatus(hp, status);
+                http_PutResponse(sp->wrk, sp->fd, hp, http_StatusMessage(status));
+                if (v->value != NULL) {
+                    LOG_E("vmod_done [%s]", v->value);
+                    http_SetHeader(sp->wrk, sp->fd, hp, v->value);
+                }
             }
-            http_PutStatus(sp->obj->http, status);
-            http_PutResponse(sp->wrk, sp->fd,
-                    sp->obj->http, http_StatusMessage(status));
         }
-        if (sd->body != NULL && sd->body[0] != '\0') {
-            VRT_synth_page(sp, 0, sd->body, vrt_magic_string_end);
+
+        if (r->body != NULL && strlen(r->body) > 0) {
+            VRT_synth_page(sp, 0, r->body, vrt_magic_string_end);
         }
     } else {
-        LOG_E("am_vmod_done failed. vmod private data is NULL\n");
-        http_PutStatus(sp->obj->http, 403);
-        http_PutResponse(sp->wrk, sp->fd, sp->obj->http, http_StatusMessage(403));
-        VRT_synth_page(sp, 0, "403 Forbidden", vrt_magic_string_end);
-        VRT_SetHdr(sp, HDR_OBJ, ct, "text/plain", vrt_magic_string_end);
+        LOG_E("vmod_done() error: xid %u does not match %u", sp->xid, r->xid);
     }
-    vmod_request_cleanup(sp, priv);
 }
 
 void vmod_ok(struct sess *sp, struct vmod_priv *priv) {
-    request_data_t *sd = (request_data_t *) priv->priv;
-    if (sd != NULL && am_ws_valid(sp)) {
-        struct var *v;
-        struct var_head *vh = sd->headers_out;
+    struct header *v, *v1;
+    int status;
+    request_data_t *r = get_request_data(sp);
+    assert(r != NULL);
+    if (sp->xid == r->xid) {
 
-        VTAILQ_FOREACH(v, &vh->vars, list) {
-            if (v->value != NULL && v->value[0] != '\0')
-                am_vmod_set_header(sp, HDR_RESP, 0,
-                    am_vmod_printf(sp, "%c%s:", (int) strlen(v->name) + 1, v->name),
-                    v->value, vrt_magic_string_end);
+        status = r->status;
+        if (status < 100 || status > 999) {
+            status = 503;
+        }
+
+        LOG_E("vmod_ok() %u (%d)", sp->xid, status);
+
+        http_PutStatus(sp->wrk->resp, status);
+        http_PutResponse(sp->wrk, sp->fd, sp->wrk->resp, http_StatusMessage(status));
+
+        VTAILQ_FOREACH_SAFE(v, &r->headers->vars, list, v1) {
+            if (v != NULL && v->type == OK) {
+                struct http *hp = get_sess_http(sp, v->where);
+                assert(hp != NULL);
+                if (v->value == NULL) {
+                    /*should not happen within v->type == OK*/
+                    http_Unset(hp, v->name);
+                } else {
+                    LOG_E("vmod_ok [%s]", v->value);
+                    if (v->unset) {
+                        http_Unset(hp, v->name);
+                    }
+                    http_SetHeader(sp->wrk, sp->fd, hp, v->value);
+                }
+            }
         }
     } else {
-        LOG_E("am_vmod_ok failed. vmod private data is NULL\n");
+        http_PutStatus(sp->wrk->resp, 403);
+        http_PutResponse(sp->wrk, sp->fd, sp->wrk->resp, http_StatusMessage(403));
+        LOG_E("vmod_ok() error: xid %u does not match %u", sp->xid, r->xid);
     }
     vmod_request_cleanup(sp, priv);
 }
 
 static am_status_t content_read(void **args, char **body) {
     request_data_t *r;
-    const char thisfunc[] = "content_read()";
+    const char *thisfunc = "content_read()";
     am_status_t status = AM_FAILURE;
-    int re, buf_size, rsize;
-    char *cl_ptr, buf[4096];
-    unsigned long cl, ocl;
-    if (args == NULL || (r = args[0]) == NULL || !am_ws_valid(r->s)) {
+    size_t total_read = 0;
+    int bytes_read;
+#define BUF_LENGTH 8192
+    char buf[BUF_LENGTH];
+
+    if (!args || !(r = args[0]) || !r->s || r->s->magic != SESS_MAGIC || !r->s->wrk) {
         am_web_log_error("%s: invalid arguments", thisfunc);
         return AM_INVALID_ARGUMENT;
     } else {
-        *body = NULL;
-        cl_ptr = VRT_GetHdr(r->s, HDR_REQ, "\017Content-Length:");
-        ocl = cl = cl_ptr ? strtoul(cl_ptr, NULL, 10) : 0;
-        if (cl <= 0 || errno == ERANGE) {
+        char *cl_ptr = VRT_GetHdr(r->s, HDR_REQ, "\017Content-Length:");
+        size_t content_length = cl_ptr ? strtoul(cl_ptr, NULL, 10) : 0;
+        if (content_length <= 0 || errno == ERANGE) {
             am_web_log_warning("%s: post data is empty", thisfunc);
             return AM_NOT_FOUND;
         } else {
-            status = AM_SUCCESS;
-            if (r->s->htc->pipeline.b != NULL && Tlen(r->s->htc->pipeline) == cl) {
-                *body = r->s->htc->pipeline.b;
+            size_t content_length_hdr = content_length;
+            *body = (char*) WS_Alloc(r->s->ws, content_length + 1);
+            if (*body == NULL) {
+                am_web_log_error("%s: memory allocation failure", thisfunc);
+                return AM_FAILURE;
             } else {
-
-                if (!r->s->htc->rxbuf.b || !r->s->htc->rxbuf.e || r->s->htc->rxbuf.b > r->s->htc->rxbuf.e) {
-                    *body = NULL;
-                    LOG_E("content_read(): invalid rxbuf data\n");
-                    am_web_log_error("%s: memory allocation failure", thisfunc);
-                    return AM_FAILURE;
-                }
-
-                int rxbuf_size = Tlen(r->s->htc->rxbuf);
-
-                /*do ws memory allocation*/
-                int u = WS_Reserve(r->s->wrk->ws, 0);
-                if (u < cl + rxbuf_size + 1) {
-                    *body = NULL;
-                    WS_Release(r->s->wrk->ws, 0);
-                    am_web_log_error("%s: memory allocation failure", thisfunc);
-                    return AM_FAILURE;
-                }
-                *body = (char*) r->s->wrk->ws->f;
-                memcpy(*body, r->s->htc->rxbuf.b, rxbuf_size);
-                r->s->htc->rxbuf.b = *body;
-                *body += rxbuf_size;
-                *body[0] = 0;
-                r->s->htc->rxbuf.e = *body;
-                WS_Release(r->s->wrk->ws, cl + rxbuf_size + 1);
-
-                /*read post data*/
-                re = 0;
-                while (cl) {
-                    if (cl > sizeof (buf)) {
-                        buf_size = sizeof (buf) - 1;
-                    } else {
-                        buf_size = cl;
-                    }
+                am_web_log_debug("%s: content-length is %d bytes", thisfunc, content_length);
+            }
+            while (content_length) {
+                bytes_read = content_length > BUF_LENGTH ? BUF_LENGTH : content_length;
 #ifdef VARNISH302
-                    rsize = HTC_Read(r->s->htc, buf, buf_size);
+                bytes_read = HTC_Read(r->s->htc, buf, bytes_read);
 #else
-                    rsize = HTC_Read(r->s->wrk, r->s->htc, buf, buf_size);
+                bytes_read = HTC_Read(r->s->wrk, r->s->htc, buf, bytes_read);
 #endif
-                    if (rsize <= 0) {
-                        *body = NULL;
-                        am_web_log_error("%s: memory failure", thisfunc);
-                        return AM_FAILURE;
-                    }
-                    cl -= rsize;
-                    memcpy(*body + re, buf, buf_size);
-                    re += rsize;
+                if (bytes_read <= 0) {
+                    *body = NULL;
+                    am_web_log_error("%s: HTC_Read failure (%d)", thisfunc, errno);
+                    return AM_FAILURE;
                 }
-                r->s->htc->pipeline.b = *body;
-                r->s->htc->pipeline.e = *body + ocl;
+
+                content_length -= bytes_read;
+                memcpy((*body) + total_read, buf, bytes_read);
+                total_read += bytes_read;
+            }
+
+            if (total_read == content_length_hdr) {
+                (*body)[total_read] = '\0';
+                status = AM_SUCCESS;
+            } else {
+                am_web_log_warning("%s: post data read %d does not correspond to content length %d",
+                        thisfunc, total_read, content_length_hdr);
+                *body = NULL;
+                return AM_FAILURE;
             }
         }
     }
 
-    if (status == AM_SUCCESS) {
-        (*body)[ocl] = 0;
-        am_web_log_max_debug("%s:\n%s\n", thisfunc, *body);
-    }
-
-    am_web_log_debug("%s: %d bytes", thisfunc, ocl);
+    am_web_log_debug("%s: %d bytes", thisfunc, total_read);
     return status;
 }
 
 static const char* get_req_header(request_data_t* r, const char* key) {
-    if (r == NULL || r->s == NULL || !am_ws_valid(r->s)) {
+    char h[HTTP_HEADER_MAX_LEN];
+    if (key != NULL && r != NULL && r->s != NULL) {
+        memset(&h[0], 0x00, sizeof (h));
+        bprintf(h, "%c%s:", (unsigned) strlen(key) + 1, key);
+        return VRT_GetHdr(r->s, HDR_REQ, h);
+    } else {
         am_web_log_error("get_req_header(): invalid arguments");
-        return NULL;
     }
-    return VRT_GetHdr(r->s, HDR_REQ, am_vmod_printf(r->s, "%c%s:", (int) strlen(key) + 1, key));
+    return NULL;
 }
 
 static am_status_t set_header_in_request(void **args, const char *key, const char *value) {
-    am_status_t sts = AM_SUCCESS;
+    am_status_t status = AM_SUCCESS;
     request_data_t * r = (request_data_t *) args[0];
-    if (r == NULL || key == NULL || !am_ws_valid(r->s)) {
+    if (!r || !key) {
         am_web_log_error("set_header_in_request(): invalid arguments");
-        sts = AM_INVALID_ARGUMENT;
+        status = AM_INVALID_ARGUMENT;
     } else {
-        am_vmod_set_header(r->s, HDR_REQ, 1,
-                am_vmod_printf(r->s, "%c%s:", (int) strlen(key) + 1, key),
-                value != NULL && *value != '\0' ? value : "",
-                vrt_magic_string_end);
+        char h[HTTP_HEADER_MAX_LEN];
+        memset(&h[0], 0x00, sizeof (h));
+        bprintf(h, "%c%s:", (unsigned) strlen(key) + 1, key);
+        am_add_header(r, h,
+                value != NULL && *value != '\0' ? value : "", OK,
+                HTTP_HEADER_UNSET, HDR_REQ);
     }
-    return sts;
+    return status;
 }
 
 static am_status_t set_cookie(const char *header, void **args) {
-    am_status_t ret = AM_INVALID_ARGUMENT;
+    am_status_t status = AM_INVALID_ARGUMENT;
+    const char* set_cookie_h = "\013Set-Cookie:";
     char *currentCookies;
-    if (header != NULL && args != NULL) {
+    if (header && args) {
         request_data_t *r = (request_data_t *) args[0];
-        if (r == NULL || !am_ws_valid(r->s)) {
+        if (!r || !r->s) {
             am_web_log_error("set_cookie(): invalid arguments");
         } else {
-            int status = am_add_header(r, "Set-Cookie", header);
+            am_add_header(r, set_cookie_h, header, OK, HTTP_HEADER_SET, HDR_RESP);
             if ((currentCookies = (char *) get_req_header(r, "Cookie")) == NULL) {
                 set_header_in_request(args, "Cookie", header);
             } else {
-                set_header_in_request(args, "Cookie",
-                        am_vmod_printf(r->s, "%s;%s", header, currentCookies));
+                size_t hl = strlen(currentCookies) + strlen(header);
+                char *h = WS_Alloc(r->s->ws, hl + 3);
+                assert(h != NULL);
+                strcpy(h, header);
+                strcat(h, "; ");
+                strcat(h, currentCookies);
+                set_header_in_request(args, "Cookie", h);
             }
-            ret = status ? AM_SUCCESS : AM_NO_MEMORY;
+            status = AM_SUCCESS;
         }
     }
-    return ret;
+    return status;
 }
 
 static am_status_t add_header_in_response(void **args, const char *key, const char *values) {
     request_data_t* r = NULL;
-    am_status_t sts = AM_SUCCESS;
+    am_status_t status = AM_SUCCESS;
     if (args == NULL || (r = (request_data_t *) args[0]) == NULL || key == NULL) {
         am_web_log_error("add_header_in_response(): invalid arguments");
-        sts = AM_INVALID_ARGUMENT;
+        status = AM_INVALID_ARGUMENT;
     } else {
         if (values == NULL) {
-            sts = set_cookie(key, args);
+            status = set_cookie(key, args);
         } else {
-            int status = am_add_header(r, key, values);
-            sts = status ? AM_SUCCESS : AM_NO_MEMORY;
+            char h[HTTP_HEADER_MAX_LEN];
+            memset(&h[0], 0x00, sizeof (h));
+            bprintf(h, "%c%s:", (unsigned) strlen(key) + 1, key);
+            am_add_header(r, h,
+                    values, OK,
+                    HTTP_HEADER_SET, HDR_RESP);
         }
     }
-    return sts;
+    return status;
 }
 
 static am_status_t set_user(void **args, const char *user) {
@@ -471,97 +620,85 @@ static am_status_t set_user(void **args, const char *user) {
     return AM_SUCCESS;
 }
 
-static void am_custom_response(request_data_t *rec, int status, char *data) {
-    rec->status = status;
-    rec->body = data != NULL && am_ws_valid(rec->s) ? am_vmod_printf(rec->s, "%s", data) : NULL;
-}
-
 static am_status_t set_method(void **args, am_web_req_method_t method) {
-    request_data_t *rec = NULL;
-    struct sess* sp = NULL;
-    am_status_t sts = AM_SUCCESS;
-    if (args == NULL || (rec = (request_data_t *) args[0]) == NULL ||
-            (sp = rec->s) == NULL || sp->http == NULL || !am_ws_valid(rec->s)) {
+    request_data_t *rec;
+    struct sess* sp;
+    am_status_t status = AM_SUCCESS;
+    if (!args || !(rec = (request_data_t *) args[0]) ||
+            !(sp = rec->s) || !sp->http) {
         am_web_log_error("set_method(): invalid arguments");
-        sts = AM_INVALID_ARGUMENT;
+        status = AM_INVALID_ARGUMENT;
     } else {
-        http_SetH(sp->http, HTTP_HDR_REQ, am_vmod_printf(rec->s, "%s", am_web_method_num_to_str(method)));
-        sts = AM_SUCCESS;
+        char hdr[HTTP_HEADER_MAX_LEN];
+        memset(&hdr[0], 0x00, sizeof (hdr));
+        snprintf(hdr, sizeof (hdr), "%s", am_web_method_num_to_str(method));
+        http_SetH(sp->http, HTTP_HDR_REQ, hdr);
     }
-    return sts;
+    return status;
 }
 
 static am_status_t render_result(void **args, am_web_result_t http_result, char *data) {
     const char *thisfunc = "render_result()";
-    request_data_t* rec = NULL;
-    am_status_t sts = AM_SUCCESS;
+    request_data_t* rec;
+    am_status_t status = AM_SUCCESS;
     int *ret = NULL;
     int len = 0;
     char clen[13];
 
-    if (args == NULL || (rec = (request_data_t *) args[0]) == NULL || (ret = (int *) args[1]) == NULL ||
+    if (!args || !(rec = (request_data_t *) args[0]) || !(ret = (int *) args[1]) ||
             ((http_result == AM_WEB_RESULT_OK_DONE || http_result == AM_WEB_RESULT_REDIRECT) &&
-            (data == NULL || *data == '\0'))) {
+            (!data || *data == '\0'))) {
         am_web_log_error("%s: invalid arguments", thisfunc);
-        sts = AM_INVALID_ARGUMENT;
+        status = AM_INVALID_ARGUMENT;
     } else {
         switch (http_result) {
             case AM_WEB_RESULT_OK:
+                am_custom_response(rec, 200, NULL);
                 *ret = OK;
                 break;
             case AM_WEB_RESULT_OK_DONE:
                 if (data && ((len = strlen(data)) > 0)) {
                     memset(&clen[0], 0x00, sizeof (clen));
                     snprintf(clen, sizeof (clen), "%d", len);
-                    rec->status = 200;
-                    if (!am_add_header(rec, "Content-Type", "text/html")) return AM_NO_MEMORY;
-                    if (!am_add_header(rec, "Content-Length", clen)) return AM_NO_MEMORY;
+                    am_add_header(rec, "\015Content-Type:", "text/html", DONE, HTTP_HEADER_SET, HDR_OBJ);
+                    am_add_header(rec, "\017Content-Length:", clen, DONE, HTTP_HEADER_SET, HDR_OBJ);
                     am_custom_response(rec, 200, data);
                     *ret = DONE;
                 } else {
+                    am_custom_response(rec, 200, NULL);
                     *ret = OK;
                 }
                 break;
             case AM_WEB_RESULT_REDIRECT:
-                if (!am_add_header(rec, "Location", data)) return AM_NO_MEMORY;
-                am_custom_response(rec, 302, NULL);
+                send_redirect(rec, data);
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_FORBIDDEN:
-                rec->status = 403;
-                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
-                am_custom_response(rec, 403, "403 Forbidden");
+                send_deny(rec, DONE);
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_ERROR:
-                rec->status = 500;
-                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
-                am_custom_response(rec, 500, "500 Internal Server Error");
+                send_error(rec, DONE);
                 *ret = DONE;
                 break;
             case AM_WEB_RESULT_NOT_IMPLEMENTED:
-                rec->status = 501;
-                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
-                am_custom_response(rec, 501, "501 Not Implemented");
+                send_error_not_implemented(rec, DONE);
                 *ret = DONE;
                 break;
             default:
-                am_web_log_error("%s: Unrecognized process result %d", thisfunc, http_result);
-                rec->status = 500;
-                if (!am_add_header(rec, "Content-Type", "text/plain")) return AM_NO_MEMORY;
-                am_custom_response(rec, 500, "500 Internal Server Error");
+                am_web_log_error("%s: unrecognized process result %d", thisfunc, http_result);
+                send_error(rec, DONE);
                 *ret = DONE;
                 break;
         }
-        sts = AM_SUCCESS;
     }
-    return sts;
+    return status;
 }
 
 static am_web_req_method_t get_method_num(request_data_t *sp) {
     const char *thisfunc = "get_method_num()";
     am_web_req_method_t method_num = AM_WEB_REQUEST_UNKNOWN;
-    if (sp == NULL || sp->s == NULL || sp->s->http == NULL) {
+    if (!sp || !sp->s || !sp->s->http) {
         am_web_log_error("%s: invalid arguments", thisfunc);
     } else {
         method_num = am_web_method_str_to_num(http_GetReq(sp->s->http));
@@ -572,32 +709,15 @@ static am_web_req_method_t get_method_num(request_data_t *sp) {
     return method_num;
 }
 
-static void send_deny(request_data_t * rec) {
-    if (NULL == rec) return;
-    am_add_header(rec, "Content-Type", "text/plain");
-    am_custom_response(rec, 403, "403 Forbidden");
-}
-
-static void send_ok(request_data_t * rec) {
-    if (NULL == rec) return;
-    am_add_header(rec, "Content-Type", "text/plain");
-    am_custom_response(rec, 200, "OK");
-}
-
-static void send_error(request_data_t * rec) {
-    if (NULL == rec) return;
-    am_add_header(rec, "Content-Type", "text/plain");
-    am_custom_response(rec, 500, "500 Internal Server Error");
-}
-
 static am_status_t update_post_data_for_request(void **args, const char *key, const char *acturl, const char *value, const unsigned long postcacheentry_life) {
     const char *thisfunc = "update_post_data_for_request()";
     am_web_postcache_data_t post_data;
-    void *agent_config = NULL;
+    void *agent_config;
     am_status_t status = AM_SUCCESS;
     agent_config = am_web_get_agent_configuration();
-    if (agent_config == NULL || key == NULL || acturl == NULL) {
+    if (!agent_config || !key || !acturl) {
         am_web_log_error("%s: invalid arguments", thisfunc);
+        if (agent_config) am_web_delete_agent_configuration(agent_config);
         return AM_INVALID_ARGUMENT;
     } else {
         post_data.value = (char *) value;
@@ -684,38 +804,20 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
     }
     if (temp_uri != NULL) {
         free(temp_uri);
-        temp_uri = NULL;
     }
     if (stickySessionValue != NULL) {
         am_web_free_memory(stickySessionValue);
-        stickySessionValue = NULL;
     }
     am_web_delete_agent_configuration(agent_config);
     return status;
 }
 
-static am_status_t set_notes_in_request(void **args, const char *key, const char *values) {
-    request_data_t *r = NULL;
-    am_status_t sts = AM_SUCCESS;
-    if (args == NULL || (r = (request_data_t *) args[0]) == NULL || key == NULL || !am_ws_valid(r->s)) {
-        am_web_log_error("set_notes_in_request(): invalid arguments");
-        sts = AM_INVALID_ARGUMENT;
-    } else {
-        r->notes = NULL;
-        if (values != NULL && *values != '\0') {
-            r->notes = am_vmod_printf(r->s, "%s", values);
-        }
-        sts = AM_SUCCESS;
-    }
-    return sts;
-}
-
 static const char *get_query_string(request_data_t *r, const char *url) {
-    char *ptr = NULL;
-    if (r != NULL && url != NULL && am_ws_valid(r->s)) {
+    char *ptr;
+    if (r && url) {
         ptr = strstr(url, "?");
-        if (ptr != NULL) {
-            return am_vmod_printf(r->s, "%s", ptr + 1);
+        if (ptr) {
+            return ptr + 1;
         }
     }
     return "";
@@ -723,10 +825,11 @@ static const char *get_query_string(request_data_t *r, const char *url) {
 
 unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *req_method, const char *proto, const char *host, int port, const char *uri, struct sockaddr_storage * cip) {
     const char thisfunc[] = "vmod_authenticate()";
-    void *agent_config = NULL;
+    void *agent_config;
     am_status_t status = AM_FAILURE;
-    const char *url = NULL;
-    request_data_t* r = NULL;
+    char *url;
+    size_t url_len;
+    request_data_t *r;
     int ret = OK;
     void *args[] = {NULL, (void*) &ret};
     char client_ip[INET6_ADDRSTRLEN];
@@ -743,45 +846,44 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
 
-    r = (request_data_t *) priv->priv;
-    if (r == NULL || !am_ws_valid(sp)) {
-        send_deny(r);
+    LOG_E("vmod_authenticate %u\n", sp->xid);
+
+    r = get_request_data(sp);
+    assert(r != NULL);
+
+    if (!sp || sp->magic != SESS_MAGIC || !sp->wrk) {
+        send_deny(r, DONE);
         return 0;
     }
 
-    r->s = sp;
     args[0] = r;
     agent_config = am_web_get_agent_configuration();
 
-    if (agent_config == NULL) {
-        send_deny(r);
+    if (!agent_config) {
+        send_deny(r, DONE);
         return 0;
     }
 
     am_web_log_debug("Begin process %s request, proto: %s, host: %s, port: %d, uri: %s", req_method, proto, host, port, uri);
 
-    if (proto == NULL) {
-        url = am_ws_valid(r->s) ? am_vmod_printf(r->s, "http://%s%s", host, uri) : NULL;
+    if (!proto) {
+        url_len = strlen(host) + strlen(uri) + 8;
+        url = WS_Alloc(sp->ws, url_len + 1);
+        if (url) {
+            snprintf(url, url_len, "http://%s%s", host, uri);
+        }
     } else {
-        url = am_ws_valid(r->s) ? am_vmod_printf(r->s, "%s://%s%s", proto, host, uri) : NULL;
+        url_len = strlen(proto) + strlen(host) + strlen(uri) + 4;
+        url = WS_Alloc(sp->ws, url_len + 1);
+        if (url) {
+            snprintf(url, url_len, "%s://%s%s", proto, host, uri);
+        }
     }
 
-    if (url == NULL) {
+    if (!url) {
         am_web_log_error("%s: memory allocation error", thisfunc);
         status = AM_FAILURE;
     } else {
-        char *tmp = (char *) url;
-#ifdef OPENAM_2969
-        am_web_log_debug("%s: request url before normalization: %s", thisfunc, url);
-        /*find the end of url string*/
-        while (tmp && *tmp) ++tmp;
-        for (--tmp; url < tmp; --tmp) {
-            if (*tmp == '/') {
-                /*erase (all) trailing slashes*/
-                *tmp = 0;
-            } else break;
-        }
-#endif
         am_web_log_debug("%s: request url: %s", thisfunc, url);
     }
 
@@ -801,10 +903,13 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
                 am_web_handle_notification(data, strlen(data), agent_config);
                 am_web_delete_agent_configuration(agent_config);
                 am_web_log_debug("%s: received notification message, sending HTTP-200 response", thisfunc);
-                send_ok(r);
+                send_ok(r, DONE);
                 return 0;
             } else {
                 am_web_log_error("%s: content_read for notification failed, %s", thisfunc, am_status_to_string(status));
+                am_web_delete_agent_configuration(agent_config);
+                send_deny(r, DONE);
+                return 0;
             }
         }
     }
@@ -819,7 +924,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
                 am_web_log_error("%s: Request URL validation failed. Returning Access Denied error (HTTP403)", thisfunc);
                 status = AM_FAILURE;
                 am_web_delete_agent_configuration(agent_config);
-                send_deny(r);
+                send_deny(r, DONE);
                 return 0;
             }
         }
@@ -929,7 +1034,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
 
     if (status != AM_SUCCESS) {
         am_web_log_error("%s: error encountered rendering result: %s", thisfunc, am_status_to_string(status));
-        send_error(r);
+        send_error(r, DONE);
         return 0;
     }
     return (0 == ret);
