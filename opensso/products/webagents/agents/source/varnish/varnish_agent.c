@@ -42,6 +42,7 @@
 
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
+#define DEBUG_FILE              "/tmp/vmod_am.log"
 #ifdef DEBUG
 #define LOG_E(...)         log_file(__VA_ARGS__)
 #else
@@ -105,7 +106,7 @@ static pthread_key_t thread_key;
 static int n_init = 0;
 
 static void log_file(const char *format, ...) {
-    FILE *fin = fopen("/tmp/vmod_am.log", "a+");
+    FILE *fin = fopen(DEBUG_FILE, "a+");
     if (fin != NULL) {
         if (format != NULL) {
             struct timespec ts;
@@ -299,6 +300,11 @@ static void send_deny(request_data_t *r, int type) {
     am_custom_response(r, 403, "403 Forbidden");
 }
 
+static void send_notfound(request_data_t *r, int type) {
+    am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 404, "404 Not Found");
+}
+
 static void send_ok(request_data_t *r, int type) {
     am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
     am_custom_response(r, 200, "OK");
@@ -320,6 +326,7 @@ static void send_redirect(request_data_t *r, char *location) {
 }
 
 int init_am(struct vmod_priv *priv, const struct VCL_conf *conf) {
+    remove(DEBUG_FILE);
     LOG_E("init_am %d", n_init);
     pthread_once(&thread_once, make_key);
     priv->priv = &n_init;
@@ -408,7 +415,13 @@ void vmod_done(struct sess *sp, struct vmod_priv *priv) {
     assert(r != NULL);
     if (sp->xid == r->xid) {
 
-        LOG_E("vmod_done() %u", r->xid);
+        LOG_E("vmod_done() %u (%d)", r->xid, sp->err_code);
+
+        if (sp->err_code == 801) {
+            r->body = NULL;
+            r->status = 404;
+            send_notfound(r, DONE);
+        }
 
         status = r->status;
         if (status < 100 || status > 999) {
@@ -1037,5 +1050,27 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
         send_error(r, DONE);
         return 0;
     }
+
+    if (0 == ret && r->status == 200) {
+        struct header *v;
+
+        VTAILQ_FOREACH(v, &r->headers->vars, list) {
+            if (v != NULL && v->type == OK &&
+                    v->where == HDR_REQ) {
+                struct http *hp = sp->http;
+                assert(hp != NULL);
+                if (v->value == NULL) {
+                    http_Unset(hp, v->name);
+                } else {
+                    LOG_E("vmod_authenticate [%s]", v->value);
+                    if (v->unset) {
+                        http_Unset(hp, v->name);
+                    }
+                    http_SetHeader(sp->wrk, sp->fd, hp, v->value);
+                }
+            }
+        }
+    }
+
     return (0 == ret);
 }
