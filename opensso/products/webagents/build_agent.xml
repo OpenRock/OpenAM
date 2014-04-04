@@ -82,7 +82,9 @@ Portions Copyrighted 2010-2014 ForgeRock AS
     <property name="container.web_agent.locale.dir" 
               location="${container.web_agent.dir}/locale"/>   
     <property name="container.web_agent.logs.dir" 
-              location="${container.web_agent.dir}/installer-logs"/>   
+              location="${container.web_agent.dir}/installer-logs"/>
+    <property name="container.web_agent.legal.notices.dir" 
+              location="${container.web_agent.dir}/legal-notices"/>   
 
     <!-- build class path for container -->
     <path id="build.class.path">
@@ -109,11 +111,12 @@ Portions Copyrighted 2010-2014 ForgeRock AS
         <mkdir dir="${container.web_agent.lib.dir}"/>
         <mkdir dir="${container.web_agent.locale.dir}"/>
         <mkdir dir="${container.web_agent.logs.dir}"/>
+        <mkdir dir="${container.web_agent.legal.notices.dir}"/>
     </target>
 
     <target name="scratch">
         <!-- Copy license file -->
-        <copy todir="${container.web_agent.dir}">
+        <copy todir="${container.web_agent.legal.notices.dir}">
             <fileset dir="${webagents.basedir}/legal">
                 <include name="license.txt"/>
             </fileset>
@@ -170,6 +173,7 @@ Portions Copyrighted 2010-2014 ForgeRock AS
         <delete dir="${container.web_agent.lib.dir}"/>
         <delete dir="${container.web_agent.locale.dir}"/>
         <delete dir="${container.web_agent.logs.dir}"/>
+        <delete dir="${container.web_agent.legal.notices.dir}"/>
         <delete dir="${container.web_agent.sampleapp.dir}"/>
         <delete dir="${container.web_agent.dir}"/>
         <delete dir="${container.web_agents.dir}"/>
