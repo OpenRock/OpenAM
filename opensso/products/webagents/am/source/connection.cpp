@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 #include <stdexcept>
 #include <errno.h>
@@ -562,7 +562,7 @@ Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLe
 
     if (timeout != 0) {
         memset(&tva, 0, sizeof (tva));
-        tva.tv_sec = timeout;
+        tva.tv_sec = timeout / 1000;
         tva.tv_usec = 0;
         if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *) &tva, sizeof (tva)) < 0) {
             Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set read timeout");
