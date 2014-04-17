@@ -27,7 +27,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012 - 2013 ForgeRock Inc
+ * Portions Copyrighted 2012 - 2014 ForgeRock AS
  */
 
 #include "agent_module.h"
@@ -481,8 +481,7 @@ static void send_error(IHttpContext* pHttpContext, BOOL ccntrl) {
         am_web_log_error("send_error(): SetHeader failed.");
     }
     if (ccntrl) {
-        pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
-        pHttpResponse->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+        pHttpResponse->SetHeader("Cache-Control", "no-cache, no-store, must-revalidate", (USHORT) strlen("no-cache, no-store, must-revalidate"), TRUE);
         pHttpResponse->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
         pHttpResponse->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
     }
@@ -777,8 +776,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     }
     /* avoid caching of any unauthenticated response */
     if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && status != AM_SUCCESS) {
-        res->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
-        res->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+        res->SetHeader("Cache-Control", "no-cache, no-store, must-revalidate", (USHORT) strlen("no-cache, no-store, must-revalidate"), TRUE);
         res->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
         res->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
     }
@@ -1994,8 +1992,7 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                             status = AM_FAILURE;
                         }
                         if (am_web_is_cache_control_enabled(agent_config) == B_TRUE) {
-                            pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
-                            pHttpResponse->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+                            pHttpResponse->SetHeader("Cache-Control", "no-cache, no-store, must-revalidate", (USHORT) strlen("no-cache, no-store, must-revalidate"), TRUE);
                             pHttpResponse->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
                             pHttpResponse->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
                         }
@@ -2079,8 +2076,7 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                                 FALSE);
                     }
                     if (am_web_is_cache_control_enabled(agent_config) == B_TRUE) {
-                        pHttpResponse->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
-                        pHttpResponse->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+                        pHttpResponse->SetHeader("Cache-Control", "no-cache, no-store, must-revalidate", (USHORT) strlen("no-cache, no-store, must-revalidate"), TRUE);
                         pHttpResponse->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
                         pHttpResponse->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
                     }

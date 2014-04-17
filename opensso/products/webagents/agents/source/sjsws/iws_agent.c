@@ -28,7 +28,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 /*
@@ -50,6 +50,7 @@
 
 #include <string.h>
 #include <nsapi.h>
+#include <time.h>
 
 #include "am_properties.h"
 #include "am_web.h"
@@ -1223,9 +1224,20 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     
     /* avoid caching of any unauthenticated response */
     if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && status != AM_SUCCESS) {
-        set_header("Cache-Control", "no-store, no-cache", args);
-        set_header("Pragma", "no-cache", args);
-        set_header("Expires", "0", args);
+        char expdate[50];
+        struct tm *resp;
+        time_t tp;
+        tp = time(NULL);
+        resp = gmtime(&tp);
+        util_strftime(expdate, HTTP_DATE_FMT, resp);
+        param_free(pblock_remove("expires", rq->srvhdrs));
+        pblock_nvinsert("expires", expdate, rq->srvhdrs);
+        param_free(pblock_remove("date", rq->srvhdrs));
+        pblock_nvinsert("date", expdate, rq->srvhdrs);
+        param_free(pblock_remove("cache-control", rq->srvhdrs));
+        pblock_nvinsert("cache-control", "no-store, no-cache, must-revalidate", rq->srvhdrs);
+        param_free(pblock_remove("pragma", rq->srvhdrs));
+        pblock_nvinsert("pragma", "no-cache", rq->srvhdrs);
     }
     
     switch (status) {
