@@ -27,7 +27,7 @@
 -->
 
 <!--
-     Portions Copyrighted 2013 ForgeRock AS.
+     Portions Copyrighted 2013-2014 ForgeRock AS.
 -->
 
 ------------------------------------
@@ -153,7 +153,7 @@ Configure the agent properties
    (through cookies, headers, or request attributes) for application 
    customization. See the Policy Agent 3.0 for details about the fetching 
    attributes for details on using this feature. If you change the agent's 
-   configuartion for the attribute fetching, the showHttpHeaders.jsp page of the
+   configuration for the attribute fetching, the showHttpHeaders.jsp page of the
    sample application will show all the attributes being fetched. You can choose
    to try this later after you have already installed and deployed the agent and
    sample application in order to learn about this feature.
@@ -196,7 +196,7 @@ To rebuild the entire application from scratch, follow these steps:
 
       The build target creates a built and dist directory with the WAR file.
       By default, the deployment descriptors assume that the OpenAM
-      product was installed under default Org/Realm "dc=opensso,dc=java,dc=net". If the 
+      product was installed under default Org/Realm "dc=openam,dc=forgerock,dc=org". If the
       Org/Realm for the deployment scenario is different from the default root 
       suffix, the Universal Id(uuid) for the role/principal mappings should be changed 
       accordingly.  The Universal Id can be verified in OpenAM console.

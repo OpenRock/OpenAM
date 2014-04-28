@@ -25,6 +25,7 @@
 
    $Id: sun-application.xml,v 1.1 2009/01/30 12:05:37 kalpanakm Exp $
 
+   Portions Copyrighted 2014 ForgeRock AS.
 -->
 
 <!DOCTYPE sun-application PUBLIC '-//Sun Microsystems, Inc.//DTD Application Server 8.1 J2EE Application 1.4//EN' 'http://www.sun.com/software/appserver/dtds/sun-application_1_4-0.dtd'> 
@@ -33,12 +34,12 @@
 
     <security-role-mapping>
         <role-name>MANAGER_ROLE</role-name>
-        <group-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</group-name>
+        <group-name>id=manager,ou=group,dc=openam,dc=forgerock,dc=org</group-name>
     </security-role-mapping>
 
     <security-role-mapping>
         <role-name>EMPLOYEE_ROLE</role-name>
-        <group-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</group-name>
+        <group-name>id=employee,ou=group,dc=openam,dc=forgerock,dc=org</group-name>
     </security-role-mapping>
 
     <security-role-mapping>

@@ -27,7 +27,7 @@
 -->
 
 <!--
-     Portions Copyrighted 2013 ForgeRock AS.
+     Portions Copyrighted 2013-2014 ForgeRock AS.
 -->
 
 ------------------------------------
@@ -150,14 +150,14 @@ Configure the agent properties
        c) then SAVE the change.
        Note you can find the UUID (Universal User ID) of the groups employee 
        and manager from the OpenAM console group page.
-       For example, if the UUID of employee is id=employee,ou=group,dc=opensso,dc=java,dc=net 
-       and the UUID of manager is id=manager,ou=group,dc=opensso,dc=java,dc=net
+       For example, if the UUID of employee is id=employee,ou=group,dc=openam,dc=forgerock,dc=org
+       and the UUID of manager is id=manager,ou=group,dc=openam,dc=forgerock,dc=org
        then you need to add the following entries in the "Privileged Attribute Mapping".
-       a) add id=employee,ou=group,dc=opensso,dc=java,dc=net in the Map Key 
+       a) add id=employee,ou=group,dc=openam,dc=forgerock,dc=org in the Map Key
           field of the UI.
           add am_employee_role in the Corresponding Map Value field of the UI
           and click the Add button.
-       b) add id=manager,ou=group,dc=opensso,dc=java,dc=net in the Map Key 
+       b) add id=manager,ou=group,dc=openam,dc=forgerock,dc=org in the Map Key
           field of the UI.
           add am_manager_role in the Corresponding Map Value field of the UI
           and click the Add button.
@@ -180,11 +180,11 @@ Configure the agent properties
       com.sun.identity.agents.config.login.form[0] = /agentsample/authentication/login.html
 
     * Privileged Attribute Mapping: 
-      com.sun.identity.agents.config.privileged.attribute.mapping[id\=employee,ou\=group,dc\=opensso,dc\=java,dc\=net] = am_employee_role.
-      com.sun.identity.agents.config.privileged.attribute.mapping[id\=manager,ou\=group,dc\=opensso,dc\=java,dc\=net] = am_manager_role.
+      com.sun.identity.agents.config.privileged.attribute.mapping[id\=employee,ou\=group,dc\=openam,dc\=forgerock,dc\=org] = am_employee_role.
+      com.sun.identity.agents.config.privileged.attribute.mapping[id\=manager,ou\=group,dc\=openam,dc\=forgerock,dc\=org] = am_manager_role.
       Note the above settings assume the UUIDs of group employee and manager are
-      "id=employee,ou=group,dc=opensso,dc=java,dc=net" and 
-      "id=manager,ou=group,dc=opensso,dc=java,dc=net" respectively. Change to 
+      "id=employee,ou=group,dc=openam,dc=forgerock,dc=org" and
+      "id=manager,ou=group,dc=openam,dc=forgerock,dc=org" respectively. Change to
       the appropriate UUIDs accordingly.
 
 
@@ -196,7 +196,7 @@ Configure the agent properties
    (through cookies, headers, or request attributes) for application 
    customization. See the Policy Agent 3.0 for details about the fetching 
    attributes for details on using this feature. If you change the agent's 
-   configuartion for the attribute fetching, the showHttpHeaders.jsp page of the
+   configuration for the attribute fetching, the showHttpHeaders.jsp page of the
    sample application will show all the attributes being fetched. You can choose
    to try this later after you have already installed and deployed the agent and
    sample application in order to learn about this feature.
@@ -240,7 +240,7 @@ To rebuild the entire application from scratch, follow these steps:
 
       The build target creates a built and dist directory with the WAR file.
       By default, the deployment descriptors assume that the OpenAM
-      product was installed under default Org/Realm "dc=opensso,dc=java,dc=net". If the 
+      product was installed under default Org/Realm "dc=openam,dc=forgerock,dc=org". If the
       Org/Realm for the deployment scenario is different from the default root 
       suffix, the Universal Id(uuid) for the role/principal mappings should be changed 
       accordingly.  The Universal Id can be verified in OpenAM console.

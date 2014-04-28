@@ -25,6 +25,7 @@
 
    $Id: web.xml,v 1.2 2009/01/25 05:58:30 naghaon Exp $
 
+   Portions Copyrighted 2014 ForgeRock AS.
 -->
 
 <web-app version="2.4" 
@@ -71,11 +72,11 @@
         <servlet-class> com.sun.identity.agents.sample.SecurityAwareServlet </servlet-class>
         <security-role-ref>
             <role-name>MANAGER_ROLE</role-name>
-            <role-link>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-link>
+            <role-link>id=manager,ou=group,dc=openam,dc=forgerock,dc=org</role-link>
         </security-role-ref>
         <security-role-ref>
             <role-name>EMPLOYEE_ROLE</role-name>
-            <role-link>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-link>
+            <role-link>id=employee,ou=group,dc=openam,dc=forgerock,dc=org</role-link>
         </security-role-ref>
     </servlet>
 
@@ -145,8 +146,8 @@
             <url-pattern>/securityawareservlet</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
-            <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=manager,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
+            <role-name>id=employee,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
         </auth-constraint>
     </security-constraint>
 
@@ -156,7 +157,7 @@
             <url-pattern>/protectedservlet</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=manager,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
         </auth-constraint>
     </security-constraint>
 
@@ -166,7 +167,7 @@
             <url-pattern>/invokerservlet</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=manager,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
         </auth-constraint>
     </security-constraint>
 
@@ -176,7 +177,7 @@
             <url-pattern>/protectedejbservlet</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=employee,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
         </auth-constraint>
     </security-constraint>
 
@@ -189,11 +190,11 @@
     </login-config>   
 
     <security-role id="SR_MANAGER_ROLE">
-            <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=manager,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
     </security-role>
 
     <security-role id="SR_EMPLOYEE_ROLE">
-            <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=employee,ou=group,dc=openam,dc=forgerock,dc=org</role-name>
     </security-role>   
 
 </web-app>

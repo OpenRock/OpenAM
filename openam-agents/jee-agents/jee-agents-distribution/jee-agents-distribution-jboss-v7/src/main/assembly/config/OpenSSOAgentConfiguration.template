@@ -24,7 +24,7 @@
 #
 # $Id: OpenSSOAgentConfiguration.template,v 1.3 2009/10/15 23:34:10 leiming Exp $
 #
-# Portions Copyrighted 2013 ForgeRock Inc.
+# Portions Copyrighted 2013-2014 ForgeRock Inc.
 
 #------------------------------------------------------------------------------
 # Configuration Property File
@@ -745,8 +745,8 @@ com.sun.identity.agents.config.bypass.principal[0] =
 #   com.sun.identity.agents.config.privileged.attribute.tolowercase[Group] = false
 #   com.sun.identity.agents.config.privileged.session.attribute[0] = UserToken
 #   com.sun.identity.agents.config.privileged.attribute.mapping.enable=true
-#   com.sun.identity.agents.config.privileged.attribute.mapping[id\=manager,ou\=group,dc\=opensso,dc\=java,dc\=net] = am_manager_role
-#   com.sun.identity.agents.config.privileged.attribute.mapping[id\=employee,ou\=group,dc\=opensso,dc\=java,dc\=net] = am_employee_role
+#   com.sun.identity.agents.config.privileged.attribute.mapping[id\=manager,ou\=group,dc\=openam,dc\=forgerock,dc\=org] = am_manager_role
+#   com.sun.identity.agents.config.privileged.attribute.mapping[id\=employee,ou\=group,dc\=openam,dc\=forgerock,dc\=org] = am_employee_role
 #
 com.sun.identity.agents.config.default.privileged.attribute[0] = AUTHENTICATED_USERS
 com.sun.identity.agents.config.privileged.attribute.type[0] = Group

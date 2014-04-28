@@ -27,7 +27,7 @@
 -->
 
 <!--
-     Portions Copyrighted 2013 ForgeRock AS.
+     Portions Copyrighted 2013-2014 ForgeRock AS.
 -->
 
 ------------------------------------
@@ -179,7 +179,7 @@ Configure the agent properties
    (through cookies, headers, or request attributes) for application 
    customization. See the Policy Agent 3.0 for details about the fetching 
    attributes for details on using this feature. If you change the agent's 
-   configuartion for the attribute fetching, the showHttpHeaders.jsp page of the
+   configuration for the attribute fetching, the showHttpHeaders.jsp page of the
    sample application will show all the attributes being fetched. You can choose
    to try this later after you have already installed and deployed the agent and
    sample application in order to learn about this feature.
@@ -203,12 +203,12 @@ To rebuild the entire application from scratch, follow these steps:
    3. Change the Universal User Id (UUID) 
       By default, the JBoss server specific deployment descriptors assume 
       that the OpenAM Server product was installed under default Org/Realm
-      "dc=opensso,dc=java,dc=net". If the Org/Realm for the deployment scenario
+      "dc=openam,dc=forgerock,dc=org". If the Org/Realm for the deployment scenario
       is different from the default root suffix, the UUID for the role/principal
       mappings should be changed accordingly. The UUID can be obtained from the
       OpenAM server console the group/role pages.
       e.g. the root suffix of the OpenAM server deployment is "dc=xyz,dc=com".
-      then replace all the occurrences of "dc=opensso,dc=java,dc=net" with 
+      then replace all the occurrences of "dc=openam,dc=forgerock,dc=org" with
       "dc=xyz,dc=com" in ejb-jar.xml, jboss.xml and web.xml
    4. Compile and assemble the application. Ant needs to be available for this task.
       Download latest Ant from http://ant.apache.org. Install Ant and build the sampleapp.ear. 

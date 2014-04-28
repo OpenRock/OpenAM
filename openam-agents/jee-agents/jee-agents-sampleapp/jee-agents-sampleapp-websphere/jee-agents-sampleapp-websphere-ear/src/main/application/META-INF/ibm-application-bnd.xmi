@@ -25,16 +25,17 @@
 
    $Id: ibm-application-bnd.xmi,v 1.1 2008/11/21 22:21:52 leiming Exp $
 
+   Portions Copyrighted 2014 ForgeRock AS.
 -->
 <applicationbnd:ApplicationBinding xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:applicationbnd="applicationbnd.xmi" xmlns:application="application.xmi" xmi:id="ApplicationBinding_1">
   <authorizationTable xmi:id="AuthorizationTable_1">
     <authorizations xmi:id="RoleAssignment_1">
       <role href="META-INF/application.xml#SR_MANAGER_ROLE"/>
-      <groups xmi:id="Group_1" name="id=manager,ou=group,dc=opensso,dc=java,dc=net"/>
+      <groups xmi:id="Group_1" name="id=manager,ou=group,dc=openam,dc=forgerock,dc=org"/>
     </authorizations>
     <authorizations xmi:id="RoleAssignment_2">
       <role href="META-INF/application.xml#SR_EMPLOYEE_ROLE"/>
-      <groups xmi:id="Group_2" name="id=employee,ou=group,dc=opensso,dc=java,dc=net"/>
+      <groups xmi:id="Group_2" name="id=employee,ou=group,dc=openam,dc=forgerock,dc=org"/>
     </authorizations>
   </authorizationTable>
   <application href="META-INF/application.xml#Application_ID"/>
