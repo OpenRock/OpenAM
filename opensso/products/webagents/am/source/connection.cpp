@@ -523,7 +523,7 @@ Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLe
     const char *host = server.getHost().c_str();
     unsigned int port = server.getPort();
 
-    snprintf(service, 6, "%u", port);
+    snprintf(service, sizeof (service), "%u", port);
 
 #ifndef AI_NUMERICSERV
 #define AI_NUMERICSERV 0
@@ -604,7 +604,7 @@ Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLe
             FD_ZERO(&eds);
             FD_SET(sock, &fds);
             FD_SET(sock, &eds);
-            if (select(FD_SETSIZE, 0, &fds, &eds, &tv) == 0) {
+            if (select(sock + 1, NULL, &fds, &eds, &tv) == 0) {
                 Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() timeout connecting to %s:%d", host, port);
                 http_close();
             } else {
