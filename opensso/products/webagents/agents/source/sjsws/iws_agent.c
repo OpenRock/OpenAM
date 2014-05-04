@@ -940,6 +940,8 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     char *clf_req =NULL;
     char *protocol_hdr = NULL;
     char *uri_hdr = NULL;
+    char *uri_tmp_hdr = NULL;
+    char *clf_hdr = NULL;
     char *pathInfo_hdr = NULL;
     char *method_hdr = NULL;
     char *method = NULL;
@@ -994,12 +996,21 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     }
     
     // Get header values.
-    // Note: the variables ending by "_hdr" should not be modified or free
+    // Note: the variables ending by "_hdr" (except uri_hdr) should not be modified or free
     status  = get_header_value(rq->reqpb, REQUEST_PROTOCOL,
                                B_TRUE, &protocol_hdr, B_FALSE, NULL);
     if (status == AM_SUCCESS) {
         status = get_header_value(rq->reqpb, REQUEST_URI,
-                               B_TRUE, &uri_hdr, B_FALSE, NULL);
+                B_TRUE, &uri_tmp_hdr, B_FALSE, NULL);
+        if (status == AM_SUCCESS) {
+            size_t uri_tmp_hdr_sz = strlen(uri_tmp_hdr);
+            uri_hdr = malloc(uri_tmp_hdr_sz + 2);
+            if (!uri_hdr) {
+                status = AM_NO_MEMORY;
+            } else {
+                strcpy(uri_hdr, uri_tmp_hdr);
+            }
+        }
     }
     if (status == AM_SUCCESS) {
         status = get_header_value(rq->vars, PATH_INFO,
@@ -1017,10 +1028,20 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
         status = get_header_value(rq->reqpb, REQUEST_QUERY,
                                B_FALSE, &query_hdr, B_TRUE, &query);
     }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->reqpb, "clf-request",
+                               B_TRUE, &clf_hdr, B_FALSE, NULL);
+    }
     // Get the request URL
     if (status == AM_SUCCESS) {
+        size_t clf_hdr_sz = strlen(clf_hdr);
+        size_t protocol_hdr_sz = strlen(protocol_hdr);
         if (security_active) {
             protocol = "HTTPS";
+        }
+        if ((clf_hdr_sz - protocol_hdr_sz - 2) > 0 &&
+                clf_hdr[clf_hdr_sz - protocol_hdr_sz - 2] == '?') {
+            strcat(uri_hdr, "?");
         }
         status = am_web_get_all_request_urls(host_hdr, protocol,
                                              server_hostname,
@@ -1047,6 +1068,10 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
                 free(method);
                 method = NULL;
             }
+            if(uri_hdr != NULL) {
+                free(uri_hdr);
+                uri_hdr = NULL;
+            }
             am_web_free_memory(request_url);
             am_web_free_memory(orig_request_url);
             am_web_delete_agent_configuration(agent_config);
@@ -1070,6 +1095,10 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
                 if (method != NULL) {
                     free(method);
                     method = NULL;
+                }
+                if (uri_hdr != NULL) {
+                    free(uri_hdr);
+                    uri_hdr = NULL;
                 }
                 am_web_free_memory(request_url);
                 am_web_free_memory(orig_request_url);
@@ -1385,7 +1414,11 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     if(clientHostname != NULL) {
         am_web_free_memory(clientHostname);
     }
-    
+    if (uri_hdr != NULL) {
+        free(uri_hdr);
+        uri_hdr = NULL;
+    }
+
     am_web_log_max_debug("%s: Completed handling request with status: %s.",
                          thisfunc, am_status_to_string(status));
     return requestResult;
