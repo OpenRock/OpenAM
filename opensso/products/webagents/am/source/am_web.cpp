@@ -1999,7 +1999,6 @@ get_normalized_url(const char *url_str,
 {
     const char *thisfunc = "get_normalized_url()";
     am_status_t status = AM_SUCCESS;
-//    am_bool_t isNotEnforced = AM_FALSE;
     std::string new_url_str;
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
@@ -2012,18 +2011,17 @@ get_normalized_url(const char *url_str,
     if (status == AM_SUCCESS) {
         // Parse & canonicalize URL
         am_web_log_max_debug("%s: Original url: %s", thisfunc, url_str);
-        am_web_log_max_debug("%s: PathInfo: %s", thisfunc, path_info);
+        am_web_log_max_debug("%s: PathInfo: %s", thisfunc, path_info == NULL ? "(empty)" : path_info);
 
         try {
             if (AM_TRUE == (*agentConfigPtr)->ignore_path_info) {
                 am_web_log_max_debug("%s: Ignoring path info for "
                                      "policy evaluation.", thisfunc);
-                pInfo=path_info;
+                pInfo = path_info == NULL ? "" : path_info;
                 URL urlObject(url_str, pInfo);
                 (void)overrideProtoHostPort(urlObject, agent_config);
                 urlObject.getBaseURL(normalizedURL);
                 pInfo.erase();
-
             } else {
                 am_web_log_max_debug("%s: Using Full URI for "
                                      "policy evaluation.", thisfunc);
