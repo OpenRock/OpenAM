@@ -1956,10 +1956,13 @@ is_url_not_enforced(const char *url, const char *client_ip, std::string pInfo,
             status = AM_NO_MEMORY;
         } catch (InternalException& exi) {
             status = exi.getStatusCode();
+            am_web_log_error("%s: Exception (%s) caught while checking "
+                    "if request URL is in not enforced list.",
+                    thisfunc, exi.getMessage());
         } catch (std::exception& exs) {
             am_web_log_error("%s: Exception (%s) caught while checking "
-                        "if client IP is in not enfourced list.",
-                        thisfunc, exs.what());
+                    "if client IP is in not enforced list.",
+                    thisfunc, exs.what());
             status = AM_FAILURE;
         } catch (...) {
             am_web_log_error("%s: Unknown Exception while checking if "

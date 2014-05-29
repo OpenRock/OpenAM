@@ -33,6 +33,7 @@
 #include "am_web.h"
 #include "url.h"
 #include "internal_exception.h"
+#include "http.h"
 
 USING_PRIVATE_NAMESPACE
 
@@ -280,6 +281,14 @@ void URL::parseURLStrNew(const std::string &urlString,
 
             if (strcmp(path_info_cstr, "/") != 0) {
                 path_info_ptr = strstr(uri_ptr, path_info_cstr);
+                if (!path_info_ptr) {
+                    std::string path_info_enc = path_info_cstr[0] == '/' ?
+                            "/" + Http::encode(std::string(path_info_cstr + 1)) :
+                            Http::encode(pathInfo);
+                    am_web_log_debug("URL::parseURLStrNew(): pathinfo (%s) is not found in request uri (%s). Retrying with url-encoded pathinfo (%s)",
+                            path_info_cstr, uri_ptr, path_info_enc.c_str());
+                    path_info_ptr = strstr(uri_ptr, path_info_enc.c_str());
+                }
             } else {
                 // As there can be several "/" in the uri, if path info
                 // equal "/" we need to point at the last one before the
