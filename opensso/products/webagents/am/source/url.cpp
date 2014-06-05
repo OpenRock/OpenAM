@@ -54,6 +54,23 @@ const char * URL::defaultPortStr[]  = { "80", "443", "21", "23", "70", "389" };
 #define MIN_PROTO_LEN	(sizeof("ftp")-1)
 #define MAX_PROTO_LEN	(sizeof("telnet")-1)
 
+/**
+ * Finds the last occurrence of the substring sub in the string str. 
+ * Returns a pointer to the beginning of the substring, or NULL if the substring 
+ * is not found or one of str and sub is NULL.
+ */
+static char *am_strrstr(const char *str, const char *sub) {
+    char *last, *p;
+    /*find 1st occurrence. if not found, return NULL*/
+    if (str == NULL || sub == NULL || (p = strstr((char *) str, sub)) == NULL)
+        return NULL;
+    /*loop around until no more occurrences*/
+    do {
+        last = p;
+        ++p;
+    } while (p = strstr(p, sub));
+    return last;
+}
 
 /**
  * Throws InternalException if there is an error in the format 
@@ -280,14 +297,14 @@ void URL::parseURLStrNew(const std::string &urlString,
 	if (path_info_cstr[0] != '\0') {
 
             if (strcmp(path_info_cstr, "/") != 0) {
-                path_info_ptr = strstr(uri_ptr, path_info_cstr);
+                path_info_ptr = am_strrstr(uri_ptr, path_info_cstr);
                 if (!path_info_ptr) {
                     std::string path_info_enc = path_info_cstr[0] == '/' ?
                             "/" + Http::encode(std::string(path_info_cstr + 1)) :
                             Http::encode(pathInfo);
                     am_web_log_debug("URL::parseURLStrNew(): pathinfo (%s) is not found in request uri (%s). Retrying with url-encoded pathinfo (%s)",
                             path_info_cstr, uri_ptr, path_info_enc.c_str());
-                    path_info_ptr = strstr(uri_ptr, path_info_enc.c_str());
+                    path_info_ptr = am_strrstr(uri_ptr, path_info_enc.c_str());
                 }
             } else {
                 // As there can be several "/" in the uri, if path info
