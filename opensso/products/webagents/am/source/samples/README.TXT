@@ -1,7 +1,7 @@
 README.TXT
 
 --------------------------------------------------------------------
-OpenAM Policy Agent 3.3
+OpenAM Policy Agent AGENT_VER
 --------------------------------------------------------------------
 
 DISCLAIMER
@@ -10,7 +10,7 @@ DISCLAIMER
    FORGEROCK INC. IS NOT LIABLE FOR ANY DAMAGE RESULTING 
    FROM THE USE OF THIS CODE OR ANY PORTION THEREOF.
 
-   Portions Copyright 2013 ForgeRock AS
+   Portions Copyright 2013-2014 ForgeRock AS
 
 SAMPLE CODE
 -----------

@@ -122,12 +122,10 @@ Portions Copyrighted 2010-2014 ForgeRock AS
             </fileset>
         </copy>
 
-        <!-- Copy README file -->
-        <copy todir="${container.web_agent.dir}">
-            <fileset dir="${webagents.basedir}">
-                <include name="README"/>
-            </fileset>
-        </copy>
+        <!-- Update and copy README file -->
+        <copy file="${webagents.basedir}/README" tofile="${container.web_agent.dir}/README" overwrite="true"/>
+        <replaceregexp file="${container.web_agent.dir}/README"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
 
         <!-- Copy OpenSSOAgentBootstrap.template file -->
         <copy todir="${container.web_agent.config.dir}">

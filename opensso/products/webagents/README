@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
-README file for OpenAM Policy Agents 3.3
+README file for OpenAM Policy Agents AGENT_VER
 ------------------------------------------------------------------------------
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -27,26 +27,7 @@ README file for OpenAM Policy Agents 3.3
 #
 #
 #
-
-# Portions Copyright 2011-2013 ForgeRock AS
-
-
-**********************************************************************************
-
-NOTE: Currently Apache 2.0.x, IIS 6.0, IIS 7.0, Webserver 7.0 and Proxyserver 4.0 Agent 
-have Agent 3.0 features enabled. Also this is the only agent that users can build and install
-(Webserver 7.0 agent is supported platforms are Solaris sparc, Solaris x86 and
-RHAS Linux 4.0, 5.0 and Windows 2003 and Proxyserver 4.0 Agent is supported onlyonly on Solaris sparc)
-Rest of the Agents for other containers viz. Sharepoint and OWA agents are 
-yet to have the Agent 3.0 features enabled. They will be done in a timely manner.
-
-If you would like to build any other agent, please use 2.2 agents 
-from opensso branch. OpenAM branch details:
-cvs -d :pserver:username@cvs.dev.java.net:/cvs co -r openam_agent22_branch openam
-
-Nightly and stable builds are available on openam web site.
-
-***********************************************************************************
+# Portions Copyright 2011-2014 ForgeRock AS
 
 %% Contents:
     %% 1. Platforms
@@ -58,7 +39,7 @@ Nightly and stable builds are available on openam web site.
 
 %% 1. Platforms
 
-Web Agent dependent external library retreiving location, build and install 
+Web Agent dependent external library retrieving location, build and install 
 instructions are platform specific. The following files for each of the 
 platforms cover this aspect in detail.
 

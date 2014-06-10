@@ -359,6 +359,9 @@
     <target name="sdk">
         <echo message="Dispatch to archive OpenAM C-SDK"/>
         <delete file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}.zip" quiet="true"/>
+        <copy file="${webagents.basedir}/am/source/samples/README.TXT" tofile="${webagents.built.dir}/README.TXT" overwrite="true"/>
+        <replaceregexp file="${webagents.built.dir}/README.TXT"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
         <zip file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}.zip">  
             <zipfileset prefix="bin" dir="${webagents.basedir}/am/source/" includes="crypt_util"/>
             <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am.h"/>
@@ -377,7 +380,7 @@
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
-            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="README.TXT"/>
+            <zipfileset prefix="samples" dir="${webagents.built.dir}/" includes="README.TXT"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile"/>
         </zip>
         <delete file="${webagents.drop.dir}/common_3_0_${build.os}${build.type.suffix.sdk}_build_date.js" quiet="true"/>
