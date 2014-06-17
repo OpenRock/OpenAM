@@ -67,17 +67,17 @@ public class ObjConfBase implements
             }
 
             // Service object to be added for POST data preservation
-            FileUtils.appendDataToFile(objFile,
-                "<Object ppath=\"*/dummypost/sunpostpreserve*\">");
-            FileUtils.appendDataToFile(objFile,
-                "Service type=text/* method=(GET|POST) fn=append_post_data");
-            FileUtils.appendDataToFile(objFile,"</Object>");
+            //FileUtils.appendDataToFile(objFile,
+            //    "<Object ppath=\"*/dummypost/sunpostpreserve*\">");
+            //FileUtils.appendDataToFile(objFile,
+            //    "Service type=text/* method=(GET|POST) fn=append_post_data");
+            //FileUtils.appendDataToFile(objFile,"</Object>");
 
-            FileUtils.appendDataToFile(objFile,
-                "<Object ppath=\"*/UpdateAgentCacheServlet*\">");
-            FileUtils.appendDataToFile(objFile,
-                "Service type=text/* method=(POST) fn=process_notification");
-            FileUtils.appendDataToFile(objFile,"</Object>");
+            //FileUtils.appendDataToFile(objFile,
+            //    "<Object ppath=\"*/UpdateAgentCacheServlet*\">");
+            //FileUtils.appendDataToFile(objFile,
+            //    "Service type=text/* method=(POST) fn=process_notification");
+            //FileUtils.appendDataToFile(objFile,"</Object>");
 
             status = true;
         } catch (Exception exc) {

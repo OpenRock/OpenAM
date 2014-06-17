@@ -289,232 +289,37 @@ static am_status_t register_post_data(Session *sn, Request *rq, char *url,
     return status;
 }
 
-/**
-  * Create the html form with the javascript that does the post with the
-  * invisible name value pairs
-*/
-static int create_buffer_withpost(const char *key, am_web_postcache_data_t
-                                  postentry, Session *sn, Request *rq,
-                                  void* agent_config)
-{
-    const char *thisfunc = "create_buffer_withpost()";
-    am_status_t status = AM_SUCCESS;
-    char *buffer_page = NULL;
-    int nsapi_status;
-    char msg_length[8];
-    char *lbCookieHeader = NULL;
-    am_status_t status_tmp = AM_SUCCESS;
-    buffer_page = am_web_create_post_page(key, postentry.value, 
-                                          postentry.url, agent_config);
-
-    // Use the protocol_status function to set the status of the
-    // response before calling protocol_start_response.
-    protocol_status(sn, rq, PROTOCOL_OK, NULL);
-
-    // Although we would expect the ObjectType stage to
-    // set the content-type, set it here just to be
-    // completely sure that it gets set to text/html.
-    param_free(pblock_remove("content-type", rq->srvhdrs));
-    pblock_nvinsert("content-type", "text/html", rq->srvhdrs);
-    util_itoa(strlen(buffer_page), msg_length);
-    pblock_nvinsert("content-length", msg_length, rq->srvhdrs);
-
-    // If using a LB cookie, it needs to be set to NULL there.
-    // If am_web_get_postdata_preserve_lbcookie() returns
-    // AM_INVALID_ARGUMENT, it means that the sticky session
-    // feature is disabled (ie no LB) or that the sticky
-    // session mode is URL.
-    status = am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, 
-                                                   B_TRUE, agent_config);
-    if (status == AM_NO_MEMORY) {
-        nsapi_status = REQ_EXIT;
-    } else {
-        if (status == AM_SUCCESS) {
-            am_web_log_debug("%s: Setting LB cookie for post data "
-                             "preservation to null.", thisfunc);
-            pblock_nvinsert("set-cookie", lbCookieHeader, rq->srvhdrs);
-        }
-        // Send the headers to the client
-        protocol_start_response(sn, rq);
-        // Repost the form
-        if (net_write(sn->csd, buffer_page , strlen(buffer_page)) == IO_ERROR){
-            am_web_log_error("%s: Fail to send the form.", thisfunc);
-            nsapi_status = REQ_EXIT;
-        } else {
-            nsapi_status = REQ_PROCEED;
-        }
-    }
-    am_web_postcache_data_cleanup(&postentry);
-    if(buffer_page != NULL){
-        system_free(buffer_page);
-    }
-    if (lbCookieHeader != NULL) {
-        am_web_free_memory(lbCookieHeader);
-        lbCookieHeader = NULL;
-    }
-    return nsapi_status;
-}
-
-/**
-  * Function Name: append_post_data
-  * This method is called when the SAF finds a /dummypost.htm extension to the
-  * the URL that the browser is trying to reach. If it finds "/dummypost.htm", 
-  * the method needs to find the post data from cache and repost it
-  *
-  * Input:  As defined by a SAF
-  * Output: As defined by a SAF
-*/
-
-NSAPI_PUBLIC int append_post_data(pblock *param, Session *sn, Request *rq)
-{
-    const char *thisfunc = "append_post_data()";
-    am_status_t status = AM_SUCCESS;
-    am_status_t status_tmp = AM_SUCCESS;
-    int requestResult = REQ_ABORTED;
-    const char *post_data_query = NULL;
-    char *uri = NULL;
-    am_web_postcache_data_t get_data = {NULL, NULL};
-    const char *postdata_cache = NULL;
-    const char *actionurl = NULL;
-    char *stickySessionValue = NULL;
-    char *stickySessionPos = NULL;
-    char *temp_uri = NULL;
-    void* agent_config = NULL;
-    
-    uri = pblock_findval("uri", rq->reqpb);
-    if(uri == NULL) {
-        status = AM_INVALID_ARGUMENT;
-    }
-
-    agent_config = am_web_get_agent_configuration();
-
-    // Check if magic URI is present in the URL
-    if(status == AM_SUCCESS) {
-        post_data_query = uri + strlen(POST_PRESERVE_URI);
-        // Check if a query paramter for the  sticky session has been
-        // added to the dummy URL. Remove it if it is the case.
-        status_tmp = am_web_get_postdata_preserve_URL_parameter
-                                   (&stickySessionValue, agent_config);
-        if (status_tmp == AM_SUCCESS) {
-            stickySessionPos = strstr(post_data_query, stickySessionValue);
-            if (stickySessionPos != NULL) {
-                size_t len = strlen(post_data_query) - 
-                             strlen(stickySessionPos)-1;
-                temp_uri = malloc(len+1);
-                memset(temp_uri,0,len+1);
-                strncpy(temp_uri, post_data_query, len);
-                post_data_query = temp_uri;
-            }
-        }
-    }
-    // If magic uri present search for corresponding value in hashtable
-    if((status == AM_SUCCESS) && (post_data_query != NULL) &&
-       (strlen(post_data_query) > 0))
-    {
-        am_web_log_debug("%s: POST Magic Query Value: %s", 
-                         thisfunc, post_data_query);
-        if (am_web_postcache_lookup(post_data_query,
-                    &get_data, agent_config) == B_TRUE)
-        {
-            // Now that the data is found, find the data and the URL to redirect
-            postdata_cache = get_data.value;
-            actionurl = get_data.url;
-            am_web_log_debug("%s: POST hashtable actionurl : %s", 
-                             thisfunc, actionurl);
-            // Create the buffer string that is to be written
-            requestResult = create_buffer_withpost(post_data_query,
-                        get_data,sn, rq, agent_config);
-        } else {
-            am_web_log_error("%s: Found magic URI but entry not in POST"
-                             " Hash table :%s", thisfunc, post_data_query);
-            protocol_status(sn, rq, PROTOCOL_NOT_FOUND, NULL);
-            param_free(pblock_remove("referer", rq->headers));
-            requestResult = REQ_ABORTED;
-        }
-    } else {
-        am_web_log_error("%s: Magic URL value not found in POST cache", thisfunc);
-        protocol_status(sn, rq, PROTOCOL_NOT_FOUND, NULL);
-        param_free(pblock_remove("referer", rq->headers));
-        requestResult = REQ_ABORTED;
-    }
-    if (temp_uri != NULL) {
-        free(temp_uri);
-        temp_uri = NULL;
-    }
-    if (stickySessionValue != NULL) {
-        am_web_free_memory(stickySessionValue);
-        stickySessionValue = NULL;
-    }
-    return requestResult;}
-
 /*
- * update the agent cache from the listener response.  Any response without a
- * valid state for the session would result on the cache being updated
+ * Handle notification
  */
-
-static int handle_notification(Session *sn, 
-                               Request *rq,
-                               void* agent_config)
-{
-    int result;
+static int process_new_notification(pblock *param, Session *sn, Request *rq, void* agent_config) {
     char *content_length_header;
     size_t content_length;
-
-    /* fixme GETPOST use new getRequestBody() routine here.... */
-    result = request_header(CONTENT_LENGTH_HDR, &content_length_header, sn,rq);
-    if (REQ_PROCEED == result && NULL != content_length_header &&
-	sscanf(content_length_header, "%u", &content_length) == 1) {
-	char ch;
-	size_t data_length = 0;
-	char *buf = NULL;
-
-	buf = system_malloc(content_length);
-	if (buf != NULL) {
-	    for (data_length = 0; data_length < content_length; data_length++){
-		ch = netbuf_getc(sn->inbuf);
-		if (ch == IO_ERROR || ch == IO_EOF) {
-		    break;
-		}
-		buf[data_length] = (char) ch;
-	    }
-	    am_web_handle_notification(buf, data_length, agent_config);
-	    system_free(buf);
-	} else {
-	    am_web_log_error("handle_notification() unable to allocate memory "
-			    "for notification data, size = %u",
-			    content_length);
-	}
-	result = REQ_PROCEED;
+    if ((content_length_header = pblock_findval("content-length", rq->headers)) != NULL
+            && sscanf(content_length_header, "%u", &content_length) == 1) {
+        char ch;
+        size_t data_length = 0;
+        char *buf = system_malloc(content_length);
+        if (buf != NULL) {
+            for (data_length = 0; data_length < content_length; data_length++) {
+                ch = netbuf_getc(sn->inbuf);
+                if (ch == IO_ERROR || ch == IO_EOF) {
+                    break;
+                }
+                buf[data_length] = (char) ch;
+            }
+            am_web_handle_notification(buf, data_length, agent_config);
+            system_free(buf);
+        } else {
+            am_web_log_error("handle_notification() unable to allocate memory "
+                    "for notification data, size = %u",
+                    content_length);
+        }
     } else {
-	am_web_log_error("handle_notification() %s content-length header",
-			(REQ_PROCEED == result &&
-			 NULL != content_length_header) ?
-			"unparsable" : "missing");
+        am_web_log_error("handle_notification() %s content-length header",
+                (NULL != content_length_header) ?
+                "unparsable" : "missing");
     }
-
-    return result;
-}
-
-/**
-  * Function Name: process_notification
-  *
-  * Processes both session and policy notifications coming from OpenAM server.
-  * Implemented as a NSAPI SAF. Works together with Service directive.
-  *
-  * Input:  As defined by a SAF
-  * Output: As defined by a SAF
-*/
-NSAPI_PUBLIC int process_notification(pblock *param, Session *sn, Request *rq)
-{
-    return REQ_PROCEED;
-}
-
-static int process_new_notification(pblock *param, 
-                                    Session *sn, 
-                                    Request *rq,
-                                    void* agent_config)
-{
-    handle_notification(sn, rq, agent_config);
 
     /* Use the protocol_status function to set the status of the
      * response before calling protocol_start_response.
@@ -538,6 +343,24 @@ static int process_new_notification(pblock *param,
         return REQ_EXIT;
     }
     net_flush(sn->csd);
+    return REQ_PROCEED;
+}
+
+/*
+ * Old implementation (no-op) of NSAPI SAF for notification support. 
+ * Functionality moved inside validate_session_policy()
+ * as for the rest of the agents.
+ */
+NSAPI_PUBLIC int process_notification(pblock *param, Session *sn, Request *rq) {
+    return REQ_PROCEED;
+}
+
+/*
+ * Old implementation (no-op) of NSAPI SAF for post data preservation support. 
+ * Functionality moved inside validate_session_policy()
+ * as for the rest of the agents.
+ */
+NSAPI_PUBLIC int append_post_data(pblock *param, Session *sn, Request *rq) {
     return REQ_PROCEED;
 }
 
@@ -813,34 +636,58 @@ static void set_method(void ** args, char * orig_req){
     }
 }
 
-int process_request_with_post_data_preservation(Session *sn, Request *rq,
-                                    am_status_t request_status,
-                                    am_policy_result_t *policy_result,
-                                    char *requestURL,
-                                    void **args,
-                                    char **resp,
-                                    void* agent_config)
-{
+static char *stristr(char *ch1, char *ch2) {
+    char *chN1, *chN2;
+    char *chNdx;
+    char *chRet = NULL;
+    if (!ch1 || !ch2) return NULL;
+    chN1 = strdup(ch1);
+    chN2 = strdup(ch2);
+    if (chN1 && chN2) {
+        chNdx = chN1;
+        while (*chNdx) {
+            *chNdx = (char) tolower(*chNdx);
+            chNdx++;
+        }
+        chNdx = chN2;
+        while (*chNdx) {
+            *chNdx = (char) tolower(*chNdx);
+            chNdx++;
+        }
+        chNdx = strstr(chN1, chN2);
+        if (chNdx)
+            chRet = ch1 + (chNdx - chN1);
+    }
+    if (chN1) free(chN1);
+    if (chN2) free(chN2);
+    return chRet;
+}
+
+static int process_request_with_post_data_preservation(Session *sn, Request *rq,
+        am_status_t request_status, am_policy_result_t *policy_result,
+        char *requestURL, void **args, char **resp, void* agent_config) {
     const char *thisfunc = "process_request_with_post_data_preservation()";
     am_status_t status = AM_SUCCESS;
     int requestResult = REQ_PROCEED;
     post_urls_t *post_urls;
     char *response = NULL;
-    int local_alloc = 1;
+    int local_alloc = 1, empty_post = 0;
 
     if (*resp != NULL) {
         response = *resp;
         local_alloc = 0;
     }
-    // Create the magic URI, actionurl
+    /* Create the magic URI, actionurl */
     status = am_web_create_post_preserve_urls(requestURL, &post_urls,
-                                              agent_config);
+            agent_config);
     if (status != AM_SUCCESS) {
         requestResult = REQ_ABORTED;
     }
-    // In CDSSO mode, for a POST request, the post data have
-    // already been saved in the response variable, so we need
-    // to get them here only if response is NULL.
+    /* 
+     * In CDSSO mode, for a POST request, the post data have
+     * already been saved in the response variable, so we need
+     * to get them here only if response is NULL.
+     */
     if (status == AM_SUCCESS) {
         if (response == NULL) {
             response = get_post_data(sn, rq, requestURL);
@@ -848,60 +695,81 @@ int process_request_with_post_data_preservation(Session *sn, Request *rq,
     }
     if (status == AM_SUCCESS) {
         if (response == NULL || strlen(response) == 0) {
-            // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
-            if ((response = realloc(response, strlen(AM_WEB_EMPTY_POST) + 1)) != NULL)
+            /* this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST */
+            if ((response = realloc(response, strlen(AM_WEB_EMPTY_POST) + 1)) != NULL) {
                 strcpy(response, AM_WEB_EMPTY_POST);
+                empty_post = 1;
+            }
         }
         if (response != NULL && strlen(response) > 0) {
-            if (AM_SUCCESS == register_post_data(sn, rq,
-                                post_urls->action_url,
-                                post_urls->post_time_key,
-                                response,
-                                agent_config))
-            {
-                char *lbCookieHeader = NULL;
-                // If using a LB in front of the agent and if the sticky 
-                // session mode is COOKIE, the lb cookie needs to be set there.
-                // If am_web_get_postdata_preserve_lbcookie()
-                // returns AM_INVALID_ARGUMENT, it means that the 
-                // sticky session feature is disabled (ie no LB) or
-                // that the sticky session mode is set to URL.
-                status = am_web_get_postdata_preserve_lbcookie(
-                          &lbCookieHeader, B_FALSE, agent_config);
-                if (status == AM_NO_MEMORY) {
-                    requestResult = REQ_ABORTED;
-                } else {
-                    if (status == AM_SUCCESS) {
-                        am_web_log_debug("%s: Setting LB cookie "
-                                         "for post data preservation (%s).",
-                                         thisfunc, lbCookieHeader);
-                        set_cookie(lbCookieHeader, args);
-                    }
-                    requestResult =  do_redirect(sn, rq, request_status,
-                                                 policy_result,
-                                                 post_urls->dummy_url,
-                                                 REQUEST_METHOD_POST,
-                                                 agent_config);
-                }
-                if (lbCookieHeader != NULL) {
-                    am_web_free_memory(lbCookieHeader);
-                    lbCookieHeader = NULL;
-                }
-            } else {
-                am_web_log_error("%s: register_post_data() "
-                     "failed.", thisfunc);
+            char *cntty = pblock_findval("content-type", rq->headers);
+            /*
+             * Post data preservation module supports only application/x-www-form-urlencoded content-type.
+             * Invalid content-type and/or actual data (name=value& pairs) will be rejected with HTTP 501 error.
+             */
+            if (cntty == NULL || stristr(cntty, (char *) "application/x-www-form-urlencoded") == NULL) {
+                am_web_log_error("%s: unsupported content type (%s)", thisfunc, cntty == NULL ? "empty" : cntty);
+                protocol_status(sn, rq, PROTOCOL_NOT_IMPLEMENTED, NULL);
                 requestResult = REQ_ABORTED;
+            } else {
+                int c1 = 0, c2 = 0;
+                char *c = response;
+                while (*c) {
+                    if (*c == '=') ++c1;
+                    if (*c == '&') ++c2;
+                    ++c;
+                }
+                if (empty_post == 0 && (c1 == 0 || (c1 != (c2 + 1)))) {
+                    am_web_log_error("%s: invalid '%s' data (%s)", thisfunc, cntty, response);
+                    protocol_status(sn, rq, PROTOCOL_NOT_IMPLEMENTED, NULL);
+                    requestResult = REQ_ABORTED;
+                } else if (AM_SUCCESS == register_post_data(sn, rq, post_urls->action_url,
+                        post_urls->post_time_key, response, agent_config)) {
+                    char *lbCookieHeader = NULL;
+                    /* 
+                     * If using a LB in front of the agent and if the sticky 
+                     * session mode is COOKIE, the lb cookie needs to be set there.
+                     * If am_web_get_postdata_preserve_lbcookie()
+                     * returns AM_INVALID_ARGUMENT, it means that the 
+                     * sticky session feature is disabled (ie no LB) or
+                     * that the sticky session mode is set to URL.
+                     */
+                    status = am_web_get_postdata_preserve_lbcookie(
+                            &lbCookieHeader, B_FALSE, agent_config);
+                    if (status == AM_NO_MEMORY) {
+                        requestResult = REQ_ABORTED;
+                    } else {
+                        if (status == AM_SUCCESS) {
+                            am_web_log_debug("%s: Setting LB cookie "
+                                    "for post data preservation (%s).",
+                                    thisfunc, lbCookieHeader);
+                            set_cookie(lbCookieHeader, args);
+                        }
+                        requestResult = do_redirect(sn, rq, request_status,
+                                policy_result,
+                                post_urls->dummy_url,
+                                REQUEST_METHOD_POST,
+                                agent_config);
+                    }
+                    if (lbCookieHeader != NULL) {
+                        am_web_free_memory(lbCookieHeader);
+                        lbCookieHeader = NULL;
+                    }
+                } else {
+                    am_web_log_error("%s: register_post_data() failed.", thisfunc);
+                    requestResult = REQ_ABORTED;
+                }
             }
         } else {
             am_web_log_debug("%s: This is a POST request with no post data. "
-                             "Redirecting as a GET request.", thisfunc);
+                    "Redirecting as a GET request.", thisfunc);
             requestResult = do_redirect(sn, rq, request_status,
-                                      policy_result,
-                                      requestURL, 
-                                      REQUEST_METHOD_GET,
-                                      agent_config);
+                    policy_result,
+                    requestURL,
+                    REQUEST_METHOD_GET,
+                    agent_config);
         }
-    } 
+    }
     if (post_urls != NULL) {
         am_web_clean_post_urls(post_urls);
         post_urls = NULL;
@@ -910,8 +778,149 @@ int process_request_with_post_data_preservation(Session *sn, Request *rq,
         free(response);
         response = NULL;
     }
-    
+
     return requestResult;
+}
+
+/* Method to check and create post page */
+static am_status_t check_for_post_data(Session *sn, Request *rq, char **page, void *agent_config) {
+    const char *thisfunc = "check_for_post_data()";
+    const char *post_data_query = NULL;
+    am_web_postcache_data_t get_data = {NULL, NULL};
+    const char *actionurl = NULL;
+    const char *postdata_cache = NULL;
+    am_status_t status = AM_SUCCESS, status_tmp = AM_SUCCESS;
+    char *buffer_page = NULL, *stickySessionValue = NULL, 
+            *stickySessionPos = NULL, *temp_uri = NULL, *requestURL;
+    *page = NULL;
+   
+    requestURL = pblock_findval("uri", rq->reqpb);
+    if(requestURL == NULL) {
+        status = AM_INVALID_ARGUMENT;
+    }
+    
+    /* Check if magic URI is present in the URL */
+    if (status == AM_SUCCESS) {
+        post_data_query = strstr(requestURL, POST_PRESERVE_URI);
+        if (post_data_query != NULL) {
+            post_data_query += strlen(POST_PRESERVE_URI);
+            /* 
+             * Check if a query parameter for the  sticky session has been
+             * added to the dummy URL. Remove it if it is the case.
+             */ 
+            status_tmp = am_web_get_postdata_preserve_URL_parameter
+                    (&stickySessionValue, agent_config);
+            if (status_tmp == AM_SUCCESS) {
+                stickySessionPos = strstr((char *) post_data_query, stickySessionValue);
+                if (stickySessionPos != NULL) {
+                    size_t len = strlen(post_data_query) -
+                            strlen(stickySessionPos) - 1;
+                    temp_uri = (char *) malloc(len + 1);
+                    memset(temp_uri, 0, len + 1);
+                    strncpy(temp_uri, post_data_query, len);
+                    post_data_query = temp_uri;
+                }
+            }
+        }
+    }
+    /* If magic uri present search for corresponding value in hash table */
+    if ((status == AM_SUCCESS) && (post_data_query != NULL) &&
+            (strlen(post_data_query) > 0)) {
+        am_web_log_debug("%s: POST Magic Query Value: %s",
+                thisfunc, post_data_query);
+        if (am_web_postcache_lookup(post_data_query, &get_data,
+                agent_config) == B_TRUE) {
+            postdata_cache = get_data.value;
+            actionurl = get_data.url;
+            am_web_log_debug("%s: POST hashtable actionurl: %s",
+                    thisfunc, actionurl);
+            /* Create the post page */
+            buffer_page = am_web_create_post_page(post_data_query,
+                    postdata_cache, actionurl, agent_config);
+            if (buffer_page == NULL || (*page = strdup(buffer_page)) == NULL) {
+                am_web_log_error("%s: Not enough memory to allocate page", thisfunc);
+                status = AM_NO_MEMORY;
+            }
+            am_web_postcache_data_cleanup(&get_data);
+            if (buffer_page != NULL) {
+                am_web_free_memory(buffer_page);
+            }
+        } else {
+            am_web_log_error("%s: Found magic URI (%s) but entry is not in POST  hash table", thisfunc, post_data_query);
+            status = AM_SUCCESS;
+        }
+    }
+    if (temp_uri != NULL) {
+        free(temp_uri);
+        temp_uri = NULL;
+    }
+    if (stickySessionValue != NULL) {
+        am_web_free_memory(stickySessionValue);
+        stickySessionValue = NULL;
+    }
+    return status;
+}
+
+/* 
+ * This function is called when the preserve post data feature is enabled
+ * to send the original request with the original post data
+ */
+static int send_post_data(Session *sn, Request *rq, char *buffer_page, void* agent_config) {
+    const char *thisfunc = "send_post_data()";
+    am_status_t status = AM_SUCCESS;
+    int nsapi_status;
+    char msg_length[8];
+    char *lbCookieHeader = NULL;
+  
+    /* 
+     * Use the protocol_status function to set the status of the
+     * response before calling protocol_start_response.
+     */ 
+    protocol_status(sn, rq, PROTOCOL_OK, NULL);
+
+    /* 
+     * Although we would expect the ObjectType stage to
+     * set the content-type, set it here just to be
+     * completely sure that it gets set to text/html.
+     */ 
+    param_free(pblock_remove("content-type", rq->srvhdrs));
+    pblock_nvinsert("content-type", "text/html", rq->srvhdrs);
+    util_itoa(strlen(buffer_page), msg_length);
+    pblock_nvinsert("content-length", msg_length, rq->srvhdrs);
+
+    /* 
+     * If using a LB cookie, it needs to be set to NULL there.
+     * If am_web_get_postdata_preserve_lbcookie() returns
+     * AM_INVALID_ARGUMENT, it means that the sticky session
+     * feature is disabled (ie no LB) or that the sticky
+     * session mode is URL.
+     */
+    status = am_web_get_postdata_preserve_lbcookie(&lbCookieHeader,
+            B_TRUE, agent_config);
+    if (status == AM_NO_MEMORY) {
+        nsapi_status = REQ_ABORTED;
+    } else {
+        if (status == AM_SUCCESS) {
+            am_web_log_debug("%s: setting LB cookie for post data "
+                    "preservation to null.", thisfunc);
+            pblock_nvinsert("set-cookie", lbCookieHeader, rq->srvhdrs);
+        }
+        /* Send the headers to the client */
+        protocol_start_response(sn, rq);
+        /* Repost the form */
+        if (net_write(sn->csd, buffer_page, strlen(buffer_page)) == IO_ERROR) {
+            am_web_log_error("%s: failed to send the form.", thisfunc);
+            nsapi_status = REQ_ABORTED;
+        } else {
+            nsapi_status = REQ_EXIT;
+        }
+    }
+
+    if (lbCookieHeader != NULL) {
+        am_web_free_memory(lbCookieHeader);
+        lbCookieHeader = NULL;
+    }
+    return nsapi_status;
 }
 
 /*
@@ -958,7 +967,9 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     char *orig_request_url = NULL;
     void* agent_config = NULL;
     am_status_t cdStatus = AM_FAILURE;
-    char* logout_url = NULL;
+    char *logout_url = NULL;
+    char *post_page = NULL;
+    int redirectRequest = 0;
 
     // Check if agent is initialized.
     // If not initialized, then call agent init function
@@ -1169,11 +1180,16 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
         status = get_header_value(sn->client, REQUEST_IP_ADDR,
                                B_FALSE, &clientIP_hdr, B_TRUE, &clientIP);
     }
+    if (status == AM_SUCCESS) {
+        if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+            status = check_for_post_data(sn, rq, &post_page, agent_config);
+        }
+    }
     // In CDSSO mode, check if the sso token is in the post data
     if (status == AM_SUCCESS) {
         if ((dpro_cookie == NULL) &&
             (am_web_is_cdsso_enabled(agent_config) == B_TRUE) &&
-            (am_web_is_url_enforced(request_url, pathInfo_hdr, 
+            (post_page != NULL || am_web_is_url_enforced(request_url, pathInfo_hdr, 
                    clientIP, agent_config) == B_TRUE))
         {
             if (strcmp(method, REQUEST_METHOD_POST) == 0) {
@@ -1205,6 +1221,7 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
                                              clf_reqSize);
                             status = AM_NO_MEMORY;
                         } else {
+                            redirectRequest = 1;
                             memset (clf_req,'\0',clf_reqSize);
                             strcpy(clf_req, orig_req);
                             strcat(clf_req, " ");
@@ -1298,6 +1315,24 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
                 am_web_log_error("%s: am_web_result_attr_map_set failed, "
                                  "status = %s (%d)", thisfunc,
                                  am_status_to_string(status), status);
+            } else {
+                if (post_page != NULL) {
+                    /* 
+                     * If post_page is not null it means that the request 
+                     * contains the "/dummypost/sunpostpreserve" string and
+                     * that the post data of the original request need to be
+                     * posted.
+                     */
+                    requestResult = send_post_data(sn, rq, post_page, agent_config);
+                    break;
+                } else {
+                    if (redirectRequest == 1) {
+                        am_web_log_debug("%s: Request redirected to original url after return from CDC servlet", thisfunc);
+                        do_url_redirect(sn, rq, request_url);
+                        requestResult = REQ_ABORTED;
+                        break;
+                    }
+                }
             }
             requestResult = REQ_PROCEED;
             break;
@@ -1388,9 +1423,13 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     am_web_free_memory(orig_request_url);
     am_web_free_memory(logout_url);
     am_web_delete_agent_configuration(agent_config);
-    if(response != NULL) {
+    if (response != NULL) {
         free(response);
         response = NULL;
+    }
+    if (post_page != NULL) {
+        free(post_page);
+        post_page = NULL;
     }    
     if(orig_req != NULL) {
         free(orig_req);
