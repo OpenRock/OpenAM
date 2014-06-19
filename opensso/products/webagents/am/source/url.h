@@ -24,7 +24,11 @@
  *
  * $Id: url.h,v 1.6 2009/10/13 01:40:42 robertis Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 #ifndef __URL_H__
 #define __URL_H__
 #include <string>
@@ -57,15 +61,15 @@ class URL {
      * The exception will contain an message for the error.
      */
     URL(const std::string &urlStr,
-	bool ignore_case=true, bool useOld=false); 
+	bool ignore_case=true); 
 
     URL(const std::string &urlStr,
 	const std::string &path_info,
-	bool ignore_case=true, bool useOld=false); 
+	bool ignore_case=true); 
 
     URL(const std::string &urlStr,
 	std::size_t url_len,
-	bool ignore_case=true, bool useOld=false); 
+	bool ignore_case=true); 
 
     URL(const URL &);
 
@@ -151,12 +155,6 @@ class URL {
      * of the URL, such as invalid protocol or port number.
      * The exception will contain an message for the error.  */
     void parseURLStr(const std::string &urlStr,
-		     const std::string &pathInfo=std::string(""), 
-		     bool useOld=true);
-
-    void parseURLStrNew(const std::string &urlStr,
-		     const std::string &pathInfo=std::string(""));
-    void parseURLStrOld(const std::string &urlStr,
 		     const std::string &pathInfo=std::string(""));
 
     inline bool validatePort() {
@@ -187,8 +185,8 @@ class URL {
     std::size_t port;
     std::string uri;
     std::string path_info;
-    std::string query;
     KeyValueMap qParams;
+    std::string query;
     bool icase;
 };
 

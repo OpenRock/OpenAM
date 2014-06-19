@@ -55,30 +55,12 @@ const char * URL::defaultPortStr[]  = { "80", "443", "21", "23", "70", "389" };
 #define MAX_PROTO_LEN	(sizeof("telnet")-1)
 
 /**
- * Finds the last occurrence of the substring sub in the string str. 
- * Returns a pointer to the beginning of the substring, or NULL if the substring 
- * is not found or one of str and sub is NULL.
- */
-static char *am_strrstr(const char *str, const char *sub) {
-    char *last, *p;
-    /*find 1st occurrence. if not found, return NULL*/
-    if (str == NULL || sub == NULL || (p = strstr((char *) str, sub)) == NULL)
-        return NULL;
-    /*loop around until no more occurrences*/
-    do {
-        last = p;
-        ++p;
-    } while (p = strstr(p, sub));
-    return last;
-}
-
-/**
  * Throws InternalException if there is an error in the format 
  * of the URL, such as invalid protocol or port number.
  * The exception will contain an message for the error.
  */
 URL::URL(const std::string &urlStr, std::size_t url_len,
-	 bool ignore_case, bool useOld) 
+	 bool ignore_case) 
     : 
       protocol(PROTOCOL_UNKNOWN),
       host(),
@@ -90,7 +72,7 @@ URL::URL(const std::string &urlStr, std::size_t url_len,
       query(),
       icase(ignore_case) 
 {
-    parseURLStr(std::string(urlStr.c_str(), url_len), "", useOld);
+    parseURLStr(std::string(urlStr.c_str(), url_len), "");
 }
 
 /**
@@ -100,7 +82,7 @@ URL::URL(const std::string &urlStr, std::size_t url_len,
  */
 URL::URL(const std::string &urlStr,
 	 const std::string &pathInfo,
-	 bool ignore_case, bool useOld) 
+	 bool ignore_case) 
     : 
       protocol(PROTOCOL_UNKNOWN),
       host(),
@@ -112,7 +94,7 @@ URL::URL(const std::string &urlStr,
       query(),
       icase(ignore_case) 
 {
-    parseURLStr(urlStr, pathInfo, useOld);
+    parseURLStr(urlStr, pathInfo);
 }
 
 /**
@@ -121,7 +103,7 @@ URL::URL(const std::string &urlStr,
  * The exception will contain an message for the error.
  */
 URL::URL(const std::string &urlStr,
-	 bool ignore_case, bool useOld) 
+	 bool ignore_case) 
     : 
       protocol(PROTOCOL_UNKNOWN),
       host(),
@@ -133,7 +115,7 @@ URL::URL(const std::string &urlStr,
       query(),
       icase(ignore_case) 
 {
-    parseURLStr(urlStr, "", useOld);
+    parseURLStr(urlStr, "");
 }
 
 
@@ -146,243 +128,7 @@ URL::URL(const URL &srcURL):
 			    path_info(srcURL.path_info),
 			    qParams(srcURL.qParams),
 			    query(srcURL.query),
-			    icase(srcURL.icase){}
-
-void URL::parseURLStr(const std::string &urlString,
-		      const std::string &pathInfo,
-		      bool useOld)  
-{
-    if (useOld) {
-	parseURLStrOld(urlString, pathInfo);
-    }
-    else {
-	parseURLStrNew(urlString, pathInfo);
-    }
-}
-
-void URL::parseURLStrNew(const std::string &urlString,
-		         const std::string &pathInfo) 
-{
-    const char *func = "parseURLStrNew()";
-    const char *url = urlString.c_str();
-    const char *path_info_cstr = pathInfo.c_str();
-    char *colon_ptr = NULL;
-    size_t proto_len = 0;
-    char *host_ptr = NULL;
-    char *port_ptr = NULL;
-    char *uri_ptr = NULL;
-    char *query_ptr = NULL;
-    char *path_info_ptr = NULL;
-    char *end_uri = NULL;
-    char *uri_path = NULL;
-    char *next_uri_path = NULL;
-    int i = 0;
-
-    // check arguments
-    if (url == NULL || *url == '\0') {
-	throw InternalException(func, "URL is null or empty", 
-			        AM_INVALID_RESOURCE_FORMAT);
-    }
-
-    // 1. parse protocol 
-    
-    if ((colon_ptr = (char *)strchr(url, ':')) == NULL) { 
-	throw InternalException(func, "URL is missing expected ':'", 
-			        AM_INVALID_RESOURCE_FORMAT);
-    }
-    else if ((proto_len = colon_ptr - url) < MIN_PROTO_LEN || 
-	      proto_len > MAX_PROTO_LEN) {
-	throw InternalException(func, "Unrecognized URL protocol", 
-			        AM_INVALID_RESOURCE_FORMAT);
-    }
-    // note - if colon_ptr[1] is null, the 2nd compare below will not be done
-    // so we are not accessing memory out of bounds. Same with 3rd compare.
-    else if (colon_ptr[1] != '/' || colon_ptr[2] != '/' || 
-	     colon_ptr[3] == '\0') {
-	throw InternalException(func, 
-			        "Invalid URL Format - missing :// or "
-				"host name following ://", 
-			        AM_INVALID_RESOURCE_FORMAT);
-    }
-    // we know the protocol length is equal to one of the protocol lengths
-    // at this point.
-    for (i = 0; i < PROTOCOL_UNKNOWN; ++i) {
-	if (proto_len == protocolLen[i] &&
-	    !strncasecmp(url, protocolStr[i], protocolLen[i])) {
-	    // protocol found.
-	    protocol = (Protocol)i;
-	    break;
-	}
-    }
-    if (i == PROTOCOL_UNKNOWN) {
-	throw InternalException(func, "Unknown protocol", 
-			        AM_INVALID_RESOURCE_FORMAT);
-    }
-
-    // 2. parse host, port
-    
-    host_ptr = &colon_ptr[3];	// this cannot be the empty string b/c we 
-				// checked it above.
-    port_ptr = strchr(host_ptr, ':');
-    uri_ptr = strchr(host_ptr, '/');
-    query_ptr = strchr(host_ptr, '?');
-
-    // check that the special characters : / ? comes after the hostname, 
-    // and in that order if at all.
-    if (port_ptr == host_ptr || uri_ptr == host_ptr || query_ptr == host_ptr) {
-	throw InternalException(func, "Missing hostname in URL",
-			        AM_INVALID_RESOURCE_FORMAT);
-
-    }
-    if (port_ptr != NULL && 
-	    (uri_ptr != NULL && uri_ptr <= port_ptr) || 
-	    (query_ptr != NULL && query_ptr <= port_ptr)) {
-        port_ptr = NULL; //as there is no port mentioned in URL.
-
-    }
-    
-
-    // Now check that / and ? comes after the port, and that 
-    // ? comes after the uri.
-    if (port_ptr == NULL || port_ptr[1] == '\0' ||
-	port_ptr[1] == '/' || port_ptr[1] == '?') {
-	// set host
-	if (port_ptr != NULL) {
-	    host.append(host_ptr, port_ptr - host_ptr);
-	}
-	else if (uri_ptr != NULL) {
-	    host.append(host_ptr, uri_ptr - host_ptr);
-	} 
-	else if (query_ptr != NULL) {
-	    host.append(host_ptr, query_ptr - host_ptr);
-	}
-	else {
-	    host.append(host_ptr);
-	}
-	// set port
-	port = defaultPort[protocol];
-	portStr = defaultPortStr[protocol];
-    }
-    else {
-	// set host
-	host.append(host_ptr, port_ptr - host_ptr);
-	port_ptr = &port_ptr[1];
-	// set port
-	// check if port number is valid 
-	port = 0;
-	for (i = 0; port_ptr[i] != '\0' && 
-		    port_ptr[i] != '/' && port_ptr[i] != '?'; ++i) {
-	    if (port_ptr[i] != '*' && 
-		(port_ptr[i] < '0' || port_ptr[i] > '9')) {
-		break;
-	    } else {
-		if (port_ptr[i] == '*') {
-		    port = (port*10);   // port is actually never used as a 
-					// number, but keeping it for now.
-		} else {
-		    port = (port*10) + (port_ptr[i] - '0');
-		}
-	    }
-	}
-	if (port_ptr[i] != '/' && port_ptr[i] != '\0' && port_ptr[i] != '?') {
-	    throw InternalException(func, "Invalid port number", 
-				    AM_INVALID_RESOURCE_FORMAT);
-	}
-	portStr.append(port_ptr, i);
-    }
-
-    // 3. parse uri and path-info
-    
-    if (uri_ptr != NULL) {
-	if (path_info_cstr[0] != '\0') {
-
-            if (strcmp(path_info_cstr, "/") != 0) {
-                path_info_ptr = am_strrstr(uri_ptr, path_info_cstr);
-                if (!path_info_ptr) {
-                    try {
-                        std::string uri_dec = Http::decode(std::string(uri_ptr));
-                        am_web_log_debug("URL::parseURLStrNew(): pathinfo (%s) is not found in request uri (%s). "
-                                "Retrying with url-decoded request uri (%s)",
-                                path_info_cstr, uri_ptr, uri_dec.c_str());
-                        path_info_ptr = am_strrstr(uri_dec.c_str(), path_info_cstr);
-                    } catch (std::exception& exs) {
-                        path_info_ptr = NULL;
-                    } catch (...) {
-                        path_info_ptr = NULL;
-                    }
-                }
-            } else {
-                // As there can be several "/" in the uri, if path info
-                // equal "/" we need to point at the last one before the
-                // query.
-                for (size_t i=0 ; i<strlen(uri_ptr) ; i++) {
-                    if (uri_ptr[i] == '?') {
-                        break;
-                    }
-                    if (uri_ptr[i] == '/') {
-                        path_info_ptr = uri_ptr + i;
-                    }
-                }
-            }
-            if (path_info_ptr == NULL) {
-                throw InternalException(func, "Path Info not found in uri",
-                      AM_INVALID_RESOURCE_FORMAT);
-            } else {
-                end_uri = path_info_ptr;
-            }
-
-	}
-	else if (query_ptr != NULL) {
-	    end_uri = query_ptr;
-	}
-	else {
-	    end_uri = uri_ptr+strlen(uri_ptr);
-	}
-	// remove null paths in and set uri string.
-	uri.reserve(end_uri - uri_ptr);
-	uri_path = uri_ptr;
-	while (uri_path < end_uri) {
-	    uri.append("/");
-	    ++uri_path;
-	    // remove any consecutive '/' so uri_path will point to 
-	    // the first non '/' char or end of uri.
-	    while (uri_path < end_uri && *uri_path == '/') 
-		++uri_path;  
-	    if (uri_path >= end_uri) {
-		break;
-	    }
-	    else {
-		next_uri_path = uri_path;
-		// look for the next '/' 
-		while (next_uri_path < end_uri && *next_uri_path != '/')
-		    ++next_uri_path;
-		if (next_uri_path >= end_uri) {
-		    uri.append(uri_path, end_uri - uri_path);
-		    break;
-		}
-		else {
-		    uri.append(uri_path, next_uri_path - uri_path);
-		    uri_path = next_uri_path;
-		}
-	    }
-	}
-    }
-    else {
-	if (*path_info_cstr != '\0') {
-	    throw InternalException(func, "Path Info not found in uri",
-				    AM_INVALID_RESOURCE_FORMAT);
-	}
-    }
-    // 4. parse query
-    if (query_ptr != NULL && strlen(query_ptr) == 1) {
-        query = "?";
-    }
-    if (query_ptr != NULL && query_ptr[1] != '\0') {
-        query.reserve(strlen(query_ptr));
-        query.append(query_ptr);
-        checkQueryFormat();
-        splitQParams(&query_ptr[1]);
-    }
+			    icase(srcURL.icase){
 }
 
 /**
@@ -390,35 +136,33 @@ void URL::parseURLStrNew(const std::string &urlString,
  * of the URL, such as invalid protocol or port number.
  * The exception will contain an message for the error.
  */
-void URL::parseURLStrOld(const std::string &urlString,
-		         const std::string &pathInfo) 
-{
+void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo) {
     std::string urlStr(urlString);
     std::size_t startPos = 0, tmpPos = 0, endPos = 0;
     std::string func("URL::parseURLStr");
     Utils::trim(urlStr);
-    
-    if(urlStr.size() < MIN_URL_LEN) {
-	std::string msg("Invalid URL. URL Resource is smaller "
-			"than the least possible URL: ");
-	msg.append(MIN_URL);
-	throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+
+    if (urlStr.size() < MIN_URL_LEN) {
+        std::string msg("Invalid URL. URL Resource is smaller "
+                "than the least possible URL: ");
+        msg.append(MIN_URL);
+        throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
     }
 
     /* parse protocol */
     startPos = urlStr.find(":");
-    if(startPos == std::string::npos) {
-	std::string msg("Invalid protocol in URL :");
-	msg.append(urlStr);
-	throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+    if (startPos == std::string::npos) {
+        std::string msg("Invalid protocol in URL :");
+        msg.append(urlStr);
+        throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
     } else {
-	std::string proto = urlStr.substr(0, startPos);
-	protocol = whichProtocol(proto);
-	if(protocol == PROTOCOL_UNKNOWN) {
-	    std::string msg("Unsupported protocol in URL:");
-	    msg.append(urlStr);
-	    throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
-	}
+        std::string proto = urlStr.substr(0, startPos);
+        protocol = whichProtocol(proto);
+        if (protocol == PROTOCOL_UNKNOWN) {
+            std::string msg("Unsupported protocol in URL:");
+            msg.append(urlStr);
+            throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+        }
     }
 
     /* parse host */
@@ -427,17 +171,17 @@ void URL::parseURLStrOld(const std::string &urlString,
     startPos += 3;
     tmpPos = urlStr.find(":", startPos);
 
-    if(tmpPos == std::string::npos)
-	tmpPos = urlStr.find("/", startPos);
+    if (tmpPos == std::string::npos)
+        tmpPos = urlStr.find("/", startPos);
 
-    endPos = (tmpPos == std::string::npos)?tmpPos:tmpPos - startPos;
+    endPos = (tmpPos == std::string::npos) ? tmpPos : tmpPos - startPos;
 
     host = urlStr.substr(startPos, endPos);
     Utils::trim(host);
-    if(host.size() <= 0) {
-	std::string msg("Invalid Host name in URL:");
-	msg.append(urlStr);
-	throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+    if (host.size() <= 0) {
+        std::string msg("Invalid Host name in URL:");
+        msg.append(urlStr);
+        throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
     }
 
     /* parse port */
@@ -448,95 +192,106 @@ void URL::parseURLStrOld(const std::string &urlString,
     // ftp://ftp.sun.com:80/...
 
     // e.g. ftp://xyz.com
-    if(endPos == std::string::npos) {
-	port = defaultPort[protocol];
-	portStr = defaultPortStr[protocol];
+    if (endPos == std::string::npos) {
+        port = defaultPort[protocol];
+        portStr = defaultPortStr[protocol];
     } else {
-	startPos = tmpPos;
-	if(urlStr.at(tmpPos) == '/') {
-	    // e.g. http://xyz.com/blah
-	    port = defaultPort[protocol];
-	    portStr = defaultPortStr[protocol];
-	} else {
-	    // e.g. http://xyz.com:<port>/blah
-	    startPos = tmpPos + 1;
-	    tmpPos = urlStr.find("/", startPos);
-	    if(tmpPos == std::string::npos) {
-		endPos = tmpPos;
-	    } else {
-		endPos = tmpPos - startPos;
-	    }
+        startPos = tmpPos;
+        if (urlStr.at(tmpPos) == '/') {
+            // e.g. http://xyz.com/blah
+            port = defaultPort[protocol];
+            portStr = defaultPortStr[protocol];
+        } else {
+            // e.g. http://xyz.com:<port>/blah
+            startPos = tmpPos + 1;
+            tmpPos = urlStr.find("/", startPos);
+            if (tmpPos == std::string::npos) {
+                endPos = tmpPos;
+            } else {
+                endPos = tmpPos - startPos;
+            }
 
-	    portStr = urlStr.substr(startPos, endPos);
-	    Utils::trim(portStr);
-	    if(portStr.size() == 0) {
-		port = defaultPort[protocol];
-		portStr = defaultPortStr[protocol];
-	    } else {
-	        size_t indx = portStr.find('*');
-	  	if (indx < 0) {
-		    try {
-			port = Utils::getNumber(portStr);
-		    }
-		    catch (...) {
-			throw InternalException(func, "Invalid Port Number",
-					        AM_INVALID_ARGUMENT);
-		    }
-		    if (0 == port) {
+            portStr = urlStr.substr(startPos, endPos);
+            Utils::trim(portStr);
+            if (portStr.size() == 0) {
+                port = defaultPort[protocol];
+                portStr = defaultPortStr[protocol];
+            } else {
+                size_t indx = portStr.find('*');
+                if (indx < 0) {
+                    try {
+                        port = Utils::getNumber(portStr);
+                    } catch (...) {
+                        throw InternalException(func, "Invalid Port Number",
+                                AM_INVALID_ARGUMENT);
+                    }
+                    if (0 == port) {
                         port = defaultPort[protocol];
                     }
-		    if(!validatePort()) {
-		        std::string msg("Invalid port value specified in URL:");
-		        msg.append(urlStr);
-		        throw InternalException(func, msg,
-					    AM_INVALID_RESOURCE_FORMAT);
-		    }
-		} 
-	    }
-	}
+                    if (!validatePort()) {
+                        std::string msg("Invalid port value specified in URL:");
+                        msg.append(urlStr);
+                        throw InternalException(func, msg,
+                                AM_INVALID_RESOURCE_FORMAT);
+                    }
+                }
+            }
+        }
     }
     /* parse URI */
     // The options are:
     // http://xyz.sun.com[:port]
     // http://xyz.sun.com[:port]/uri
     // http://xyz.sun.com[:port]/uri[query params]
-    if(endPos != std::string::npos) {
-	// e.g. http://xyz.sun.com[:<port>]/<uri>[query params]
-	startPos = tmpPos;
-	tmpPos = urlStr.find("?", startPos);
-	if(tmpPos == std::string::npos) {
-	    endPos = tmpPos;
-	} else {
-	    endPos = tmpPos - startPos;
-	}
-	uri = urlStr.substr(startPos, endPos);
-	if(pathInfo.size() > 0) {
-	    std::size_t pPos = uri.rfind(pathInfo);
-	    // if path_info is indeed a substring of the URI,
-	    // then we do take path info into account.
-	    if(pPos != std::string::npos) {
-		uri.erase(pPos);
-		path_info = pathInfo;
-	    } else {
-		std::string msg("Path info passed was not "
-				"found to be a part of the URL: ");
-		msg.append(urlStr);
-		msg.append(" :Path-info: ");
-		msg.append(pathInfo);
-		throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
-	    }
-	}
+    if (endPos != std::string::npos) {
+        // e.g. http://xyz.sun.com[:<port>]/<uri>[query params]
+        startPos = tmpPos;
+        tmpPos = urlStr.find("?", startPos);
+        if (tmpPos == std::string::npos) {
+            endPos = tmpPos;
+        } else {
+            endPos = tmpPos - startPos;
+        }
+        uri = urlStr.substr(startPos, endPos);
+        if (pathInfo.size() > 0) {
+            std::string uriDec;
+            std::size_t pPos = uri.rfind(pathInfo);
+            try {
+                uriDec = Http::decode(uri);
+            } catch (...) {
+                uriDec.erase();
+            }
+            // if path_info is indeed a substring of the URI,
+            // then we do take path info into account.
+            if (pPos != std::string::npos) {
+                uri.erase(pPos);
+                path_info = pathInfo;
+            } else if ((pPos = uriDec.rfind(pathInfo)) != std::string::npos) {
+                uri.erase(pPos);
+                path_info = pathInfo;
+            } else {
+                std::string msg("Path info passed was not "
+                        "found to be a part of the URL: ");
+                msg.append(urlStr);
+                msg.append(" :Path-info: ");
+                msg.append(pathInfo);
+                throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+            }
+        }
     }
 
     /* parse queryParameters */
-    if(endPos != std::string::npos) {
-	startPos = tmpPos + 1;
-	query = urlStr.substr(startPos);
-        checkQueryFormat();
-	splitQParams(query);
+    if (endPos != std::string::npos && (tmpPos + 1) == urlStr.size()) {
+        /* keep trailing question mark */
+        query = "?";
     }
 
-    return;
+    if (endPos != std::string::npos && (tmpPos + 1) < urlStr.size()) {
+        startPos = tmpPos + 1;
+        query = urlStr.substr(startPos);
+        checkQueryFormat();
+        splitQParams(query);
+    }
 }
 
 void URL::getURLString(std::string& urlStr, size_t capacity) {
@@ -599,7 +354,6 @@ std::string URL::get_canonicalized_query_parameter_string() const
 {
     std::string retVal;
     if(qParams.size() > 0) {
-        retVal.append("?");
         KeyValueMap::const_iterator iter = qParams.begin();
         for(; iter != qParams.end(); ++iter) {
             const KeyValueMap::key_type &key = iter->first;
@@ -618,7 +372,7 @@ std::string URL::get_canonicalized_query_parameter_string() const
                 }
             }
         }
-    } else if (query == "?") {
+    } else if (query.size() == 1 && query == "?") {
         retVal.append("?");
     }
     return retVal;
