@@ -66,19 +66,6 @@ public class ObjConfBase implements
                     objFile, line1 +1, "PathCheck fn=validate_session_policy");
             }
 
-            // Service object to be added for POST data preservation
-            //FileUtils.appendDataToFile(objFile,
-            //    "<Object ppath=\"*/dummypost/sunpostpreserve*\">");
-            //FileUtils.appendDataToFile(objFile,
-            //    "Service type=text/* method=(GET|POST) fn=append_post_data");
-            //FileUtils.appendDataToFile(objFile,"</Object>");
-
-            //FileUtils.appendDataToFile(objFile,
-            //    "<Object ppath=\"*/UpdateAgentCacheServlet*\">");
-            //FileUtils.appendDataToFile(objFile,
-            //    "Service type=text/* method=(POST) fn=process_notification");
-            //FileUtils.appendDataToFile(objFile,"</Object>");
-
             status = true;
         } catch (Exception exc) {
             Debug.log("ObjConfBase.configureObjConf() - " +
@@ -102,25 +89,6 @@ public class ObjConfBase implements
 
             if (i != -1) {
                 FileUtils.removeLinesByNum(objFile, i, 1);
-
-                // Remove the lines from service object added for POST
-                // preservation
-                int j = FileUtils.getFirstOccurence(objFile,
-                    "<Object ppath=\"*/dummypost/sunpostpreserve*\">",
-                    true, false, false, 0);
-
-                if (j > 0) {
-                    FileUtils.removeLinesByNum(objFile, j, 3);
-                }
-
-                j = FileUtils.getFirstOccurence(objFile,
-                    "<Object ppath=\"*/UpdateAgentCacheServlet*\">",
-                    false, false, false, 0);
-
-                if (j > 0) {
-                    FileUtils.removeLinesByNum(objFile, j, 3);
-                }
-
                 status = true;
             }
         } catch (Exception exc) {
