@@ -6246,61 +6246,62 @@ am_web_get_cookie_value(const char *separator, const char *cookie_name, const ch
  */
 static am_status_t
 get_sso_token(am_web_request_params_t *req_params,
-              am_web_request_func_t *req_func,
-              char **sso_token, char **post_data,
-              am_web_req_method_t *orig_method,
-              char *post_page,
-              void* agent_config)
-{
+        am_web_request_func_t *req_func,
+        char **sso_token, char **post_data,
+        am_web_req_method_t *orig_method,
+        char *post_page,
+        void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
     const char *thisfunc = "get_sso_token()";
     am_status_t sts = AM_NOT_FOUND;
     am_web_req_method_t req_method = AM_WEB_REQUEST_UNKNOWN;
-
-    // Get the sso token from cookie header
-    sts = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),
-                            req_params->cookie_header_val, sso_token);
-    if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
-        am_web_log_error("%s: Error while getting sso token from "
-                         "cookie header: %s", thisfunc, 
-                         am_status_to_string(sts));
-    } else if (sts == AM_SUCCESS &&
-             (*sso_token == NULL || (*sso_token)[0] == '\0')) {
-        sts = AM_NOT_FOUND;
-    }
-    am_web_log_debug("%s: sso token %s, status - %s", thisfunc, *sso_token != NULL ? *sso_token : "", am_status_to_string(sts));
-
-    // If SSO token is not found and CDSSO mode is enabled
-    // check for the request method.
-    // If the method is POST, 
-    //     1) set the request method to GET 
-    //     2) try to get the SSO token from assertion
+    /* If CDSSO mode is enabled check for the request method.
+     * If the method is POST, 
+     *     1) set the request method to GET 
+     *     2) try to get the SSO token from assertion
+     * In case CDSSO mode is not enabled, look for the sso token in
+     * cookie header.
+     */
     if ((*agentConfigPtr)->cdsso_enable == AM_TRUE &&
-           ((req_method = req_params->method) == AM_WEB_REQUEST_POST &&
-           sts == AM_NOT_FOUND && (post_page != NULL ||
-           (am_web_is_url_enforced(req_params->url, req_params->path_info,
-                    req_params->client_ip, agent_config) == B_TRUE)))) {
+            ((req_method = req_params->method) == AM_WEB_REQUEST_POST &&
+            sts == AM_NOT_FOUND && (post_page != NULL ||
+            (am_web_is_url_enforced(req_params->url, req_params->path_info,
+            req_params->client_ip, agent_config) == B_TRUE)))) {
         req_method = AM_WEB_REQUEST_GET;
-        sts = process_cdsso(req_params, req_func, req_method, 
-                            sso_token, post_data, agent_config);
+        sts = process_cdsso(req_params, req_func, req_method,
+                sso_token, post_data, agent_config);
         if (sts == AM_SUCCESS &&
-             (*sso_token == NULL || (*sso_token)[0] == '\0')) {
+                (*sso_token == NULL || (*sso_token)[0] == '\0')) {
             sts = AM_NOT_FOUND;
         }
         if (sts == AM_NOT_FOUND) {
             am_web_log_debug("%s: SSO token not found in "
-                             "assertion. Redirecting to login page.",
-                             thisfunc);
+                    "assertion. Redirecting to login page.",
+                    thisfunc);
         } else if (sts == AM_SUCCESS) {
             am_web_log_debug("%s: SSO token found in assertion.",
-                                  thisfunc);
+                    thisfunc);
         } else {
             am_web_log_error("%s: Error while getting sso token from "
-                             "assertion: %s", thisfunc,
-                             am_status_to_string(sts));
+                    "assertion: %s", thisfunc,
+                    am_status_to_string(sts));
         }
     }
+    if (sts != AM_SUCCESS) {
+        /* Get the sso token from cookie header */
+        sts = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),
+                req_params->cookie_header_val, sso_token);
+        if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
+            am_web_log_error("%s: Error while getting sso token from "
+                    "cookie header: %s", thisfunc,
+                    am_status_to_string(sts));
+        } else if (sts == AM_SUCCESS &&
+                (*sso_token == NULL || (*sso_token)[0] == '\0')) {
+            sts = AM_NOT_FOUND;
+        }
+    }
+    am_web_log_debug("%s: sso token %s, status - %s", thisfunc, *sso_token != NULL ? *sso_token : "", am_status_to_string(sts));
     return sts;
 }
 
