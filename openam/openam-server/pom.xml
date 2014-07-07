@@ -37,27 +37,12 @@
     <name>OpenAM Server</name>
     <description>OpenAM Server Component</description>
     <artifactId>openam-server</artifactId>
-    <packaging>uberwar</packaging>
+    <packaging>war</packaging>
 
     <!-- Build -->
     <build>
         <finalName>OpenAM-${project.version}</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <descriptor>src/assemble/merge.xml</descriptor>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>

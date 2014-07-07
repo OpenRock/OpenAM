@@ -321,6 +321,7 @@
         <module>openam-ui-ria</module>
 
         <module>openam-server-only</module>
+        <module>openam-server-only-war</module>
 
         <!-- OpenAM Server -->
         <module>openam-server</module>
@@ -922,6 +923,12 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-server-only</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-server-only-war</artifactId>
                 <version>${project.version}</version>
                 <type>war</type>
             </dependency>

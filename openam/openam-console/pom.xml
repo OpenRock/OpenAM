@@ -47,12 +47,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>
-                        WEB-INF/lib/jersey-core-1.1.5.2.jar,
-                        WEB-INF/lib/jaxb-api-1.0.6.jar,
-                        WEB-INF/lib/jaxb-impl-1.0.6.jar,
-                        WEB-INF/lib/jaxb-libs-1.0.6.jar,
-                        WEB-INF/lib/jaxb-xjc-1.0.6.jar,
-                        WEB-INF/lib/jdom-2.0.1.jar,
+                        WEB-INF/lib/jersey-core-1.1.5.2.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
@@ -184,5 +179,28 @@
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
         </dependency>
+
+        <!-- JAXB/JAXP is provided -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 </project>

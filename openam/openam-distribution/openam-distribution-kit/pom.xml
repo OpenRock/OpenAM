@@ -137,7 +137,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-server-only</artifactId>
+            <artifactId>openam-server-only-war</artifactId>
             <type>war</type>
         </dependency>
         <dependency>

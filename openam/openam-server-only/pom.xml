@@ -41,7 +41,6 @@
 
     <!-- Build -->
     <build>
-        <finalName>OpenAM-ServerOnly-${project.version}</finalName>
         <plugins>
             <!-- Pre-Packaging step for WAR elements. -->
             <plugin>
@@ -153,12 +152,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>
-                        WEB-INF/lib/jersey-core-1.1.5.2.jar,
-                        WEB-INF/lib/jaxb-api-1.0.6.jar,
-                        WEB-INF/lib/jaxb-impl-1.0.6.jar,
-                        WEB-INF/lib/jaxb-libs-1.0.6.jar,
-                        WEB-INF/lib/jaxb-xjc-1.0.6.jar,
-                        WEB-INF/lib/jaxp-api-1.4.2.jar,
+                        WEB-INF/lib/jersey-core-1.1.5.2.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
@@ -692,6 +686,7 @@
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
         </dependency>
+
         <!-- XML -->
         <!-- Xerces-J Required for fedlet -->
         <dependency>
@@ -710,5 +705,27 @@
             <groupId>xerces-J</groupId>
             <artifactId>xml-serializer</artifactId>
         </dependency>
+        <!-- JAXB/JAXP is provided -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 </project>
