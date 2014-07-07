@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock, Inc.
+  !    
+-->
+<chapter xml:id='chap-issues'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
+
+ <para>OpenAM issues are tracked at <link
+ xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
+ >https://bugster.forgerock.org/jira/browse/OPENAM</link>. This chapter
+ covers the status of key issues and limitations at release
+ <?eval ${serverDocTargetVersion}?>.</para>
+
+ <!-- TODO: Note for the final release
+ <important>
+  <para>This release resolves a number of issues, including security issues in
+  OpenAM. It is strongly recommended that you update to this release to make
+  your deployment more secure, and to take advantage of important functional
+  fixes. ForgeRock customers can contact support for help and further
+  information.</para>
+ </important>
+ -->
+
+ <section xml:id="fixes">
+  <title>Key Fixes</title>
+
+  <para>The following bugs were fixed in release
+  <?eval ${serverDocTargetVersion}?>. For details, see the <link
+  xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+  >OpenAM issue tracker</link>.</para>
+
+  <para>TODO</para>
+ </section>
+
+ <section xml:id="limitations">
+  <title>Limitations</title>
+
+  <!-- For OPENAM-1886 TODO: Remove when this is fixed after 10.1.0-Xpress -->
+  <para>When session failover is configured to use external OpenDJ directory
+  servers, OpenAM must access those directory servers through an LDAP load
+  balancer that can fail over connections from OpenAM whenever a directory
+  server goes offline. Otherwise, sessions could continue to persist after
+  users logout of OpenAM.</para>
+
+  <para>Do not run different versions of OpenAM together in the same OpenAM
+  site.</para>
+
+  <para>
+   OpenAM allows you to delete a referral policy
+   even if policies depending on the referral still exist in the target realm.
+   Deleting a referral policy that other policies depend on
+   can cause problems during policy evaluation.
+   You must therefore make sure that no policies
+   depend on any referrals that you delete.
+  </para>
+
+  <para>When deploying OpenAM components on Microsoft Windows in an IPv6 environment,
+  you must use the Java 7 Development Kit on Windows (due to <link xlink:show="new"
+  xlink:href="http://bugs.sun.com/view_bug.do?bug_id=6230761">JDK-6230761</link>,
+  which is fixed only in Java 7).</para>
+
+  <para>The Database Repository type of data store is experimental and not
+  supported for production use.</para>
+
+  <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
+  <para>By default OpenAM does not enforce session quotas when running in Site
+  mode without session failover. To work around this behavior, set the server
+  configuration property
+  <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
+  You can set this property in OpenAM console under Configuration &gt; Servers
+  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+
+  <para>The XUI is experimental and not supported for production use. The only
+  language locale available for the XUI at this time is US English, in the
+  <filename>/path/to/openam/webapps/XUI/locales</filename> directory.</para>
+
+  <para>
+   On hosts with pure IPv6 networks, OpenAM configuration has been seen to fail
+   while starting the embedded OpenDJ directory server
+   (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3008"
+   >OPENAM-3008</link>).
+  </para>
+ </section>
+
+ <section xml:id="known-issues">
+  <title>Known Issues</title>
+
+  <para>The following important known issues remained open at the time
+  release <?eval ${serverDocTargetVersion}?> became available. For details and
+  information on other issues, see the <link xlink:show="new"
+  xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
+  tracker</link>.</para>
+
+  <para>TODO</para>
+ </section>
+</chapter>
