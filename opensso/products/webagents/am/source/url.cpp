@@ -30,7 +30,6 @@
  */
 
 #include <iterator>
-#include "am_web.h"
 #include "url.h"
 #include "internal_exception.h"
 #include "http.h"
@@ -138,7 +137,7 @@ URL::URL(const URL &srcURL):
  */
 void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo) {
     std::string urlStr(urlString);
-    std::size_t startPos = 0, tmpPos = 0, endPos = 0;
+    std::size_t startPos = 0, tmpPos = 0, endPos = 0, tmpPos1 = 0;
     std::string func("URL::parseURLStr");
     Utils::trim(urlStr);
 
@@ -166,17 +165,30 @@ void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo)
     }
 
     /* parse host */
-
-    // move position after //.
     startPos += 3;
-    tmpPos = urlStr.find(":", startPos);
-
-    if (tmpPos == std::string::npos)
-        tmpPos = urlStr.find("/", startPos);
-
-    endPos = (tmpPos == std::string::npos) ? tmpPos : tmpPos - startPos;
-
-    host = urlStr.substr(startPos, endPos);
+    tmpPos = urlStr.find("/", startPos);
+    if (tmpPos == std::string::npos) {
+        /* http://host.domain */
+        endPos = std::string::npos;
+    } else {
+        /* http://host.domain[:port]/ */
+        tmpPos1 = urlStr.rfind(":", tmpPos);
+        endPos = (tmpPos1 < startPos) ? std::string::npos : tmpPos1;
+    }
+    if (endPos == std::string::npos) {
+        /* http://host.domain */
+        /* http://host.domain/ */
+        host = urlStr.substr(startPos);
+        port = defaultPort[protocol];
+        portStr = defaultPortStr[protocol];
+    } else {
+        /* http://host.domain:port */
+        /* http://host.domain:port/ */
+        host = urlStr.substr(startPos, endPos - startPos);
+        portStr = urlStr.substr(tmpPos1 + 1, tmpPos - tmpPos1 - 1);
+        endPos = tmpPos1 + (tmpPos - tmpPos1);
+    }
+    
     Utils::trim(host);
     if (host.size() <= 0) {
         std::string msg("Invalid Host name in URL:");
@@ -185,66 +197,33 @@ void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo)
     }
 
     /* parse port */
-    // The options are
-    // ftp://xyz.sun.com
-    // ftp://fxy.blah.com:/
-    // ftp://ftp.sun.com:80
-    // ftp://ftp.sun.com:80/...
-
-    // e.g. ftp://xyz.com
-    if (endPos == std::string::npos) {
+    Utils::trim(portStr);
+    if (portStr.size() == 0) {
         port = defaultPort[protocol];
         portStr = defaultPortStr[protocol];
     } else {
-        startPos = tmpPos;
-        if (urlStr.at(tmpPos) == '/') {
-            // e.g. http://xyz.com/blah
-            port = defaultPort[protocol];
-            portStr = defaultPortStr[protocol];
-        } else {
-            // e.g. http://xyz.com:<port>/blah
-            startPos = tmpPos + 1;
-            tmpPos = urlStr.find("/", startPos);
-            if (tmpPos == std::string::npos) {
-                endPos = tmpPos;
-            } else {
-                endPos = tmpPos - startPos;
+        size_t indx = portStr.find("*");
+        if (indx == std::string::npos) {
+            try {
+                port = Utils::getNumber(portStr);
+            } catch (...) {
+                throw InternalException(func, "Invalid Port Number",
+                        AM_INVALID_ARGUMENT);
             }
-
-            portStr = urlStr.substr(startPos, endPos);
-            Utils::trim(portStr);
-            if (portStr.size() == 0) {
+            if (0 == port) {
                 port = defaultPort[protocol];
-                portStr = defaultPortStr[protocol];
-            } else {
-                size_t indx = portStr.find('*');
-                if (indx < 0) {
-                    try {
-                        port = Utils::getNumber(portStr);
-                    } catch (...) {
-                        throw InternalException(func, "Invalid Port Number",
-                                AM_INVALID_ARGUMENT);
-                    }
-                    if (0 == port) {
-                        port = defaultPort[protocol];
-                    }
-                    if (!validatePort()) {
-                        std::string msg("Invalid port value specified in URL:");
-                        msg.append(urlStr);
-                        throw InternalException(func, msg,
-                                AM_INVALID_RESOURCE_FORMAT);
-                    }
-                }
+            }
+            if (!validatePort()) {
+                std::string msg("Invalid port value specified in URL:");
+                msg.append(urlStr);
+                throw InternalException(func, msg,
+                        AM_INVALID_RESOURCE_FORMAT);
             }
         }
     }
+    
     /* parse URI */
-    // The options are:
-    // http://xyz.sun.com[:port]
-    // http://xyz.sun.com[:port]/uri
-    // http://xyz.sun.com[:port]/uri[query params]
     if (endPos != std::string::npos) {
-        // e.g. http://xyz.sun.com[:<port>]/<uri>[query params]
         startPos = tmpPos;
         tmpPos = urlStr.find("?", startPos);
         if (tmpPos == std::string::npos) {
