@@ -772,9 +772,11 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
     }
     // Check if magic URI is present in the URL
     if (status == AM_SUCCESS) {
+        status = AM_NOT_FOUND;
         post_data_query = strstr(requestURL, POST_PRESERVE_URI);
         if (post_data_query != NULL) {
             post_data_query += strlen(POST_PRESERVE_URI);
+            status = AM_SUCCESS;
             // Check if a query parameter for the  sticky session has been
             // added to the dummy URL. Remove it if it is the case.
             status_tmp = am_web_get_postdata_preserve_URL_parameter(&stickySessionValue, agent_config);
@@ -793,6 +795,7 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
     // If magic uri present search for corresponding value in hashtable
     if ((status == AM_SUCCESS) && (post_data_query != NULL) && (strlen(post_data_query) > 0)) {
         am_web_log_debug("%s: POST Magic Query Value: %s", thisfunc, post_data_query);
+        status = AM_NOT_FOUND;
         if (am_web_postcache_lookup(post_data_query, &get_data,
                 agent_config) == B_TRUE) {
             postdata_cache = get_data.value;
@@ -805,6 +808,8 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
             if (*page == NULL) {
                 am_web_log_error("%s: Not enough memory to allocate page");
                 status = AM_NO_MEMORY;
+            } else {
+                status = AM_SUCCESS;
             }
             am_web_postcache_data_cleanup(&get_data);
             if (buffer_page != NULL) {
@@ -814,7 +819,7 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
             am_web_log_error("%s: Found magic URI (%s) but entry is not in POST hash table", thisfunc, post_data_query);
             status = AM_FAILURE;
         }
-    }
+    } 
     if (temp_uri != NULL) {
         free(temp_uri);
     }

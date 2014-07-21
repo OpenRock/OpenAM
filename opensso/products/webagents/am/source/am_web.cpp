@@ -1881,7 +1881,7 @@ log_access(am_status_t access_status,
 	}
 	if (key != NULL) {
 	    memset(fmtStr, 0, sizeof(fmtStr));
-            strncpy(fmtStr, key, sizeof(fmtStr));
+            strncpy(fmtStr, key, sizeof(fmtStr) - 1);
             status = Log::auditLog((*agentConfigPtr)->auditLogDisposition,
                     (*agentConfigPtr)->localAuditLogFileRotate ? true : false,
                     (*agentConfigPtr)->localAuditLogFileSize,
@@ -4509,7 +4509,7 @@ split_post_data(const char * test_string)
             escapeQuotationMark(post_data->namevalue[i].value);
         }
         post_data->buffer = str;
-        am_web_log_max_debug("%s: post value = %s", thisfunc, post_data->buffer);
+        am_web_log_max_debug("%s: post value: %s", thisfunc, test_string != NULL ? test_string : "NULL");
     }
     return post_data;
 }
@@ -5373,12 +5373,12 @@ get_token_from_assertion(
 			     "postdata %s",
 			     thisfunc, am_status_to_string(sts),
 			     postdata == NULL ? "NULL": "empty");
-	    /*if (postdata != NULL) {
+	    if (postdata != NULL) {
 		if (free_post_data.func != NULL) {
 		    free_post_data.func(free_post_data.args, postdata);
 		}
 		postdata = NULL;
-	    }*/
+	    }
 	    sts = AM_NOT_FOUND;
 	}
 	else if ((sts = am_web_get_token_from_assertion(
@@ -5396,12 +5396,12 @@ get_token_from_assertion(
 	}
 	else {
 	    // all is ok - free post data.
-	    /*if (postdata != NULL) {
+	    if (postdata != NULL) {
 		if (free_post_data.func != NULL) {
 		    free_post_data.func(free_post_data.args, postdata);
 		}
 		postdata = NULL;
-	    }*/
+	    }
 	}
     }
     *post_data = postdata;    
@@ -5654,7 +5654,7 @@ set_cookie_in_domains(const char *sso_token,
 		cookieInfo.domain = (char *)((*iter).c_str());
 		setSts = set_cookie_in_request_and_response(
 			    &cookieInfo, req_params, req_func, true);
-		am_web_log_debug("%s: setting cookie %s in domain %s"
+		am_web_log_debug("%s: setting cookie %s in domain %s "
 				 "returned %s", thisfunc,
 				 (*agentConfigPtr)->cookie_name,
 				 cookieInfo.domain,
@@ -5690,7 +5690,7 @@ process_cdsso(
 
     // Check args
     if (req_params->url == NULL ||
-        sso_token == NULL || orig_method == NULL) {
+        sso_token == NULL || orig_method == AM_WEB_REQUEST_UNKNOWN) {
         am_web_log_error("%s: one or more input arguments is not valid.",
                          thisfunc);
         sts = AM_INVALID_ARGUMENT;
@@ -5704,7 +5704,7 @@ process_cdsso(
                                req_params->method,
                                req_func->get_post_data,
                                req_func->free_post_data,
-                               sso_token, post_data,
+                               sso_token, post_data, 
                                agent_config)) != AM_SUCCESS) {
         // Get sso token from assertion.
         am_web_log_error("%s: Error getting token from assertion: %s",
@@ -5729,7 +5729,7 @@ process_cdsso(
                      "returned error: %s.",
                      thisfunc, am_web_method_num_to_str(orig_method),
                      am_status_to_string(local_sts));
-        }
+        } 
     }
     return sts;
 }
@@ -6249,7 +6249,7 @@ get_sso_token(am_web_request_params_t *req_params,
         am_web_request_func_t *req_func,
         char **sso_token, char **post_data,
         am_web_req_method_t *orig_method,
-        char *post_page,
+        char *post_page, am_status_t *token_in_assertion,
         void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
             (AgentConfigurationRefCntPtr*) agent_config;
@@ -6263,44 +6263,58 @@ get_sso_token(am_web_request_params_t *req_params,
      * In case CDSSO mode is not enabled, look for the sso token in
      * cookie header.
      */
+    char *sso_token_ast = NULL;
+    char *sso_token_hdr = NULL;
+
+    *token_in_assertion = AM_NOT_FOUND;
+
+    /* Get the sso token from cookie header */
+    sts = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),
+            req_params->cookie_header_val, &sso_token_hdr);
+    if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
+        am_web_log_error("%s: Error while getting sso token from "
+                "cookie header: %s", thisfunc,
+                am_status_to_string(sts));
+    } else if (sts == AM_SUCCESS &&
+            (sso_token_hdr == NULL || (sso_token_hdr)[0] == '\0')) {
+        sts = AM_NOT_FOUND;
+    }
+
     if ((*agentConfigPtr)->cdsso_enable == AM_TRUE &&
             ((req_method = req_params->method) == AM_WEB_REQUEST_POST &&
-            sts == AM_NOT_FOUND && (post_page != NULL ||
+            sso_token_hdr == NULL &&
+            (post_page != NULL ||
             (am_web_is_url_enforced(req_params->url, req_params->path_info,
             req_params->client_ip, agent_config) == B_TRUE)))) {
         req_method = AM_WEB_REQUEST_GET;
         sts = process_cdsso(req_params, req_func, req_method,
-                sso_token, post_data, agent_config);
+                &sso_token_ast, post_data, agent_config);
         if (sts == AM_SUCCESS &&
-                (*sso_token == NULL || (*sso_token)[0] == '\0')) {
+                (sso_token_ast == NULL || (sso_token_ast)[0] == '\0')) {
             sts = AM_NOT_FOUND;
         }
         if (sts == AM_NOT_FOUND) {
-            am_web_log_debug("%s: SSO token not found in "
-                    "assertion. Redirecting to login page.",
+            am_web_log_debug("%s: SSO token not found in assertion.",
                     thisfunc);
         } else if (sts == AM_SUCCESS) {
             am_web_log_debug("%s: SSO token found in assertion.",
                     thisfunc);
+            *token_in_assertion = AM_SUCCESS;
         } else {
             am_web_log_error("%s: Error while getting sso token from "
                     "assertion: %s", thisfunc,
                     am_status_to_string(sts));
         }
     }
-    if (sts != AM_SUCCESS) {
-        /* Get the sso token from cookie header */
-        sts = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),
-                req_params->cookie_header_val, sso_token);
-        if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
-            am_web_log_error("%s: Error while getting sso token from "
-                    "cookie header: %s", thisfunc,
-                    am_status_to_string(sts));
-        } else if (sts == AM_SUCCESS &&
-                (*sso_token == NULL || (*sso_token)[0] == '\0')) {
-            sts = AM_NOT_FOUND;
-        }
+
+    if (*token_in_assertion == AM_SUCCESS) {
+        *sso_token = sso_token_ast;
+        if (sso_token_hdr != NULL) free(sso_token_hdr);
+    } else {
+        *sso_token = sso_token_hdr;
+        if (sso_token_ast != NULL) free(sso_token_ast);
     }
+
     am_web_log_debug("%s: sso token %s, status - %s", thisfunc, *sso_token != NULL ? *sso_token : "", am_status_to_string(sts));
     return sts;
 }
@@ -6354,7 +6368,6 @@ process_request(am_web_request_params_t *req_params,
     am_web_result_t result = AM_WEB_RESULT_OK;
     char *sso_token = NULL;
     am_web_req_method_t orig_method = AM_WEB_REQUEST_UNKNOWN;
-    am_status_t local_sts = AM_SUCCESS;
     am_map_t env_map = NULL;
     am_policy_result_t policy_result = AM_POLICY_RESULT_INITIALIZER;
     char *redirect_url = NULL;
@@ -6365,6 +6378,7 @@ process_request(am_web_request_params_t *req_params,
     void *args[1];
     int local_alloc = 0;
     boolean_t cdsso_enabled = am_web_is_cdsso_enabled(agent_config);
+    am_status_t token_in_assertion = AM_NOT_FOUND;
     // initialize reserved field to NULL
     req_params->reserved = NULL;
 
@@ -6374,13 +6388,14 @@ process_request(am_web_request_params_t *req_params,
     AgentConfigurationRefCntPtr* agentConfigPtr = (AgentConfigurationRefCntPtr*) agent_config;
     if (am_web_is_postpreserve_enabled(agent_config)
             && req_func->check_postdata.func != NULL) {
-        req_func->check_postdata.func(req_func->check_postdata.args, req_params->url, &post_data_cache, (*agentConfigPtr)->postcacheentry_life);
+       token_in_assertion =  req_func->check_postdata.func(req_func->check_postdata.args, req_params->url, 
+                &post_data_cache, (*agentConfigPtr)->postcacheentry_life);
     }
     // get sso token from either cookie header or assertion in cdsso mode.
     // OK if it's not found - am_web_is_access_allowed will check if
     // access is enforced.
     sts = get_sso_token(req_params, req_func, &sso_token, &post_data,
-                        &orig_method, post_data_cache, agent_config);
+                        &orig_method, post_data_cache, &token_in_assertion, agent_config);
     if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
         am_web_log_error("%s: Error while getting sso token from "
                          "cookie or cdsso assertion: %s",
@@ -6423,7 +6438,7 @@ process_request(am_web_request_params_t *req_params,
         switch(sts) {
             case AM_SUCCESS:
                 if (post_data_cache != NULL) {
-                    strcpy(data_buf, post_data_cache);
+                    strncpy(data_buf, post_data_cache, data_buf_size);
                     char *lbCookieHeader = NULL;
                     if (am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_TRUE, agent_config) != AM_NO_MEMORY) {
                         am_web_log_debug("%s: setting LB cookie for post data preservation (%s)", thisfunc, lbCookieHeader);
@@ -6434,18 +6449,12 @@ process_request(am_web_request_params_t *req_params,
                         lbCookieHeader = NULL;
                     }
                     result = AM_WEB_RESULT_OK_DONE;
-                } else if (post_data_cache == NULL && post_data != NULL && req_func->add_header_in_response.func != NULL) {
+                } else if (token_in_assertion == AM_SUCCESS && req_func->add_header_in_response.func != NULL) {
                     URL url(req_params->url);
                     bool override = overrideProtoHostPort(url, agent_config);
                     url.getURLString(request_url_str);
-                    if (strncmp(post_data, "LARES", 5) == 0
-                            && req_func->set_notes_in_request.func != NULL
-                            && (*agentConfigPtr)->cdsso_disable_redirect_on_post) {
-                        req_func->set_notes_in_request.func(req_func->set_notes_in_request.args, "CDSSO_REPOST_URL", (override ? request_url_str.c_str() : req_params->url));
-                    } else {
-                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", (override ? request_url_str.c_str() : req_params->url));
-                    }
-                    strcpy(data_buf, (override ? request_url_str.c_str() : req_params->url));
+                    req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", (override ? request_url_str.c_str() : req_params->url));
+                    strncpy(data_buf, (override ? request_url_str.c_str() : req_params->url), data_buf_size);
                     result = AM_WEB_RESULT_REDIRECT;
                 } else {
                     result = process_access_success(req_params->url,
@@ -6483,7 +6492,7 @@ process_request(am_web_request_params_t *req_params,
                     /*
                      * post data preservation is enabled - check if method is POST, register post data
                      * function exists, post data is available and proceed with creating appropriate redirection and storing
-                     * generated data in agent shared cache for later retrieval when cdsso servlet posts back
+                     * generated data in agent shared cache for later retrieval when server posts back
                      */
                     am_status_t pds = AM_SUCCESS;
                     post_urls_t *pu = NULL;
@@ -6493,25 +6502,15 @@ process_request(am_web_request_params_t *req_params,
                         if (pds == AM_NOT_FOUND) {
                             // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
                             post_data = strdup(AM_WEB_EMPTY_POST);
-                            local_alloc = 1;
-                            pds = AM_SUCCESS;
-                        }
-                        if (post_data == NULL) {
-                            am_web_log_warning("%s: this is a POST request with no post data. Redirecting as a GET request.", thisfunc);
-                            pds = AM_FAILURE;
-                        } else {
-                            am_web_log_debug("%s: post data: %s", thisfunc, post_data);
-                        }
-                    }
-                    /*do not store LARES post data in a shared cache*/
-                    if (post_data != NULL && strncmp(post_data, "LARES", 5) == 0) {
-                        if (post_data != NULL && local_alloc == 0) {
-                            if (req_func->free_post_data.func != NULL) {
-                                req_func->free_post_data.func(req_func->free_post_data.args, post_data);
+                            if (post_data == NULL) {
+                                pds = AM_NO_MEMORY;
+                                result = AM_WEB_RESULT_ERROR;
+                            } else {
+                                am_web_log_debug("%s: post data: %s", thisfunc, post_data);
+                                local_alloc = 1;
+                                pds = AM_SUCCESS;
                             }
-                            post_data = NULL;
                         }
-                        pds = AM_FAILURE;
                     }
                     if (pds == AM_SUCCESS) {
                         URL url(req_params->url);
@@ -6649,7 +6648,7 @@ process_request(am_web_request_params_t *req_params,
                 "for pointer [%s]", thisfunc, ptr);
                 result = AM_WEB_RESULT_ERROR;
             } else {
-                strcpy(data_buf, ptr);
+                strncpy(data_buf, ptr, data_buf_size);
             }
         }
         if (redirect_url != NULL) {
@@ -6684,19 +6683,13 @@ am_web_process_request(am_web_request_params_t *req_params,
                        am_status_t *render_sts, 
                        void* agent_config)
 {
-
-    AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
-
-
     const char *thisfunc = "am_web_process_request()";
     am_status_t sts = AM_SUCCESS;
     am_web_result_t result = AM_WEB_RESULT_ERROR;
     // size of render_data_buf should be at least the length of
     // NOTIFICATION_OK string, and long enough to hold a redirect url.
-    char data_buf[2048];
-
-    memset(data_buf, 0, sizeof(data_buf));
+    char data_buf[4096];
+    memset(&data_buf[0], 0, sizeof(data_buf));
 
     // Check arguments
     if (req_params == NULL || req_func == NULL || render_sts == NULL) {
@@ -6747,7 +6740,7 @@ am_web_process_request(am_web_request_params_t *req_params,
 				 thisfunc, req_params->url);
 		// checked that size of data_buf is big enough for
 		// the NOTIFICATION_OK message.
-		strcpy(data_buf, NOTIFICATION_OK);
+		strncpy(data_buf, NOTIFICATION_OK, sizeof(data_buf) - 1);
 		result = AM_WEB_RESULT_OK_DONE;
 	    } else {
 		am_web_log_error("%s: process notification url [%s] "
@@ -6761,7 +6754,7 @@ am_web_process_request(am_web_request_params_t *req_params,
     // Now process access check.
     else {
 	result = process_request(req_params, req_func,
-				 data_buf, sizeof(data_buf), agent_config);
+                data_buf, sizeof (data_buf) - 1, agent_config);
     }
 
     // render web result

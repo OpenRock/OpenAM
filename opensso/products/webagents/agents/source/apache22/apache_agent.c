@@ -1204,9 +1204,11 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
     }
     // Check if magic URI is present in the URL
     if (status == AM_SUCCESS) {
+        status = AM_NOT_FOUND;
         post_data_query = strstr(requestURL, POST_PRESERVE_URI);
         if (post_data_query != NULL) {
             post_data_query += strlen(POST_PRESERVE_URI);
+            status = AM_SUCCESS;
             // Check if a query parameter for the  sticky session has been
             // added to the dummy URL. Remove it if it is the case.
             status_tmp = am_web_get_postdata_preserve_URL_parameter
@@ -1231,6 +1233,7 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
 #ifdef DEBUG
         pdp_dump(r->server);
 #endif
+        status = AM_NOT_FOUND;
         if ((status = find_post_data((char*) post_data_query, &get_data, postcacheentry_life, r->server)) == AM_SUCCESS) {
             postdata_cache = get_data.value;
             actionurl = get_data.url;
@@ -1243,6 +1246,8 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
             if (*page == NULL) {
                 am_web_log_error("%s: Not enough memory to allocate page");
                 status = AM_NO_MEMORY;
+            } else {
+                status = AM_SUCCESS;
             }
             am_web_postcache_data_cleanup(&get_data);
             if (buffer_page != NULL) {
