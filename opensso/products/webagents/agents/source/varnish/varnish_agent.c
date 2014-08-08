@@ -423,17 +423,10 @@ void vmod_done(struct sess *sp, struct vmod_priv *priv) {
             send_notfound(r, DONE);
         }
 
-        status = r->status;
-        if (status < 100 || status > 999) {
-            status = 503;
-        }
-
         VTAILQ_FOREACH_SAFE(v, &r->headers->vars, list, v1) {
             if (v != NULL && v->type == DONE) {
                 struct http *hp = get_sess_http(sp, v->where);
                 assert(hp != NULL);
-                http_PutStatus(hp, status);
-                http_PutResponse(sp->wrk, sp->fd, hp, http_StatusMessage(status));
                 if (v->value != NULL) {
                     LOG_E("vmod_done [%s]", v->value);
                     http_SetHeader(sp->wrk, sp->fd, hp, v->value);
@@ -459,6 +452,10 @@ void vmod_ok(struct sess *sp, struct vmod_priv *priv) {
         status = r->status;
         if (status < 100 || status > 999) {
             status = 503;
+        }
+        if (status == 200 && sp->wrk->resp->status != 200
+                && sp->wrk->resp->status != 800 && sp->wrk->resp->status != 801) {
+            status = sp->wrk->resp->status;
         }
 
         LOG_E("vmod_ok() %u (%d)", sp->xid, status);
@@ -819,7 +816,7 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
             am_web_log_error("%s: Found magic URI (%s) but entry is not in POST hash table", thisfunc, post_data_query);
             status = AM_FAILURE;
         }
-    } 
+    }
     if (temp_uri != NULL) {
         free(temp_uri);
     }
