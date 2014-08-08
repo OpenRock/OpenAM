@@ -24,10 +24,7 @@
  *
  * $Id: AmAgentBaseFilter.java,v 1.6 2009/03/26 18:29:23 ww203982 Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.agents.filter;
 
@@ -153,16 +150,9 @@ public abstract class AmAgentBaseFilter implements Filter
     }
 
     public void destroy() {
-
         // Let any registered components of the ShutdownManager know to shutdown.
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                shutdownMan.shutdown();
-            } finally {
-                shutdownMan.releaseLockAndNotify();
-            }
-        }
+        shutdownMan.shutdown();
     }
     
     public void setFilterConfig(FilterConfig config) {
