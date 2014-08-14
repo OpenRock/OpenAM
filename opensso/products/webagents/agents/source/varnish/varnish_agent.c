@@ -171,11 +171,12 @@ request_data_t *get_request_data(struct sess *sp) {
 
         rl = (request_list_t *) malloc(sizeof (request_list_t));
         assert(rl != NULL);
+        pthread_setspecific(thread_key, rl);
 
         rl->magic = VMOD_AM_R_MAGIC;
         VTAILQ_INIT(&rl->vars);
 
-        rld = (struct request *) WS_Alloc(sp->ws, sizeof (struct request));
+        rld = (struct request *) malloc(sizeof (struct request));
         assert(rld != NULL);
 
         rld->xid = sp->xid;
@@ -196,11 +197,8 @@ request_data_t *get_request_data(struct sess *sp) {
 
         rld->value = r;
         VTAILQ_INSERT_TAIL(&rl->vars, rld, list);
-
-        pthread_setspecific(thread_key, rl);
-
     } else {
-        struct request *v, *rld;
+        struct request *v = NULL, *rld = NULL, *v_tmp = NULL;
 
         LOG_E("get_request_data() ***FETCH*** key %u (%p)", sp->xid, THREAD_ID);
 
@@ -209,7 +207,7 @@ request_data_t *get_request_data(struct sess *sp) {
             return NULL;
         }
 
-        VTAILQ_FOREACH(v, &rl->vars, list) {
+        VTAILQ_FOREACH_SAFE(v, &rl->vars, list, v_tmp) {
             if (v != NULL && sp != NULL && v->xid == sp->xid) {
                 LOG_E("get_request_data() ***FOUND*** key %u (%p)", sp->xid, THREAD_ID);
                 return (request_data_t *) v->value;
@@ -218,7 +216,7 @@ request_data_t *get_request_data(struct sess *sp) {
 
         LOG_E("get_request_data() ***UPDATE*** key %u (%p)", sp->xid, THREAD_ID);
 
-        rld = (struct request *) WS_Alloc(sp->ws, sizeof (struct request));
+        rld = (struct request *) malloc(sizeof (struct request));
         assert(rld != NULL);
 
         rld->xid = sp->xid;
@@ -398,6 +396,7 @@ void vmod_request_cleanup(struct sess *sp, struct vmod_priv *priv) {
         if (vr != NULL && vr->xid == sp->xid) {
             LOG_E("vmod_request_cleanup() ***REMOVING*** key %u (%p)", sp->xid, THREAD_ID);
             VTAILQ_REMOVE(&rl->vars, vr, list);
+            free(vr);
             break;
         }
     }
