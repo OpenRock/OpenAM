@@ -30,6 +30,8 @@
  */
 
 #include <iterator>
+#include <algorithm>
+#include <stdlib.h>
 #include "url.h"
 #include "internal_exception.h"
 #include "http.h"
@@ -137,8 +139,8 @@ URL::URL(const URL &srcURL):
  */
 void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo) {
     std::string urlStr(urlString);
-    std::size_t startPos = 0, tmpPos = 0, endPos = 0, tmpPos1 = 0;
     std::string func("URL::parseURLStr");
+    typedef std::string::const_iterator iterator_t;
     Utils::trim(urlStr);
 
     if (urlStr.size() < MIN_URL_LEN) {
@@ -148,90 +150,59 @@ void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo)
         throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
     }
 
-    /* parse protocol */
-    startPos = urlStr.find(":");
-    if (startPos == std::string::npos) {
-        std::string msg("Invalid protocol in URL :");
-        msg.append(urlStr);
-        throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
-    } else {
-        std::string proto = urlStr.substr(0, startPos);
-        protocol = whichProtocol(proto);
-        if (protocol == PROTOCOL_UNKNOWN) {
-            std::string msg("Unsupported protocol in URL:");
-            msg.append(urlStr);
-            throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+    iterator_t uriStart = urlStr.begin();
+    iterator_t uriEnd = urlStr.end();
+    /* query start */
+    iterator_t queryStart = std::find(uriStart, uriEnd, '?');
+    /* protocol */
+    iterator_t protocolStart = urlStr.begin();
+    iterator_t protocolEnd = std::find(protocolStart, uriEnd, ':');
+    if (protocolEnd != uriEnd) {
+        std::string prot = &*(protocolEnd);
+        if ((prot.length() > 3) && (prot.substr(0, 3) == "://")) {
+            protocol = whichProtocol(std::string(protocolStart, protocolEnd));
+            protocolEnd += 3;
+        } else {
+            protocolEnd = urlStr.begin();
         }
+    } else {
+        protocolEnd = urlStr.begin();
     }
 
-    /* parse host */
-    startPos += 3;
-    tmpPos = urlStr.find("/", startPos);
-    if (tmpPos == std::string::npos) {
-        /* http://host.domain */
-        endPos = std::string::npos;
-    } else {
-        /* http://host.domain[:port]/ */
-        tmpPos1 = urlStr.rfind(":", tmpPos);
-        endPos = (tmpPos1 < startPos) ? std::string::npos : tmpPos1;
+    if (protocol == PROTOCOL_UNKNOWN) {
+        std::string msg("Unsupported protocol in URL: ");
+        msg.append(urlStr);
+        throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
     }
-    if (endPos == std::string::npos) {
-        /* http://host.domain */
-        /* http://host.domain/ */
-        host = urlStr.substr(startPos);
-        port = defaultPort[protocol];
-        portStr = defaultPortStr[protocol];
-    } else {
-        /* http://host.domain:port */
-        /* http://host.domain:port/ */
-        host = urlStr.substr(startPos, endPos - startPos);
-        portStr = urlStr.substr(tmpPos1 + 1, tmpPos - tmpPos1 - 1);
-        endPos = tmpPos1 + (tmpPos - tmpPos1);
-    }
-    
+
+    /* host */
+    iterator_t hostStart = protocolEnd;
+    iterator_t pathStart = std::find(hostStart, uriEnd, '/'); /* path start */
+    iterator_t hostEnd = std::find(protocolEnd,
+            (pathStart != uriEnd) ? pathStart : queryStart,
+            ':'); /* check for port */
+    host = std::string(hostStart, hostEnd);
     Utils::trim(host);
     if (host.size() <= 0) {
-        std::string msg("Invalid Host name in URL:");
+        std::string msg("Invalid Host name in URL: ");
         msg.append(urlStr);
         throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
     }
 
     /* parse port */
-    Utils::trim(portStr);
-    if (portStr.size() == 0) {
-        port = defaultPort[protocol];
-        portStr = defaultPortStr[protocol];
+    if ((hostEnd != uriEnd) && ((&*(hostEnd))[0] == ':')) {
+        hostEnd++;
+        iterator_t portEnd = (pathStart != uriEnd) ? pathStart : queryStart;
+        portStr = std::string(hostEnd, portEnd);
+        port = strtol(portStr.c_str(), NULL, 10);
     } else {
-        size_t indx = portStr.find("*");
-        if (indx == std::string::npos) {
-            try {
-                port = Utils::getNumber(portStr);
-            } catch (...) {
-                throw InternalException(func, "Invalid Port Number",
-                        AM_INVALID_ARGUMENT);
-            }
-            if (0 == port) {
-                port = defaultPort[protocol];
-            }
-            if (!validatePort()) {
-                std::string msg("Invalid port value specified in URL:");
-                msg.append(urlStr);
-                throw InternalException(func, msg,
-                        AM_INVALID_RESOURCE_FORMAT);
-            }
-        }
+        portStr = defaultPortStr[protocol];
+        port = defaultPort[protocol];
     }
-    
-    /* parse URI */
-    if (endPos != std::string::npos) {
-        startPos = tmpPos;
-        tmpPos = urlStr.find("?", startPos);
-        if (tmpPos == std::string::npos) {
-            endPos = tmpPos;
-        } else {
-            endPos = tmpPos - startPos;
-        }
-        uri = urlStr.substr(startPos, endPos);
+
+    /* parse uri */
+    if (pathStart != uriEnd) {
+        uri = std::string(pathStart, queryStart);
         if (pathInfo.size() > 0) {
             std::string uriDec;
             std::size_t pPos = uri.rfind(pathInfo);
@@ -260,14 +231,13 @@ void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo)
     }
 
     /* parse queryParameters */
-    if (endPos != std::string::npos && (tmpPos + 1) == urlStr.size()) {
+    if (queryStart != uriEnd && (queryStart + 1) == uriEnd) {
         /* keep trailing question mark */
         query = "?";
     }
 
-    if (endPos != std::string::npos && (tmpPos + 1) < urlStr.size()) {
-        startPos = tmpPos + 1;
-        query = urlStr.substr(startPos);
+    if (queryStart != uriEnd && (queryStart + 1) != uriEnd) {
+        query = std::string(queryStart, uriEnd);
         checkQueryFormat();
         splitQParams(query);
     }
@@ -375,20 +345,28 @@ void URL::splitQParams(const std::string &qparam)
 }
 
 void URL::removeQueryParameter(const std::string &key) {
-    KeyValueMap::iterator iter = qParams.find(key);
-    size_t startPos = 0; size_t endPos = 0;
-    
+    size_t startPos = 0, endPos = 0;
+
     // Remove parameter from KeyValueMap
-    qParams.erase(iter);
-    
+    if (qParams.size() > 0) {
+        KeyValueMap::iterator iter = qParams.begin();
+        for (; iter != qParams.end(); ++iter) {
+            const KeyValueMap::key_type &k = iter->first;
+            if (key == k) {
+                qParams.erase(iter);
+                break;
+            }
+        }
+    }
+
     // Remove parameter from the query string
-    startPos=query.find(key);
+    startPos = query.find(key);
     if (startPos != std::string::npos) {
-        endPos=query.find("&");
+        endPos = query.find("&");
         if (endPos == std::string::npos) {
             endPos = query.size();
         }
-        query.erase (startPos, endPos);
+        query.erase(startPos, endPos);
         if (query.compare("?") == 0) {
             query.clear();
         }
