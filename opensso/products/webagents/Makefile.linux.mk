@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+# Copyright (c) 2013-2014 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -77,10 +77,6 @@ varnish302i: varnish_agent_302.o vcc_if_302.o
 oiwsi: $(OIWSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libames6.so $(LDFLAGS) $(OIWSOBJS) -o agents/source/sjsws/libames6.so am/source/libamsdk.a $(EXT_LIBS)
-
-oipsi: $(OPSOBJS)
-	@echo "[*** Creating "$@" shared library ***]"
-	${CXX} -shared -Wl,-export-dynamic -fPIC -Wl,-soname,libampxy4.so $(LDFLAGS) $(OPSOBJS) -o agents/source/sjsws/libampxy4.so am/source/libamsdk.a $(EXT_LIBS)
 
 dominoi: $(DOMINOOBJS)
 	@echo "[*** Creating "$@" shared library ***]"

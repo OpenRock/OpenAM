@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+# Copyright (c) 2013-2014 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -81,10 +81,6 @@ varnishi: $(VRNSHOBJS)
 oiwsi: $(OIWSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} $(CFLAGS) -h libames6.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(OIWSOBJS) -o agents/source/sjsws/libames6.so -M agents/source/sjsws/iws_agent.mapfile am/source/libamsdk.a $(EXT_LIBS)
-
-oipsi: $(OPSOBJS)
-	@echo "[*** Creating "$@" shared library ***]"
-	${CXX} $(CFLAGS) -h libampxy4.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(OPSOBJS) -o agents/source/proxy40/libampxy4.so -M agents/source/proxy40/libampxy4.mapfile am/source/libamsdk.a $(EXT_LIBS)
 
 ifneq ($(OS_MARCH), i86pc)
 dominoi: $(DOMINOOBJS)

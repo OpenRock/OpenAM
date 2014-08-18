@@ -41,8 +41,6 @@ Portions Copyrighted 2010-2014 ForgeRock AS
               location="${webagents.basedir}/agents/source/apache"/>
     <property name="webagents.sjsws.src.dir" 
               location="${webagents.basedir}/agents/source/sjsws"/>
-    <property name="webagents.proxy40.src.dir"
-              location="${webagents.basedir}/agents/source/proxy40"/>
     <property name="webagents.apache22.src.dir" 
               location="${webagents.basedir}/agents/source/apache22"/>
     <property name="webagents.apache24.src.dir" 

@@ -7,7 +7,6 @@ The following web agents have been developed as part of the OpenAM project's
 
 - Sun Java System Web Server 7.0 agent
 - Apache Web Server 2.0.x
-- Sun Java System Proxy Server 4.0.x
 - Apache Web Server 2.2.x
 - Apache Web Server 2.4.x
 - Varnish Cache Server 3.0.x

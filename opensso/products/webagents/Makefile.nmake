@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2010-2013 ForgeRock Inc. All Rights Reserved
+# Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -50,7 +50,6 @@ AM_IIS7_SRC = agents\source\iis7\agent_main.cpp agents\source\iis7\agent_module.
 AM_APA_SRC = agents\source\apache\apache_agent.c
 AM_APA22_SRC = agents\source\apache22\apache_agent.c
 AM_APA24_SRC = agents\source\apache24\apache_agent.c
-AM_PROXY4_SRC = agents\source\proxy40\web_agent.c
 AM_SJSWS_SRC = agents\source\sjsws\iws_agent.c
 AM_DOMINO_SRC = agents\source\domino\domino_agent.c
 
@@ -196,20 +195,6 @@ apache24i : apache24.obj
 
 #
 # Apache 2 and 2.2 Agent end
-#
-
-#
-# Proxy40 Agent begin
-#
-proxy40.obj : $(AM_PROXY4_SRC)
-	$(CC) $(CFLAGS) $(DEP_INCPATH) /DXP_WIN32 /DWINNT /Iagents\source\proxy40 /Foagents\source\proxy40\ $(AM_PROXY4_SRC)
-
-proxy40i	: proxy40.obj 
-	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /DEF:"agents\source\proxy40\proxy4agent.def" \
-		/PDB:"agents\source\proxy40\ampxy4.pdb" \
-		/DLL /OUT:agents\source\proxy40\ampxy4.dll agents\source\proxy40\web_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) ns-httpd40.lib
-#
-# Proxy40 Agent end
 #
 
 #
