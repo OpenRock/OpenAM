@@ -202,7 +202,18 @@ void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo)
 
     /* parse uri */
     if (pathStart != uriEnd) {
-        uri = std::string(pathStart, queryStart);
+        std::string uriTmp = std::string(pathStart, queryStart);
+        const char *u = uriTmp.c_str();
+        char last = 0;
+        uri.reserve(uriTmp.size());
+        while (*u != '\0') {
+            // replace all consecutive '/' with a single '/'
+            if (*u != '/' || (*u == '/' && last != '/')) {
+                uri.push_back(*u);
+            }
+            last = *u;
+            u++;
+        }
         if (pathInfo.size() > 0) {
             std::string uriDec;
             std::size_t pPos = uri.rfind(pathInfo);
@@ -303,6 +314,7 @@ std::string URL::get_canonicalized_query_parameter_string() const
 {
     std::string retVal;
     if(qParams.size() > 0) {
+        retVal.append("?");
         KeyValueMap::const_iterator iter = qParams.begin();
         for(; iter != qParams.end(); ++iter) {
             const KeyValueMap::key_type &key = iter->first;
@@ -328,19 +340,17 @@ std::string URL::get_canonicalized_query_parameter_string() const
 }
  
 
-
 /**
  * Throws InternalException if the query parameter has an invalid format.
  */
-void URL::splitQParams(const std::string &qparam) 
-{
+void URL::splitQParams(const std::string &qparam) {
     try {
-	qParams.parseKeyValuePairString(qparam, '&', '=', icase);
-    }
-    catch (...) {
-	throw InternalException("URL::splitQParams", 
-			        "Invalid key value pair",
-				AM_INVALID_ARGUMENT);
+        qParams.parseKeyValuePairString(qparam[0] != '?' ? qparam : qparam.substr(1),
+                '&', '=', true, icase);
+    } catch (...) {
+        throw InternalException("URL::splitQParams",
+                "Invalid key value pair",
+                AM_INVALID_ARGUMENT);
     }
 }
 
