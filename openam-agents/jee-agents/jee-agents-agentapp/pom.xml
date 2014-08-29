@@ -32,6 +32,13 @@
     <artifactId>jee-agents-agentapp</artifactId>
     <packaging>war</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-sdk</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
     <build>
       <plugins>
         <plugin>
