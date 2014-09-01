@@ -24,9 +24,7 @@
  *
  * $Id: AgentAppBase.java,v 1.1 2008/12/11 15:01:54 naghaon Exp $
  *
- */
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 package com.sun.identity.agents.tools.jboss;
 
@@ -38,7 +36,7 @@ import java.io.File;
 import static org.forgerock.agents.tools.jboss.CommonConstants.*;
 
 /**
- * Deploys/undelpoy agenntapp.war to JBoss server instance's deploy directory.
+ * Deploy/un-deploy agentapp.war to JBoss server instance's deploy directory.
  */
 public class AgentAppBase {
 
@@ -48,12 +46,13 @@ public class AgentAppBase {
         String destDir = (String) stateAccess.get(STR_KEY_JB_INST_DEPLOY_DIR);
 
         try {
-            FileUtils.copyJarFile(srcDir, destDir, STR_AGENT_APP_WAR_FILE);
+            FileUtils.copyFile(srcDir + File.separator + STR_AGENT_APP_WAR_FILE,
+                    destDir + File.separator + STR_AGENT_APP_WAR_FILE);
             Debug.log("ConfigureAgentAppTask.copyAgentAppWarFile() - copy " + STR_AGENT_APP_WAR_FILE
                     + " from " + srcDir + " to " + destDir);
             status = true;
         } catch (Exception e) {
-            Debug.log("ConfigureAgentAppTask.copyAgentAppWarFile() - Error occured while copying "
+            Debug.log("ConfigureAgentAppTask.copyAgentAppWarFile() - Error occurred while copying "
                     + STR_AGENT_APP_WAR_FILE + " from " + srcDir + " to " + destDir, e);
         }
         return status;
