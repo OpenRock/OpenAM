@@ -24,6 +24,7 @@
  *
  * $Id: LocalAuthTaskHandler.java,v 1.3 2008/06/25 05:51:47 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.agents.filter;
@@ -50,7 +51,7 @@ public class LocalAuthTaskHandler extends AmFilterTaskHandler
 implements ILocalAuthTaskHandler {
 
     /**
-     * The constructor that takes a <code>Manager</code> intance in order
+     * The constructor that takes a <code>Manager</code> instance in order
      * to gain access to the infrastructure services such as configuration
      * and log access.
      *
@@ -242,7 +243,7 @@ implements ILocalAuthTaskHandler {
             HttpServletRequest request, HttpServletResponse response,
             SSOValidationResult ssoValidationResult) {
 
-        if(isLogMessageEnabled()) {
+        if (isLogMessageEnabled()) {
             logMessage(
                 "LocalAuthTaskHandler: doing local authentication with " 
                 + "session binding");
@@ -255,7 +256,7 @@ implements ILocalAuthTaskHandler {
         try {
             password = ssoValidationResult.getTransportString();
         } catch(Exception ex) {
-            if(isLogMessageEnabled()) {
+            if (isLogMessageEnabled()) {
                 logMessage(
                     "LocalAuthTaskHandler: Exception caught while doing local " 
                     + "authentication",
@@ -265,23 +266,28 @@ implements ILocalAuthTaskHandler {
 
         boolean authResult = false;
 
-        if(password != null) {
+        if (password != null) {
             authResult = authHandler.authenticate(userName, password,
                                                   request, response, null);
         }
 
-        if( !authResult) {
-            if(isLogMessageEnabled()) {
+        if (!authResult) {
+            if (isLogMessageEnabled()) {
                 logMessage(
                     "LocalAuthTaskHandler: Local authentication failed, " 
                     + "invalidating session.");
             }
 
-            session.invalidate();
+            // The authHandler implementation may have already invalidated the session so don't fail here is it has.
+            try {
+                session.invalidate();
+            } catch (IllegalStateException e) {
+                logMessage("LocalAuthTaskHandler: Session was already invalidated.");
+            }
         } else {
             if(isLogMessageEnabled()) {
                 logMessage(
-                    "LocalAuthTaskHandler: Local authenticatio successful for "
+                    "LocalAuthTaskHandler: Local authentication successful for "
                     + userName + ", session is valid.");
             }
         }
@@ -294,7 +300,7 @@ implements ILocalAuthTaskHandler {
             HttpServletRequest request, HttpServletResponse response,
             SSOValidationResult ssoValidationResult) {
 
-        if(isLogMessageEnabled()) {
+        if (isLogMessageEnabled()) {
             logMessage(
                 "LocalAuthTaskHandler: doing local authentication without " 
                 + "session binding");
@@ -303,7 +309,7 @@ implements ILocalAuthTaskHandler {
         HttpSession session         = request.getSession(false);
         boolean     existingSession = (session != null);
 
-        if( !existingSession) {
+        if (!existingSession) {
             if(isLogMessageEnabled()) {
                 logMessage(
                     "LocalAuthTaskHandler: session does not exist, will be " 
@@ -329,23 +335,28 @@ implements ILocalAuthTaskHandler {
 
         boolean authResult = false;
 
-        if(password != null) {
+        if (password != null) {
             authResult = authHandler.authenticate(userName, password,
                                                   request, response, null);
         }
 
-        if( !existingSession) {
-            if(isLogMessageEnabled()) {
+        if (!existingSession) {
+            if (isLogMessageEnabled()) {
                 logMessage(
                     "LocalAuthTaskHandler: invalidating session after " 
                     + "authentication");
             }
 
-            session.invalidate();
+            // The authHandler implementation may have already invalidated the session so don't fail here is it has.
+            try {
+                session.invalidate();
+            } catch (IllegalStateException e) {
+                logMessage("LocalAuthTaskHandler: Session was already invalidated.");
+            }
         }
 
-        if(isLogMessageEnabled()) {
-            if(authResult) {
+        if (isLogMessageEnabled()) {
+            if (authResult) {
                 logMessage(
                     "LocalAuthTaskHandler: Local authentication successful for "
                     + userName);
