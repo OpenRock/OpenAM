@@ -24,14 +24,14 @@
 #
 # $Id: OpenSSOAgentBootstrap.template,v 1.1 2008/12/11 14:40:32 naghaon Exp $
 #
-# Portions Copyrighted 2010-2013 ForgeRock AS.
+# Portions Copyrighted 2010-2014 ForgeRock AS.
 #------------------------------------------------------------------------------
 # J2EE Agents Bootstrap File
 #
 # OpenAM Policy Agent for:
 # JBoss server 4.x
 #
-# Version: 3.0
+# Version: ${project.version}
 
 #------------------------------------------------------------------------------
 #

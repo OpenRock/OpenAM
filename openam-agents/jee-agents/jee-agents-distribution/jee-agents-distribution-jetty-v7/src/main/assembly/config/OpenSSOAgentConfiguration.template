@@ -32,7 +32,7 @@
 # OpenAM Policy Agent for:
 # Jetty 7.x
 #
-# Version: 3.0
+# Version: ${project.version}
 #------------------------------------------------------------------------------
 #
 # THIS FILE PROVIDES THE CONFIGURATION SETTINGS NECESSARY FOR THE AGENT

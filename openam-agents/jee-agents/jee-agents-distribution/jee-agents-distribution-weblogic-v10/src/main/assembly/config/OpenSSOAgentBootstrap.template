@@ -26,7 +26,7 @@
 #
 #
 
-# Portions Copyrighted 2010-2013 ForgeRock AS.
+# Portions Copyrighted 2010-2014 ForgeRock AS.
 
 #------------------------------------------------------------------------------
 # J2EE Agents Bootstrap File
@@ -34,7 +34,7 @@
 # OpenAM Policy Agent for:
 # BEA WebLogic 10.0 Server/Portal
 #
-# Version: 3.0
+# Version: ${project.version}
 #------------------------------------------------------------------------------
 #
 # THIS FILE PROVIDES THE CONFIGURATION SETTINGS NECESSARY FOR THE AGENT

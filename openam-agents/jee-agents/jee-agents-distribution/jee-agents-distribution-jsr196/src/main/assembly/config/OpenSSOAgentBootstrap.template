@@ -22,7 +22,7 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-# Portions Copyrighted 2010-2013 ForgeRock AS.
+# Portions Copyrighted 2010-2014 ForgeRock AS.
 #
 #------------------------------------------------------------------------------
 # J2EE Agents Bootstrap File
@@ -30,7 +30,7 @@
 # OpenAM Policy Agent for:
 # GlassFish 2.1
 #
-# Version: 3.0
+# Version: ${project.version}
 
 #------------------------------------------------------------------------------
 #

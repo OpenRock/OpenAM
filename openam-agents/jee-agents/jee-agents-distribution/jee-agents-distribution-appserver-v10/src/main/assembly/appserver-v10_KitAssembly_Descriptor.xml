@@ -113,6 +113,7 @@
         <fileSet>
             <outputDirectory>config</outputDirectory>
             <directory>${project.basedir}/src/main/assembly/config</directory>
+            <filtered>true</filtered>
             <excludes>
                 <exclude>*version*</exclude>
             </excludes>
