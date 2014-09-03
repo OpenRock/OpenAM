@@ -24,9 +24,7 @@
  *
  * $Id: ServiceFactory.java,v 1.4 2008/06/25 05:51:37 qcheng Exp $
  *
- */
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.agents.arch;
@@ -45,6 +43,7 @@ import com.sun.identity.agents.filter.IAmFilterTaskHandler;
 import com.sun.identity.agents.filter.IAmSSOCache;
 import com.sun.identity.agents.filter.ICDSSOContext;
 import com.sun.identity.agents.filter.ISSOContext;
+import com.sun.identity.agents.log.AmAgentLogModule;
 import com.sun.identity.agents.log.IAmAgentLocalLog;
 import com.sun.identity.agents.log.IAmAgentLog;
 import com.sun.identity.agents.log.IAmAgentRemoteLog;
@@ -75,6 +74,8 @@ public class ServiceFactory {
                         result.add(instance);
                     }
             } catch (Exception ex) {
+                AmAgentLogModule.getModule().logError("ServiceFactory.getFilterInboundTaskHandlers: " +
+                        "Unable to load filter inbound task handlers", ex);
                 throw new AgentException(
                         "Unable to load filter inbound task handlers", ex);
             }
@@ -101,6 +102,8 @@ public class ServiceFactory {
                         result.add(instance);
                     }
             } catch (Exception ex) {
+                AmAgentLogModule.getModule().logError("ServiceFactory.getFilterSelfRedirectTaskHandlers: " +
+                        "Unable to load filter self-redirect task handlers", ex);
                 throw new AgentException(
                        "Unable to load filter self-redirect task handlers", ex);
             }
@@ -128,6 +131,8 @@ public class ServiceFactory {
                         result.add(instance);
                     }
             } catch (Exception ex) {
+                AmAgentLogModule.getModule().logError("ServiceFactory.getAmFilter: " +
+                        "Unable to load filter result handlers", ex);
                 throw new AgentException(
                         "Unable to load filter result handlers", ex);
             }
@@ -145,8 +150,9 @@ public class ServiceFactory {
             result = (IAmFilter) getServiceInstance(manager, className);
             result.initialize(mode);
         } catch (Exception ex) {
-            throw new AgentException("Unable to load IAmFilter: " 
-                    + className, ex);
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmFilter: " +
+                    "Unable to load IAmFilter: " + className, ex);
+            throw new AgentException("Unable to load IAmFilter: " + className, ex);
         }        
         return result;
     }
@@ -158,7 +164,9 @@ public class ServiceFactory {
             result = (IAmRealm) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
-            throw new AgentException("Unable to load IAmRealm: " 
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmRealm: " +
+                    "Unable to load IAmRealm: " + className, ex);
+            throw new AgentException("Unable to load IAmRealm: "
                     + className, ex);
         }
         return result;
@@ -173,7 +181,9 @@ public class ServiceFactory {
             result = (ICDSSOContext) getServiceInstance(manager, className);
             result.initialize(filterMode);
         } catch (Exception ex) {
-            throw new AgentException("Unable to load ICDSSOContext: " 
+            AmAgentLogModule.getModule().logError("ServiceFactory.getCDSSOContext: " +
+                    "Unable to load ICDSSOContext: " + className, ex);
+            throw new AgentException("Unable to load ICDSSOContext: "
                     + className, ex);
         }
         return result;
@@ -188,7 +198,9 @@ public class ServiceFactory {
             result = (IAmSSOCache) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
-            throw new AgentException("Unable to load IAmSSOCache: " 
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmSSOCache: " +
+                    "Unable to load IAmSSOCache: " + className, ex);
+            throw new AgentException("Unable to load IAmSSOCache: "
                     + className, ex);
         }
         return result;
@@ -202,6 +214,8 @@ public class ServiceFactory {
             result = (IPDPCache) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getPDPCache: " +
+                    "Unable to load IPDPCache: " + className, ex);
             throw new AgentException("Unable to load IPDPCache: "
                     + className, ex);
         }
@@ -216,6 +230,8 @@ public class ServiceFactory {
             result = (IPDPCacheEntry) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getPDPCacheEntry: " +
+                    "Unable to load IPDPCacheEntry: " + className, ex);
             throw new AgentException("Unable to load IPDPCacheEntry: "
                     + className, ex);
         }
@@ -231,7 +247,9 @@ public class ServiceFactory {
             result = (ISSOContext) getServiceInstance(manager, className);
             result.initialize(filterMode);
         } catch (Exception ex) {
-            throw new AgentException("Unable to load ISSOContext: " 
+            AmAgentLogModule.getModule().logError("ServiceFactory.getSSOContext: " +
+                    "Unable to load ISSOContext: " + className, ex);
+            throw new AgentException("Unable to load ISSOContext: "
                     + className, ex);
         }
         return result;
@@ -247,6 +265,8 @@ public class ServiceFactory {
                                     getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmWebPolicyAppSSOProvider: " +
+                    "Unable to load IAmWebPolicyAppSSOProvider: " + className, ex);
             throw new AgentException(
                     "Unable to load IAmWebPolicyAppSSOProvider: "
                     + className, ex);
@@ -262,7 +282,9 @@ public class ServiceFactory {
         try {
             result = (ICrypt) getServiceInstance(className);
         } catch (Exception ex) {
-            throw new AgentException("Unable to load ICrypt: " 
+            AmAgentLogModule.getModule().logError("ServiceFactory.getCryptProvider: " +
+                    "Unable to load ICrypt: " + className, ex);
+            throw new AgentException("Unable to load ICrypt: "
                     + className, ex);
         }
         return result;
@@ -277,6 +299,8 @@ public class ServiceFactory {
             result = (IAmWebPolicy) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmWebPolicy: " +
+                    "Unable to load IAmWebPolicy: " + className, ex);
             throw new AgentException("Unable to load IAmWebPolicy: "
                     + className, ex);
         }
@@ -292,6 +316,8 @@ public class ServiceFactory {
             result = (IAmAgentLog) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmAgentLog: " +
+                    "Unable to load IAmAgentLog: " + className, ex);
             throw new AgentException("Unable to load IAmAgentLog: "
                     + className, ex);
         }
@@ -307,6 +333,8 @@ public class ServiceFactory {
             result = (IAmAgentRemoteLog) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmAgentRemoteLog: " +
+                    "Unable to load IAmAgentRemoteLog: " + className, ex);
             throw new AgentException("Unable to load IAmAgentRemoteLog: "
                     + className, ex);
         }
@@ -322,6 +350,8 @@ public class ServiceFactory {
             result = (IAmAgentLocalLog) getServiceInstance(manager, className);
             result.initialize();
         } catch (Exception ex) {
+            AmAgentLogModule.getModule().logError("ServiceFactory.getAmAgentLocalLog: " +
+                    "Unable to load IAmAgentLocalLog: " + className, ex);
             throw new AgentException("Unable to load IAmAgentLocalLog: "
                     + className, ex);
         }
