@@ -277,7 +277,7 @@ throw () {
             if (maxLogFileSize < DEBUG_FILE_MIN_SIZE) {
                 maxLogFileSize = DEBUG_FILE_MIN_SIZE;
             }
-
+            
             if (!pSetLogFile(logFileName)) {
                 log(ALL_MODULES, LOG_ERROR,
                         "Unable to open agent debug file: '%s', errno = %d",
@@ -291,7 +291,7 @@ throw () {
             if (maxAuditLogFileSize < DEBUG_FILE_MIN_SIZE) {
                 maxAuditLogFileSize = DEBUG_FILE_MIN_SIZE;
             }
-
+            
             if (!setAuditLogFile(auditLogFileName)) {
                 log(ALL_MODULES, LOG_ERROR,
                         "Unable to open local audit file: '%s', errno = %d",
@@ -828,6 +828,15 @@ void Log::doLocalAuditLog(ModuleId module, Level level, const char* auditLogMsg,
                 "LocalAuditLog");
 
 #endif
+        {
+            ScopeLock mylock(*lockPtr);
+            maxAuditLogFileSize = localAuditFileSize;
+            if (maxAuditLogFileSize < DEBUG_FILE_MIN_SIZE) {
+                maxAuditLogFileSize = DEBUG_FILE_MIN_SIZE;
+            }
+            auditLogRotation = localAuditLogRotate;
+        }
+                
         if (len > 0) {
             writeAuditLog(hdr, auditLogMsg);
         }

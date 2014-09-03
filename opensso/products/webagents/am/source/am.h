@@ -136,7 +136,7 @@ AM_BEGIN_EXTERN_C
 #define AUDIT_DISPOSITION_ALL "ALL"
 #define AUDIT_DISPOSITION_LOCAL "LOCAL"
 #define AUDIT_DISPOSITION_REMOTE "REMOTE"
-#define LOCAL_AUDIT_FILE_DEFAULT_SIZE 52428800 /* 5 MB */
+#define LOCAL_AUDIT_FILE_DEFAULT_SIZE 5242880 /* 5 MB */
 
 /*
  * This function must be called at the end of the program to
