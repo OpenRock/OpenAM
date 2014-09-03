@@ -293,6 +293,11 @@ static void am_custom_response(request_data_t *r, int status, char *data) {
     r->body = data != NULL ? WS_Dup(r->s->ws, data) : NULL;
 }
 
+static void send_badrequest(request_data_t *r, int type) {
+    am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
+    am_custom_response(r, 400, "400 Bad Request");
+}
+
 static void send_deny(request_data_t *r, int type) {
     am_add_header(r, "\015Content-Type:", "text/plain", type, HTTP_HEADER_SET, HDR_OBJ);
     am_custom_response(r, 403, "403 Forbidden");
@@ -837,7 +842,7 @@ static const char *get_query_string(request_data_t *r, const char *url) {
     return "";
 }
 
-unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *req_method, const char *proto, const char *host, int port, const char *uri, struct sockaddr_storage * cip) {
+unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *req_method, const char *proto, const char *host, int port, const char *uri_p, struct sockaddr_storage * cip) {
     const char thisfunc[] = "vmod_authenticate()";
     void *agent_config;
     am_status_t status = AM_FAILURE;
@@ -856,6 +861,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
     const char *clientHostname_hdr_name = NULL;
     char *clientHostname_hdr = NULL;
     char *clientHostname = NULL;
+    const char *uri = uri_p == NULL ? "/" : uri_p;
 
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
@@ -867,6 +873,11 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
 
     if (!sp || sp->magic != SESS_MAGIC || !sp->wrk) {
         send_deny(r, DONE);
+        return 0;
+    }
+
+    if (host == NULL) {
+        send_badrequest(r, DONE);
         return 0;
     }
 
