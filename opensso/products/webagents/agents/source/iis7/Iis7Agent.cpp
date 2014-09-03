@@ -34,6 +34,7 @@
 #include <wincrypt.h>
 #include <shlwapi.h>
 #include <string.h>
+#include <algorithm>
 #include "agent_ev.h"
 
 char agentInstPath[MAX_PATH];
@@ -212,6 +213,33 @@ static am_status_t des_decrypt(const char *encrypted, const char *keys, char **c
     return status;
 }
 
+static char *stristr(char *ch1, char *ch2) {
+    char *chN1, *chN2;
+    char *chNdx;
+    char *chRet = NULL;
+    if (!ch1 || !ch2) return NULL;
+    chN1 = strdup(ch1);
+    chN2 = strdup(ch2);
+    if (chN1 && chN2) {
+        chNdx = chN1;
+        while (*chNdx) {
+            *chNdx = (char) tolower(*chNdx);
+            chNdx++;
+        }
+        chNdx = chN2;
+        while (*chNdx) {
+            *chNdx = (char) tolower(*chNdx);
+            chNdx++;
+        }
+        chNdx = strstr(chN1, chN2);
+        if (chNdx)
+            chRet = ch1 + (chNdx - chN1);
+    }
+    if (chN1) free(chN1);
+    if (chN2) free(chN2);
+    return chRet;
+}
+
 am_status_t process_request_with_post_data_preservation(IHttpContext* pHttpContext,
         am_status_t request_status,
         am_policy_result_t *policy_result,
@@ -224,6 +252,7 @@ am_status_t process_request_with_post_data_preservation(IHttpContext* pHttpConte
     DWORD returnValue = AM_FAILURE;
     post_urls_t *post_urls = NULL;
     std::string response = "";
+    PCSTR cntty = NULL;
 
     if (resp != NULL) {
         response = resp;
@@ -238,6 +267,28 @@ am_status_t process_request_with_post_data_preservation(IHttpContext* pHttpConte
     // to get them here only if response is NULL.
     if ((status == AM_SUCCESS) && (response.size() == 0)) {
         GetEntity(pHttpContext, response);
+    }
+    if (status == AM_SUCCESS && response.size() > 0) {
+        if (GetVariable(pHttpContext, "CONTENT_TYPE", &cntty, NULL, TRUE) == AM_SUCCESS) {
+            if (stristr((char *) cntty, "multipart/form-data") == NULL &&
+                    stristr((char *) cntty, "application/x-www-form-urlencoded") == NULL) {
+                am_web_log_error("%s: unsupported content type (%s)", thisfunc, cntty);
+                status = AM_INVALID_RESOURCE_FORMAT;
+                returnValue = status;
+            } else {
+                size_t c1 = std::count(response.begin(), response.end(), '=');
+                size_t c2 = std::count(response.begin(), response.end(), '&');
+                if (c1 == 0 || (c1 != (c2 + 1))) {
+                    am_web_log_error("%s: invalid %s data (%s)", thisfunc, cntty, response.c_str());
+                    status = AM_INVALID_RESOURCE_FORMAT;
+                    returnValue = status;
+                }
+            }
+        } else {
+            am_web_log_error("%s: empty content type", thisfunc);
+            status = AM_INVALID_RESOURCE_FORMAT;
+            returnValue = status;
+        }
     }
     if ((status == AM_SUCCESS) && (response.size() == 0)) {
         // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
@@ -280,7 +331,7 @@ am_status_t process_request_with_post_data_preservation(IHttpContext* pHttpConte
                     "failed.", thisfunc);
             returnValue = AM_FAILURE;
         }
-    } else {
+    } else if (status != AM_INVALID_RESOURCE_FORMAT) {
         am_web_log_debug("%s: This is a POST request with no post data. "
                 "Redirecting as a GET request.", thisfunc);
         returnValue = do_redirect(pHttpContext, request_status,
@@ -493,6 +544,30 @@ static void send_error(IHttpContext* pHttpContext, BOOL ccntrl) {
     hr = pHttpResponse->WriteEntityChunks(&dataChunk, 1, FALSE, TRUE, &cbSent);
     if (FAILED(hr)) {
         am_web_log_error("send_error(): WriteEntityChunks failed.");
+    }
+}
+
+static void send_error_notimpl(IHttpContext* pHttpContext) {
+    am_web_log_debug("send_error_notimpl(): sending http not implemented error");
+    HRESULT hr;
+    IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
+    pHttpResponse->Clear();
+    PCSTR pszBuffer;
+    pszBuffer = "Not Implemented";
+    hr = pHttpResponse->SetStatus(501, "Status Not Implemented", 0, S_OK);
+    hr = pHttpResponse->SetHeader("Content-Type", "text/plain", (USHORT) strlen("text/plain"), TRUE);
+    hr = pHttpResponse->SetHeader("Content-Length", "15", (USHORT) strlen("15"), TRUE);
+    if (FAILED(hr)) {
+        am_web_log_error("send_error_notimpl(): SetHeader failed.");
+    }
+    HTTP_DATA_CHUNK dataChunk;
+    dataChunk.DataChunkType = HttpDataChunkFromMemory;
+    DWORD cbSent;
+    dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
+    dataChunk.FromMemory.BufferLength = (USHORT) strlen(pszBuffer);
+    hr = pHttpResponse->WriteEntityChunks(&dataChunk, 1, FALSE, TRUE, &cbSent);
+    if (FAILED(hr)) {
+        am_web_log_error("send_error_notimpl(): WriteEntityChunks failed.");
     }
 }
 
@@ -879,6 +954,10 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
                 status = process_request_with_post_data_preservation
                         (pHttpContext, status, &pOphResources->result,
                         (char *) requestURL.c_str(), args, (char *) response.c_str(), agent_config);
+                if (status == AM_INVALID_RESOURCE_FORMAT) {
+                    send_error_notimpl(pHttpContext);
+                    retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                }
             } else {
                 status = do_redirect(pHttpContext, status, &OphResources.result,
                         requestURL.c_str(), requestMethod, args, agent_config);
@@ -916,6 +995,10 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
                 status = process_request_with_post_data_preservation
                         (pHttpContext, status, &pOphResources->result,
                         (char *) requestURL.c_str(), args, (char *) response.c_str(), agent_config);
+                if (status == AM_INVALID_RESOURCE_FORMAT) {
+                    send_error_notimpl(pHttpContext);
+                    retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                }
             } else {
                 status = do_redirect(pHttpContext, status, &OphResources.result,
                         requestURL.c_str(), requestMethod,
