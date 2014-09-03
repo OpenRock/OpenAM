@@ -24,10 +24,7 @@
  *
  * $Id: URLFailoverHelper.java,v 1.5 2008/06/25 05:51:42 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS.
  */
 package com.sun.identity.agents.common;
 
@@ -162,6 +159,26 @@ public class URLFailoverHelper extends SurrogateBase
         }
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("URLFailoverHelper\n");
+        builder.append("_timeout:").append(_timeout).append("\n");
+        builder.append("_disabled:").append(_disabled).append("\n");
+        builder.append("_isPrioritized:").append(_isPrioritized).append("\n");
+        builder.append("_probeEnabled:").append(_probeEnabled).append("\n");
+        builder.append("_index:").append(_index).append("\n");
+        builder.append("_urlList:");
+        for (String url : _urlList) {
+            builder.append(url).append(" ");
+        }
+        builder.append("\n");
+        builder.append("conditionalUrls:").append(conditionalUrls).append("\n");
+
+        return builder.toString();
     }
 
     /**
@@ -391,7 +408,7 @@ public class URLFailoverHelper extends SurrogateBase
             }
         }
     }    
-    
+
     private String[] _urlList;
     private Map<String, Set<String>> conditionalUrls;
     private int      _index    = 0;
