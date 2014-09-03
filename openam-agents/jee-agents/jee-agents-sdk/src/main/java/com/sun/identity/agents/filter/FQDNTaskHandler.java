@@ -24,6 +24,7 @@
  *
  * $Id: FQDNTaskHandler.java,v 1.2 2008/06/25 05:51:44 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.agents.filter;
@@ -63,7 +64,13 @@ implements IFQDNTaskHandler {
     throws AgentException {
         super.initialize(context, mode);
         initFQDNEnabledFlag();
-        initFQDNHelper();
+        if (isFQDNCheckEnabled()) {
+            initFQDNHelper();
+        } else {
+            if (isLogMessageEnabled()) {
+                logMessage("FQDNTaskHandler.initialize: skipping remaining init since _isFQDNCheckEnabled is false.");
+            }
+        }
     }
 
     /**
