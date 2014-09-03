@@ -24,6 +24,7 @@
  *
  * $Id: NotenforcedIPHelper.java,v 1.2 2008/06/25 05:51:40 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.agents.common;
@@ -32,6 +33,9 @@ import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.SurrogateBase;
 import com.sun.identity.agents.util.AgentCache;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -54,40 +58,36 @@ public class NotenforcedIPHelper extends SurrogateBase
         setCacheEnabledFlag(cacheEnabled);
         setInvertNotenforcedFlag(invertList);
         initCache(maxSize);
-        
-        String [] ips = new String[notenforcedIPs.length];
+
+        // This will end up holding the final list of not enforced IP's
+        List<String> ips = new ArrayList<String>(notenforcedIPs.length);
         if (notenforcedIPs.length > 0) {
-            for (int i = 0; i < notenforcedIPs.length; i++) {
-                if (!(notenforcedIPs[i].regionMatches(true, 0,
-                        LOOP_BACK_PREFIX, 0, LOOP_BACK_PREFIX.length()))) {
-                    ips[i] = notenforcedIPs[i];
+            for (String notenforcedIP : notenforcedIPs) {
+                if (!(notenforcedIP.regionMatches(true, 0, LOOP_BACK_PREFIX, 0, LOOP_BACK_PREFIX.length()))) {
+                    ips.add(notenforcedIP);
                 } else {
                     if (isLogMessageEnabled()) {
-                        logMessage("NotenforcedIPHelper: Ignoring Loopback "
-                                + "address: " + notenforcedIPs[i]);
+                        logMessage("NotenforcedIPHelper: Ignoring Loopback address: " + notenforcedIP);
                     }
                 }
             }
         }
         
         CommonFactory cf = new CommonFactory(getModule());
-        setMatcher(cf.newPatternMatcher(ips));
+        setMatcher(cf.newPatternMatcher(ips.toArray(new String[ips.size()])));
         
         // Set the handler active if addresses specified in config and
         // inversion is false
-        if ((ips.length == 0) && !isInverted()) {
+        if ((ips.isEmpty()) && !isInverted()) {
             setActive(false);
         } else {
             setActive(true);
         }
         
         if(isLogMessageEnabled()) {
-            logMessage("NotenforcedIPHelper: isActive: "
-                    + isActive()
-                    + ", isInverted: " + this.isInverted());
-            for(int i=0; i<ips.length; i++) {
-                logMessage("NotenforcedIPHelper: next ip: "
-                        + ips[i]);
+            logMessage("NotenforcedIPHelper: isActive: " + isActive() + ", isInverted: " + this.isInverted());
+            for (String ip : ips) {
+                logMessage("NotenforcedIPHelper: next ip: " + ip);
             }
         }
     }
