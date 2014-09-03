@@ -1211,6 +1211,22 @@ am_web_cleanup() {
     return status;
 }
 
+/**
+ * Performs the Agent session cleanup. 
+ */
+extern "C" AM_WEB_EXPORT am_status_t
+am_agent_cleanup() {
+    const char *thisfunc = "am_agent_cleanup";
+    am_status_t status = AM_SUCCESS;
+    const Properties& propPtr =
+            *reinterpret_cast<Properties *> (boot_info.properties);
+    if (agentProfileService != NULL &&
+            agentProfileService->agentLogout(propPtr) == AM_SUCCESS) {
+        am_web_log_debug("%s: Agent logout done.", thisfunc);
+    }
+    return status;
+}
+
 static int match(const char *subject, const char *pattern) {
     pcre *x = NULL;
     const char *error;

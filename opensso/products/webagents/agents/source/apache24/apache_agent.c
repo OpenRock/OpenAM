@@ -693,6 +693,7 @@ static apr_status_t agent_worker_cleanup(void *arg) {
         pthread_mutex_destroy(&d->read[i].thr_exit);
 #endif
     }
+    am_agent_cleanup();
     return APR_SUCCESS;
 }
 

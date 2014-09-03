@@ -631,6 +631,11 @@ AM_WEB_EXPORT am_status_t am_web_init(const char *agent_bootstrap_file,
 AM_WEB_EXPORT am_status_t am_agent_init(boolean_t *pAgentAuthenticated);
 
 /**
+ * Method to clean up the Agent session
+ */
+AM_WEB_EXPORT am_status_t am_agent_cleanup();
+
+/**
  * Method to clean up the Agent Toolkit
  */
 AM_WEB_EXPORT am_status_t am_web_cleanup();
