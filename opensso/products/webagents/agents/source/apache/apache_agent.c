@@ -75,7 +75,7 @@ typedef int pid_t;
 #define OpenAM                 "OpenAM"
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
-#define QUEUE_SIZE              128
+#define QUEUE_SIZE              512
 #define MESSAGE_SIZE            8192
 #define PDP_KEY_SIZE            256
 #define PDP_URL_SIZE            4096
@@ -404,11 +404,11 @@ static void *notification_listener(void *arg) {
 #ifdef _MSC_VER
         while (WaitForSingleObject(d->read[i].thr_exit, 0) == WAIT_TIMEOUT) {
             if (d->read[i].read == d->write) {
-                SleepEx(500, FALSE); /* 1/2 sec */
+                SleepEx(250, FALSE); /* 1/4 sec */
 #else
         while (!need_quit(&d->read[i].thr_exit)) {
             if (d->read[i].read == d->write) {
-                usleep(500000); /* 1/2 sec */
+                usleep(250000); /* 1/4 sec */
 #endif
             } else {
                 void *agent_config = am_web_get_agent_configuration();
@@ -665,6 +665,7 @@ static apr_status_t agent_worker_cleanup(void *arg) {
         int i = 0;
         for (i = 0; i < d->read_sz; i++) {
             if (d->read[i].id == pid) {
+                d->read[i].id = 0;
                 break;
             }
         }
