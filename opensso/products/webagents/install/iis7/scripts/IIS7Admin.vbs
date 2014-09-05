@@ -21,6 +21,8 @@
 '
 ' Copyright 2007 Sun Microsystems Inc. All Rights Reserved
 '
+' Portions Copyrighted 2014 ForgeRock AS
+'
 '---------------------------------------------------------------------------
 ' Configures/UnConfigures the IIS7 module for a Web Site
 '
@@ -82,8 +84,7 @@ end if
 Function Init()
   Dim correctConfigFile
 
-  WScript.Echo "Copyright c 2009 Sun Microsystems, Inc. All rights reserved"
-  WScript.Echo "Use is subject to license terms"
+  WScript.Echo ""
 
   Set WshShell = WScript.CreateObject("WScript.Shell")
   Set FSO = CreateObject("Scripting.FileSystemObject")

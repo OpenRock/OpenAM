@@ -21,6 +21,7 @@
 '
 ' Copyright 2009 Sun Microsystems Inc. All Rights Reserved
 '
+' Portions Copyrighted 2014 ForgeRock AS
 '
 '--------------------------------------------------------------------
 Const ForReading = 1, ForWriting = 2
@@ -53,8 +54,6 @@ if Args.Count < 1 Then
 end if
 
 WScript.Echo ""
-WScript.Echo "Copyright c 2009 Sun Microsystems, Inc. All rights reserved"
-WScript.Echo "Use is subject to license terms"
 
 Set oFSO = CreateObject("Scripting.FileSystemObject")
 Set dict = CreateObject("Scripting.Dictionary")
