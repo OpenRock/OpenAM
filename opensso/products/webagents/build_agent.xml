@@ -125,19 +125,23 @@ Portions Copyrighted 2010-2014 ForgeRock AS
         <replaceregexp file="${container.web_agent.dir}/README"
                        match="AGENT_VER" replace="${agentversion}" byline="true"/>
 
-        <!-- Copy OpenSSOAgentBootstrap.template file -->
+        <!-- Copy and update OpenSSOAgentBootstrap.template file -->
         <copy todir="${container.web_agent.config.dir}">
             <fileset dir="${webagents.basedir}/conf">
                 <include name="OpenSSOAgentBootstrap.template"/>
             </fileset>
         </copy>
+        <replaceregexp file="${container.web_agent.config.dir}/OpenSSOAgentBootstrap.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
 
-        <!-- Copy OpenSSOAgentConfiguration.template file -->
+        <!-- Copy and update OpenSSOAgentConfiguration.template file -->
         <copy todir="${container.web_agent.config.dir}">
             <fileset dir="${webagents.basedir}/conf">
                 <include name="OpenSSOAgentConfiguration.template"/>
             </fileset>
         </copy>
+        <replaceregexp file="${container.web_agent.config.dir}/OpenSSOAgentConfiguration.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
 
         <!-- Copy OpenSSOAgentMigration.template file -->
         <copy todir="${container.web_agent.config.dir}">

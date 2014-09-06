@@ -340,7 +340,13 @@
         <echo message="Dispatch to archive OpenAM C-SDK"/>
         <delete file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}.zip" quiet="true"/>
         <copy file="${webagents.basedir}/am/source/samples/README.TXT" tofile="${webagents.built.dir}/README.TXT" overwrite="true"/>
+        <copy file="${webagents.basedir}/conf/OpenSSOAgentBootstrap.template" tofile="${webagents.built.dir}/OpenSSOAgentBootstrap.template" overwrite="true"/>
+        <copy file="${webagents.basedir}/conf/OpenSSOAgentConfiguration.template" tofile="${webagents.built.dir}/OpenSSOAgentConfiguration.template" overwrite="true"/>
         <replaceregexp file="${webagents.built.dir}/README.TXT"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+        <replaceregexp file="${webagents.built.dir}/OpenSSOAgentBootstrap.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+        <replaceregexp file="${webagents.built.dir}/OpenSSOAgentConfiguration.template"
                        match="AGENT_VER" replace="${agentversion}" byline="true"/>
         <zip file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}.zip">  
             <zipfileset prefix="bin" dir="${webagents.basedir}/am/source/" includes="cryptit.exe"/>
@@ -359,8 +365,8 @@
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.dll"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.lib"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.pdb"/>
-            <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
-            <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
+            <zipfileset dir="${webagents.built.dir}" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
+            <zipfileset dir="${webagents.built.dir}" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
             <zipfileset prefix="samples" dir="${webagents.built.dir}/" includes="README.TXT"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile.nmake"/>

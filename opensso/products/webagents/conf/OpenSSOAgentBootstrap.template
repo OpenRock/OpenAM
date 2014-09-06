@@ -23,7 +23,7 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 #
-# Portions Copyrighted 2013 ForgeRock Inc
+# Portions Copyrighted 2013-2014 ForgeRock AS
 #
 
 #------------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 #
 # OpenAM Policy Agent 
 #
-# Version: 3.0
+# Version: AGENT_VER
 
 #########################################################################
 #
