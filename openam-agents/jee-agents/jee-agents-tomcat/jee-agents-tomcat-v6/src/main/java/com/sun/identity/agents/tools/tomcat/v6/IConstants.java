@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IConstants.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ *
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.agents.tools.tomcat.v6;
 
@@ -115,8 +113,6 @@ public interface IConstants {
     public static final String STR_TOMCAT_VERSION =
     	"org.apache.catalina.util.ServerInfo";
     public static final String TOMCAT_VER_60 = "Tomcat 6.0.x";
-    public static final String TOMCAT_VMWARE_7 = "VMware vFabric tc Runtime "
-            + "2.7.1.RELEASE/7.0.29.A.RELEASE";
     public static final String STR_WEBAPP_DIR = "webapps";
     public static final String STR_AGENT_APP_WAR_FILE = "agentapp.war";
     public static final String INSTANCE_CONFIG_DIR_NAME = "config";
@@ -132,7 +128,7 @@ public interface IConstants {
     	"setAgentclasspath.bat";
     public static final String STR_SET_AGENT_CLASSPATH_FILE_UNIX =
     	"setAgentclasspath.sh";
-    public static final String STR_APACHE_TOMCAT = "Apache Tomcat/";
+    public static final String STR_APACHE_TOMCAT_SERVER_NUMBER = "Server number:";
     public static final String cmdTemplateSuffix = ".cmd.template";
     public static final String shTemplateSuffix = ".sh.template";
     public static final String AGENT_ENV_CMD_TEMPLATE = "setAgentEnv"

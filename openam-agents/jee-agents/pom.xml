@@ -472,6 +472,14 @@
                 <artifactId>openam-installtools</artifactId>
                 <version>${openam.version}</version>
             </dependency>
+
+            <!-- Testing dependencies -->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.8.5</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

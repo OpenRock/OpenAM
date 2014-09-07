@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: TomcatVersionValidator.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.agents.tools.tomcat.v6;
@@ -64,9 +66,9 @@ public class TomcatVersionValidator extends ValidatorBase
      * Method isTomcatVersionValid
      *
      *
-     * @param dir
+     * @param catalinaHomeDir
      * @param props
-     * @param IStateAccess
+     * @param state
      *
      * @return ValidationResult
      *
@@ -139,112 +141,74 @@ public class TomcatVersionValidator extends ValidatorBase
     }
 
     private boolean isTomcatVersionValid(IStateAccess stateAccess) {
-        boolean version60 = false;
+
+        boolean result = false;
+        StringBuffer output = new StringBuffer();
 
         try {
-            String catalinaJarPath = (String) stateAccess.get(
-                    STR_CATALINA_JAR_PATH);
-            StringBuffer output = new StringBuffer();
+            String catalinaJarPath = (String) stateAccess.get(STR_CATALINA_JAR_PATH);
 
-            String JAVA_EXE = System.getProperty("java.home")
-                + "/bin/java";
+            String JAVA_EXE = System.getProperty("java.home") + "/bin/java";
 
+            Debug.log("TomcatVersionValidator.getTomcatVersion(): JAVA_HOME = " + JAVA_EXE +
+                    " jarFile = " + catalinaJarPath);
+
+            String[] commandArray = {JAVA_EXE, STR_CLASSPATH, catalinaJarPath, STR_TOMCAT_VERSION_CLASS};
+
+            executeCommand(commandArray, null, output);
+        } catch (Exception ex) {
+            Debug.log("TomcatVersionValidator.getTomcatVersion() threw exception", ex);
+        }
+
+        if (output.length() != 0) {
+            result = isTomcatVersionIsValid(output.toString());
+        }
+
+        if (result) {
+            stateAccess.put(STR_TOMCAT_VERSION, TOMCAT_VER_60);
+        }
+
+        return result;
+    }
+
+    /**
+     * For the given ServerInfo output from org.apache.catalina.util.ServerInfo, return true or false depending on if
+     * this version of Tomcat is supported.
+     * @param serverInfo The out from the ServerInfo command.
+     * @return true if this is a supported version of Tomcat.
+     */
+    public static boolean isTomcatVersionIsValid(String serverInfo) {
+
+        boolean result = false;
+
+        if (serverInfo != null && !serverInfo.isEmpty()) {
             Debug.log(
-                "TomcatVersionValidator.getTomcatVersion(): JAVA_HOME = "
-                + JAVA_EXE + " jarFile = " + catalinaJarPath);
+                "TomcatVersionValidator.getTomcatVersion() - validating ServerInfo:" + serverInfo);
 
-            String[] commandArray = {
-                    JAVA_EXE, STR_CLASSPATH, catalinaJarPath,
-                    STR_TOMCAT_VERSION_CLASS
-                };
-
-            executeCommand(
-                commandArray,
-                null,
-                output);
-
-            if (output == null) {
+            // Parse the output looking for the Server number string, for example:
+            // ﻿Server number:  6.0.24.0
+            // Server number:  7.0.39.0
+            int currentIndex = serverInfo.indexOf(STR_APACHE_TOMCAT_SERVER_NUMBER);
+            if (currentIndex == -1) {
                 return false;
             }
-
-            String temp = output.toString();
-
-            if (temp != null) {
-                Debug.log(
-                    "TomcatVersionValidator.getTomcatVersion() command "
-                    + "returned version name =" + temp);
-
-                int majorVersion = 0;
-                int minorVersion = 0;
-
-                // Accept VMware Tomcat Version
-                if(temp.contains(TOMCAT_VMWARE_7)){
-                    return true;
-                }
-
-                int index1 = temp.indexOf(STR_APACHE_TOMCAT);
-
-                if (index1 == -1) {
-                    return false;
-                }
-
-                index1 += STR_APACHE_TOMCAT.length();
-
-                if ((index1 <= temp.length())
-                        && Character.isDigit(temp.charAt(index1))) {
-                    majorVersion = Integer.parseInt(
-                            temp.substring(
-                                index1,
-                                ++index1));
-
-                    if ((index1 <= temp.length())
-                            && (temp.charAt(index1) == '.')) {
-                        index1++;
-
-                        if ((index1 <= temp.length())
-                                && Character.isDigit(temp.charAt(index1))) {
-                            minorVersion = Integer.parseInt(
-                                    temp.substring(
-                                        index1,
-                                        ++index1));
-                        }
-                    }
-                } else {
-                    return false;
-                }
-
-                if ((majorVersion == 6) || (majorVersion == 7)) {
-                    if (minorVersion == 0) {
-                        version60 = true;
-                        stateAccess.put(
-                            STR_TOMCAT_VERSION,
-                            TOMCAT_VER_60);
-                    }
-                }
-
-                Debug.log(
-                    "TomcatVersionValidator.getTomcatVersion() - Major version "
-                    + Integer.toString(majorVersion)
-                    + ", Minor Version = "
-                    + Integer.toString(minorVersion));
+            currentIndex += STR_APACHE_TOMCAT_SERVER_NUMBER.length();
+            int endIndex = serverInfo.indexOf('\n', currentIndex);
+            // If we don't find this character, just take the remainder of the string, we only care about the start
+            if (endIndex == -1) {
+                endIndex = serverInfo.length() - 1;
             }
-        } catch (Exception ex) {
-            Debug.log(
-                "TomcatVersionValidator.getTomcatVersion() threw "
-                + " exception: " + ex.getMessage(),
-                ex);
+            // Grab the version number, trimming any spaces in front/end to simplify the matching.
+            String versionLine = serverInfo.substring(currentIndex, endIndex).trim();
+
+            // Only versions 6.0.x and 7.0.x are currently valid.
+            result = versionLine.startsWith("6.0") || versionLine.startsWith("7.0");
+
+            Debug.log("TomcatVersionValidator.getTomcatVersion() - version:" + versionLine +
+                    " was valid:" + result);
         }
 
-        if (!version60) {
-            Debug.log(
-                "TomcatVersionValidator.getTomcatVersion(): Unsupported " +
-                "Tomcat version. "
-                + "Please check documentation for supported versions.");
-
-            return false;
-        }
-
-        return true;
+        return result;
     }
 
     /**
