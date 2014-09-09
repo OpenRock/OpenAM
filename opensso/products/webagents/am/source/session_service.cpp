@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 #include "am.h"
 #include "session_service.h"
@@ -247,32 +247,27 @@ SessionService::parseException(const XMLElement& element,
         const std::string& sessionId) const {
     am_status_t status;
     std::string exceptionMsg;
-    
+
     if (element.getValue(exceptionMsg)) {
         std::string appSSOToken = agentProfileService->getAgentSSOToken();
-
-        // The error message in an exception will potentially be localized.
-        // By direct inspection of
-        // com/iplanet/dpro/session/service/SessionService.java, however,
-        // the two exceptions that indicate an invalid session are the only
-        // ones that contain the SSOToken.
-        //
-        // This observation was true on March 29th, 2006, your mileage may
-        // vary.
-        if (exceptionMsg.find(sessionId) != std::string::npos) {
+        /*
+         * Start the search with appSSOToken; if not found, look for sessionId.
+         * In case none of the above can be found, return AM_SESSION_FAILURE.
+         */
+        if ((appSSOToken.size() > 0 &&
+                (exceptionMsg.find(appSSOToken) != std::string::npos)) ||
+                (strncmp(exceptionMsg.c_str(), appSSOTokenMsg,
+                sizeof (appSSOTokenMsg) - 1) == 0)) {
+            Log::log(logModule, Log::LOG_DEBUG,
+                    "SessionService::parseException() "
+                    "invalid application ssotoken %s",
+                    sessionId.c_str());
+            status = AM_INVALID_APP_SSOTOKEN;
+        } else if (exceptionMsg.find(sessionId) != std::string::npos) {
             Log::log(logModule, Log::LOG_DEBUG,
                     "SessionService::parseException() invalid session %s",
                     sessionId.c_str());
             status = AM_INVALID_SESSION;
-        }  else if((appSSOToken.size() > 0 &&
-               (exceptionMsg.find(appSSOToken) != std::string::npos)) ||
-               (strncmp(exceptionMsg.c_str(), appSSOTokenMsg,
-                   sizeof(appSSOTokenMsg) - 1) == 0)) {
-            Log::log(logModule, Log::LOG_DEBUG,
-                    "SessionService::parseException() "
-            "invalid application ssotoken %s",
-                    sessionId.c_str());
-            status = AM_INVALID_APP_SSOTOKEN;
         } else {
             Log::log(logModule, Log::LOG_INFO,
                     "SessionService::parseException() server side error: %s",
@@ -282,10 +277,10 @@ SessionService::parseException(const XMLElement& element,
     } else {
         Log::log(logModule, Log::LOG_INFO,
                 "SessionService::parseException() server side error, no "
-        "message in exception");
+                "message in exception");
         status = AM_SESSION_FAILURE;
     }
-    
+
     return status;
 }
 

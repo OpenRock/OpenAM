@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 /*
@@ -1051,53 +1051,50 @@ void AgentProfileService::setEncodedAgentSSOToken(std::string appSSOToken) {
     }
 }
 
-
 /*
-* Validate App SSOToken
-*/
+ * Validate Agent SSOToken
+ * Returns:
+ *   AM_SUCCESS
+ *              if Agent SSO token is valid.
+ *
+ *   AM_INVALID_SESSION
+ *		if Agent SSO token is invalid or there is an error 
+ *              parsing token service response.
+ */
 am_status_t AgentProfileService::validateAgentSSOToken() {
-    am_status_t sts = AM_FAILURE;
+    am_status_t status = AM_INVALID_SESSION;
     const char *thisfunc = "AgentProfileService::validateAgentSSOToken()";
     SessionInfo *sessionInfo = NULL;
     try {
         sessionInfo = new SessionInfo();
         Http::CookieList cookieList;
         SSOTokenService *ssoTokenSvc = get_sso_token_service();
-        sts = ssoTokenSvc->getSessionInfo(ServiceInfo(),
-                                          agentSSOToken,
-                                          cookieList,
-                                          false,
-                                          *sessionInfo,
-                                          true);
-        if (sts == AM_SUCCESS) {
-            sts = sessionInfo->isValid() ? AM_SUCCESS : AM_INVALID_SESSION;
-        }
-        else {
-            Log::log(logModule, Log::LOG_ERROR,
-                 "%s: Invalid Agent(app) SSO token %s.",
-                 thisfunc, agentSSOToken.c_str());
-        }
-    }
-    catch (InternalException& ex) {
+        status = ssoTokenSvc->getSessionInfo(ServiceInfo(),
+                agentSSOToken,
+                cookieList,
+                false,
+                *sessionInfo,
+                true);
+        status = (status == AM_SUCCESS && sessionInfo->isValid()) ?
+                AM_SUCCESS : AM_INVALID_SESSION;
+    } catch (InternalException& ex) {
         Log::log(logModule, Log::LOG_ERROR, ex);
-        sts = AM_FAILURE;
-    }
-    catch (std::bad_alloc& exb) {
+    } catch (std::bad_alloc& exb) {
         Log::log(logModule, Log::LOG_ERROR, exb);
-        sts = AM_NO_MEMORY;
-    }
-    catch (std::exception& exs) {
+    } catch (std::exception& exs) {
         Log::log(logModule, Log::LOG_ERROR, exs);
-        sts = AM_FAILURE;
-    }
-    catch (...) {
+    } catch (...) {
         Log::log(logModule, Log::LOG_ERROR,
-                 "Unknown exception encountered.");
-        sts = AM_FAILURE;
+                "Unknown exception encountered.");
+    }
+
+    if (status != AM_SUCCESS) {
+        Log::log(logModule, Log::LOG_ERROR,
+                "%s: Invalid Agent(app) SSO token %s.",
+                thisfunc, agentSSOToken.c_str());
     }
 
     delete sessionInfo;
     sessionInfo = NULL;
-    
-    return sts;
+    return status;
 }
