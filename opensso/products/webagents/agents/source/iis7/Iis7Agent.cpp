@@ -1269,7 +1269,7 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
             size_t scriptPos = pathInfoStr.find(scriptName);
             if (scriptPos != std::string::npos) {
                 pathInfo = pathInfoStr.substr(strlen(scriptName));
-                am_web_log_debug("%s: Reconstructed path info = %s",
+                am_web_log_debug("%s: Reconstructed path info: %s",
                         thisfunc, pathInfo.c_str());
             } else {
                 am_web_log_warning("%s: Script name %s not found in path info"
@@ -1302,25 +1302,35 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
                     &requestURL, &origRequestURL);
         }
         if (status == AM_SUCCESS) {
-            if (requestURL != NULL) {
-                char *url = requestURL;
-#ifdef OPENAM_2969
-                am_web_log_debug("%s: constructed request url before normalization: %s", thisfunc, url);
-                /*find the end of url string*/
-                while (url && *url) ++url;
-                for (--url; requestURL < url; --url) {
-                    if (*url == '/') {
-                        /*erase (all) trailing slashes*/
-                        *url = 0;
-                    } else break;
+            char *rawUrl = NULL;
+            USHORT rawUrlsz = 0;
+            IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
+            if (pHttpRequest != NULL) {
+                HTTP_REQUEST *pRawRequest = pHttpRequest->GetRawHttpRequest();
+                if (pRawRequest != NULL) {
+                    rawUrlsz = pRawRequest->RawUrlLength;
+                    rawUrl = (char *) pHttpContext->AllocateRequestMemory(rawUrlsz + 1);
+                    if (rawUrl != NULL) {
+                        memcpy(rawUrl, pRawRequest->pRawUrl, rawUrlsz);
+                        rawUrl[rawUrlsz] = '\0';
+                        am_web_log_debug("%s: unprocessed request url: %s",
+                                thisfunc, rawUrl);
+                    }
                 }
-#endif
+            }
+            if (requestURL != NULL) {
                 requestURLStr.assign(requestURL);
+                if (rawUrl != NULL && rawUrlsz > 0 && rawUrl[rawUrlsz - 1] == '?') {
+                    requestURLStr.append("?");
+                }
                 am_web_log_debug("%s: constructed request url: %s",
                         thisfunc, requestURLStr.c_str());
             }
             if (origRequestURL != NULL) {
                 origRequestURLStr.assign(origRequestURL);
+                if (rawUrl != NULL && rawUrlsz > 0 && rawUrl[rawUrlsz - 1] == '?') {
+                    origRequestURLStr.append("?");
+                }
             }
         }
     }
