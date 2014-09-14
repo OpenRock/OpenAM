@@ -110,9 +110,9 @@ public interface IConstants {
     public static final String STR_CATALINA_JAR_PATH = "CATALINA_JAR_PATH";
     public static final String STR_TOMCAT_VERSION_CLASS =
     	"org.apache.catalina.util.ServerInfo";
-    public static final String STR_TOMCAT_VERSION =
-    	"org.apache.catalina.util.ServerInfo";
-    public static final String TOMCAT_VER_60 = "Tomcat 6.0.x";
+    public static final String STR_TOMCAT_VERSION = "STR_TOMCAT_VERSION";
+    public static final String TOMCAT_VER_60 = "TOMCAT_VER_60";
+    public static final String TOMCAT_VER_70 = "TOMCAT_VER_70";
     public static final String STR_WEBAPP_DIR = "webapps";
     public static final String STR_AGENT_APP_WAR_FILE = "agentapp.war";
     public static final String INSTANCE_CONFIG_DIR_NAME = "config";

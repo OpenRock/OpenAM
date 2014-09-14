@@ -24,7 +24,7 @@
  *
  * $Id: TomcatVersionValidator.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.agents.tools.tomcat.v6;
@@ -142,7 +142,6 @@ public class TomcatVersionValidator extends ValidatorBase
 
     private boolean isTomcatVersionValid(IStateAccess stateAccess) {
 
-        boolean result = false;
         StringBuffer output = new StringBuffer();
 
         try {
@@ -160,37 +159,39 @@ public class TomcatVersionValidator extends ValidatorBase
             Debug.log("TomcatVersionValidator.getTomcatVersion() threw exception", ex);
         }
 
+        String versionString = null;
         if (output.length() != 0) {
-            result = isTomcatVersionIsValid(output.toString());
+            versionString = getTomcatVersion(output.toString());
         }
 
-        if (result) {
-            stateAccess.put(STR_TOMCAT_VERSION, TOMCAT_VER_60);
+        // A non-null value means a supported version was found
+        if (versionString != null) {
+            stateAccess.put(STR_TOMCAT_VERSION, versionString);
+            return true;
+        } else {
+            return false;
         }
-
-        return result;
     }
 
     /**
      * For the given ServerInfo output from org.apache.catalina.util.ServerInfo, return true or false depending on if
      * this version of Tomcat is supported.
      * @param serverInfo The out from the ServerInfo command.
-     * @return true if this is a supported version of Tomcat.
+     * @return the version as a String from constants TOMCAT_VER_60, TOMCAT_VER_70 or null if not a valid version
      */
-    public static boolean isTomcatVersionIsValid(String serverInfo) {
+    public static String getTomcatVersion(String serverInfo) {
 
-        boolean result = false;
+        String result = null;
 
         if (serverInfo != null && !serverInfo.isEmpty()) {
-            Debug.log(
-                "TomcatVersionValidator.getTomcatVersion() - validating ServerInfo:" + serverInfo);
+            Debug.log("TomcatVersionValidator.getTomcatVersion() - validating ServerInfo:" + serverInfo);
 
             // Parse the output looking for the Server number string, for example:
             // ﻿Server number:  6.0.24.0
             // Server number:  7.0.39.0
             int currentIndex = serverInfo.indexOf(STR_APACHE_TOMCAT_SERVER_NUMBER);
             if (currentIndex == -1) {
-                return false;
+                return null;
             }
             currentIndex += STR_APACHE_TOMCAT_SERVER_NUMBER.length();
             int endIndex = serverInfo.indexOf('\n', currentIndex);
@@ -202,10 +203,14 @@ public class TomcatVersionValidator extends ValidatorBase
             String versionLine = serverInfo.substring(currentIndex, endIndex).trim();
 
             // Only versions 6.0.x and 7.0.x are currently valid.
-            result = versionLine.startsWith("6.0") || versionLine.startsWith("7.0");
+            if (versionLine.startsWith("6.0")) {
+                result = TOMCAT_VER_60;
+            } else if (versionLine.startsWith("7.0")) {
+                result = TOMCAT_VER_70;
+            }
 
             Debug.log("TomcatVersionValidator.getTomcatVersion() - version:" + versionLine +
-                    " was valid:" + result);
+                    " found version: " + result);
         }
 
         return result;

@@ -25,6 +25,8 @@
 
    $Id: configure.xml,v 1.3 2009/02/14 07:49:36 bakka Exp $
 
+   Portions Copyrighted 2014 ForgeRock AS.
+
 -->
 <configure>
     <class-prefix>
@@ -95,6 +97,9 @@
         </common-interactions>
         <instance-interactions>
             <interaction lookupkey="INSTALL_GLOBAL_WEB_XML">
+                <skipIf key="STR_TOMCAT_VERSION" ignorecase="true">
+                    <value>TOMCAT_VER_70</value>
+                </skipIf>
                 <i18n key="INT_GLOBAL_WEB_XML" group="tomcatv6Tools"/>
                 <default-value-finder>
                     <class name="StaticDefaultValueFinder" type="system"/>

@@ -78,14 +78,14 @@ public class TomcatVersionValidatorTest {
     @Test
     public void testCheckTomcatVersionIsValid() {
 
-        Assert.assertTrue(TomcatVersionValidator.isTomcatVersionIsValid(VMWARE_TOMCAT6_SERVERINFO));
-        Assert.assertTrue(TomcatVersionValidator.isTomcatVersionIsValid(WINDOWS_TOMCAT6_SERVERINFO));
-        Assert.assertTrue(TomcatVersionValidator.isTomcatVersionIsValid(LINUX_TOMCAT6_SERVERINFO));
-        Assert.assertTrue(TomcatVersionValidator.isTomcatVersionIsValid(LINUX_TOMCAT7_SERVERINFO));
+        Assert.assertEquals(IConstants.TOMCAT_VER_60, TomcatVersionValidator.getTomcatVersion(VMWARE_TOMCAT6_SERVERINFO));
+        Assert.assertEquals(IConstants.TOMCAT_VER_60, TomcatVersionValidator.getTomcatVersion(WINDOWS_TOMCAT6_SERVERINFO));
+        Assert.assertEquals(IConstants.TOMCAT_VER_60, TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT6_SERVERINFO));
+        Assert.assertEquals(IConstants.TOMCAT_VER_70, TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT7_SERVERINFO));
 
-        Assert.assertFalse(TomcatVersionValidator.isTomcatVersionIsValid(LINUX_TOMCAT5_SERVERINFO));
-        Assert.assertFalse(TomcatVersionValidator.isTomcatVersionIsValid(LINUX_TOMCAT8_SERVERINFO));
-        Assert.assertFalse(TomcatVersionValidator.isTomcatVersionIsValid(null));
-        Assert.assertFalse(TomcatVersionValidator.isTomcatVersionIsValid(""));
+        Assert.assertNull(TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT5_SERVERINFO));
+        Assert.assertNull(TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT8_SERVERINFO));
+        Assert.assertNull(TomcatVersionValidator.getTomcatVersion(null));
+        Assert.assertNull(TomcatVersionValidator.getTomcatVersion(""));
     }
 }
