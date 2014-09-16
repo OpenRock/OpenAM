@@ -277,6 +277,24 @@
             </interaction>
         </common-interactions>
         <instance-interactions>
+            <interaction lookupkey="INSTALL_GLOBAL_WEB_XML">
+                <skipIf key="STR_TOMCAT_VERSION" ignorecase="true">
+                    <value>TOMCAT_VER_70</value>
+                </skipIf>
+                <i18n key="INT_GLOBAL_WEB_XML" group="tomcatv6Tools"/>
+                <default-value-finder>
+                    <class name="StaticDefaultValueFinder" type="system"/>
+                    <static value="true"/>
+                </default-value-finder>
+                <validations>
+                    <validation name="VALID_CHOICE">
+                        <class name="ChoiceValidator" type="system"/>
+                        <property name="value1" value="true"/>
+                        <property name="value2" value="false"/>
+                        <property name="ignorecase" value="true"/>
+                    </validation>
+                </validations>
+            </interaction>
             <interaction lookupkey="AGENT_URL">
                 <i18n key="INT_AGENT_URL" group="amToolsMessages"/>
                 <validations>
