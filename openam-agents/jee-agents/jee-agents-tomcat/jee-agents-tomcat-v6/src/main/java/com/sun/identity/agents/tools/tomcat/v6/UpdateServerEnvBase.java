@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -40,7 +40,6 @@ import java.io.File;
 public class UpdateServerEnvBase implements IConstants, IConfigKeys {
     protected String _catalinaHomeDir = null;
     protected String _setenvFile;
-    protected String _setJvmOption;
     protected String _agentInstanceConfigDirPath;
     protected String _agentLibPath;
     protected String _agentLocaleDir;
@@ -50,11 +49,10 @@ public class UpdateServerEnvBase implements IConstants, IConfigKeys {
     }
 
     protected boolean unconfigureServerEnv(IStateAccess state) {
-        boolean status = true;
 
         getSetenvScriptFile(state);
         getAgentConfigLocation(state);
-        status = updateServerEnv();
+        boolean status = updateServerEnv();
         return status;
     }
 
@@ -126,21 +124,33 @@ public class UpdateServerEnvBase implements IConstants, IConfigKeys {
     }
 
     protected void getSetenvScriptFile(IStateAccess stateAccess) {
+
         if (_catalinaHomeDir == null) {
             _catalinaHomeDir = (String) stateAccess.get(STR_KEY_CATALINA_BASE_DIR);
 
-            String temp = _catalinaHomeDir + STR_FORWARD_SLASH
-            				+ STR_BIN_DIRECTORY + STR_FORWARD_SLASH;
+            // If we are installing agent on a RedHat like system then we should attempt to update
+            // the tomcat6.conf file rather than the setenv.sh file.
+            String catalinaConfDir = (String) stateAccess.get(STR_KEY_TOMCAT_SERVER_CONFIG_DIR);
+            if (catalinaConfDir != null) {
+                String confFilePath = catalinaConfDir + STR_FORWARD_SLASH + STR_TOMCAT6_CONF_UNIX;
+                if (FileUtils.isFileValid(confFilePath)) {
+                    _setenvFile = confFilePath;
+                    Debug.log("getSetenvScriptFile(): found a " + STR_TOMCAT6_CONF_UNIX + " in " + catalinaConfDir);
+                }
+            }
 
-            if (OSChecker.isWindows()) {
-                _setenvFile = temp + STR_SET_ENV_FILE_WINDOWS;
-            } else {
-                _setenvFile = temp + STR_SET_ENV_FILE_UNIX;
+            if (_setenvFile == null) {
+
+                String temp = _catalinaHomeDir + STR_FORWARD_SLASH + STR_BIN_DIRECTORY + STR_FORWARD_SLASH;
+
+                if (OSChecker.isWindows()) {
+                    _setenvFile = temp + STR_SET_ENV_FILE_WINDOWS;
+                } else {
+                    _setenvFile = temp + STR_SET_ENV_FILE_UNIX;
+                }
             }
 
             Debug.log("getSetenvScriptFile(): script name = " + _setenvFile);
         }
-
-        return;
     }
 }

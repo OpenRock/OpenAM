@@ -124,6 +124,7 @@ public interface IConstants {
     public static final String STR_SET_CLASSPATH_FILE_UNIX = "setclasspath.sh";
     public static final String STR_SET_ENV_FILE_WINDOWS = "setenv.bat";
     public static final String STR_SET_ENV_FILE_UNIX = "setenv.sh";
+    public static final String STR_TOMCAT6_CONF_UNIX = "tomcat6.conf";
     public static final String STR_SET_AGENT_CLASSPATH_FILE_WINDOWS =
     	"setAgentclasspath.bat";
     public static final String STR_SET_AGENT_CLASSPATH_FILE_UNIX =

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: HomeDirValidator.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.agents.tools.tomcat.v6;
@@ -35,7 +37,6 @@ import com.sun.identity.install.tools.configurator.ValidatorBase;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.FileUtils;
 import com.sun.identity.install.tools.util.LocalizedMessage;
-import com.sun.identity.install.tools.util.OSChecker;
 
 import java.io.File;
 
@@ -64,9 +65,9 @@ public class HomeDirValidator extends ValidatorBase implements IConstants,
      * Method isHomeDirValid
      *
      *
-     * @param dir
+     * @param catalinaHomeDir
      * @param props
-     * @param IStateAccess
+     * @param state
      *
      * @return ValidationResult
      *
@@ -90,8 +91,7 @@ public class HomeDirValidator extends ValidatorBase implements IConstants,
 
             String catalinaJarFile = sb.toString();
 
-            if (FileUtils.isFileValid(catalinaJarFile)
-                    && canUpdateServerClassPath(catalinaHomeDir)) {
+            if (FileUtils.isFileValid(catalinaJarFile)) {
                 returnMessage = LocalizedMessage.get(
                         LOC_VA_MSG_TOMCAT_VAL_CATALINA_HOME,
                         STR_TOMCAT_GROUP,
@@ -162,29 +162,5 @@ public class HomeDirValidator extends ValidatorBase implements IConstants,
                 LocalizedMessage.get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND),
                 ex);
         }
-    }
-
-    protected boolean canUpdateServerClassPath(String catalinaHomeDir) {
-        boolean result = false;
-        String temp = catalinaHomeDir + STR_FORWARD_SLASH
-            + STR_BIN_DIRECTORY + STR_FORWARD_SLASH;
-
-        String setClassPathFile;
-
-        if (OSChecker.isWindows()) {
-            setClassPathFile = temp + STR_SET_CLASSPATH_FILE_WINDOWS;
-        } else {
-            setClassPathFile = temp + STR_SET_CLASSPATH_FILE_UNIX;
-        }
-
-        File file = new File(setClassPathFile);
-
-        if (file.exists() && file.canWrite() && file.canRead()
-                && file.getParentFile()
-                           .canWrite()) {
-            result = true;
-        }
-
-        return result;
     }
 }
