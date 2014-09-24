@@ -62,10 +62,6 @@ libamsdk_static: $(SDKOBJS) $(COBJS)
 	@echo "[*** Creating crypt utility ***]"
 	${CC} $(CFLAGS) -UAM_BUILDING_LIB -o am/source/crypt_util am/source/crypt_util.c
 
-apache20i: $(APA20OBJS)
-	@echo "[*** Creating "$@" shared library ***]"
-	${CXX} $(CFLAGS) -h libamapc2.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(APA20OBJS) -o agents/source/apache/libamapc2.so -M agents/source/apache/libamapc.mapfile am/source/libamsdk.a $(EXT_LIBS)
-
 apache22i: $(APA22OBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} $(CFLAGS) -h libamapc22.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(APA22OBJS) -o agents/source/apache22/libamapc22.so -M agents/source/apache22/libamapc.mapfile am/source/libamsdk.a $(EXT_LIBS)
@@ -81,15 +77,5 @@ varnishi: $(VRNSHOBJS)
 oiwsi: $(OIWSOBJS)
 	@echo "[*** Creating "$@" shared library ***]"
 	${CXX} $(CFLAGS) -h libames6.so $(LDFLAGS) -norunpath -library=Cstd -library=Crun -Wl,-C $(OIWSOBJS) -o agents/source/sjsws/libames6.so -M agents/source/sjsws/iws_agent.mapfile am/source/libamsdk.a $(EXT_LIBS)
-
-ifneq ($(OS_MARCH), i86pc)
-dominoi: $(DOMINOOBJS)
-	@echo "[*** Creating "$@" shared library ***]"
-	${CXX} $(CFLAGS) -h libamdomino.so $(LDFLAGS) -z muldefs -norunpath -library=Cstd -library=Crun -Wl,-C $(DOMINOOBJS) -o agents/source/domino/libamdomino.so am/source/libamsdk.a $(EXT_LIBS) extlib/$(OS_ARCH)$(OS_MARCH)/domino/lib/notes0.o extlib/$(OS_ARCH)$(OS_MARCH)/domino/lib/notesai0.o
-else
-dominoi:
-	@echo "[*** Creating "$@" shared library ***]"
-	@echo "Domino is not supported on Solaris x86"
-endif
 
 endif

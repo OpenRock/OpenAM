@@ -1,5 +1,0 @@
-EXPORTS
-	FilterInit;
-	HttpFilterProc;
-	TerminateFilter;
-

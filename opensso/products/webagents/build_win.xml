@@ -183,11 +183,8 @@
     <target name="all" depends="get-arch" unless="is32bit">
         <antcall target="apache22" />
         <antcall target="apache24" />
-        <antcall target="sjsws" />
-        <antcall target="apache" />
         <antcall target="iis6" />
         <antcall target="iis7" />
-        <antcall target="domino" />
         <antcall target="sdk" />
         <antcall target="jsFiles" />
     </target>
@@ -200,22 +197,6 @@
         <antcall target="jsFiles64" />
     </target>
    
-    <target name="apache" depends="preparebuild">
-        <echo message="Dispatch to apache"/>
-        <property name="containername" value="apache"/>
-        <antcall target="nmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml" 
-             target="all" inheritRefs="true"/>
-    </target>
-
-    <target name="sjsws" depends="preparebuild">
-        <echo message="Dispatch to SJSWS"/>
-        <property name="containername" value="sjsws"/>
-        <antcall target="nmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml" 
-             target="all" inheritRefs="true"/>
-    </target>
-
     <target name="apache22" depends="preparebuild">
         <echo message="Dispatch to Apache 22"/>
         <property name="containername" value="apache22"/>
@@ -252,14 +233,6 @@
              target="all" inheritRefs="true"/>
     </target>
 
-    <target name="domino" depends="preparebuild">
-        <echo message="Dispatch to domino"/>
-        <property name="containername" value="domino"/>
-        <antcall target="nmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml"
-             target="all" inheritRefs="true"/>
-    </target>
-    
     <target name="sdk" depends="preparebuild">
         <echo message="Dispatch to build OpenAM C-SDK"/>
         <property name="containername" value="sdk"/>
@@ -421,9 +394,6 @@
         <echo message=" all             : builds all the Web agents (32bit)"/>
         <echo message=" all64           : builds all the Web agents (64bit), requires -Dbuild.type=64 option"/>
         <echo message=" clean           : deletes all the generated files"/>
-        <echo message=" apache          : builds the Apache Web Server 2.0.x agent"/>
-        <echo message=" sjsws           : builds the Sun Java System Web Server 6.1/7.0 agent"/>
-        <echo message=" domino          : builds the Sun Java System IBM Lotus Domino Server 8.5 agent"/>
         <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
         <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
         <echo message=" iis6            : builds the Microsoft Internet Information Services 6 agent"/>

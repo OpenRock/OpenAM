@@ -37,16 +37,12 @@ Portions Copyrighted 2010-2014 ForgeRock AS
               location="${webagents.basedir}/install"/>
     <property name="webagents.am.src.dir" 
               location="${webagents.basedir}/am/source"/>
-    <property name="webagents.apache.src.dir" 
-              location="${webagents.basedir}/agents/source/apache"/>
     <property name="webagents.sjsws.src.dir" 
               location="${webagents.basedir}/agents/source/sjsws"/>
     <property name="webagents.apache22.src.dir" 
               location="${webagents.basedir}/agents/source/apache22"/>
     <property name="webagents.apache24.src.dir" 
               location="${webagents.basedir}/agents/source/apache24"/>
-    <property name="webagents.domino.src.dir"
-              location="${webagents.basedir}/agents/source/domino"/>
 
     <!-- top level directory structure -->
     <property name="webagents.container.extlib.dir" 

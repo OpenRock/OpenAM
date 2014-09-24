@@ -144,19 +144,9 @@
         <antcall target="apache22" />
         <antcall target="apache24" />
         <antcall target="sjsws" /> 
-        <antcall target="apache" />
-        <antcall target="domino" />
         <antcall target="varnish" />
         <antcall target="varnish302" />
         <antcall target="sdk" />
-    </target>
-
-    <target name="apache" depends="preparebuild">
-        <echo message="Dispatch to apache"/>
-        <property name="containername" value="apache"/>
-        <antcall target="gmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml" 
-             target="all" inheritRefs="true"/>
     </target>
 
     <target name="sjsws" depends="preparebuild">
@@ -165,31 +155,6 @@
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
              target="all" inheritRefs="true"/>
-    </target>
-
-    <target name="domino" depends="preparebuild,check.build.domino" 
-            if="build.domino">
-        <echo message="Dispatch to domino"/>
-        <property name="containername" value="domino"/>
-        <antcall target="gmake" inheritRefs="true"/>
-        <ant antfile="${webagents.basedir}/build_agent.xml"
-             target="all" inheritRefs="true"/>
-    </target>
-
-    <target name="check.build.domino">
-        <condition property="build.domino">
-            <and>
-                <not>
-                    <equals arg1="${build.type}" arg2="64"/>
-                </not>
-                <or>
-                    <os name="linux" />
-                    <os name="sunos" arch="sparc"/>
-                    <os name="aix"/>
-                    <os family="windows"/>
-                </or>
-            </and>
-        </condition>
     </target>
 
     <target name="apache22" depends="preparebuild">
@@ -388,9 +353,7 @@
         <echo message=" "/>
         <echo message=" all             : builds all the Web agents"/>
         <echo message=" clean           : deletes all the generated files"/>
-        <echo message=" apache          : builds the Apache Web Server 2.0.x agent"/>
         <echo message=" sjsws           : builds the Sun Java System Web Server 6.1/7.0 agent"/>
-        <echo message=" domino          : builds the Sun Java System IBM Lotus Domino Server 8.5 agent"/>
         <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
         <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
         <echo message=" varnish         : builds the Varnish Cache Server 3.0.x agent"/>
