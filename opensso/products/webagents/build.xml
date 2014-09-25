@@ -290,8 +290,6 @@
         <filter token="BIT" value="${build.type.suffix}" />
         <filter token="ARCH" value="${build.type.suffix}" />
         <filter token="BUILD_DATE" value="${nightly.date}" />
-        <copy file="${webagents.basedir}/agents/source/apache/build_date.js.template"
-              tofile="${webagents.dist.dir}/apache_v20_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
               tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
