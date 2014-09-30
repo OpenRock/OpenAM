@@ -59,7 +59,7 @@ ifeq ($(OS_ARCH), Linux)
  OS_MARCH =
 endif
 
-CFLAGS += -Iextlib/$(OS_ARCH)$(OS_MARCH)/libxml2$(ARCH)/include/libxml2 -Iextlib/$(OS_ARCH)$(OS_MARCH)/pcre$(ARCH)/include/
+CFLAGS += -I/usr/include/libxml2 -Iextlib/$(OS_ARCH)$(OS_MARCH)/pcre$(ARCH)/include/
 EXT_LIBS = extlib/$(OS_ARCH)$(OS_MARCH)/pcre$(ARCH)/lib/libpcre.a
 
 WIN_SRC=am/source/connection_win.cpp am/source/xml_attribute_win.cpp am/source/xml_element_win.cpp am/source/xml_tree_win.cpp
