@@ -178,6 +178,11 @@ Portions Copyrighted 2010-2014 ForgeRock AS
         <delete dir="${webagents.container.lib.dir}"/>
         <delete dir="${webagents.container.classes.dir}"/>
         <delete dir="${webagents.container.built.dir}"/>
+        <delete>
+            <fileset dir="${webagents.basedir}/install/varnish/source/" includes="**/*.o"/>
+            <fileset dir="${webagents.basedir}/install/varnish/include/" includes="version.h"/>
+            <fileset dir="${webagents.basedir}/install/varnish/" includes="agentadmin"/>
+        </delete>
     </target>
 
     <target name="all" depends="preparebuild, scratch">
@@ -187,11 +192,13 @@ Portions Copyrighted 2010-2014 ForgeRock AS
     
     <target name="varnish" depends="preparebuild, scratch">
         <zip file="${webagents.dist.dir}/${containername}_v30_${build.os}${build.type.suffix}_agent_${agentversion}.zip" whenempty="create">  
-            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/extlib/${build.os.ext}/varnish${build.type.suffix}/bin/" includes="agentadmin"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/install/varnish/" includes="agentadmin"/>
             <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
             <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
             <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
             <zipfileset dir="${webagents.basedir}/extlib/${build.os.ext}/legal-notices/" includes="license.txt" fullpath="web_agents/varnish/legal-notices/license.txt"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentBootstrap.template" fullpath="web_agents/varnish/conf/OpenSSOAgentBootstrap.template"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentConfiguration.template" fullpath="web_agents/varnish/conf/OpenSSOAgentConfiguration.template"/>
         </zip>
         <checksum file="${webagents.dist.dir}/${containername}_v30_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
                   algorithm="SHA" fileext=".sha" />  
@@ -199,11 +206,13 @@ Portions Copyrighted 2010-2014 ForgeRock AS
     
     <target name="varnish302" depends="preparebuild, scratch">
         <zip file="${webagents.dist.dir}/${containername}_${build.os}${build.type.suffix}_agent_${agentversion}.zip" whenempty="create">  
-            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/extlib/Linux/varnish302_64/bin/" includes="agentadmin"/>
+            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/install/varnish/" includes="agentadmin"/>
             <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
             <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
             <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
             <zipfileset dir="${webagents.basedir}/extlib/${build.os.ext}/legal-notices/" includes="license.txt" fullpath="web_agents/varnish/legal-notices/license.txt"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentBootstrap.template" fullpath="web_agents/varnish/conf/OpenSSOAgentBootstrap.template"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentConfiguration.template" fullpath="web_agents/varnish/conf/OpenSSOAgentConfiguration.template"/>
         </zip>
         <checksum file="${webagents.dist.dir}/${containername}_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
                   algorithm="SHA" fileext=".sha" />  

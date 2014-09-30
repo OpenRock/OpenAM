@@ -135,6 +135,8 @@
 
     <target name="clean">
         <echo message="Dispatch to clean"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+             target="clean" inheritRefs="true"/>
         <exec executable="gmake" failonerror="true">
             <arg value="clean" />
         </exec>
