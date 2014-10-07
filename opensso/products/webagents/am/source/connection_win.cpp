@@ -60,20 +60,18 @@ std::string Connection::cipherList = "";
 bool Connection::trustServerCerts = true;
 std::string Connection::keyName = "";
 
-Connection::Connection(const ServerInfo& server) : context(NULL) {
+Connection::Connection(const char *host, unsigned int port, bool usessl = false) : context(NULL), useSSL(usessl), dataBuffer(NULL) {
 
-    WCHAR szHost[256];
     char ccName[256];
-    URL_COMPONENTS urlComp;
-
-    std::wstring url(utf8_decode(server.getURL()));
+    std::wstring whost(utf8_decode(std::string(host)));
     std::wstring agent(utf8_decode(std::string(Version::getAgentVersion())));
+
     agent = L"OpenAM Web Agent/" + agent;
 
     Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
-            "Connection::Connection(): connecting to: %s", server.getURL().c_str());
+            "Connection::Connection(): connecting to: %s:%d", host, port);
 
-    if (!url.empty() && (context = (REQUEST_CONTEXT *) malloc(sizeof (REQUEST_CONTEXT))) != NULL) {
+    if ((context = (REQUEST_CONTEXT *) malloc(sizeof (REQUEST_CONTEXT))) != NULL) {
         ZeroMemory(context, sizeof (REQUEST_CONTEXT));
         context->tokenType = NO_AUTH;
         context->hSession = WinHttpOpen(agent.c_str(), WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
@@ -90,61 +88,40 @@ Connection::Connection(const ServerInfo& server) : context(NULL) {
                 }
             }
 
-            ZeroMemory(&urlComp, sizeof (urlComp));
-            urlComp.dwStructSize = sizeof (urlComp);
-            urlComp.lpszHostName = szHost;
-            urlComp.dwHostNameLength = sizeof (szHost) / sizeof (szHost[0]);
-            urlComp.dwUrlPathLength = -1;
-            urlComp.dwSchemeLength = -1;
-            urlComp.dwExtraInfoLength = -1;
-            if (WinHttpCrackUrl(url.c_str(), 0, 0, &urlComp)) {
-                if ((context->hConnect = WinHttpConnect(context->hSession, szHost, urlComp.nPort, 0))) {
-                    context->lpUrlPath = (LPWSTR) malloc((urlComp.dwUrlPathLength + urlComp.dwExtraInfoLength + 1) * sizeof (WCHAR));
-                    if (context->lpUrlPath) {
-                        memcpy(context->lpUrlPath, urlComp.lpszUrlPath, (urlComp.dwUrlPathLength + urlComp.dwExtraInfoLength) * sizeof (WCHAR));
-                        context->lpUrlPath[urlComp.dwUrlPathLength + urlComp.dwExtraInfoLength] = 0;
+            if ((context->hConnect = WinHttpConnect(context->hSession, whost.c_str(), port, 0))) {
+                context->dwReqFlag = usessl ? WINHTTP_FLAG_SECURE | WINHTTP_FLAG_REFRESH : WINHTTP_FLAG_REFRESH;
+                context->dwSecFlag = (usessl && trustServerCerts) ?
+                        SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID
+                        | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE : 0;
 
-                        context->dwReqFlag = (INTERNET_SCHEME_HTTPS == urlComp.nScheme) ? WINHTTP_FLAG_SECURE | WINHTTP_FLAG_REFRESH : WINHTTP_FLAG_REFRESH;
-                        context->dwSecFlag = (INTERNET_SCHEME_HTTPS == urlComp.nScheme && trustServerCerts) ?
-                                SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID
-                                | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE : 0;
-
-                        if (context->dwSecFlag > 0) {
-                            DWORD protocols = WINHTTP_FLAG_SECURE_PROTOCOL_SSL3 | WINHTTP_FLAG_SECURE_PROTOCOL_TLS1 |
-                                    WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1 | WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2;
-                            WinHttpSetOption(context->hSession, WINHTTP_OPTION_SECURE_PROTOCOLS,
-                                    &protocols, sizeof (protocols));
-                        }
-
-                        if (context->dwSecFlag > 0 && keyName.length() > 0) {
-                            context->pfxStore = CertOpenStore(CERT_STORE_PROV_SYSTEM,
-                                    X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, L"My");
-                            if (context->pfxStore) {
-                                context->pCertContext = CertFindCertificateInStore(context->pfxStore, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-                                        0, CERT_FIND_SUBJECT_STR, keyName.c_str(), NULL);
-                                if (context->pCertContext) {
-                                    if (CertGetNameStringA(context->pCertContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, ccName, 128)) {
-                                        Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
-                                                "Connection::Connection(): found certificate: \"%s\", nickname: %s", ccName, keyName.c_str());
-                                        context->tokenType = CERT_AUTH;
-                                    }
-                                } else {
-                                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-                                            "Connection::Connection(): failed to locate certificate in local machine store (nickname: %s)", keyName.c_str());
-                                }
-                            }
-                        }
-
-                        return;
-                    } else {
-                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-                                "Connection::Connection(): memory allocation failure");
-                    }
-                } else {
-                    log_error("Connection::Connection(): http connect failed:", GetLastError());
+                if (context->dwSecFlag > 0) {
+                    DWORD protocols = WINHTTP_FLAG_SECURE_PROTOCOL_SSL3 | WINHTTP_FLAG_SECURE_PROTOCOL_TLS1 |
+                            WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1 | WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2;
+                    WinHttpSetOption(context->hSession, WINHTTP_OPTION_SECURE_PROTOCOLS,
+                            &protocols, sizeof (protocols));
                 }
+
+                if (context->dwSecFlag > 0 && keyName.length() > 0) {
+                    context->pfxStore = CertOpenStore(CERT_STORE_PROV_SYSTEM,
+                            X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, L"My");
+                    if (context->pfxStore) {
+                        context->pCertContext = CertFindCertificateInStore(context->pfxStore, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                                0, CERT_FIND_SUBJECT_STR, keyName.c_str(), NULL);
+                        if (context->pCertContext) {
+                            if (CertGetNameStringA(context->pCertContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, ccName, 128)) {
+                                Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
+                                        "Connection::Connection(): found certificate: \"%s\", nickname: %s", ccName, keyName.c_str());
+                                context->tokenType = CERT_AUTH;
+                            }
+                        } else {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                                    "Connection::Connection(): failed to locate certificate in local machine store (nickname: %s)", keyName.c_str());
+                        }
+                    }
+                }
+                return;
             } else {
-                log_error("Connection::Connection(): url parser failed:", GetLastError());
+                log_error("Connection::Connection(): http connect failed:", GetLastError());
             }
         } else {
             log_error("Connection::Connection(): http connection open failed:", GetLastError());
@@ -176,10 +153,6 @@ void Connection::http_close() {
             WinHttpCloseHandle(context->hSession);
             context->hSession = NULL;
         }
-        if (context->lpUrlPath != NULL) {
-            free(context->lpUrlPath);
-            context->lpUrlPath = NULL;
-        }
         if (context->pCertContext != NULL) {
             CertFreeCertificateContext(context->pCertContext);
             context->pCertContext = NULL;
@@ -191,6 +164,10 @@ void Connection::http_close() {
         free(context);
         context = NULL;
     }
+    if (dataBuffer != NULL) {
+        free(dataBuffer);
+    }
+    dataBuffer = NULL;
 }
 
 BOOL Connection::request(REQUEST_TYPE type, std::wstring& urlpath, ConnHeaderMap& hdrs, std::string& post) {
@@ -215,7 +192,7 @@ BOOL Connection::request(REQUEST_TYPE type, std::wstring& urlpath, ConnHeaderMap
         ZeroMemory(ctxi, sizeof (REQUEST_CONTEXT_INT));
         context->lpRequest = ctxi;
         ctxi->hRequest = WinHttpOpenRequest(context->hConnect,
-                method, (urlpath.empty() ? context->lpUrlPath : urlpath.c_str()),
+                method, (urlpath.empty() ? L"/" : urlpath.c_str()),
                 NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES,
                 context->dwReqFlag);
         if (ctxi->hRequest) {
@@ -328,6 +305,7 @@ BOOL Connection::response(REQUEST_TYPE rtype) {
 
             std::auto_ptr<char> outBuffer;
             bool error = false;
+            std::string dataBufferTmp;
 
             do {
                 downloadSize = 0;
@@ -346,7 +324,7 @@ BOOL Connection::response(REQUEST_TYPE rtype) {
                 } else {
                     ZeroMemory(outBuffer.get(), downloadSize + 1);
                     if (WinHttpReadData(ctx->hRequest, outBuffer.get(), downloadSize, &readCount)) {
-                        dataBuffer.append(outBuffer.get(), readCount);
+                        dataBufferTmp.append(outBuffer.get(), readCount);
                         ctx->dwSize += readCount;
                     }
 
@@ -356,9 +334,14 @@ BOOL Connection::response(REQUEST_TYPE rtype) {
             DWORD err = GetLastError();
 
             if (!error) {
-                if (dataBuffer.size() > 0) {
+                if (dataBufferTmp.size() > 0) {
+                    dataBuffer = (char *) malloc(dataBufferTmp.size() + 1);
+                    if (dataBuffer) {
+                        memcpy(dataBuffer, dataBufferTmp.c_str(), dataBufferTmp.size());
+                        dataBuffer[dataBufferTmp.size()] = 0;
+                    }
                     Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
-                            "Connection::response():\n%s", dataBuffer.c_str());
+                            "Connection::response():\n%s", dataBufferTmp.c_str());
                     log_error("Connection::response():", err);
                     return TRUE;
                 } else {

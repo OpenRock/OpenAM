@@ -313,7 +313,7 @@ void encode_url( const char *orig_url, char *dest_url)
 {
     int ucnt;
     char p_enc = '%';
-    char buffer[4];
+    char buffer[6];
     for(size_t i=0; i < strlen(orig_url); i++) {
 	ucnt = orig_url[i];
 	if (( ucnt >  32) && ( ucnt < 127))  {
@@ -321,9 +321,9 @@ void encode_url( const char *orig_url, char *dest_url)
 	} else {
 	   if ( ucnt < 0 ) ucnt += 256;
 	      if (ucnt < 32)
-		 sprintf(buffer, "%c0%X", p_enc, ucnt);
+		 snprintf(buffer, sizeof (buffer), "%c0%X", p_enc, ucnt);
 	      else
-		 sprintf(buffer, "%c%X", p_enc, ucnt);
+		 snprintf(buffer, sizeof (buffer), "%c%X", p_enc, ucnt);
 	}
     }
     strncat(dest_url, buffer, strlen(buffer));
@@ -483,7 +483,7 @@ static am_bool_t is_server_alive(const Utils::url_info_t *info_ptr,
 
     Connection::ConnHeaderMap emptyHdrs;
     ServerInfo si(sstm.str());
-    Connection conn(si);
+    Connection conn(si.getHost().c_str(), si.getPort(), si.useSSL());
     am_status_t stat = conn.sendRequest("HEAD", empty, emptyHdrs, empty);
     int http_status = conn.httpStatusCode();
 
@@ -1161,7 +1161,7 @@ am_web_init(const char *agent_bootstrap_file,
                 
                 SleepEx((nvld->ping_interval + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
 #else
-                sprintf(fn, "/tmp/%s_%d", AM_NAMING_LOCK, iid);
+                snprintf(fn, sizeof (fn), "/tmp/%s_%d", AM_NAMING_LOCK, iid);
                 unlink(fn);
                 pthread_create(&nv_thr, NULL, naming_validator, nvld);
 #endif
@@ -1437,7 +1437,7 @@ void set_host_ip_in_env_map(const char *client_ip,
             (AgentConfigurationRefCntPtr*) agent_config;
     
     struct addrinfo hints, *res = NULL;
-    char client_host[NI_MAXHOST];
+    char client_host[NI_MAXHOST + 1];
     socklen_t slen;
 
     am_map_insert(env_parameter_map, requestIp, client_ip, AM_TRUE);
@@ -1635,14 +1635,20 @@ std::string cookie_timestamp(const char *sec) {
     if (errno != ERANGE || errno != EINVAL) {
         char time_string[50];
         struct tm *now;
+        struct tm tm;
         time_t rawtime;
         if (sec_ == 0) {
             return std::string("Thu, 01-Jan-1970 00:00:01 GMT");
         }
         time(&rawtime);
         rawtime += sec_;
-        now = gmtime(&rawtime);
+#ifdef _MSC_VER
+        gmtime_s(&tm, &rawtime);
+        strftime(time_string, sizeof (time_string), "%a, %d-%b-%Y %H:%M:%S GMT", &tm);
+#else
+        now = gmtime_r(&rawtime, &tm);
         strftime(time_string, sizeof (time_string), "%a, %d-%b-%Y %H:%M:%S GMT", now);
+#endif
         return std::string(time_string);
     }
     return std::string();
@@ -1774,14 +1780,14 @@ am_web_get_parameter_value(const char* inpString,
     size_t i = 0, end_param = 0;
 
     *param_value = NULL;
-    if (inpString == NULL || param_name == NULL && param_value == NULL) {
+    if (inpString == NULL || param_name == NULL) {
         status = AM_INVALID_ARGUMENT;
     }
     else {
 	try {
 	    if((i = inpStr.find(paramStr)) != -1) {
 		i = inpStr.find("=", i);
-		if (i >= 0) {
+		if (i != std::string::npos) {
 		    if((end_param = inpStr.find("&", i+1)) != -1) {
 			outStr.append(inpStr, i+1, end_param - (i+1));
 		    } else {
@@ -1929,7 +1935,7 @@ is_url_not_enforced(const char *url, const char *client_ip, std::string pInfo,
     // Check all required arguments.
     if (url == NULL || *url == '\0' || 
             (AM_TRUE == (*agentConfigPtr)->check_client_ip &&
-            NULL == client_ip || *client_ip == '\0')) {
+            (NULL == client_ip || *client_ip == '\0'))) {
         status = AM_INVALID_ARGUMENT;
     }
 
@@ -2084,7 +2090,6 @@ am_web_is_access_allowed(const char *sso_token,
 
     const char *thisfunc = "am_web_is_access_allowed()";
     am_status_t status = AM_SUCCESS;
-    char fmtStr[MSG_MAX_LEN];
     const char *rmtUsr = NULL;
     std::string queryToken;
     am_bool_t isNotEnforced = AM_FALSE;
@@ -2104,14 +2109,12 @@ am_web_is_access_allowed(const char *sso_token,
     char *urlSSOToken = NULL;    //sso_token present in the url
     char *modifiedURL = NULL;    //modified url after removal of sso_token
 
-    memset(fmtStr, 0, sizeof(fmtStr));
-
     // Check arguments
     if (url_str == NULL || action_name == NULL ||
             *url_str == '\0' || action_name == '\0' ||
             env_parameter_map == NULL || result == NULL ||
             (AM_TRUE == (*agentConfigPtr)->check_client_ip &&
-            NULL == client_ip || *client_ip == '\0')) {
+            (NULL == client_ip || *client_ip == '\0'))) {
         status = AM_INVALID_ARGUMENT;
     }
 
@@ -2185,7 +2188,7 @@ am_web_is_access_allowed(const char *sso_token,
                 sso_token = urlSSOToken;
                 am_web_log_debug("am_web_is_access_allowed(): "
                         "sso token from request url = \"%s\"", sso_token);
-                modifiedURL = (char *) malloc(strlen(url));
+                modifiedURL = (char *) malloc(strlen(url) + 1);
                 if(modifiedURL != NULL) {
                     am_web_remove_parameter_from_query(url,
                                                    am_web_get_cookie_name(agent_config),
@@ -2259,7 +2262,7 @@ am_web_is_access_allowed(const char *sso_token,
                 } else {
                     if ((*agentConfigPtr)->encode_url_special_chars 
                                == AM_TRUE ) {
-                        encodedUrlSize = (strlen(url)+1)*4;
+                        encodedUrlSize = (strlen(url) + 1) * 4;
                         encodedUrl = (char *) malloc (encodedUrlSize);
                         // Check url for special chars
                         if (encodedUrl != NULL) {
@@ -2949,13 +2952,13 @@ std::string add_cdsso_elements_to_redirect_url(void* agent_config) {
     // request id
     char id[10];
     srand((unsigned)time(NULL));
-    sprintf(id, "%ld", (long int)rand());
+    snprintf(id, sizeof (id), "%ld", (long int) rand());
     std::string requestID = id;
 
     // issue instant
     char *strtime = NULL;
-    strtime = (char *) malloc ( AM_WEB_MAX_POST_KEY_LENGTH );
-    time_2_str(strtime,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
+    strtime = (char *) malloc(AM_WEB_MAX_POST_KEY_LENGTH + 1);
+    time_2_str(strtime, AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
     std::string strIssueInstant;
     if(strtime != NULL && strlen(strtime) > 0) {
             strIssueInstant = strtime;
@@ -3285,9 +3288,9 @@ am_web_reset_ldap_attribute_cookies(
     am_status_t tmpStatus = AM_SUCCESS;
 
     // Reset cookies from ldap Attributes
-    if (((*agentConfigPtr)->setUserProfileAttrsMode == SET_ATTRS_AS_COOKIE) ||
+    if ((((*agentConfigPtr)->setUserProfileAttrsMode == SET_ATTRS_AS_COOKIE) ||
        ((*agentConfigPtr)->setUserSessionAttrsMode == SET_ATTRS_AS_COOKIE)  ||
-       ((*agentConfigPtr)->setUserResponseAttrsMode == SET_ATTRS_AS_COOKIE) &&
+       ((*agentConfigPtr)->setUserResponseAttrsMode == SET_ATTRS_AS_COOKIE)) &&
 	    ((*agentConfigPtr)->attrList.size() > 0)) {
 	Utils::cookie_info_t attr_cookie;
 	attr_cookie.value = const_cast<char*>("");
@@ -3733,7 +3736,7 @@ am_web_result_attr_map_set(
                                "function. ", thisfunc);
                       if (values.c_str() != NULL) {
                          new_str_size = (unsigned int) (strlen(values.c_str())+1)*4;
-                         if (new_str_size  > 2048) {
+                         if (new_str_size  >= 2048) {
                             new_str_free = 1;
                             new_str = (char *) malloc (new_str_size);
                          } else {
@@ -4347,7 +4350,7 @@ am_web_create_post_preserve_urls(const char *request_url,
     }
     // Get the time stamp
     if (status == AM_SUCCESS) {
-        time_str = (char *) malloc (AM_WEB_MAX_POST_KEY_LENGTH);
+        time_str = (char *) malloc (AM_WEB_MAX_POST_KEY_LENGTH + 1);
         if (time_str != NULL) {
             time_to_string(time_str,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
         } else {
@@ -4381,7 +4384,7 @@ am_web_create_post_preserve_urls(const char *request_url,
         if (postDataPreserveKey == 5000) {
             postDataPreserveKey = 1;
         }
-        sprintf(uniqueNumber, "%d", postDataPreserveKey);
+        snprintf(uniqueNumber, sizeof(uniqueNumber), "%d", postDataPreserveKey);
         key.append(".").append(uniqueNumber);
         url_data_tmp->post_time_key = (char *)strdup(key.c_str());
         if (url_data_tmp->post_time_key == NULL) {
@@ -4477,7 +4480,7 @@ split_post_data(const char * test_string)
     std::size_t i = 0;
     unsigned int num_sectors = 0;
     Utils::post_struct_t *post_data =
-        (Utils::post_struct_t *) malloc(sizeof(Utils::post_struct_t) * 1);
+        (Utils::post_struct_t *) malloc(sizeof(Utils::post_struct_t));
 
     //Create the tokens with name value pair separated with "&"
     char *postValue = strdup(test_string);
@@ -5218,60 +5221,64 @@ am_web_result_num_to_str(am_web_result_t result) {
  * Note: only handles netscape style cookie headers.
  */
 static am_status_t
-remove_cookie(const char *cookie_name, char *cookie_header_val)
-{
+remove_cookie(const char *cookie_name, char *cookie_header_val) {
     am_status_t sts = AM_SUCCESS;
     char *last = NULL;
     char *tok = NULL;
     char *buf = NULL;
-//    bool found = false;
+    char *cookie_header_val_tmp = NULL;
+
     if (cookie_name == NULL) {
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else if (cookie_header_val == NULL) {
-	sts = AM_SUCCESS;
-    }
-    else if (strstr(cookie_header_val, cookie_name) == NULL) {
-	// simple check if cookie is in cookie header val.
-	sts = AM_NOT_FOUND;
-    }
-    else if ((buf = (char *)calloc(1, strlen(cookie_header_val)+1)) == NULL) {
-	sts = AM_NO_MEMORY;
-    }
-    else {
-	// check if each cookie in cookie header
-	tok = strtok_r(cookie_header_val, ";", &last);
-	while (tok != NULL) {
-	    size_t cookie_name_len = strlen(cookie_name);
-	    bool match = false;
-	    char *equal_sign = strchr(tok, '=');
-	    // trim space before the cookie name in the cookie header.
-	    while (isspace(*tok))
-		tok++;
-	    if (equal_sign != NULL && equal_sign != tok) {
-		// trim white space after the cookie name in the cookie header.
-		while ((--equal_sign) >= tok && isspace(*equal_sign))
-		    ;
-		equal_sign++;
-		// now compare the cookie names.
-		if (equal_sign != tok &&
-		    (equal_sign - tok) == cookie_name_len &&
-		    !strncmp(tok, cookie_name, cookie_name_len)) {
-		    match = true;
-		}
-	    }
-	    // put cookie in header only if didn't match cookie name.
-	    if (!match) {
-		if (*buf != '\0') {
-		    strcat(buf, ";");
-		}
-		strcat(buf, tok);
-	    }
-	    tok = strtok_r(NULL, ";", &last);
-	}
-	strcpy(cookie_header_val, buf);
-	free(buf);
-	sts = AM_SUCCESS;
+        sts = AM_INVALID_ARGUMENT;
+    } else if (cookie_header_val == NULL) {
+        sts = AM_SUCCESS;
+    } else if (strstr(cookie_header_val, cookie_name) == NULL) {
+        // simple check if cookie is in cookie header val.
+        sts = AM_NOT_FOUND;
+    } else if ((buf = (char *) calloc(1, strlen(cookie_header_val) + 1)) == NULL) {
+        sts = AM_NO_MEMORY;
+    } else {
+        cookie_header_val_tmp = strdup(cookie_header_val);
+        if (cookie_header_val_tmp != NULL) {
+            // check if each cookie in cookie header
+            tok = strtok_r(cookie_header_val_tmp, ";", &last);
+            while (tok != NULL) {
+                size_t cookie_name_len = strlen(cookie_name);
+                bool match = false;
+                char *equal_sign = strchr(tok, '=');
+                // trim space before the cookie name in the cookie header.
+                while (isspace(*tok))
+                    tok++;
+                if (equal_sign != NULL && equal_sign != tok) {
+                    // trim white space after the cookie name in the cookie header.
+                    while ((--equal_sign) >= tok && isspace(*equal_sign))
+                        ;
+                    equal_sign++;
+                    // now compare the cookie names.
+                    if (equal_sign != tok &&
+                            (equal_sign - tok) == cookie_name_len &&
+                            !strncmp(tok, cookie_name, cookie_name_len)) {
+                        match = true;
+                    }
+                }
+                // put cookie in header only if didn't match cookie name.
+                if (!match) {
+                    if (*buf != '\0') {
+                        strcat(buf, ";");
+                    }
+                    strcat(buf, tok);
+                }
+                tok = strtok_r(NULL, ";", &last);
+            }
+            if (strlen(buf) > strlen(cookie_header_val)) {
+                sts = AM_NO_MEMORY;
+            } else {
+                strcpy(cookie_header_val, buf);
+                sts = AM_SUCCESS;
+            }
+            free(buf);
+            free(cookie_header_val_tmp);
+        }
     }
     return sts;
 }
@@ -5463,26 +5470,29 @@ set_cookie_in_cookie_header(char *cookie_header,
 	// now set new value
 	// if no new value given, we're done.
 	char *new_cookie_header = NULL;
-	if (cookie_header == NULL) {
-	    new_cookie_header = (char *)
-		calloc(1, strlen(cookie_name)+strlen(cookie_val)+2);
-	} else {
-	    new_cookie_header = (char *)
-		calloc(1, strlen(cookie_header)+
-			    strlen(cookie_name)+strlen(cookie_val)+3);
-	    strcpy(new_cookie_header, cookie_header);
-	    strcat(new_cookie_header, ";");
-	}
-	if (new_cookie_header == NULL) {
-	    sts = AM_NO_MEMORY;
-	}
-	else {
-	    strcat(new_cookie_header, cookie_name);
-	    strcat(new_cookie_header, "=");
-	    strcat(new_cookie_header, cookie_val);
-	}
-	*new_cookie_header_ptr = new_cookie_header;
-	sts = AM_SUCCESS;
+        if (cookie_header == NULL) {
+            new_cookie_header = (char *)
+                    calloc(1, strlen(cookie_name) + strlen(cookie_val) + 3);
+        } else {
+            new_cookie_header = (char *)
+                    calloc(1, strlen(cookie_header) +
+                    strlen(cookie_name) + strlen(cookie_val) + 4);
+            if (new_cookie_header == NULL) {
+                sts = AM_NO_MEMORY;
+            } else {
+                strcpy(new_cookie_header, cookie_header);
+                strcat(new_cookie_header, ";");
+            }
+        }
+        if (new_cookie_header == NULL) {
+            sts = AM_NO_MEMORY;
+        } else {
+            strcat(new_cookie_header, cookie_name);
+            strcat(new_cookie_header, "=");
+            strcat(new_cookie_header, cookie_val);
+        }
+        *new_cookie_header_ptr = new_cookie_header;
+        sts = AM_SUCCESS;
     }
     return sts;
 }
@@ -6127,25 +6137,21 @@ process_access_redirect(char *url,
         if (policy_result.advice_string != NULL) {
             if (B_FALSE == am_web_use_redirect_for_advice(agent_config) && advice_response != NULL) {
                 // Composite advice is sent as a POST
-                char* advice_res = (char *) malloc(2048 * sizeof (char));
-                if (advice_res) {
-                    am_status_t ret = am_web_build_advice_response(
-                            &policy_result,
-                            *redirect_url,
-                            &advice_res);
-                    am_web_log_debug("%s: policy status=%s, advice response[%s]",
-                            thisfunc, am_status_to_string(ret),
-                            *advice_response);
-                    if (ret != AM_SUCCESS) {
-                        am_web_log_error("%s: Error while building "
-                                "advice response body:%s",
-                                thisfunc, am_status_to_string(ret));
-                    } else {
-                        result = AM_WEB_RESULT_OK_DONE;
-                        *advice_response = advice_res;
-                    }
+                char* advice_res = NULL;
+                am_status_t ret = am_web_build_advice_response(
+                        &policy_result,
+                        *redirect_url,
+                        &advice_res);
+                am_web_log_debug("%s: policy status=%s, advice response[%s]",
+                        thisfunc, am_status_to_string(ret),
+                        *advice_response);
+                if (ret != AM_SUCCESS) {
+                    am_web_log_error("%s: Error while building "
+                            "advice response body:%s",
+                            thisfunc, am_status_to_string(ret));
                 } else {
-                    sts = AM_NO_MEMORY;
+                    result = AM_WEB_RESULT_OK_DONE;
+                    *advice_response = advice_res;
                 }
             } else if (B_TRUE == am_web_use_redirect_for_advice(agent_config)) {
                 // Composite advice is redirected

@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 
 #ifndef __UTILS_H__
@@ -201,38 +201,6 @@ namespace Utils {
             const char* cookieResetDefaultDomain);
     am_status_t initCookieResetList(
             cookie_info_list_t *cookie_list, const char* cookieResetDefaultDomain);
-
-    enum flags {
-        FL_ZERO = 0x01,
-        FL_MINUS = 0x02,
-        FL_PLUS = 0x04,
-        FL_TICK = 0x08,
-        FL_SPACE = 0x10,
-        FL_HASH = 0x20,
-        FL_SIGNED = 0x40,
-        FL_UPPER = 0x80
-    };
-
-    enum ranks {
-        rank_char = -2,
-        rank_short = -1,
-        rank_int = 0,
-        rank_long = 1,
-        rank_longlong = 2
-    };
-
-    inline flags operator|(flags a, flags b) {
-        return static_cast<flags> (static_cast<int> (a) | static_cast<int> (b));
-    }
-
-    size_t format_int(char *q, size_t n, uintmax_t val, enum flags flags,
-            int base, int width, int prec);
-
-    int am_vsnprintf(char *buffer, size_t n, const char *format, va_list ap);
-
-    int am_vasprintf(char **strp, const char *fmt, va_list ap);
-
-    int am_printf(char **buffer, const char *fmt, ...);
     
 }
 

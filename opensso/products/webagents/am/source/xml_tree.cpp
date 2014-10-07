@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <stdio.h>
@@ -38,40 +38,43 @@
 
 USING_PRIVATE_NAMESPACE
 
-namespace {
+#ifndef PUGIXML
+
+        namespace {
 
     struct XMLErrorData {
-	XMLErrorData(const char *prefix)
-	    : errorDetected(false), message(prefix)
-	{
-	}
 
-	bool errorDetected;
-	std::string message;
+        XMLErrorData(const char *prefix)
+        : errorDetected(false), message(prefix) {
+        }
+
+        bool errorDetected;
+        std::string message;
     };
 
-    void XMLErrorHandler(XMLErrorData *data, const char *format, ...)
-    {
-	if (data) {
-	    const char prefix[] = "XMLTree() ";
-	    char buf[1024 + sizeof(prefix)];
-	    va_list args;
+    void XMLErrorHandler(XMLErrorData *data, const char *format, ...) {
+        if (data) {
+            const char prefix[] = "XMLTree() ";
+            char buf[4096 + sizeof (prefix)];
+            va_list args;
 
-	    std::memcpy(buf, prefix, sizeof(prefix) - 1);
+            std::memcpy(buf, prefix, sizeof (prefix) - 1);
 
-	    va_start(args, format);
-	    vsnprintf(buf, sizeof(buf) - sizeof(prefix) - 1, format, args);
-	    va_end(args);
+            va_start(args, format);
+            vsnprintf(buf, sizeof (buf) - sizeof (prefix) - 1, format, args);
+            va_end(args);
 
-	    data->errorDetected = true;
-	    try {
-		data->message.append(buf);
-	    } catch (const std::exception&) {
-		// supress any exceptions that occur copying the message
-	    }
-	}
+            data->errorDetected = true;
+            try {
+                data->message.append(buf);
+            } catch (const std::exception&) {
+                // supress any exceptions that occur copying the message
+            }
+        }
     }
 }
+
+#endif
 
 bool XMLTree::initialized = false;
 
@@ -80,84 +83,122 @@ bool XMLTree::initialized = false;
  *	std::invalid_argument if any argument is invalid 
  *	XMLTree::ParseException upon XML parsing error
  */
-XMLTree::XMLTree(bool validate, const char *docBuffer, std::size_t bufferLen)
-    : docPtr(NULL)
-{
-    if (static_cast<const char *>(NULL) == docBuffer) {
-	throw std::invalid_argument("XMLTree(docBuffer) is NULL");
+#ifdef PUGIXML
+
+XMLTree::XMLTree(bool validate, const char *docBuffer, std::size_t bufferLen) {
+    pugi::xml_parse_result result;
+
+    if (!docBuffer) {
+        throw std::invalid_argument("XMLTree(docBuffer) is NULL");
     }
 
-    if (0 == bufferLen) {
-	bufferLen = std::strlen(docBuffer);
-	if (0 == bufferLen) {
-	    throw std::invalid_argument("XMLTree(docBuffer) is empty");
-	}
+    if (bufferLen == 0) {
+        bufferLen = std::strlen(docBuffer);
+        if (bufferLen == 0) {
+            throw std::invalid_argument("XMLTree(docBuffer) is empty");
+        }
     }
 
     if (INT_MAX < bufferLen) {
-	throw std::invalid_argument("XMLTree(docBuffer) too long");
+        throw std::invalid_argument("XMLTree(docBuffer) too long");
     }
 
-    docPtr = xmlParseMemory(docBuffer, static_cast<int>(bufferLen));
-    if (static_cast<xmlDocPtr>(NULL) == docPtr) {
-	throw ParseException("XMLTree() unable to parse docBuffer");
+    result = docPtr.load_buffer(docBuffer, bufferLen);
+
+    if (result.status != pugi::status_ok) {
+        std::string msg("XMLTree() unable to parse docBuffer ");
+        if (result.description()) {
+            msg.append(result.description());
+        }
+        throw ParseException(msg);
+    }
+}
+
+#else
+
+XMLTree::XMLTree(bool validate, const char *docBuffer, std::size_t bufferLen)
+: docPtr(NULL) {
+    if (static_cast<const char *> (NULL) == docBuffer) {
+        throw std::invalid_argument("XMLTree(docBuffer) is NULL");
+    }
+
+    if (0 == bufferLen) {
+        bufferLen = std::strlen(docBuffer);
+        if (0 == bufferLen) {
+            throw std::invalid_argument("XMLTree(docBuffer) is empty");
+        }
+    }
+
+    if (INT_MAX < bufferLen) {
+        throw std::invalid_argument("XMLTree(docBuffer) too long");
+    }
+
+    docPtr = xmlReadMemory(docBuffer, static_cast<int> (bufferLen), NULL, NULL, XML_PARSE_NONET);
+    if (static_cast<xmlDocPtr> (NULL) == docPtr) {
+        throw ParseException("XMLTree() unable to parse docBuffer");
     }
 
     if (validate) {
-	//
-	// Now, try to validate the document.
-	//
+        //
+        // Now, try to validate the document.
+        //
         XMLErrorData errorData("XMLTree() ");
-	xmlValidCtxt cvp;
+        xmlValidCtxt cvp;
 
-	cvp.userData = &errorData;
-	cvp.error = reinterpret_cast<xmlValidityErrorFunc>(XMLErrorHandler);
-	cvp.warning = reinterpret_cast<xmlValidityErrorFunc>(XMLErrorHandler);
+        cvp.userData = &errorData;
+        cvp.error = reinterpret_cast<xmlValidityErrorFunc> (XMLErrorHandler);
+        cvp.warning = reinterpret_cast<xmlValidityErrorFunc> (XMLErrorHandler);
 
-	if (!xmlValidateDocument(&cvp, docPtr)) {
-	    xmlFreeDoc(docPtr);
-	    if (errorData.errorDetected) {
-		throw ParseException(errorData.message);
-	    } else {
-		throw ParseException("XMLTree() docBuffer does not validate");
-	    }
-	}
+        if (!xmlValidateDocument(&cvp, docPtr)) {
+            xmlFreeDoc(docPtr);
+            if (errorData.errorDetected) {
+                throw ParseException(errorData.message);
+            } else {
+                throw ParseException("XMLTree() docBuffer does not validate");
+            }
+        }
     }
 
-    if (static_cast<xmlNodePtr>(NULL) == xmlDocGetRootElement(docPtr)) {
-	xmlFreeDoc(docPtr);
-	throw ParseException("XMLTree() empty document");
+    if (static_cast<xmlNodePtr> (NULL) == xmlDocGetRootElement(docPtr)) {
+        xmlFreeDoc(docPtr);
+        throw ParseException("XMLTree() empty document");
     }
 }
+#endif
 
-XMLTree::~XMLTree()
-{
+XMLTree::~XMLTree() {
+#ifndef PUGIXML
     xmlFreeDoc(docPtr);
     docPtr = NULL;
+#endif
 }
 
-void XMLTree::initialize()
-{
-    if (! initialized) {
-	xmlInitParser();
-	xmlKeepBlanksDefault(false);
-	initialized = true;
+void XMLTree::initialize() {
+    if (!initialized) {
+#ifndef PUGIXML
+        xmlInitParser();
+        xmlKeepBlanksDefault(false);
+#endif
+        initialized = true;
     }
 }
 
-void XMLTree::shutdown()
-{
+void XMLTree::shutdown() {
+#ifndef PUGIXML
     xmlCleanupParser();
+#endif
 }
 
-XMLElement XMLTree::getRootElement() const
-{
+XMLElement XMLTree::getRootElement() const {
+#ifdef PUGIXML
+    return XMLElement(docPtr.first_child());
+#else
     return XMLElement(xmlDocGetRootElement(docPtr));
+#endif
 }
 
-void XMLTree::log(Log::ModuleId logModule, Log::Level level) const
-{
+void XMLTree::log(Log::ModuleId logModule, Log::Level level) const {
     if (Log::isLevelEnabled(logModule, level)) {
-	getRootElement().log(logModule, level);
+        getRootElement().log(logModule, level);
     }
 }

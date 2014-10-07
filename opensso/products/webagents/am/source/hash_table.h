@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <list>
 #include <stdexcept>
+#include <time.h>
 #include "internal_macros.h"
 #include "ref_cnt_ptr.h"
 #include "scope_lock.h"

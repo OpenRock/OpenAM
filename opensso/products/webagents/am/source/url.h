@@ -158,7 +158,7 @@ class URL {
 		     const std::string &pathInfo=std::string(""));
 
     inline bool validatePort() {
-	return (port < 0 || port > 65535)?false:true;
+	return (port > 65535) ? false : true;
     }
 
     URL::Protocol whichProtocol(const std::string &proto) {

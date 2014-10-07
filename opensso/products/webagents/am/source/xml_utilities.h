@@ -30,7 +30,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef XML_UTILITIES_H
@@ -47,7 +47,11 @@
 #include <msxml6.h>
 #else
 #include <strings.h>
+#ifdef PUGIXML
+#include <pugixml.hpp>
+#else
 #include <libxml/tree.h>
+#endif
 #endif
 
 #include "internal_macros.h"
@@ -56,10 +60,19 @@
 BEGIN_PRIVATE_NAMESPACE
 
 #if defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(AIX)
+#ifdef PUGIXML
+inline bool matchesXMLString(const std::string& str1, const char *str2) {
+    std::string tmp = str2 ? str2 : "";
+    /* skip namespace prefix if any */
+    tmp.erase(0, tmp.find(":") + 1);
+    return str2 ? (0 == strcasecmp(str1.c_str(), tmp.c_str())) : false;
+}
+#else
 inline bool matchesXMLString(const std::string& str1, const xmlChar *str2) {
-    return str2 ? (0 == strcasecmp(str1.c_str(), 
+    return str2 ? (0 == strcasecmp(str1.c_str(),
             reinterpret_cast<const char *> (str2))) : false;
 }
+#endif
 #elif defined(_MSC_VER)
 
 inline std::string bstrToString(const BSTR bstr, int cp = CP_UTF8) {

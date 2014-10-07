@@ -32,7 +32,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 
 #ifndef BASE_SERVICE_H
@@ -60,17 +60,17 @@ protected:
 	{
 	}
 	explicit BodyChunk(const std::string& rhs,
-			   bool hide = false):data(rhs), secure(hide)
+			   bool hide = false):data(rhs.c_str()), secure(hide)
 	{
 	}
 
 	BodyChunk& operator=(const std::string& rhs)
 	{
-	    data = rhs;
+	    data = rhs.c_str();
 	    return *this;
 	}
 
-	BodyChunk(const BodyChunk &tbcopied):data(tbcopied.data),
+	BodyChunk(const BodyChunk &tbcopied):data(tbcopied.data.c_str()),
 					     secure(tbcopied.secure){}
 	std::string data;
 	bool secure;

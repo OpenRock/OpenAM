@@ -31,7 +31,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef CONNECTION_H
@@ -52,7 +52,6 @@
 #include "nspr_exception.h"
 #include "log.h"
 #include "properties.h"
-#include "server_info.h"
 
 #define NETWORK_TIMEOUT 4000 //msec
 
@@ -90,7 +89,6 @@ public:
     typedef struct {
         HINTERNET hSession;
         HINTERNET hConnect;
-        LPWSTR lpUrlPath;
         DWORD dwReqFlag;
         DWORD dwSecFlag;
         REQUEST_CONTEXT_INT *lpRequest;
@@ -99,7 +97,7 @@ public:
         HCERTSTORE pfxStore;
     } REQUEST_CONTEXT;
 
-    Connection(const ServerInfo& server);
+    Connection(const char *host, unsigned int port, bool usessl);
 
     ~Connection();
 
@@ -133,7 +131,7 @@ public:
         return -1;
     }
 
-    std::string& getBody() {
+    const char *getBody() {
         return dataBuffer;
     }
 
@@ -162,7 +160,8 @@ private:
     static unsigned long timeout;
     REQUEST_CONTEXT *context;
     ConnHeaderMap headers;
-    std::string dataBuffer;
+    char *dataBuffer;
+    bool useSSL;
 
     static std::string proxyHost;
     static std::string proxyUser;
@@ -205,8 +204,8 @@ public:
 
     typedef std::map<std::string, std::string> ConnHeaderMap;
     typedef std::pair<std::string, std::string> ConnHeaderMapValue;
-    
-    Connection(const ServerInfo& server);
+
+    Connection(const char *host, unsigned int port, bool usessl);
 
     ~Connection();
 
@@ -228,7 +227,7 @@ public:
         return statusCode;
     }
 
-    std::string& getBody() {
+    const char *getBody() {
         return dataBuffer;
     }
 
@@ -255,8 +254,8 @@ private:
     int statusCode;
     int dataLength;
     ConnHeaderMap headers;
-    std::string dataBuffer;
-    ServerInfo server;
+    char *dataBuffer;
+    bool useSSL;
     void *ssl;
 
     static std::string proxyHost;
@@ -269,6 +268,7 @@ private:
     static std::string keyPassword;
     static std::string caFile;
     static std::string certFile;
+    static Properties addrMap;
 
     void http_close();
 
@@ -278,11 +278,11 @@ private:
     void net_error(int n) {
 #ifdef __sun
         size_t size = 1024;
-        char *s = (char *) malloc(size);
+        char *s = (char *) malloc(size + 1);
         if (s == NULL) return;
         while (strerror_r(n, s, size) == -1 && errno == ERANGE) {
             size *= 2;
-            s = (char *) realloc(s, size);
+            s = (char *) realloc(s, size + 1);
             if (s == NULL) return;
         }
         if (s != NULL) {

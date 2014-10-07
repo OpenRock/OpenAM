@@ -26,7 +26,7 @@
  *
  */ 
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <string.h>
@@ -465,8 +465,6 @@ PolicyEngine::policy_evaluate(am_policy_t hdl, const char *ssoToken,
 				ex.getMessage(),
 				AM_FAILURE);
     }
-
-    return;
 }
 
 

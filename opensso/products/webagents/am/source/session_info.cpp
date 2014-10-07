@@ -26,9 +26,10 @@
  *
  */ 
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
+#include <stdio.h>
 #include "http.h"
 #include "session_info.h"
 #include "xml_tree.h"
@@ -69,27 +70,27 @@ void SessionInfo::parseAttributes(XMLElement element)
 	missingAttr = "cdomain";
     }
     if (! element.getAttributeValue("maxtime", value) ||
-	1 != sscanf(value.c_str(), "%lld", &maxSessionTime)) {
+	1 != sscanf(value.c_str(), "%ld", &maxSessionTime)) {
 	foundAll = false;
 	missingAttr = "maxtime";
     }
     if (! element.getAttributeValue("maxidle", value) ||
-	1 != sscanf(value.c_str(), "%lld", &maxIdleTime)) {
+	1 != sscanf(value.c_str(), "%ld", &maxIdleTime)) {
 	foundAll = false;
 	missingAttr = "maxidle";
     }
     if (! element.getAttributeValue("maxcaching", value) ||
-	1 != sscanf(value.c_str(), "%lld", &maxCachingTime)) {
+	1 != sscanf(value.c_str(), "%ld", &maxCachingTime)) {
 	foundAll = false;
 	missingAttr = "maxcaching";
     }
     if (! element.getAttributeValue("timeidle", value) ||
-	1 != sscanf(value.c_str(), "%lld", &idleTime)) {
+	1 != sscanf(value.c_str(), "%ld", &idleTime)) {
 	foundAll = false;
 	missingAttr = "timeidle";
     }
     if (! element.getAttributeValue("timeleft", value) ||
-	1 != sscanf(value.c_str(), "%lld", &remainingSessionTime)) {
+	1 != sscanf(value.c_str(), "%ld", &remainingSessionTime)) {
 	foundAll = false;
 	missingAttr = "timeleft";
     }

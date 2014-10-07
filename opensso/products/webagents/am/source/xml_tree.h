@@ -30,7 +30,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef XML_TREE_H
@@ -171,7 +171,11 @@ private:
     MSXML2::IXMLDOMDocument2Ptr docPtr;
     MSXML2::IXMLDOMElementPtr rootPtr;
 #else
+#ifdef PUGIXML
+    pugi::xml_document docPtr;
+#else
     struct _xmlDoc *docPtr;
+#endif
 #endif
 
 };

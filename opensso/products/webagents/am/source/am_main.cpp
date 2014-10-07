@@ -26,9 +26,10 @@
  *
  */
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
+#include <stdio.h>
 #include <cstring>
 #include "am.h"
 #include "connection.h"

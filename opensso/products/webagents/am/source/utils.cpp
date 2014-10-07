@@ -26,9 +26,11 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdexcept>
 #include <limits.h>
 #include <cmath>
@@ -358,18 +360,22 @@ time_t Utils::getTTL(const PRIVATE_NAMESPACE_NAME::XMLElement &element,
     unsigned long long val = 0;
     struct tm tm;
     time_t rawtime;
-    time(&rawtime);
 
+    time(&rawtime);
+    memset(&tm, 0, sizeof (struct tm));
 #ifdef _MSC_VER
     localtime_s(&tm, &rawtime);
 #else
     localtime_r(&rawtime, &tm);
 #endif
 
-    if (element.getAttributeValue(TIME_TO_LIVE, ttl)) {
-        if (sscanf(ttl.c_str(), "%llu", &val) != 1) {
-            val = 0;
-        }
+    if (element.getAttributeValue(TIME_TO_LIVE, ttl)
+            && ttl != "9223372036854775807") {
+#ifdef _MSC_VER
+        val = _strtoui64(ttl.c_str(), NULL, 10);
+#else
+        val = strtoull(ttl.c_str(), NULL, 10);
+#endif
     }
 
     if (val == 0 || val >= LONG_MAX) {
@@ -389,9 +395,10 @@ time_t Utils::getTTL(const PRIVATE_NAMESPACE_NAME::XMLElement &element,
     if (policy_clock_skew > 0) {
         tm.tm_sec += policy_clock_skew;
     }
-
+    
+    tm.tm_isdst = -1;
     retVal = mktime(&tm);
-
+    
     return retVal;
 }
 
@@ -523,7 +530,7 @@ ressubcmp(const char *r1, const char *r2, const am_resource_traits_t *traits,
     if (fwdcmp) {
         char *tmp;
 #define BUF_LEN 1024
-        char buf[BUF_LEN];
+        char buf[BUF_LEN + 1];
         std::size_t r1_size = strlen(r1);
 
         if (r1_size > BUF_LEN - 2) {
@@ -909,7 +916,6 @@ void Utils::cleanup_url_info_list(url_info_list_t *url_list) {
 
     url_list->size = 0;
 }
-
 /*
  * Parse a cookie string represenation of the form
  * name[=value][;Domain=value][;Max-Age=value][;Path=value]
@@ -920,9 +926,15 @@ am_status_t Utils::parseCookie(std::string cookie,
         cookie_info_t *cookie_data) {
     char *holder = NULL;
     char* temp_str = const_cast<char*> (cookie.c_str());
+    char* temp_str_w = NULL;
 
     if (cookie_data == NULL || temp_str == NULL) {
         return AM_INVALID_ARGUMENT;
+    }
+
+    temp_str_w = strdup(temp_str);
+    if (temp_str_w == NULL) {
+        return AM_NO_MEMORY;
     }
 
     cleanup_cookie_info(cookie_data);
@@ -931,8 +943,9 @@ am_status_t Utils::parseCookie(std::string cookie,
 
     char *token = NULL;
     std::string tempstr;
-    token = strtok_r(temp_str, ";", &holder);
+    token = strtok_r(temp_str_w, ";", &holder);
     if (token == NULL) {
+        free(temp_str_w);
         return AM_INVALID_ARGUMENT;
     }
     tempstr = token;
@@ -943,6 +956,7 @@ am_status_t Utils::parseCookie(std::string cookie,
     if (loc == NULL) {
         cookie_data->name = (char *) malloc(len + 1);
         if (cookie_data->name == NULL) {
+            free(temp_str_w);
             return AM_NO_MEMORY;
         }
         strcpy(cookie_data->name, token);
@@ -950,13 +964,15 @@ am_status_t Utils::parseCookie(std::string cookie,
         len = len - strlen(loc);
         cookie_data->name = (char *) malloc(len + 1);
         if (cookie_data->name == NULL) {
+            free(temp_str_w);
             return AM_NO_MEMORY;
         }
         strncpy(cookie_data->name, token, len);
         cookie_data->name[len] = '\0';
-        cookie_data->value = (char *) malloc(strlen(loc));
+        cookie_data->value = (char *) malloc(strlen(loc) + 1);
         if (cookie_data->name == NULL) {
             cleanup_cookie_info(cookie_data);
+            free(temp_str_w);
             return AM_NO_MEMORY;
         }
         strcpy(cookie_data->value, loc + 1);
@@ -978,6 +994,7 @@ am_status_t Utils::parseCookie(std::string cookie,
             cookie_data->domain = (char *) malloc(len + 1);
             if (cookie_data->domain == NULL) {
                 cleanup_cookie_info(cookie_data);
+                free(temp_str_w);
                 return AM_NO_MEMORY;
             }
             /*use domain value exactly as set in a configuration (do not remove leading '.')*/
@@ -991,6 +1008,7 @@ am_status_t Utils::parseCookie(std::string cookie,
                 cookie_data->max_age = (char *) malloc(len + 1);
                 if (cookie_data->max_age == NULL) {
                     cleanup_cookie_info(cookie_data);
+                    free(temp_str_w);
                     return AM_NO_MEMORY;
                 }
                 strcpy(cookie_data->max_age, loc);
@@ -1002,6 +1020,7 @@ am_status_t Utils::parseCookie(std::string cookie,
                     cookie_data->path = (char *) malloc(len + 1);
                     if (cookie_data->path == NULL) {
                         cleanup_cookie_info(cookie_data);
+                        free(temp_str_w);
                         return AM_NO_MEMORY;
                     }
                     strcpy(cookie_data->path, loc);
@@ -1011,7 +1030,7 @@ am_status_t Utils::parseCookie(std::string cookie,
         }
         token = strtok_r(NULL, ";", &holder);
     }
-
+    free(temp_str_w);
     return AM_SUCCESS;
 }
 
@@ -1254,13 +1273,10 @@ am_status_t Utils::parseCookieList(const char *property,
         }
     } while (*temp_ptr != '\0');
 
-    cookie_list->list = (cookie_info_t *) calloc(num_cookies,
-            sizeof (cookie_info_t));
+    cookie_list->list = (cookie_info_t *) calloc(num_cookies, sizeof (cookie_info_t));
     if (cookie_list->list == NULL) {
         return AM_NO_MEMORY;
     }
-
-    memset(cookie_list->list, 0, num_cookies * sizeof (cookie_info_t));
 
     size_t space = 0, curPos = 0;
     unsigned int idx = 0;
@@ -1398,430 +1414,3 @@ am_status_t Utils::initCookieResetList(
     }
     return AM_SUCCESS;
 }
-
-#define EMIT(x) do{if (o<n){*q++ = (x);} o++; }while(0)
-
-size_t Utils::format_int(char *q, size_t n, uintmax_t val, enum flags flags,
-        int base, int width, int prec) {
-    char *qq;
-    size_t o = 0, oo;
-    static const char lcdigits[] = "0123456789abcdef";
-    static const char ucdigits[] = "0123456789ABCDEF";
-    const char *digits;
-    uintmax_t tmpval;
-    int minus = 0;
-    int nd = 0, nchars;
-    int ta, tb;
-
-    digits = (flags & FL_UPPER) ? ucdigits : lcdigits;
-
-    if (flags & FL_SIGNED && (intmax_t) val < 0) {
-        minus = 1;
-        val = (uintmax_t) (-(intmax_t) val);
-    }
-
-    tmpval = val;
-    while (tmpval) {
-        tmpval /= base;
-        nd++;
-    }
-
-    if (flags & FL_HASH && base == 8) {
-        if (prec < nd + 1)
-            prec = nd + 1;
-    }
-
-    if (nd < prec) {
-        nd = prec;
-    } else if (val == 0) {
-        nd = 1;
-    }
-
-    if (flags & FL_TICK) {
-        ta = (base == 16) ? 4 : 3;
-    } else {
-        ta = nd;
-    }
-
-    nd += (nd - 1) / ta;
-
-    nchars = nd;
-
-    if (minus || (flags & (FL_PLUS | FL_SPACE)))
-        nchars++;
-    if ((flags & FL_HASH) && base == 16) {
-        nchars += 2;
-    }
-
-    if (!(flags & (FL_MINUS | FL_ZERO)) && width > nchars) {
-        while (width > nchars) {
-            EMIT(' ');
-            width--;
-        }
-    }
-
-    if (minus)
-        EMIT('-');
-    else if (flags & FL_PLUS)
-        EMIT('+');
-    else if (flags & FL_SPACE)
-        EMIT(' ');
-
-    if ((flags & FL_HASH) && base == 16) {
-        EMIT('0');
-        EMIT((flags & FL_UPPER) ? 'X' : 'x');
-    }
-
-    if ((flags & (FL_MINUS | FL_ZERO)) == FL_ZERO && width > nd) {
-        while (width > nchars) {
-            EMIT('0');
-            width--;
-        }
-    }
-
-    q += nd;
-    o += nd;
-    qq = q;
-    oo = o;
-
-    tb = ta;
-    while (nd > 0) {
-        if (!tb--) {
-            qq--;
-            oo--;
-            nd--;
-            if (oo < n)
-                *qq = '_';
-            tb = ta - 1;
-        }
-        qq--;
-        oo--;
-        nd--;
-        if (oo < n)
-            *qq = digits[val % base];
-        val /= base;
-    }
-
-    while ((flags & FL_MINUS) && width > nchars) {
-        EMIT(' ');
-        width--;
-    }
-
-    return o;
-}
-
-#define MIN_RANK	Utils::rank_char
-#define MAX_RANK	Utils::rank_longlong
-
-#define INTMAX_RANK	Utils::rank_longlong
-#define SIZE_T_RANK	Utils::rank_long
-#define PTRDIFF_T_RANK	Utils::rank_long
-
-int Utils::am_vsnprintf(char *buffer, size_t n, const char *format, va_list ap) {
-    const char *p = format;
-    char ch;
-    char *q = buffer;
-    size_t o = 0;
-    uintmax_t val = 0;
-    int rank = Utils::rank_int;
-    int width = 0;
-    int prec = -1;
-    int base;
-    size_t sz;
-    enum flags flags = static_cast<enum flags> (0);
-
-    enum {
-        st_normal,
-        st_flags,
-        st_width,
-        st_prec,
-        st_modifiers
-    } state = st_normal;
-    const char *sarg;
-    char carg;
-    int slen;
-
-    while ((ch = *p++)) {
-        switch (state) {
-            case st_normal:
-                if (ch == '%') {
-                    state = st_flags;
-                    flags = static_cast<enum flags> (0);
-                    rank = rank_int;
-                    width = 0;
-                    prec = -1;
-                } else {
-                    EMIT(ch);
-                }
-                break;
-
-            case st_flags:
-                switch (ch) {
-                    case '-':
-                        flags = flags | FL_MINUS;
-                        break;
-                    case '+':
-                        flags = flags | FL_PLUS;
-                        break;
-                    case '\'':
-                        flags = flags | FL_TICK;
-                        break;
-                    case ' ':
-                        flags = flags | FL_SPACE;
-                        break;
-                    case '#':
-                        flags = flags | FL_HASH;
-                        break;
-                    case '0':
-                        flags = flags | FL_ZERO;
-                        break;
-                    default:
-                        state = st_width;
-                        p--;
-                        break;
-                }
-                break;
-
-            case st_width:
-                if (ch >= '0' && ch <= '9') {
-                    width = width * 10 + (ch - '0');
-                } else if (ch == '*') {
-                    width = va_arg(ap, int);
-                    if (width < 0) {
-                        width = -width;
-                        flags = flags | FL_MINUS;
-                    }
-                } else if (ch == '.') {
-                    prec = 0;
-                    state = st_prec;
-                } else {
-                    state = st_modifiers;
-                    p--;
-                }
-                break;
-
-            case st_prec:
-                if (ch >= '0' && ch <= '9') {
-                    prec = prec * 10 + (ch - '0');
-                } else if (ch == '*') {
-                    prec = va_arg(ap, int);
-                    if (prec < 0)
-                        prec = -1;
-                } else {
-                    state = st_modifiers;
-                    p--;
-                }
-                break;
-
-            case st_modifiers:
-                switch (ch) {
-                    case 'h':
-                        rank--;
-                        break;
-                    case 'l':
-                        rank++;
-                        break;
-                    case 'j':
-                        rank = INTMAX_RANK;
-                        break;
-                    case 'z':
-                        rank = SIZE_T_RANK;
-                        break;
-                    case 't':
-                        rank = PTRDIFF_T_RANK;
-                        break;
-                    case 'L':
-                    case 'q':
-                        rank += 2;
-                        break;
-                    default:
-                        state = st_normal;
-                        if (rank < MIN_RANK)
-                            rank = MIN_RANK;
-                        else if (rank > MAX_RANK)
-                            rank = MAX_RANK;
-
-                        switch (ch) {
-                            case 'P':
-                                flags = flags | FL_UPPER;
-                            case 'p':
-                                base = 16;
-                                prec = (CHAR_BIT * sizeof (void *) + 3) / 4;
-                                flags = flags | FL_HASH;
-                                val = (uintmax_t) (uintptr_t) va_arg(ap, void *);
-                                goto is_integer;
-
-                            case 'd':
-                            case 'i':
-                                base = 10;
-                                flags = flags | FL_SIGNED;
-                                switch (rank) {
-                                    case rank_char:
-                                        val =
-                                                (uintmax_t) (intmax_t) (signed char) va_arg(ap,
-                                                signed
-                                                int);
-                                        break;
-                                    case rank_short:
-                                        val =
-                                                (uintmax_t) (intmax_t) (signed short) va_arg(ap,
-                                                signed
-                                                int);
-                                        break;
-                                    case rank_int:
-                                        val = (uintmax_t) (intmax_t) va_arg(ap, signed int);
-                                        break;
-                                    case rank_long:
-                                        val = (uintmax_t) (intmax_t) va_arg(ap, signed long);
-                                        break;
-                                    case rank_longlong:
-                                        val =
-                                                (uintmax_t) (intmax_t) va_arg(ap, signed long long);
-                                        break;
-                                }
-                                goto is_integer;
-                            case 'o':
-                                base = 8;
-                                goto is_unsigned;
-                            case 'u':
-                                base = 10;
-                                goto is_unsigned;
-                            case 'X':
-                                flags = flags | FL_UPPER;
-                            case 'x':
-                                base = 16;
-                                goto is_unsigned;
-
-is_unsigned:
-                                switch (rank) {
-                                    case rank_char:
-                                        val =
-                                                (uintmax_t) (unsigned char) va_arg(ap, unsigned int);
-                                        break;
-                                    case rank_short:
-                                        val =
-                                                (uintmax_t) (unsigned short) va_arg(ap,
-                                                unsigned int);
-                                        break;
-                                    case rank_int:
-                                        val = (uintmax_t) va_arg(ap, unsigned int);
-                                        break;
-                                    case rank_long:
-                                        val = (uintmax_t) va_arg(ap, unsigned long);
-                                        break;
-                                    case rank_longlong:
-                                        val = (uintmax_t) va_arg(ap, unsigned long long);
-                                        break;
-                                }
-
-
-is_integer:
-                                sz = format_int(q, (o < n) ? n - o : 0, val, flags, base,
-                                        width, prec);
-                                q += sz;
-                                o += sz;
-                                break;
-
-                            case 'c':
-                                carg = (char) va_arg(ap, int);
-                                sarg = &carg;
-                                slen = 1;
-                                goto is_string;
-                            case 's':
-                                sarg = va_arg(ap, const char *);
-                                sarg = sarg ? sarg : "(null)";
-                                slen = (int) strlen(sarg);
-                                goto is_string;
-
-is_string:{
-                                    char sch;
-                                    int i;
-
-                                    if (prec != -1 && slen > prec)
-                                        slen = prec;
-
-                                    if (width > slen && !(flags & FL_MINUS)) {
-                                        char pad = (flags & FL_ZERO) ? '0' : ' ';
-                                        while (width > slen) {
-                                            EMIT(pad);
-                                            width--;
-                                        }
-                                    }
-                                    for (i = slen; i; i--) {
-                                        sch = *sarg++;
-                                        EMIT(sch);
-                                    }
-                                    if (width > slen && (flags & FL_MINUS)) {
-                                        while (width > slen) {
-                                            EMIT(' ');
-                                            width--;
-                                        }
-                                    }
-                                }
-                                break;
-
-                            case 'n':
-                            {
-                                switch (rank) {
-                                    case rank_char:
-                                        *va_arg(ap, signed char *) = (signed char) o;
-                                        break;
-                                    case rank_short:
-                                        *va_arg(ap, signed short *) = (signed short) o;
-                                        break;
-                                    case rank_int:
-                                        *va_arg(ap, signed int *) = (signed int) o;
-                                        break;
-                                    case rank_long:
-                                        *va_arg(ap, signed long *) = (signed long) o;
-                                        break;
-                                    case rank_longlong:
-                                        *va_arg(ap, signed long long *) = (signed long long) o;
-                                        break;
-                                }
-                            }
-                                break;
-
-                            default:
-                                EMIT(ch);
-                                break;
-                        }
-                }
-        }
-    }
-
-    if (o < n)
-        *q = '\0';
-    else if (n > 0)
-        buffer[n - 1] = '\0';
-
-    return (int) o;
-}
-
-int Utils::am_vasprintf(char **strp, const char *fmt, va_list ap) {
-    va_list aq;
-    int ret = 0;
-#ifndef va_copy
-#define va_copy(dst, src) ((void)((dst) = (src)))
-#endif
-    va_copy(aq, ap);
-    ret = am_vsnprintf(NULL, 0, fmt, aq);
-    va_end(aq);
-    if ((*strp = (char *) malloc(ret + 1)) == NULL)
-        return (-1);
-    ret = am_vsnprintf(*strp, ret + 1, fmt, ap);
-    return (ret);
-}
-
-int Utils::am_printf(char **buffer, const char *fmt, ...) {
-    int size;
-    char *tmp = NULL;
-    va_list ap;
-    va_start(ap, fmt);
-    tmp = *buffer;
-    size = am_vasprintf(buffer, fmt, ap);
-    free(tmp);
-    va_end(ap);
-    return size;
-}
-

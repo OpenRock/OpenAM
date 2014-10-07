@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifdef _MSC_VER
@@ -63,6 +63,7 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <limits.h>
 
 #define REMOTE_LOG "RemoteLog"
 #define ALL_LOG "all"
@@ -106,6 +107,43 @@ static void rotate_log(HANDLE file, const char *fn, size_t ms) {
     }
 }
 
+#endif
+
+#if (defined(__sun) && defined(__SunOS_5_10)) || defined(_MSC_VER)
+
+#ifndef va_copy
+#define va_copy(dest, src) dest = src
+#endif
+
+int vasprintf(char **strp, const char *fmt, va_list ap) {
+    int r = -1, size;
+    va_list ap2;
+    va_copy(ap2, ap);
+    size = vsnprintf(0, 0, fmt, ap2);
+    if ((size >= 0) && (size < INT_MAX)) {
+        *strp = (char *) malloc(size + 1); 
+        if (*strp) {
+            r = vsnprintf(*strp, size + 1, fmt, ap);
+            if ((r < 0) || (r > size)) {
+                free(*strp);
+                r = -1;
+            }
+        }
+    } else {
+        *strp = 0;
+    }
+    va_end(ap2);
+    return r;
+}
+
+int asprintf(char **strp, const char *fmt, ...) {
+    int r;
+    va_list ap;
+    va_start(ap, fmt);
+    r = vasprintf(strp, fmt, ap);
+    va_end(ap);
+    return r;
+}
 #endif
 
 USING_PRIVATE_NAMESPACE
@@ -688,7 +726,7 @@ void Log::vlog(ModuleId module, Level level, const char *format,
         }
 
         char *logMsg = NULL;
-        Utils::am_vasprintf(&logMsg, format, args);
+        if (vasprintf(&logMsg, format, args) < 0) return;
         // call user defined logger if any.
         if (loggerFunc != NULL) {
             loggerFunc((*moduleList)[module].name.c_str(),
@@ -859,7 +897,10 @@ Log::rlog(ModuleId module, int remote_log_level,
     } else {
         std::va_list args;
         va_start(args, format);
-        Utils::am_vasprintf(&logMsg, format, args);
+        if (vasprintf(&logMsg, format, args) < 0) {
+            va_end(args);
+            return AM_NO_MEMORY;
+        }
         va_end(args);
         if (logMsg != NULL) {
             logMessage = logMsg;
@@ -978,25 +1019,20 @@ Log::auditLog(const char* auditDisposition,
         ...) {
     am_status_t status = AM_SUCCESS;
 
-    int size = MSG_MAX_LEN;
-    std::vector<char> logMsg(size);
+    int size;
+    char *logMsg = NULL;
     va_list args;
     va_start(args, format);
-    int needed = vsnprintf(&logMsg[0], logMsg.size(), format, args);
+    size = vasprintf(&logMsg, format, args);
     va_end(args);
-    if (needed >= size) {
-        logMsg.resize(needed + 1);
-        va_start(args, format);
-        needed = vsnprintf(&logMsg[0], logMsg.size(), format, args);
-        va_end(args);
-    }
-    if (&logMsg[0] != NULL) {
+    
+    if (logMsg != NULL) {
         if ((strcasecmp(auditDisposition, AUDIT_DISPOSITION_REMOTE) == 0) ||
                 (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
             status = doRemoteAuditLog(module,
                     remoteLogLevel,
                     userSSOToken,
-                    &logMsg[0]
+                    logMsg
                     );
         }
         if (status != AM_SUCCESS ||
@@ -1005,13 +1041,14 @@ Log::auditLog(const char* auditDisposition,
             try {
                 doLocalAuditLog(module,
                         Log::LOG_INFO,
-                        &logMsg[0],
+                        logMsg,
                         localAuditLogRotate,
                         localAuditFileSize);
             } catch (...) {
                 status = AM_FAILURE;
             }
         }
+        free(logMsg);
     }
     if (status != AM_SUCCESS) {
         Log::log(Log::ALL_MODULES, Log::LOG_ERROR,

@@ -25,6 +25,9 @@
  * $Id: am_resource.cpp,v 1.3 2008/06/25 08:14:28 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 
 #include <cctype>
 #include "policy_resource.h"
@@ -36,7 +39,7 @@ bool
 ResourceName::getResourceRoot(const am_resource_traits_t &rsrcTraits,
 			      std::string &str) 
 {
-    size_t maxlen = resourceStr.size() + 1;
+    size_t maxlen = resourceStr.size();
     char *rootResName = new char[resourceStr.size() + 1];
     boolean_t result;
     bool retVal = false;

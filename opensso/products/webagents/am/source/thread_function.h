@@ -31,7 +31,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef __THREAD_FUNCTION_H__
@@ -47,8 +47,8 @@ private:
     std::string name;
 public:
 
-    ThreadFunction(std::string name = "ThreadFunction",
-            bool exitNow = false) : name(name), exitNow(exitNow) {
+    ThreadFunction(std::string name_param = "ThreadFunction",
+            bool exitNow_param = false) : exitNow(exitNow_param), name(name_param) {
     }
     virtual void operator()(void) const = 0;
 

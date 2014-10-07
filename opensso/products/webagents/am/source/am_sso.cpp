@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <stdexcept>
@@ -416,17 +416,17 @@ am_string_set_t * am_get_char_seperated_string_set(const char *str, char sep)
     beg = str;
     i = 0;
     while ((c = *ptr++) && i < n_sep) {
-	if (c == sep) {
-            len = ptr-beg-1;
-            ret->strings[i] = (char *)malloc(len+1);
+        if (c == sep) {
+            len = ptr - beg - 1;
+            ret->strings[i] = (char *) malloc(len + 1);
             strncpy(ret->strings[i], beg, len);
             ret->strings[i][len] = '\0';
             beg = ptr;
             i++;
         }
     }
-    len = ptr-beg;
-    ret->strings[i] = (char *)malloc(len);
+    len = ptr - beg;
+    ret->strings[i] = (char *) malloc(len + 1);
     strcpy(ret->strings[i], beg);
 
     return ret;

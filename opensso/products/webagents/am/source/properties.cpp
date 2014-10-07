@@ -26,9 +26,10 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
+#include <stdio.h>
 #include <cerrno>
 #include <cstdlib>
 #include <stdexcept>
@@ -248,7 +249,7 @@ am_status_t Properties::parseBuffer(char *buffer)
     am_status_t status = AM_SUCCESS;
     char *nextLine;
     std::size_t len;
-
+    
     try {
 	for (buffer = skipWhitespaceAndComments(buffer);
 	     *buffer;
@@ -285,7 +286,7 @@ am_status_t Properties::parseBuffer(char *buffer)
     } catch (const std::bad_alloc&) {
 	status = AM_NO_MEMORY;
     }
-
+    
     return status;
 }
 

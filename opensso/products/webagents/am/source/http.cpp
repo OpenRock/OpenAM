@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <cstdio>
@@ -451,14 +451,23 @@ am_status_t Http::Response::readAndParse(Log::ModuleId logModule, Connection& co
                     "Http::Response::readAndParse(): "
                     "Reading body content of length: %d", contentLength);
 
-            std::string body = conn.getBody();
-            if (body.length() == 0) {
+            const char *body = conn.getBody();
+            int body_len = conn.httpContentLength();
+            if (!body || body_len <= 0) {
                 status = AM_END_OF_FILE;
                 bodyPtr = NULL;
+                bodyLen = 0;
             } else {
-                bodyPtr = new (std::nothrow) char[body.length() + 1];
-                bodyLen = body.length();
-                strcpy(bodyPtr, body.c_str());
+                bodyPtr = new (std::nothrow) char[body_len + 1];
+                if (bodyPtr) {
+                    bodyLen = body_len;
+                    memcpy(bodyPtr, body, body_len);
+                    bodyPtr[bodyLen] = 0;
+                } else {
+                    bodyPtr = NULL;
+                    bodyLen = 0;
+                    status = AM_NO_MEMORY;
+                }
             }
 
         } else {

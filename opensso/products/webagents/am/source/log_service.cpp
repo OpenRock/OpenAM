@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
@@ -372,7 +372,7 @@ am_status_t LogService::addLogDetails(const std::string& logName,
             remoteBodyChunkList.push_back(temp);
         }
 
-        sprintf(logLevel, "%d", record.getLogLevel());
+        snprintf(logLevel, sizeof (logLevel), "%d", record.getLogLevel());
 
         remoteBodyChunkList.push_back(BodyChunk(std::string(logLogPrefix)));
         remoteBodyChunkList.push_back(BodyChunk(std::string(logName)));

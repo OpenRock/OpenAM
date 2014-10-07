@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock AS
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 
 #include <climits>
@@ -258,8 +258,7 @@ Service::initialize() {
     if (threadPoolCreated == false) {
         if (tPool == NULL) {
             try {
-                tPool = new ThreadPool(1, 1 + notificationEnabled?
-                                DEFAULT_MAX_THREADS:0);
+                tPool = new ThreadPool(1, 1 + (notificationEnabled ? DEFAULT_MAX_THREADS : 0));
             } catch(std::bad_alloc &bae) {
                 throw InternalException(func,
                                         "Memory allocation failure while"

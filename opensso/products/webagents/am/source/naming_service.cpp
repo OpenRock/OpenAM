@@ -26,7 +26,7 @@
  *
  */ 
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 
 #include <sstream>
@@ -259,25 +259,37 @@ am_status_t NamingService::getProfile(const ServiceInfo& service,
 	    bodyChunkList.push_back(preferredNamingPrefixChunk);
 
 	    url_length = strlen(namingURL.c_str());
-	    preferredNamingURL = (char *)malloc(url_length);
-	    if (preferredNamingURL != NULL) {
-	        ServiceInfo::const_iterator iter;
-	        for (iter = service.begin(); (iter != service.end() && 
-                     status == AM_FAILURE); ++iter) {
-		    std::string protocol = (*iter).getProtocol();
-		    std::string hostname = (*iter).getHost();
-		    unsigned short portnumber = (*iter).getPort();
-		    status = check_server_alive((*iter).useSSL(), hostname, portnumber);
-		    if (status == AM_SUCCESS) {
-		        strcpy(preferredNamingURL,protocol.c_str());
-		        strcat(preferredNamingURL,"://");
-		        strcat(preferredNamingURL,hostname.c_str());
-		        strcat(preferredNamingURL,":");
-		        snprintf(portBuf, sizeof(portBuf), "%u", portnumber);
-		        strcat(preferredNamingURL,portBuf);
-		    }
-	        }
-	    } else {
+            preferredNamingURL = (char *) malloc(url_length + 1);
+            if (preferredNamingURL != NULL) {
+                ServiceInfo::const_iterator iter;
+                for (iter = service.begin(); (iter != service.end() &&
+                        status == AM_FAILURE); ++iter) {
+                    std::string protocol = (*iter).getProtocol();
+                    std::string hostname = (*iter).getHost();
+                    unsigned short portnumber = (*iter).getPort();
+                    status = check_server_alive((*iter).useSSL(), hostname, portnumber);
+                    if (status == AM_SUCCESS) {
+                        std::size_t url_length_alloc = protocol.size() + hostname.size() + 4;
+                        memset(&portBuf[0], 0, sizeof (portBuf));
+                        snprintf(portBuf, sizeof (portBuf), "%u", portnumber);
+                        url_length_alloc += strlen(portBuf);
+                        if (url_length_alloc > url_length) {
+                            preferredNamingURL = (char *) realloc(preferredNamingURL, url_length_alloc + 1);
+                        }
+                        if (preferredNamingURL != NULL) {
+                            strcpy(preferredNamingURL, protocol.c_str());
+                            strcat(preferredNamingURL, "://");
+                            strcat(preferredNamingURL, hostname.c_str());
+                            strcat(preferredNamingURL, ":");
+                            strcat(preferredNamingURL, portBuf);
+                        } else {
+                            Log::log(logModule, Log::LOG_ERROR,
+                                    "NamingService::getProfile() unable to (re)allocate memory %d for "
+                                    "preferredNamingURL", url_length_alloc);
+                        }
+                    }
+                }
+            } else {
 	        Log::log(logModule, Log::LOG_ERROR,
 	        "NamingService::getProfile() unable to allocate memory %d for "
 	        "preferredNamingURL", url_length);
@@ -338,8 +350,6 @@ am_status_t NamingService::getProfile(const ServiceInfo& service,
 void NamingService::addLoadBalancerCookie(NamingInfo& namingInfo, 
 					  Http::CookieList& cookieList)
 {    
-    int i = 0; 
-    int j = 0; 
     std::size_t cookieLen = 0;
     char *cookieName = NULL;
     char *cookieValue = NULL;
@@ -348,7 +358,7 @@ void NamingService::addLoadBalancerCookie(NamingInfo& namingInfo,
     
     const std::string lbCookieStr = namingInfo.getlbCookieStr();
     if (!lbCookieStr.empty()) {
-        cookieLen = lbCookieStr.size()+1;
+        cookieLen = lbCookieStr.size() + 1;
         tmplbCookie = (char *)malloc(cookieLen);
         cookieName = (char *)malloc(cookieLen);
         cookieValue = (char *)malloc(cookieLen); 
@@ -405,7 +415,7 @@ am_status_t NamingService::check_server_alive(bool ssl, std::string hostname, un
 
     Connection::ConnHeaderMap emptyHdrs;
     ServerInfo si(sstm.str());
-    Connection conn(si);
+    Connection conn(si.getHost().c_str(), si.getPort(), si.useSSL());
     status = conn.sendRequest("HEAD", empty, emptyHdrs, empty);
     int http_status = conn.httpStatusCode();
 
@@ -476,7 +486,7 @@ am_status_t NamingService::doNamingRequest(const ServiceInfo& service,
             status = AM_NAMING_FAILURE;
         } catch (std::exception &exs) {
             Log::log(logModule, Log::LOG_ERROR,
-                    "aNamingService::doNamingRequest(): exception encountered: %s",
+                    "NamingService::doNamingRequest(): exception encountered: %s",
                     exs.what());
             status = AM_NAMING_FAILURE;
         } catch (...) {

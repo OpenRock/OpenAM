@@ -30,7 +30,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef XML_ATTRIBUTE_H
@@ -159,18 +159,31 @@ private:
 #ifdef _MSC_VER
     explicit XMLAttribute(MSXML2::IXMLDOMNodePtr pointer);
 #else
-    explicit XMLAttribute(struct _xmlAttr *pointer);
+    explicit XMLAttribute(
+#ifdef PUGIXML
+            const pugi::xml_attribute& pointer
+#else
+            struct _xmlAttr *pointer
+#endif
+            );
 #endif
 
 #ifdef _MSC_VER
     MSXML2::IXMLDOMNodePtr attrPtr;
 #else
+#ifdef PUGIXML
+    pugi::xml_attribute attrPtr;
+#else
     struct _xmlAttr *attrPtr;
+#endif
 #endif
 };
 
 inline XMLAttribute::XMLAttribute()
-: attrPtr(NULL) {
+#ifndef PUGIXML
+: attrPtr(NULL)
+#endif
+{
 }
 
 #ifdef _MSC_VER
@@ -180,7 +193,12 @@ inline XMLAttribute::XMLAttribute(MSXML2::IXMLDOMNodePtr attrPtrArg)
 }
 #else
 
-inline XMLAttribute::XMLAttribute(struct _xmlAttr *attrPtrArg)
+inline XMLAttribute::XMLAttribute(
+#ifdef PUGIXML
+        const pugi::xml_attribute& attrPtrArg)
+#else
+        struct _xmlAttr *attrPtrArg)
+#endif
 : attrPtr(attrPtrArg) {
 }
 #endif
@@ -190,18 +208,23 @@ inline XMLAttribute::XMLAttribute(const XMLAttribute& rhs)
 }
 
 inline XMLAttribute::~XMLAttribute() {
+#ifndef PUGIXML
     attrPtr = NULL;
+#endif
 }
 
 inline XMLAttribute& XMLAttribute::operator=(const XMLAttribute& rhs) {
     // Not worth checking for self-assignment, since this is safe to do anyway.
     attrPtr = rhs.attrPtr;
-
     return *this;
 }
 
 inline bool XMLAttribute::isValid() const {
+#ifdef PUGIXM
+    return attrPtr ? true : false;
+#else
     return attrPtr != NULL;
+#endif
 }
 
 END_PRIVATE_NAMESPACE

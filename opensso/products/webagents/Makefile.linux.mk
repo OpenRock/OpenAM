@@ -25,15 +25,15 @@
 ifndef	LINUX_MK_INCLUDED
 LINUX_MK_INCLUDED := true
 
-CC = gcc
-CXX = g++
+CC = gcc44
+CXX = g++44
 
-CFLAGS += -fPIC -pthread -D_REENTRANT -DLINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -Wno-unused-value
+CFLAGS += -fPIC -pthread -D_REENTRANT -DLINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -Wno-unused-value -D_FORTIFY_SOURCE=2 -fstack-protector
 
 ifdef DEBUG
  CFLAGS += -g3 -fno-inline -O0 -DDEBUG -Wall
 else
- CFLAGS += -O2 -DNDEBUG
+ CFLAGS += -g -O2 -DNDEBUG
 endif
 
 ifdef 64

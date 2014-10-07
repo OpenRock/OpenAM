@@ -28,9 +28,11 @@
 /*
  * Portions Copyrighted 2011-2014 ForgeRock AS
  */
+#include <stdio.h>
 #include <stdexcept>
 #include <errno.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -45,6 +47,7 @@
 #include <sys/filio.h>
 #endif
 #ifdef linux
+#include <sys/select.h>
 #include <sys/ioctl.h>
 #endif
 #include <iostream>
@@ -67,6 +70,10 @@ USING_PRIVATE_NAMESPACE
 #define SSL_OP_NO_SSLv2                 0x01000000L
 #define	MAX_RETRY_COUNT                 5
 #define SOCKET_IO_WAIT_TIME             300000 //microseconds
+
+#if !defined(howmany)
+#define howmany(x, y) (((x)+((y)-1))/(y))
+#endif
 
 static pthread_mutex_t *ssl_mutexes = NULL;
 static void *crypto_lib_h = NULL;
@@ -337,11 +344,20 @@ void show_server_cert(const SSL* s) {
 
 int wait_for_io(int sock, int timeout, int for_read) {
     struct timeval tv, *tvptr;
-    fd_set fdset;
-    int srv;
+    fd_set *fds = NULL, fdset;
+    int srv, fd_alloc = 0;
     do {
-        FD_ZERO(&fdset);
-        FD_SET(sock, &fdset);
+        if (sock + 1 > FD_SETSIZE) {
+            int bytes = howmany(sock + 1, NFDBITS) * sizeof (fd_mask);
+            fds = (fd_set *) malloc(bytes);
+            if (fds == NULL) return -2;
+            memset(fds, 0, bytes);
+            fd_alloc = 1;
+        } else {
+            fds = &fdset;
+            FD_ZERO(fds);
+        }
+        FD_SET(sock, fds);
         if (timeout < 0) {
             tvptr = NULL;
         } else {
@@ -349,14 +365,19 @@ int wait_for_io(int sock, int timeout, int for_read) {
             tv.tv_usec = timeout;
             tvptr = &tv;
         }
-        srv = select(sock + 1, for_read ? &fdset : NULL, for_read ? NULL : &fdset, NULL, tvptr);
+        srv = select(sock + 1, for_read ? fds : NULL, for_read ? NULL : fds, NULL, tvptr);
+        if (fd_alloc) {
+            free(fds);
+            fds = NULL;
+            fd_alloc = 0;
+        }
     } while (srv == -1 && errno == EINTR);
     if (srv == 0) {
         return -1;
     } else if (srv < 0) {
         return errno;
     }
-    return FD_ISSET(sock, &fdset) ? 0 : -2;
+    return 0;
 }
 
 void tls_free(tls_t * s) {
@@ -502,6 +523,11 @@ tls_t * tls_initialize(int sock, int verifycert, const char *keyfile, const char
     return ssl;
 }
 
+static Properties create_properties() {
+    Properties m;
+    return m;
+}
+
 unsigned long Connection::timeout = NETWORK_TIMEOUT;
 std::string Connection::proxyHost = "";
 std::string Connection::proxyUser = "";
@@ -513,126 +539,202 @@ std::string Connection::keyFile = "";
 std::string Connection::caFile = "";
 std::string Connection::certFile = "";
 std::string Connection::keyPassword = "";
+Properties Connection::addrMap = create_properties();
 
-Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLength(-1), server(srv), ssl(NULL) {
+Connection::Connection(const char *host, unsigned int port, bool usessl = false) : sock(-1), statusCode(-1),
+dataLength(-1), ssl(NULL), useSSL(usessl), dataBuffer(NULL) {
     struct in6_addr serveraddr;
     char service[6];
-    struct addrinfo *res, hints;
+    struct addrinfo *res = NULL, *rp, hints;
     int err, saveflags, on = 1;
     struct timeval tva;
-    const char *host = server.getHost().c_str();
-    unsigned int port = server.getPort();
+    Properties::const_iterator iter;
+    const char *ip = NULL;
 
+    if (host == NULL) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() host parameter value is NULL");
+        return;
+    }
+
+    /* Try to use com.forgerock.agents.config.hostmap property values to 
+     * shortcut any host name resolution.
+     */
+    for (iter = addrMap.begin(); iter != addrMap.end(); iter++) {
+        const std::string &name = (*iter).first;
+        const std::string &value = (*iter).second;
+        if (name.compare(host) == 0) {
+            ip = value.c_str();
+            Log::log(Log::ALL_MODULES, Log::LOG_DEBUG,
+                    "Connection::Connection() found host '%s' (%s) entry in com.forgerock.agents.config.hostmap",
+                    host, ip);
+            break;
+        }
+    }
+
+    memset(&service[0], 0, sizeof (service));
     snprintf(service, sizeof (service), "%u", port);
 
 #ifndef AI_NUMERICSERV
 #define AI_NUMERICSERV 0
 #endif
 
+    /* Check if we were provided the address of the server using       
+     * inet_pton() to convert the text form of the address to binary 
+     * form. If it is numeric then we want to prevent getaddrinfo()
+     * from doing any name resolution.                                  
+     */
     memset(&hints, 0, sizeof (struct addrinfo));
     hints.ai_flags = AI_NUMERICSERV;
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
-    err = inet_pton(AF_INET, host, &serveraddr);
+    err = inet_pton(AF_INET, ip == NULL ? host : ip, &serveraddr);
     if (err == 1) {
         hints.ai_family = AF_INET;
         hints.ai_flags |= AI_NUMERICHOST;
     } else {
-        err = inet_pton(AF_INET6, host, &serveraddr);
+        err = inet_pton(AF_INET6, ip == NULL ? host : ip, &serveraddr);
         if (err == 1) {
             hints.ai_family = AF_INET6;
             hints.ai_flags |= AI_NUMERICHOST;
         }
     }
 
-    if ((err = getaddrinfo(host, service, &hints, &res)) != 0) {
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() cannot resolve address %s:%d, error %d",
-                host, port, err);
+    err = getaddrinfo(ip == NULL ? host : ip, service, &hints, &res);
+    if (err != 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() cannot resolve address %s:%d, error: %s (%d)",
+                host, port, gai_strerror(err), err);
         return;
     }
 
-
-    if ((sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0) {
-        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() cannot create socket, error %d", errno);
-        net_error(errno);
-        freeaddrinfo(res);
-        return;
-    }
-
-    if (timeout != 0) {
-        memset(&tva, 0, sizeof (tva));
-        tva.tv_sec = timeout / 1000;
-        tva.tv_usec = 0;
-        if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *) &tva, sizeof (tva)) < 0) {
-            Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set read timeout");
+    for (rp = res; rp != NULL; rp = rp->ai_next) {
+        if (rp->ai_family != AF_INET && rp->ai_family != AF_INET6 &&
+                rp->ai_socktype != SOCK_STREAM && rp->ai_protocol != IPPROTO_TCP) continue;
+        if ((sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) == -1) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() error %d opening socket", errno);
             net_error(errno);
-        }
-        if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *) &tva, sizeof (tva)) < 0) {
-            Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set write timeout");
-            net_error(errno);
-        }
-    }
-    if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *) &on, sizeof (on)) < 0) {
-        Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  TCP_NODELAY error");
-        net_error(errno);
-    }
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &on, sizeof (on)) < 0) {
-        Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  SO_REUSEADDR error");
-        net_error(errno);
-    }
-
-    saveflags = fcntl(sock, F_GETFL, 0);
-    fcntl(sock, F_SETFL, saveflags | O_NONBLOCK);
-    err = connect(sock, res->ai_addr, res->ai_addrlen);
-
-    if (err == 0) {
-        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d", host, port);
-    } else if (err < 0) {
-        int ern = errno;
-        if (ern != EWOULDBLOCK && ern != EINPROGRESS) {
-            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() connect error %d", ern);
-            net_error(ern);
-        }
-        if (ern == EWOULDBLOCK || ern == EINPROGRESS) {
-            fd_set fds, eds;
-            struct timeval tv;
-            memset(&tv, 0, sizeof (tv));
-            tv.tv_sec = timeout == 0 ? NETWORK_TIMEOUT / 1000 : timeout / 1000;
-            tv.tv_usec = 0;
-            FD_ZERO(&fds);
-            FD_ZERO(&eds);
-            FD_SET(sock, &fds);
-            FD_SET(sock, &eds);
-            if (select(sock + 1, NULL, &fds, &eds, &tv) == 0) {
-                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() timeout connecting to %s:%d", host, port);
-                http_close();
-            } else {
-                if (FD_ISSET(sock, &fds)) {
-                    int ret;
-                    socklen_t rlen = sizeof (ret);
-                    if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &ret, &rlen) == 0) {
-                        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d", host, port);
-                    } else {
-                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() getsockopt error %d", errno);
-                        net_error(errno);
-                        http_close();
-                    }
-                } else if (FD_ISSET(sock, &eds)) {
-                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() error %d", errno);
+        } else {
+            if (timeout != 0) {
+                memset(&tva, 0, sizeof (tva));
+                tva.tv_sec = timeout / 1000;
+                tva.tv_usec = 0;
+                if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *) &tva, sizeof (tva)) < 0) {
+                    Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set read timeout");
                     net_error(errno);
+                }
+                if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *) &tva, sizeof (tva)) < 0) {
+                    Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() unable to set write timeout");
+                    net_error(errno);
+                }
+            }
+            if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *) &on, sizeof (on)) < 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  TCP_NODELAY error");
+                net_error(errno);
+            }
+            if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &on, sizeof (on)) < 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  SO_REUSEADDR error");
+                net_error(errno);
+            }
+
+#ifdef SO_NOSIGPIPE
+            if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *) &on, sizeof (on)) < 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::Connection() setsockopt  SO_NOSIGPIPE error");
+                net_error(errno);
+            }
+#endif
+
+            saveflags = fcntl(sock, F_GETFL, 0);
+            fcntl(sock, F_SETFL, saveflags | O_NONBLOCK);
+
+            err = connect(sock, rp->ai_addr, rp->ai_addrlen);
+            if (err == 0) {
+                Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d (%s)",
+                        host, port, rp->ai_family == AF_INET ? "IPv4" : "IPv6");
+                break;
+            } else if (err < 0) {
+                int ern = errno;
+                if (ern != EWOULDBLOCK && ern != EINPROGRESS) {
+                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() connect error %d", ern);
+                    net_error(ern);
+                }
+                if (ern == EWOULDBLOCK || ern == EINPROGRESS) {
+                    int fd_alloc = 0;
+                    fd_set *fds = NULL, *eds = NULL, fdss, edss;
+                    struct timeval tv;
+                    memset(&tv, 0, sizeof (tv));
+                    tv.tv_sec = timeout == 0 ? NETWORK_TIMEOUT / 1000 : timeout / 1000;
+                    tv.tv_usec = 0;
+
+                    if (sock + 1 > FD_SETSIZE) {
+                        int bytes = howmany(sock + 1, NFDBITS) * sizeof (fd_mask);
+                        fds = (fd_set *) malloc(bytes);
+                        eds = (fd_set *) malloc(bytes);
+                        if (fds == NULL || eds == NULL) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() memory allocation error");
+                            http_close();
+                            if (fds != NULL) free(fds);
+                            if (eds != NULL) free(eds);
+                            return;
+                        }
+                        memset(fds, 0, bytes);
+                        memset(eds, 0, bytes);
+                        fd_alloc = 1;
+                    } else {
+                        fds = &fdss;
+                        FD_ZERO(fds);
+                        eds = &edss;
+                        FD_ZERO(eds);
+                    }
+
+                    FD_SET(sock, fds);
+                    FD_SET(sock, eds);
+                    if (select(sock + 1, NULL, fds, eds, &tv) == 0) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() timeout connecting to %s:%d (%s)",
+                                host, port, rp->ai_family == AF_INET ? "IPv4" : "IPv6");
+                        http_close();
+                    } else {
+                        if (FD_ISSET(sock, fds)) {
+                            int ret;
+                            socklen_t rlen = sizeof (ret);
+                            if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &ret, &rlen) == 0) {
+                                Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::Connection() connected to %s:%d (%s)",
+                                        host, port, rp->ai_family == AF_INET ? "IPv4" : "IPv6");
+                                if (fd_alloc == 1) {
+                                    free(fds);
+                                    free(eds);
+                                }
+                                break;
+                            } else {
+                                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() getsockopt error %d", errno);
+                                net_error(errno);
+                                http_close();
+                            }
+                        } else if (FD_ISSET(sock, eds)) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::Connection() error %d", errno);
+                            net_error(errno);
+                            http_close();
+                        }
+                    }
+                    if (fd_alloc == 1) {
+                        free(fds);
+                        free(eds);
+                        fds = NULL;
+                        eds = NULL;
+                    }
+                } else {
                     http_close();
                 }
             }
-        } else {
-            http_close();
         }
+    }
+
+    if (res != NULL) {
+        freeaddrinfo(res);
     }
 
     if (sock != -1) {
         fcntl(sock, F_SETFL, saveflags);
-
-        if (server.useSSL()) {
+        if (usessl) {
             ssl = tls_initialize(sock, trustServerCerts ? 0 : 1,
                     keyFile.empty() ? NULL : keyFile.c_str(),
                     keyPassword.empty() ? NULL : keyPassword.c_str(),
@@ -641,15 +743,20 @@ Connection::Connection(const ServerInfo& srv) : sock(-1), statusCode(-1), dataLe
                     cipherList.empty() ? NULL : cipherList.c_str());
         }
     }
-    freeaddrinfo(res);
+
 }
 
 void Connection::http_close() {
     if (static_cast<tls_t *> (NULL) != ssl) {
         tls_free(static_cast<tls_t *> (ssl));
     }
+    if (dataBuffer != NULL) {
+        free(dataBuffer);
+    }
+    dataBuffer = NULL;
     if (sock > 0) {
-        close(sock);
+        ::shutdown(sock, SHUT_RDWR);
+        ::close(sock);
     }
     sock = -1;
 }
@@ -660,90 +767,92 @@ ssize_t Connection::response(char ** buff) {
     int err = 0;
     char *tmp = NULL;
 #define TEMP_SIZE 8192
-    if ((tmp = (char *) malloc(TEMP_SIZE))) {
-        if (server.useSSL()) {
-            if (static_cast<tls_t *> (NULL) != ssl) {
-                tls_t *ssd = static_cast<tls_t *> (ssl);
+    if (buff != NULL && sock > 0) {
+        if ((tmp = (char *) malloc(TEMP_SIZE + 1))) {
+            if (useSSL) {
+                if (static_cast<tls_t *> (NULL) != ssl) {
+                    tls_t *ssd = static_cast<tls_t *> (ssl);
+                    do {
+                        n = 0;
+                        memset((void *) tmp, 0, TEMP_SIZE + 1);
+                        len = SSL_read(ssd->sslh, tmp, TEMP_SIZE);
+                        if (len > 0) {
+                            *buff = (char *) realloc(*buff, out_len + len + 1);
+                            if (*buff == NULL) {
+                                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL memory allocation error");
+                                break;
+                            }
+                            memcpy((*buff) + out_len, tmp, len);
+                            out_len += len;
+                            if (ioctl(SSL_get_fd(ssd->sslh), FIONREAD, &n) < 0) {
+                                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL ioctl failed, %d", errno);
+                                net_error(errno);
+                                break;
+                            }
+                            if (n > 0) {
+                                Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() SSL more data available (%ld), continue reading", n);
+                            }
+                        } else if (len == 0) {
+                            break;
+                        } else {
+                            switch (SSL_get_error(ssd->sslh, len)) {
+                                case SSL_ERROR_WANT_READ:
+                                    if ((err = wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 1)) == 0) {
+                                        len = 1;
+                                    }
+                                case SSL_ERROR_WANT_WRITE:
+                                    if ((err = wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 0)) == 0) {
+                                        len = 1;
+                                    }
+                            }
+                            break;
+                        }
+                    } while (len > 0);
+                } else {
+                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL connection is not available");
+                }
+            } else {
                 do {
                     n = 0;
-                    memset((void *) tmp, 0, TEMP_SIZE);
-                    len = SSL_read(ssd->sslh, tmp, TEMP_SIZE);
+                    memset((void *) tmp, 0, TEMP_SIZE + 1);
+                    len = recv(sock, tmp, TEMP_SIZE, 0);
                     if (len > 0) {
                         *buff = (char *) realloc(*buff, out_len + len + 1);
                         if (*buff == NULL) {
-                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL memory allocation error");
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() memory allocation error");
                             break;
                         }
                         memcpy((*buff) + out_len, tmp, len);
                         out_len += len;
-                        if (ioctl(SSL_get_fd(ssd->sslh), FIONREAD, &n) < 0) {
-                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL ioctl failed, %d", errno);
+                        if (ioctl(sock, FIONREAD, &n) < 0) {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() ioctl failed, %d", errno);
                             net_error(errno);
                             break;
                         }
                         if (n > 0) {
-                            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() SSL more data available (%ld), continue reading", n);
+                            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() more data available (%ld), continue reading", n);
+                        }
+                    } else if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+                        Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::response() got %s error, retrying",
+                                errno == EAGAIN ? "EAGAIN" : "EWOULDBLOCK");
+                        if ((err = wait_for_io(sock, SOCKET_IO_WAIT_TIME, 1)) == 0) {
+                            len = 1;
+                        } else {
+                            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() read retry failed, error: %d", err);
                         }
                     } else if (len == 0) {
                         break;
                     } else {
-                        switch (SSL_get_error(ssd->sslh, len)) {
-                            case SSL_ERROR_WANT_READ:
-                                if ((err = wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 1)) == 0) {
-                                    len = 1;
-                                }
-                            case SSL_ERROR_WANT_WRITE:
-                                if ((err = wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 0)) == 0) {
-                                    len = 1;
-                                }
-                        }
-                        break;
-                    }
-                } while (len > 0);
-            } else {
-                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() SSL connection is not available");
-            }
-        } else {
-            do {
-                n = 0;
-                memset((void *) tmp, 0, TEMP_SIZE);
-                len = recv(sock, tmp, TEMP_SIZE, 0);
-                if (len > 0) {
-                    *buff = (char *) realloc(*buff, out_len + len + 1);
-                    if (*buff == NULL) {
-                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() memory allocation error");
-                        break;
-                    }
-                    memcpy((*buff) + out_len, tmp, len);
-                    out_len += len;
-                    if (ioctl(sock, FIONREAD, &n) < 0) {
-                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() ioctl failed, %d", errno);
                         net_error(errno);
                         break;
                     }
-                    if (n > 0) {
-                        Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::response() more data available (%ld), continue reading", n);
-                    }
-                } else if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-                    Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Connection::response() got %s error, retrying",
-                            errno == EAGAIN ? "EAGAIN" : "EWOULDBLOCK");
-                    if ((err = wait_for_io(sock, SOCKET_IO_WAIT_TIME, 1)) == 0) {
-                        len = 1;
-                    } else {
-                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::response() read retry failed, error: %d", err);
-                    }
-                } else if (len == 0) {
-                    break;
-                } else {
-                    net_error(errno);
-                    break;
-                }
-            } while (len > 0);
+                } while (len > 0);
+            }
+            free(tmp);
         }
-        free(tmp);
     }
 
-    if (*buff != NULL) {
+    if (buff != NULL && *buff != NULL) {
         (*buff)[out_len] = 0;
     } else out_len = 0;
 
@@ -752,55 +861,57 @@ ssize_t Connection::response(char ** buff) {
 
 ssize_t Connection::request(const char *buff, const size_t len) {
     ssize_t wrtlen, ttllen = 0, reqlen;
-    if (server.useSSL()) {
-        if (static_cast<tls_t *> (NULL) != ssl) {
-            tls_t *ssd = static_cast<tls_t *> (ssl);
+    if (sock > 0) {
+        if (useSSL) {
+            if (static_cast<tls_t *> (NULL) != ssl) {
+                tls_t *ssd = static_cast<tls_t *> (ssl);
+                for (ttllen = 0, reqlen = len; reqlen > 0;) {
+                    if (0 > (wrtlen = SSL_write(ssd->sslh, buff + ttllen, reqlen))) {
+                        int e = SSL_get_error(ssd->sslh, wrtlen);
+                        Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() SSL socket not available, error %X", e);
+                        switch (e) {
+                            case SSL_ERROR_WANT_READ:
+                            {
+                                if (wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 1) == 0) {
+                                    continue;
+                                }
+                            }
+                                break;
+                            case SSL_ERROR_WANT_WRITE:
+                            {
+                                if (wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 0) == 0) {
+                                    continue;
+                                }
+                            }
+                                break;
+                        }
+                        return -1;
+                    }
+                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::request() SSL writing %ld bytes", wrtlen);
+                    ttllen += wrtlen;
+                    reqlen -= wrtlen;
+                }
+            } else {
+                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() SSL connection is not available");
+            }
+        } else {
             for (ttllen = 0, reqlen = len; reqlen > 0;) {
-                if (0 > (wrtlen = SSL_write(ssd->sslh, buff + ttllen, reqlen))) {
-                    int e = SSL_get_error(ssd->sslh, wrtlen);
-                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() SSL socket not available, error %X", e);
+                if (0 > (wrtlen = send(sock, buff + ttllen, reqlen, 0))) {
+                    int e = errno;
+                    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() socket not available, error %X", e);
+                    net_error(e);
                     switch (e) {
-                        case SSL_ERROR_WANT_READ:
-                        {
-                            if (wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 1) == 0) {
-                                continue;
-                            }
-                        }
-                            break;
-                        case SSL_ERROR_WANT_WRITE:
-                        {
-                            if (wait_for_io(SSL_get_fd(ssd->sslh), SOCKET_IO_WAIT_TIME, 0) == 0) {
-                                continue;
-                            }
-                        }
-                            break;
+                        case EINTR:
+                            continue;
+                        case ECONNRESET:
+                            return 0;
                     }
                     return -1;
                 }
-                Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::request() SSL writing %ld bytes", wrtlen);
+                Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::request() writing %ld bytes", wrtlen);
                 ttllen += wrtlen;
                 reqlen -= wrtlen;
             }
-        } else {
-            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() SSL connection is not available");
-        }
-    } else {
-        for (ttllen = 0, reqlen = len; reqlen > 0;) {
-            if (0 > (wrtlen = send(sock, buff + ttllen, reqlen, 0))) {
-                int e = errno;
-                Log::log(Log::ALL_MODULES, Log::LOG_ERROR, "Connection::request() socket not available, error %X", e);
-                net_error(e);
-                switch (e) {
-                    case EINTR:
-                        continue;
-                    case ECONNRESET:
-                        return 0;
-                }
-                return -1;
-            }
-            Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::request() writing %ld bytes", wrtlen);
-            ttllen += wrtlen;
-            reqlen -= wrtlen;
         }
     }
     return ttllen;
@@ -810,6 +921,18 @@ Connection::~Connection() {
     Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
             "Connection::http_close(): cleaning up");
     http_close();
+}
+
+static int http_status_code(const char *data) {
+    int r = 0;
+    char ver[4];
+    char smsg[32];
+    if (data &&
+            sscanf(data,
+            "HTTP/%3[.012] %d %31[-_.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ]\r\n",
+            ver, &r, smsg) == 3) {
+    }
+    return r;
 }
 
 am_status_t Connection::sendRequest(const char *type, std::string& uri, ConnHeaderMap& hdrs, std::string& data) {
@@ -843,16 +966,25 @@ am_status_t Connection::sendRequest(const char *type, std::string& uri, ConnHead
 
             sz = response(&buffer);
             if (sz > 0 && buffer) {
+                std::string tmp;
+                size_t tmp_loc;
+                tmp.reserve(sz);
+                tmp.append(buffer, sz);
+                tmp_loc = tmp.find("\r\n\r\n");
+                tmp.erase(0, tmp_loc + 4);
+                dataLength = tmp.length();
+                dataBuffer = (char *) malloc(dataLength + 1);
+                if (dataBuffer) {
+                    memcpy(dataBuffer, tmp.c_str(), dataLength);
+                    dataBuffer[dataLength] = 0;
+                }
 
-                dataBuffer.reserve(sz);
-                dataBuffer.append(buffer, sz);
-                dataBuffer.erase(0, dataBuffer.find("\r\n\r\n") + 4);
-                dataLength = dataBuffer.length();
-
-                std::string header(buffer);
-                header.erase(header.find("\r\n\r\n") + 4);
-                statusCode = strtol(&header[header.find(' ') + 1], NULL, 10);
-                header.erase(0, header.find("\r\n") + 2);
+                std::string header = buffer;
+                tmp_loc = header.find("\r\n\r\n");
+                header.erase(tmp_loc + 4);
+                statusCode = http_status_code(buffer);
+                tmp_loc = header.find("\r\n");
+                header.erase(0, tmp_loc + 2);
 
                 Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG,
                         "Connection::response(): HTTP %d", statusCode);
@@ -917,6 +1049,13 @@ am_status_t Connection::initialize(const Properties& properties) {
         keyFile = properties.get(AM_COMMON_CERT_KEY_PROPERTY, "");
         caFile = properties.get(AM_COMMON_CERT_CA_FILE_PROPERTY, "");
         cipherList = properties.get(AM_COMMON_CIPHERS_PROPERTY, "");
+        addrMap.parsePropertyKeyValue(
+                properties.get("com.forgerock.agents.config.hostmap", ""),
+                ',', '|');
+        /*
+         * com.forgerock.agents.config.hostmap format:
+         *  server1.domain.name|192.168.1.1,server2.domain.name|192.168.1.2
+         */
     }
     ssl_crypto_init();
     return AM_SUCCESS;

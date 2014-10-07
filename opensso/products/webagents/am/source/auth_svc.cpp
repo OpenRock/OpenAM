@@ -27,7 +27,7 @@
  */ 
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 #include <iostream>
@@ -2329,7 +2329,7 @@ AuthService::submitRequirements(AuthContext &auth_ctx) {
     numCallbacks = validateAndCountRequirements(auth_ctx);
 
     char number[15];
-    snprintf(number, 14, "%lu", numCallbacks);
+    snprintf(number, sizeof(number), "%lu", numCallbacks);
     bodyChunkList.push_back(BodyChunk(number, strlen(number)));
     bodyChunkList.push_back(quoteEndElementChunk);
 

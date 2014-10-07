@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 #include <stdio.h>
 #include <stdexcept>
@@ -48,7 +48,7 @@ extern "C" unsigned long am_web_naming_validation_status();
 
 USING_PRIVATE_NAMESPACE
 
-namespace {
+        namespace {
     // A byte formatted as decimal digits will fit in at most 3 char's.
     const unsigned int DIGITS_PER_BYTE = 3;
     const char CONTENT_LENGTH_HDR[] = "Content-Length: ";
@@ -215,24 +215,26 @@ BaseService::doRequest(const ServiceInfo& service,
         Http::Response& response,
         const ServerInfo** serverInfo) const {
     am_status_t status = AM_SERVICE_NOT_AVAILABLE;
-    std::size_t dataLen = 0;
+    int dataLen = 0;
+    BodyChunk emptyContentLine;
     // Create a temporary buffer for the Content-Line header
     // the extra '2' is for the <CR><LF> at the end.  The
     // sizeof the CONTENT_LENGTH_HDR includes space for the
     // terminating NUL.
-    char contentLine[sizeof (CONTENT_LENGTH_HDR) +
-            (sizeof (dataLen) * DIGITS_PER_BYTE) + 2];
-    std::size_t contentLineLen;
+    const std::size_t contentLineLen_sz = sizeof (CONTENT_LENGTH_HDR) +
+            (sizeof (dataLen) * DIGITS_PER_BYTE) + 2;
+    char contentLine[contentLineLen_sz + 1];
+    std::size_t contentLineLen = 0;
 
     for (unsigned int i = 0; i < bodyChunkList.size(); ++i) {
         dataLen += bodyChunkList[i].data.size();
     }
 
-    BodyChunk emptyContentLine;
-
-    contentLineLen = snprintf(contentLine, sizeof (contentLine), "%s%d\r\n",
+    memset(&contentLine[0], 0, contentLineLen_sz);
+    contentLineLen = snprintf(contentLine, contentLineLen_sz, "%s%d\r\n",
             CONTENT_LENGTH_HDR, dataLen);
-    if (sizeof (contentLine) > contentLineLen) {
+
+    if (contentLineLen_sz > contentLineLen && contentLineLen > 0) {
         BodyChunk contentLineChunk(contentLine, contentLineLen);
         ServiceInfo::const_iterator iter;
         ServiceInfo svc(service);
@@ -262,7 +264,7 @@ BaseService::doRequest(const ServiceInfo& service,
         }
 
         for (iter = svc.begin(); iter != svc.end(); ++iter) {
-            ServerInfo svrInfo = ServerInfo((const ServerInfo&) (*iter));
+            const ServerInfo &svrInfo = (*iter);
 
             if (current_index != -1) {
                 if ((++j) != current_index) {
@@ -281,14 +283,15 @@ BaseService::doRequest(const ServiceInfo& service,
             Http::Cookie hostHeader("Host", svrInfo.getHost());
             headerList.push_back(hostHeader);
 
+#ifdef AGENT_PROXY_SUPPORT
 #ifndef _MSC_VER
             if (useProxy) {
                 proxyHeaderList.push_back(hostHeader);
                 // Override (temporarily) server credentials if using proxy
-                svrInfo.setHost(proxyHost);
-                svrInfo.setPort(proxyPort);
+                //svrInfo.setHost(proxyHost);
+                //svrInfo.setPort(proxyPort);
                 // We don't use SSL for initial proxy connection
-                svrInfo.setUseSSL(false);
+                //svrInfo.setUseSSL(false);
                 Log::log(logModule, Log::LOG_DEBUG,
                         "BaseService::doRequest(): Using proxy: %s:%d",
                         proxyHost.c_str(), proxyPort);
@@ -311,6 +314,7 @@ BaseService::doRequest(const ServiceInfo& service,
                 }
             }
 #endif
+#endif
 
             // retry to connect to server before marking it as down.
             // making the number of attempts configurable may have a negative
@@ -320,19 +324,21 @@ BaseService::doRequest(const ServiceInfo& service,
             while (retryCount < retryAttempts) {
                 retryCount++;
                 try {
-                    Connection conn(svrInfo);
                     const char *operation = "sending to";
-                    std::string requestString = iter->getURI();
+                    Connection conn(svrInfo.getHost().c_str(), svrInfo.getPort(), svrInfo.useSSL());
+#ifdef AGENT_PROXY_SUPPORT
+                    std::string requestString = svrInfo.getURI().c_str();
                     /*
                      * In case the following request would go to a proxy
                      * we need to use full URL and special headers.
                      */
 
                     if (useProxy && !(iter->useSSL())) {
-                        requestString = iter->getURL();
-                        headerList = proxyHeaderList;
+                       requestString = iter->getURL();
+                       headerList = proxyHeaderList;
                     }
-                    status = sendRequest(conn, headerPrefix, requestString,
+#endif
+                    status = sendRequest(conn, headerPrefix, svrInfo.getURI(),
                             uriParameters, headerList, cookieList,
                             dataLen > 0 ? contentLineChunk : emptyContentLine, headerSuffix,
                             bodyChunkList);
@@ -340,8 +346,8 @@ BaseService::doRequest(const ServiceInfo& service,
                         operation = "receiving from";
                         status = response.readAndParse(logModule, conn);
                         if (AM_SUCCESS == status) {
-                            Log::log(logModule, Log::LOG_MAX_DEBUG, "(%d) %s",
-                                    response.getBodyLen(), response.getBodyPtr());
+                            Log::log(logModule, Log::LOG_MAX_DEBUG, "Response::readAndParse() (%d) %s",
+                                    response.getBodyLen(), response.getBodyPtr() ? response.getBodyPtr() : "(NULL)");
                         }
                     }
 
@@ -349,11 +355,10 @@ BaseService::doRequest(const ServiceInfo& service,
                         Log::log(logModule, Log::LOG_ALWAYS,
                                 "BaseService::doRequest() NSPR failure while "
                                 "%s %s", operation,
-                                (*iter).toString().c_str());
+                                svrInfo.getURL().c_str());
                     }
 
                     if (AM_SUCCESS == status) {
-                        if (serverInfo != NULL) *serverInfo = &(*iter);
                         break;
                     } else {
                         if (retryCount < retryAttempts) {
@@ -361,7 +366,7 @@ BaseService::doRequest(const ServiceInfo& service,
                         } else {
                             Log::log(logModule, Log::LOG_DEBUG,
                                     "BaseService::doRequest() Invoking markSeverDown");
-                            svrInfo.markServerDown(poll_primary_server);
+                            /*svrInfo.markServerDown(poll_primary_server);*/
                         }
                     }
                 } catch (const NSPRException& exc) {
@@ -375,14 +380,13 @@ BaseService::doRequest(const ServiceInfo& service,
                     } else {
                         Log::log(logModule, Log::LOG_ERROR,
                                 "BaseService::doRequest() Invoking markSeverDown");
-                        svrInfo.markServerDown(poll_primary_server);
+                        /*svrInfo.markServerDown(poll_primary_server);*/
                         status = AM_NSPR_ERROR;
                     }
                 }
             } //end of while
 
             if (AM_SUCCESS == status) {
-                if (serverInfo != NULL) *serverInfo = &(*iter);
                 break;
             }
 

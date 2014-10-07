@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All Rights Reserved
+ * Copyright (c) 2012-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -486,7 +486,7 @@ void write_naming_value(const char *key, const char *value, int iid) {
         CloseHandle(fd);
     }
 #else
-    int fd;
+    int fd, rv;
     struct flock fl;
     memset(&fl, 0, sizeof (fl));
     fl.l_type = F_WRLCK;
@@ -498,9 +498,9 @@ void write_naming_value(const char *key, const char *value, int iid) {
         if (fcntl(fd, F_SETLKW, &fl) != -1) {
             lseek(fd, (off_t) 0, SEEK_SET);
             if (value == NULL) {
-                write(fd, "", 0);
+                rv = write(fd, "", 0);
             } else {
-                write(fd, value, strlen(value));
+                rv = write(fd, value, strlen(value));
             }
             fl.l_type = F_UNLCK;
             fcntl(fd, F_SETLKW, &fl);

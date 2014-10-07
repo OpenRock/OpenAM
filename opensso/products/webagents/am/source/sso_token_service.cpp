@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <climits>
@@ -439,10 +439,6 @@ SSOTokenService::getSessionInfo(const ServiceInfo& serviceInfo,
                                                         serviceInfo,
                                                         entry,
                                                         namingInfo);
-	    Log::log(mLogID, Log::LOG_DEBUG,
-                     "SSOTokenService::getSessionInfo(): "
-		     "going to server %s.",
-		     (*svcInfo.begin()).getURL().c_str());
             
             if (cookieList.empty()) {
                const std::string lbCookieName = namingInfo.getlbCookieName();
@@ -913,6 +909,7 @@ SSOTokenService::handleNotif(const std::string& notifData)
 	std::string sessionID, state, typeStr, timeStr;
 	long typeVal;
 	time_t timeVal;
+        long long llv;
 
 	// parse notification
 	if(!rootElement.isNamed(SESSION_NOTIFICATION)) {
@@ -941,8 +938,8 @@ SSOTokenService::handleNotif(const std::string& notifData)
                      "notification type or time element value.");
             sts = AM_ERROR_PARSING_XML;
         }
-        else if (sscanf(typeStr.c_str(), "%d", &typeVal) != 1 ||
-                 sscanf(timeStr.c_str(), "%lld", &timeVal) != 1) 
+        else if (sscanf(typeStr.c_str(), "%ld", &typeVal) != 1 ||
+                 sscanf(timeStr.c_str(), "%lld", &llv) != 1) 
         {
             Log::log(mLogID, Log::LOG_ERROR,
                      "SSOTokenService::handleNotif(): "
@@ -969,6 +966,8 @@ SSOTokenService::handleNotif(const std::string& notifData)
         else {
 	    // everything parsed ok. 
 
+            timeVal = llv;
+            
             // update cache
             if (strcasecmp(state.c_str(), SESSION_STATE_VALUE_VALID)!=0) {
                 try {

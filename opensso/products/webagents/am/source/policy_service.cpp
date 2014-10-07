@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <stdexcept>
@@ -689,17 +689,18 @@ PolicyService::sendNotificationMsg(bool addOrRemove,
 	XMLElement element = policyTree.getRootElement();
 	std::string version;
 	std::string revisionStr;
-	char rev[10] = {'\0'};
+#define REVSTR_LEN 10
+        char rev[REVSTR_LEN] = {'\0'};
         revision = 0;
 
         if(element.isNamed(POLICY_SERVICE)) {
             if(element.getAttributeValue(VERSION_STR, version) &&
 	       std::strcmp(version.c_str(), POLICY_SERVICE_VERSION) == 0) {
 	        element.getAttributeValue(REVISION_STR, revisionStr);
-                if (!revisionStr.empty()) {
+                if (!revisionStr.empty() && revisionStr.size() < REVSTR_LEN) {
                     strcpy(rev, revisionStr.c_str());
                     // get revision of server
-                    revision=atoi(rev);
+                    revision = atoi(rev);
                 }
 
 		std::string requestId;

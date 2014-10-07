@@ -30,7 +30,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef XML_ELEMENT_H
@@ -296,7 +296,13 @@ private:
     }
 
 #else
-    explicit XMLElement(struct _xmlNode *pointer);
+    explicit XMLElement(
+#ifdef PUGIXML
+            const pugi::xml_node& pointer
+#else
+            struct _xmlNode *pointer
+#endif
+            );
 #endif
 
     static void walkTree(Log::ModuleId logModule, Log::Level level,
@@ -307,12 +313,19 @@ private:
 #ifdef _MSC_VER
     MSXML2::IXMLDOMNodePtr nodePtr;
 #else
+#ifdef PUGIXML
+    pugi::xml_node nodePtr;
+#else
     struct _xmlNode *nodePtr;
+#endif
 #endif
 };
 
 inline XMLElement::XMLElement()
-: nodePtr(NULL) {
+#ifndef PUGIXML
+: nodePtr(NULL)
+#endif
+{
 }
 
 #ifdef _MSC_VER
@@ -322,7 +335,13 @@ inline XMLElement::XMLElement(MSXML2::IXMLDOMNodePtr nodePtrArg)
 }
 #else
 
-inline XMLElement::XMLElement(struct _xmlNode *nodePtrArg)
+inline XMLElement::XMLElement(
+#ifdef PUGIXML
+        const pugi::xml_node& nodePtrArg
+#else
+        struct _xmlNode *nodePtrArg
+#endif
+        )
 : nodePtr(nodePtrArg) {
 }
 #endif
@@ -332,18 +351,23 @@ inline XMLElement::XMLElement(const XMLElement& rhs)
 }
 
 inline XMLElement::~XMLElement() {
+#ifndef PUGIXML
     nodePtr = NULL;
+#endif
 }
 
 inline XMLElement& XMLElement::operator=(const XMLElement& rhs) {
     // Not worth checking for self-assignment, since this is safe to do anyway.
     nodePtr = rhs.nodePtr;
-
     return *this;
 }
 
 inline bool XMLElement::isValid() const {
+#ifdef PUGIXM
+    return nodePtr ? true : false;
+#else
     return nodePtr != NULL;
+#endif
 }
 
 END_PRIVATE_NAMESPACE

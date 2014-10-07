@@ -956,23 +956,24 @@ void AgentProfileService::parseURL(std::string serviceURL,
             // Need to use strtok as the uri contains eg:opensso/namingservice
             // we want only /opensso
             if (!uri.empty()) {
-                c_uri = (char *) malloc(strlen(uri.c_str())+1);
-                strcpy(c_uri,uri.c_str());
-                uriTok = strtok(c_uri, "/");
-                if (uriTok != NULL) {
-                    std::string tmpUri(uriTok);
-                    std::string newUri("/");
-                    newUri.append(tmpUri);
-                    
-                    pos = 0;
-                    pos = tmpURL.find (uriPart, pos);
-                    while (pos != std::string::npos) {
-                        tmpURL.replace (pos, uriPart.size(), newUri);
-                        pos = tmpURL.find (uriPart, pos + 1);
+                    char *tmp;
+                    c_uri = (char *) malloc(strlen(uri.c_str()) + 1);
+                    strcpy(c_uri, uri.c_str());
+                    uriTok = strtok_r(c_uri, "/", &tmp);
+                    if (uriTok != NULL) {
+                        std::string tmpUri(uriTok);
+                        std::string newUri("/");
+                        newUri.append(tmpUri);
+
+                        pos = 0;
+                        pos = tmpURL.find(uriPart, pos);
+                        while (pos != std::string::npos) {
+                            tmpURL.replace(pos, uriPart.size(), newUri);
+                            pos = tmpURL.find(uriPart, pos + 1);
+                        }
                     }
+                    free(c_uri);
                 }
-                free(c_uri);
-            }
         }
         // for rest service url, xml/attributes needs to be appended
         if(isRestURL) {
