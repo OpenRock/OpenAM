@@ -2382,12 +2382,12 @@ am_web_is_access_allowed(const char *sso_token,
                             am_web_log_warning("%s: Client ip [%s] "
                                      "does not match sso token ip [%s]. "
                                      "Denying access.",
-                                     thisfunc, result->remote_IP,
-                                     client_ip);
+                                     thisfunc, client_ip != NULL ? client_ip : "",
+                                     result->remote_IP);
                         } else {
                             am_web_log_debug("%s: Client ip [%s] matched "
-                                                "sso token ip.", thisfunc,
-                            result->remote_IP);
+                                                "sso token ip [%s].", thisfunc,
+                            client_ip != NULL ? client_ip : "", result->remote_IP);
                         }
                     }
                 }
