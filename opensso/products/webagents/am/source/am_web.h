@@ -42,8 +42,8 @@
 #define AM_WEB_EXPORT
 #endif
 
-#define AM_WEB_ALLOW_USER_MSG            "User %s was allowed access to %s"
-#define AM_WEB_DENIED_USER_MSG            "User %s was denied access to %s"
+#define AM_WEB_ALLOW_USER_MSG            "User %s (IP: %s) was allowed access to %s"
+#define AM_WEB_DENIED_USER_MSG            "User %s (IP: %s) was denied access to %s"
 
 #include <stdlib.h>
 #include <am.h>

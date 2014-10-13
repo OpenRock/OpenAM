@@ -1875,6 +1875,7 @@ overrideProtoHostPort(URL& url,
 am_status_t
 log_access(am_status_t access_status,
 	   const char *remote_user,
+           const char *client_ip,
 	   const char *user_sso_token,
 	   const char *url,
            void* agent_config)
@@ -1911,7 +1912,7 @@ log_access(am_status_t access_status,
                     AM_LOG_LEVEL_INFORMATION, 
                     user_sso_token,
                     fmtStr, 
-                    remote_user, 
+                    remote_user, client_ip,
                     url);
 	}
     }
@@ -2448,7 +2449,8 @@ am_web_is_access_allowed(const char *sso_token,
     // access to loggingservice, which gets allowed by the
     // not enforced list would cause a recursion tailspin.
     if (AM_FALSE == isNotEnforced) {
-        log_status = log_access(status, result->remote_user, 
+        log_status = log_access(status, result->remote_user,
+                      (client_ip != NULL ? client_ip : ""),
                       sso_token, url, agent_config);
     }
     if(encodedUrl) {
