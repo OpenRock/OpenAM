@@ -249,3 +249,14 @@ com.forgerock.agents.ext.url.validation.default.url.set =
 # Hot-Swap Enabled: No
 #
 com.forgerock.agents.instance.id =
+
+#
+# Agent initialization related properties
+#
+# - init.retry.max:   maximum number of consecutive agent initialization retries. Default (not set) value is 0.
+# - init.retry.wait:  wait time (value in seconds) between retries. Default (not set) value is 0.
+#
+# Hot-Swap Enabled: No
+#
+com.forgerock.agents.init.retry.max =
+com.forgerock.agents.init.retry.wait =

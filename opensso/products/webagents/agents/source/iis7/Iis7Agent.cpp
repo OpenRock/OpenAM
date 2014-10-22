@@ -1183,8 +1183,9 @@ BOOL loadAgentPropertyFile(IHttpContext* pHttpContext) {
  *
  * */
 void TerminateAgent() {
-    am_status_t status = am_web_cleanup();
-    status = am_shutdown_nss();
+    am_agent_cleanup();
+    am_web_cleanup();
+    am_shutdown_nss();
     DeleteCriticalSection(&initLock);
 }
 

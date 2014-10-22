@@ -173,6 +173,12 @@ static Utils::boot_info_t boot_info = {
 
 AgentProfileService* agentProfileService;
 
+#ifdef _MSC_VER
+HANDLE init_mutex;
+#else
+pthread_mutex_t init_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 naming_validator_t* nvld = NULL;
 
 #ifdef _MSC_VER
@@ -948,34 +954,17 @@ am_web_http_decode(const char *source, size_t len)
     return result;
 }
 
-
-/**
- * Initializes agent during first request. 
- */
-extern "C" AM_WEB_EXPORT am_status_t
-am_agent_init(boolean_t* pAgentInitialized)
-{
-    const char *thisfunc = "am_agent_init";
-    am_status_t status = AM_SUCCESS;
+static am_status_t am_agent_init_internal(boolean_t* pAgentInitialized) {
+    const char *thisfunc = "am_agent_init_internal()";
+    am_status_t status = AM_FAILURE;
     int agentAuthenticated = AM_FALSE;
-    SSOToken ssoToken;
     AgentConfigurationRefCntPtr* agentConfigPtr;
     void* agent_config;
-    std::string userName(boot_info.agent_name);
-    std::string passwd(boot_info.agent_passwd);
     const Properties& propPtr =
-        *reinterpret_cast<Properties *>(boot_info.properties);
+            *reinterpret_cast<Properties *> (boot_info.properties);
 
-    status = Connection::initialize_in_child_process(propPtr);
-    
-    if (AM_SUCCESS == status) {
-        if (agentProfileService == NULL) {
-            agentProfileService = new AgentProfileService(propPtr, boot_info);
-
-        }
-        if (agentProfileService != NULL) {
-            status = agentProfileService->agentLogin();
-        }
+    if (agentProfileService != NULL) {
+        status = agentProfileService->agentLogin();
     }
 
     if (AM_SUCCESS == status) {
@@ -995,26 +984,26 @@ am_agent_init(boolean_t* pAgentInitialized)
             status = AM_FAILURE;
         }
     }
-    
+
     if (AM_SUCCESS == status) {
 
         am_resource_traits_t rsrcTraits;
-	populate_am_resource_traits(rsrcTraits, agent_config);
+        populate_am_resource_traits(rsrcTraits, agent_config);
 
-	status = am_policy_init((*agentConfigPtr)->properties);
-	if (AM_SUCCESS == status) {
-	    /* initialize policy */
-	    status = am_policy_service_init("iPlanetAMWebAgentService",
-						INSTANCE_NAME,
-						rsrcTraits,
-						(*agentConfigPtr)->properties,
-						&boot_info.policy_handle);
-	    if (AM_SUCCESS == status) {
-		initialized = AM_TRUE;
-	    } else {
+        status = am_policy_init((*agentConfigPtr)->properties);
+        if (AM_SUCCESS == status) {
+            /* initialize policy */
+            status = am_policy_service_init("iPlanetAMWebAgentService",
+                    INSTANCE_NAME,
+                    rsrcTraits,
+                    (*agentConfigPtr)->properties,
+                    &boot_info.policy_handle);
+            if (AM_SUCCESS == status) {
+                initialized = AM_TRUE;
+            } else {
                 status = AM_FAILURE;
                 *pAgentInitialized = B_FALSE;
-		am_web_log_error("%s unable to "
+                am_web_log_error("%s unable to "
                         "initialize the agent's policy object",
                         thisfunc);
             }
@@ -1035,12 +1024,103 @@ am_agent_init(boolean_t* pAgentInitialized)
             }
         }
     }
-    
+
     if (AM_SUCCESS == status) {
         *pAgentInitialized = B_TRUE;
     } else {
         if (agentAuthenticated == AM_TRUE) {
             agentProfileService->agentLogout(propPtr);
+        }
+    }
+    return status;
+}
+
+#ifndef _MSC_VER
+
+static int need_quit(pthread_mutex_t *mtx) {
+    switch (pthread_mutex_trylock(mtx)) {
+        case 0:
+            pthread_mutex_unlock(mtx);
+            return 1;
+        case EBUSY:
+            return 0;
+    }
+    return 1;
+}
+#endif
+
+extern "C" void *am_agent_init_worker(void *arg) {
+    const char *thisfunc = "am_agent_init_worker()";
+    Properties *config = (Properties *) arg;
+    unsigned long max_retry_count = config ? config->getUnsigned("com.forgerock.agents.init.retry.max", 0) : 0,
+            max_retry_count_val = max_retry_count;
+    unsigned long retry_wait = config ? config->getUnsigned("com.forgerock.agents.init.retry.wait", 0) : 0;
+    boolean_t pAgentInitialized;
+    am_status_t status = AM_FAILURE;
+
+    if (max_retry_count == 0 || retry_wait == 0) {
+        am_web_log_warning("%s unable to initialize the agent, initialization retry has not been configured.", thisfunc);
+        return NULL;
+    }
+
+#ifdef _MSC_VER
+    while (WaitForSingleObject(init_mutex, 0) == WAIT_TIMEOUT) {
+#else
+    while (!need_quit(&init_mutex)) {
+#endif
+
+        if (--max_retry_count > 0) {
+            status = am_agent_init_internal(&pAgentInitialized);
+            if (status == AM_SUCCESS) {
+                am_web_log_debug("%s agent initialization succeeded.", thisfunc);
+                break;
+            } else {
+                am_web_log_warning("%s unable to initialize the agent, retrying (%d)...", thisfunc, max_retry_count_val - max_retry_count);
+            }
+        } else {
+            am_web_log_warning("%s unable to initialize the agent, maximum retry count (%d) has been exceeded.", thisfunc, max_retry_count_val);
+            break;
+        }
+#ifdef _MSC_VER
+        SleepEx(retry_wait * 1000, FALSE);
+#else
+        sleep(retry_wait);
+#endif
+    }
+    return NULL;
+}
+    
+/**
+ * Initializes the agent. 
+ */
+extern "C" AM_WEB_EXPORT am_status_t am_agent_init(boolean_t* pAgentInitialized) {
+    const char *thisfunc = "am_agent_init()";
+    am_status_t status = AM_FAILURE;
+    const Properties& propPtr =
+            *reinterpret_cast<Properties *> (boot_info.properties);
+
+    status = Connection::initialize_in_child_process(propPtr);
+
+    if (AM_SUCCESS == status) {
+        if (agentProfileService == NULL) {
+            agentProfileService = new AgentProfileService(propPtr, boot_info);
+
+        }
+        status = am_agent_init_internal(pAgentInitialized);
+        if (status != AM_SUCCESS) {
+            am_web_log_warning("%s unable to initialize the agent, retrying...", thisfunc);
+#ifdef _MSC_VER
+            init_mutex = CreateEvent(0, FALSE, FALSE, 0);
+            CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) am_agent_init_worker, (void *) &propPtr, 0, NULL);
+#else
+            pthread_t thr;
+            pthread_attr_t thr_attr;
+            pthread_attr_init(&thr_attr);
+            pthread_attr_setdetachstate(&thr_attr, PTHREAD_CREATE_DETACHED);
+            pthread_mutex_lock(&init_mutex);
+            pthread_create(&thr, &thr_attr, am_agent_init_worker, (void *) &propPtr);
+            pthread_attr_destroy(&thr_attr);
+#endif
         }
     }
     return status;
@@ -1214,12 +1294,17 @@ am_web_cleanup() {
 /**
  * Performs the Agent session cleanup. 
  */
-extern "C" AM_WEB_EXPORT am_status_t
-am_agent_cleanup() {
+extern "C" AM_WEB_EXPORT am_status_t am_agent_cleanup() {
     const char *thisfunc = "am_agent_cleanup";
     am_status_t status = AM_SUCCESS;
     const Properties& propPtr =
             *reinterpret_cast<Properties *> (boot_info.properties);
+#ifdef _MSC_VER
+    SetEvent(init_mutex);
+    CloseHandle(init_mutex);
+#else
+    pthread_mutex_unlock(&init_mutex);
+#endif
     if (agentProfileService != NULL &&
             agentProfileService->agentLogout(propPtr) == AM_SUCCESS) {
         am_web_log_debug("%s: Agent logout done.", thisfunc);

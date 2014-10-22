@@ -409,6 +409,7 @@ void vmod_request_cleanup(struct sess *sp, struct vmod_priv *priv) {
 
 void vmod_cleanup(struct sess *sp, struct vmod_priv *priv) {
     LOG_E("vmod_cleanup");
+    am_agent_cleanup();
     am_web_cleanup();
 }
 

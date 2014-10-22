@@ -26,7 +26,7 @@
  *
  */ 
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #include <cstring>
@@ -46,7 +46,7 @@
 #include "service.h"
 
 BEGIN_PRIVATE_NAMESPACE
-static PolicyEngine *enginePtr;
+static PolicyEngine *enginePtr = NULL;
 DEFINE_BASE_INIT;
 void policy_cleanup();
 END_PRIVATE_NAMESPACE
@@ -119,6 +119,9 @@ am_policy_service_init(const char *service_name,
 		       am_properties_t service_config_params,
 		       am_policy_t *policy_handle_ptr)
 {
+    if (enginePtr == NULL) {
+        return AM_SERVICE_NOT_INITIALIZED;
+    }
     try {
 	*policy_handle_ptr = enginePtr->create_service(service_name,
 						       instance_name,
@@ -161,6 +164,10 @@ extern "C"
 am_status_t am_policy_destroy(am_policy_t policy_handle)
 {
     am_status_t retVal = AM_SUCCESS;
+    
+    if (enginePtr == NULL) {
+        return AM_SERVICE_NOT_INITIALIZED;
+    }
 
     try {
 	enginePtr->destroy_service(policy_handle);
@@ -272,6 +279,10 @@ am_policy_evaluate_ignore_url_notenforced(am_policy_t policy_handle,
 		      am_policy_result_t *policy_res,
 		      am_bool_t ignorePolicyResult,
 		      am_properties_t properties) {
+    
+    if (enginePtr == NULL) {
+        return AM_SERVICE_NOT_INITIALIZED;
+    }
     try {
 	enginePtr->policy_evaluate(policy_handle,
 				   sso_token,
@@ -328,7 +339,7 @@ am_policy_evaluate_ignore_url_notenforced(am_policy_t policy_handle,
 extern "C" boolean_t
 am_policy_is_notification_enabled(am_policy_t policy_handle) {
     try {
-	return (enginePtr->isNotificationEnabled(policy_handle)==true)?B_TRUE:B_FALSE;
+	return (enginePtr && enginePtr->isNotificationEnabled(policy_handle)==true)?B_TRUE:B_FALSE;
     }  catch(InternalException &ie) {
 	Log::log(enginePtr->getModuleID(), Log::LOG_ERROR,
 		 "am_policy_is_notification_enabled: InternalException in %s "
@@ -367,6 +378,9 @@ am_policy_notify(am_policy_t policy_handle,
 		    size_t notification_data_len,
                     boolean_t configChangeNotificationEnabled)
 {
+    if (enginePtr == NULL) {
+        return AM_SERVICE_NOT_INITIALIZED;
+    }
     try {
 	enginePtr->policy_notify(policy_handle, notification_data,
 				 notification_data_len,
@@ -587,6 +601,9 @@ am_policy_invalidate_session(am_policy_t policy_handle,
 {
     Log::ModuleId logID = Log::addModule(AM_POLICY_SERVICE);
     am_status_t status = AM_FAILURE;
+    if (enginePtr == NULL) {
+        return AM_SERVICE_NOT_INITIALIZED;
+    }
     try {
         status = enginePtr->invalidate_session(policy_handle, ssoTokenId);
     }
@@ -627,6 +644,9 @@ am_policy_user_logout(am_policy_t policy_handle,
 {
     Log::ModuleId logID = Log::addModule(AM_POLICY_SERVICE);
     am_status_t status = AM_FAILURE;
+    if (enginePtr == NULL) {
+        return AM_SERVICE_NOT_INITIALIZED;
+    }
     try {
         status = enginePtr->user_logout(policy_handle, 
                      ssoTokenId,

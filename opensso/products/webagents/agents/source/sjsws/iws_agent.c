@@ -366,6 +366,7 @@ NSAPI_PUBLIC int append_post_data(pblock *param, Session *sn, Request *rq) {
 
 NSAPI_PUBLIC void agent_cleanup(void *args) {
     am_properties_destroy(agent_props.agent_bootstrap_props);
+    am_agent_cleanup();
     am_web_cleanup();
     crit_terminate(initLock);
 }
