@@ -93,6 +93,7 @@ typedef enum {
 typedef struct {
     struct sess *s;
     int status;
+    int inauth;
     unsigned int key;
     header_list_t *headers;
     char *body;
@@ -186,6 +187,7 @@ request_data_t *get_request_data(struct sess *sp) {
 
         r->s = sp;
         r->status = 0;
+        r->inauth = 0;
         r->xid = rld->xid;
         r->body = NULL;
         r->notes = NULL;
@@ -226,6 +228,7 @@ request_data_t *get_request_data(struct sess *sp) {
 
         r->s = sp;
         r->status = 0;
+        r->inauth = 0;
         r->xid = rld->xid;
         r->body = NULL;
         r->notes = NULL;
@@ -415,9 +418,9 @@ void vmod_cleanup(struct sess *sp, struct vmod_priv *priv) {
 
 void vmod_done(struct sess *sp, struct vmod_priv *priv) {
     struct header *v, *v1;
-    int status;
     request_data_t *r = get_request_data(sp);
     assert(r != NULL);
+    if (r->inauth == 0) return;
     if (sp->xid == r->xid) {
 
         LOG_E("vmod_done() %u (%d)", r->xid, sp->err_code);
@@ -452,42 +455,44 @@ void vmod_ok(struct sess *sp, struct vmod_priv *priv) {
     int status;
     request_data_t *r = get_request_data(sp);
     assert(r != NULL);
-    if (sp->xid == r->xid) {
+    if (r->inauth == 1) {
+        if (sp->xid == r->xid) {
 
-        status = r->status;
-        if (status < 100 || status > 999) {
-            status = 503;
-        }
-        if (status == 200 && sp->wrk->resp->status != 200
-                && sp->wrk->resp->status != 800 && sp->wrk->resp->status != 801) {
-            status = sp->wrk->resp->status;
-        }
+            status = r->status;
+            if (status < 100 || status > 999) {
+                status = 503;
+            }
+            if (status == 200 && sp->wrk->resp->status != 200
+                    && sp->wrk->resp->status != 800 && sp->wrk->resp->status != 801) {
+                status = sp->wrk->resp->status;
+            }
 
-        LOG_E("vmod_ok() %u (%d)", sp->xid, status);
+            LOG_E("vmod_ok() %u (%d)", sp->xid, status);
 
-        http_PutStatus(sp->wrk->resp, status);
-        http_PutResponse(sp->wrk, sp->fd, sp->wrk->resp, http_StatusMessage(status));
+            http_PutStatus(sp->wrk->resp, status);
+            http_PutResponse(sp->wrk, sp->fd, sp->wrk->resp, http_StatusMessage(status));
 
-        VTAILQ_FOREACH_SAFE(v, &r->headers->vars, list, v1) {
-            if (v != NULL && v->type == OK) {
-                struct http *hp = get_sess_http(sp, v->where);
-                assert(hp != NULL);
-                if (v->value == NULL) {
-                    /*should not happen within v->type == OK*/
-                    http_Unset(hp, v->name);
-                } else {
-                    LOG_E("vmod_ok [%s]", v->value);
-                    if (v->unset) {
+            VTAILQ_FOREACH_SAFE(v, &r->headers->vars, list, v1) {
+                if (v != NULL && v->type == OK) {
+                    struct http *hp = get_sess_http(sp, v->where);
+                    assert(hp != NULL);
+                    if (v->value == NULL) {
+                        /*should not happen within v->type == OK*/
                         http_Unset(hp, v->name);
+                    } else {
+                        LOG_E("vmod_ok [%s]", v->value);
+                        if (v->unset) {
+                            http_Unset(hp, v->name);
+                        }
+                        http_SetHeader(sp->wrk, sp->fd, hp, v->value);
                     }
-                    http_SetHeader(sp->wrk, sp->fd, hp, v->value);
                 }
             }
+        } else {
+            http_PutStatus(sp->wrk->resp, 403);
+            http_PutResponse(sp->wrk, sp->fd, sp->wrk->resp, http_StatusMessage(403));
+            LOG_E("vmod_ok() error: xid %u does not match %u", sp->xid, r->xid);
         }
-    } else {
-        http_PutStatus(sp->wrk->resp, 403);
-        http_PutResponse(sp->wrk, sp->fd, sp->wrk->resp, http_StatusMessage(403));
-        LOG_E("vmod_ok() error: xid %u does not match %u", sp->xid, r->xid);
     }
     vmod_request_cleanup(sp, priv);
 }
@@ -871,6 +876,7 @@ unsigned vmod_authenticate(struct sess *sp, struct vmod_priv *priv, const char *
 
     r = get_request_data(sp);
     assert(r != NULL);
+    r->inauth = 1;
 
     if (!sp || sp->magic != SESS_MAGIC || !sp->wrk) {
         send_deny(r, DONE);
