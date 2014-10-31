@@ -27,46 +27,59 @@
  *
  */
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 
-#include "agent_module_factory.h"
+#include "Iis7Agent.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <io.h>
 
 /*
  * IIS calls this function when the agent module DLL is loaded.
  * It registers for the server events.
  **/
 
-HRESULT __stdcall RegisterModule(DWORD dwServerVersion, IHttpModuleRegistrationInfo * pModuleInfo, IHttpServer * pHttpServer) {
-
+HRESULT __stdcall RegisterModule(DWORD dwServerVersion,
+        IHttpModuleRegistrationInfo *pModuleInfo, IHttpServer *pHttpServer) {
     HRESULT hr = S_OK;
-    CAgentModuleFactory * pFactory = NULL;
+    CAgentModuleFactory *pFactory = NULL;
+    IAppHostAdminManager *adminMgr = NULL;
 
     UNREFERENCED_PARAMETER(dwServerVersion);
-    
-    if (pModuleInfo == NULL || pHttpServer == NULL) {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
-        goto Finished;
-    }
 
-    pFactory = new CAgentModuleFactory();
-    if (pFactory == NULL) {
-        hr = HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
-        goto Finished;
-    }
+    do {
 
-    hr = pModuleInfo->SetRequestNotifications(pFactory, RQ_BEGIN_REQUEST | RQ_AUTHENTICATE_REQUEST, 0);
-    hr = pModuleInfo->SetPriorityForRequestNotification(RQ_BEGIN_REQUEST, PRIORITY_ALIAS_HIGH);
+        if (pModuleInfo == NULL || pHttpServer == NULL) {
+            hr = HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
+            break;
+        }
 
-    if (FAILED(hr)) {
-        goto Finished;
-    }
+        adminMgr = pHttpServer->GetAdminManager();
+        if (adminMgr == NULL) {
+            hr = HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
+            break;
+        }
 
-    RegisterAgentModule();
+        pFactory = new CAgentModuleFactory(adminMgr);
+        if (pFactory == NULL) {
+            hr = HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
+            break;
+        }
 
-    pFactory = NULL;
+        hr = pModuleInfo->SetRequestNotifications(pFactory,
+                RQ_BEGIN_REQUEST | RQ_AUTHENTICATE_REQUEST, 0);
+        if (FAILED(hr)) {
+            break;
+        }
+        hr = pModuleInfo->SetPriorityForRequestNotification(RQ_BEGIN_REQUEST, PRIORITY_ALIAS_HIGH);
+        if (FAILED(hr)) {
+            break;
+        }
 
-Finished:
+        pFactory = NULL;
+
+    } while (FALSE);
 
     if (pFactory != NULL) {
         delete pFactory;

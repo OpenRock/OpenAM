@@ -46,7 +46,7 @@ AM_WIN32_SRC = am\source\action_decision.cpp am\source\agent_config_cache.cpp am
                am\source\xml_element_win.cpp am\source\xml_tree_win.cpp 
 
 AM_IIS6_SRC = agents\source\iis6\IisAgent6.c
-AM_IIS7_SRC = agents\source\iis7\agent_main.cpp agents\source\iis7\agent_module.cpp agents\source\iis7\Iis7Agent.cpp
+AM_IIS7_SRC = agents\source\iis7\agent_main.cpp agents\source\iis7\Iis7Agent.cpp
 AM_APA22_SRC = agents\source\apache22\apache_agent.c
 AM_APA24_SRC = agents\source\apache24\apache_agent.c
 
@@ -145,15 +145,13 @@ iis6i : ii6.obj
 
 
 iis7.obj : $(AM_IIS7_SRC)
-        $(MC) -A -b -c -h agents\source\iis7\ -r agents\source\iis7\ agents\source\iis7\agent_ev.mc
 	$(CC) /I"C:\Program Files\Microsoft SDKs\Windows\v7.1\Include" $(CFLAGS) $(DEP_INCPATH) /D WIN32 /Iagents\source\iis7 /Foagents\source\iis7\ $(AM_IIS7_SRC)
 
 iis7i	: iis7.obj
-	$(RC) /nologo /fo agents\source\iis7\agent_ev.res agents\source\iis7\agent_ev.rc
 	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /EXPORT:RegisterModule \
 	/PDB:"agents\source\iis7\amiis7module.pdb" \
-	/DLL /OUT:"agents\source\iis7\amiis7module.dll" agents\source\iis7\agent_main.obj agents\source\iis7\agent_module.obj \
-        agents\source\iis7\Iis7Agent.obj agents\source\iis7\agent_ev.res /LIBPATH:"am\source" $(DEP_LIBS)
+	/DLL /OUT:"agents\source\iis7\amiis7module.dll" agents\source\iis7\agent_main.obj \
+        agents\source\iis7\Iis7Agent.obj /LIBPATH:"am\source" $(DEP_LIBS)
 
 #
 # IIS6 and IIS7 Agent end

@@ -27,76 +27,232 @@
  *
  */
 /*
- * Portions Copyrighted 2012 - 2013 ForgeRock AS
+ * Portions Copyrighted 2012 - 2014 ForgeRock AS
  */
 
-#ifndef __IIS7AGENT_H__
-#define __IIS7AGENT_H__
+#ifndef IIS7AGENT_H
+#define IIS7AGENT_H
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <io.h>
 #include <stdio.h>
 #include <httpserv.h>
+#include <stdarg.h>
 #include <string>
+#include <vector>
 #include "am_web.h"
 
-#define TCP_PORT_ASCII_SIZE_MAX 5
-#define URL_SIZE_MAX (20*1024)
+/*
+ * This class has implementation for all of the module functionality
+ * for all of the server events registered.
+ **/
+class CAgentModule : public CHttpModule {
+public:
 
-typedef struct OphResources {
-    PCSTR cookies;
-    DWORD cbCookies;
-    am_policy_result_t result;
-} tOphResources;
+    CAgentModule(IAppHostAdminManager *admin, HANDLE eventh) {
+        InitializeCriticalSection(&initLock);
+        eventLog = eventh;
+        adminMgr = admin;
+    }
 
-BOOL RegisterAgentModule();
+    ~CAgentModule() {
+        DeleteCriticalSection(&initLock);
+    }
 
-am_status_t get_request_url(IHttpContext* pHttpContext, std::string& requestURL,
-        std::string& origRequestURL, std::string& pathInfo, void* agent_config);
+    REQUEST_NOTIFICATION_STATUS OnBeginRequest(IN IHttpContext *pHttpContext,
+            IN OUT IHttpEventProvider *pProvider);
 
-am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
-        PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired);
+    REQUEST_NOTIFICATION_STATUS OnAuthenticateRequest(IN IHttpContext *pHttpContext,
+            IN OUT IAuthenticationProvider *pProvider);
 
-BOOL loadAgentPropertyFile(IHttpContext* pHttpContext);
+    REQUEST_NOTIFICATION_STATUS OnEndRequest(IN IHttpContext *pHttpContext,
+            IN OUT IHttpEventProvider *pProvider);
 
-BOOL GetEntity(IHttpContext* pHttpContext, std::string& data);
+private:
 
-static am_status_t set_cookie(const char *header, void **args);
+    am_status_t loadAgentPropertyFile(IHttpContext * pHttpContext);
 
-static void set_method(void ** args, char * orig_req);
+    void reportEvent(const char *format, va_list argList) {
+        int count = _vscprintf(format, argList);
+        if (count > 0) {
+            std::vector<char> formattedStringBuff(count + 1);
+            char *formattedString = &formattedStringBuff.front();
+            vsprintf(formattedString, format, argList);
+            if (eventLog != NULL) {
+                ReportEvent(eventLog, EVENTLOG_INFORMATION_TYPE, 0, 0,
+                        NULL, 1, 0, (LPCTSTR *) & formattedString, NULL);
+            }
+        }
+    }
 
-static am_status_t reset_cookie(const char *header, void **args);
+    void WriteEventViewerLog(const char *format, ...) {
+        va_list args;
+        va_start(args, format);
+        reportEvent(format, args);
+        va_end(args);
+    }
 
-static am_status_t set_header(const char *key, const char *values, void **args);
+    HANDLE eventLog;
+    IAppHostAdminManager *adminMgr;
+    PCSTR userName;
+    PCWSTR userPassword;
+    DWORD userPasswordSize;
+    PCWSTR userPasswordCrypted;
+    DWORD userPasswordCryptedSize;
+    BOOL showPassword;
+    BOOL doLogOn;
+    CRITICAL_SECTION initLock;
 
-static am_status_t set_cookie_in_response(const char *header, void **args);
+};
 
-static am_status_t set_header_attr_as_cookie(const char *header, void **args);
+/*
+ * This class creates instances of the CHttpModule for each request.
+ **/
+class CAgentModuleFactory : public IHttpModuleFactory {
+public:
 
-static am_status_t get_cookie_sync(const char *cookieName, char** dpro_cookie, void **args);
+    CAgentModuleFactory(IAppHostAdminManager *admin) {
+        eventLog = RegisterEventSource(NULL, "IISADMIN");
+        adminMgr = admin;
+    }
 
-am_status_t set_request_headers(IHttpContext *pHttpContext, void** args);
+    ~CAgentModuleFactory() {
+        if (eventLog != NULL) {
+            DeregisterEventSource(eventLog);
+            eventLog = NULL;
+        }
+    }
 
-REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
-        const char *redirect_url, const char *set_cookies_list);
+    virtual HRESULT GetHttpModule(OUT CHttpModule **ppModule, IN IModuleAllocator *) {
+        CAgentModule *pModule = NULL;
 
-static am_status_t do_redirect(IHttpContext* pHttpContext, am_status_t status,
-        am_policy_result_t *policy_result, const char *original_url,
-        const char *method, void** args, void* agent_config);
+        if (ppModule == NULL) {
+            return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
+        }
 
-am_status_t remove_key_in_headers(char* key, char** httpHeaders);
+        pModule = new CAgentModule(adminMgr, eventLog);
+        if (pModule == NULL) {
+            return HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
+        }
 
-am_status_t set_headers_in_context(IHttpContext *pHttpContext,
-        std::string headersList, BOOL isRequest);
+        *ppModule = pModule;
+        pModule = NULL;
+        return S_OK;
+    }
 
-void ConstructReqCookieValue(std::string& completeString, std::string value);
+    virtual void Terminate() {
+        am_agent_cleanup();
+        am_web_cleanup();
+        am_shutdown_nss();
+        delete this;
+    }
 
-void do_deny(IHttpContext* pHttpContext);
+private:
 
-void OphResourcesFree(tOphResources* pOphResources);
+    IAppHostAdminManager *adminMgr;
+    HANDLE eventLog;
+};
 
-void TerminateAgent();
+/*
+ * This class provides request-specific information about a user.
+ * This information includes data such as credentials and role-based authorization.
+ **/
+class OpenAMUser : public IHttpUser {
+public:
 
-void init_at_request();
+    virtual PCWSTR GetRemoteUserName(VOID) {
+        return userName;
+    }
+
+    virtual PCWSTR GetUserName(VOID) {
+        return userName;
+    }
+
+    virtual PCWSTR GetAuthenticationType(VOID) {
+        return L"OpenAM";
+    }
+
+    virtual PCWSTR GetPassword(VOID) {
+        return showPassword ? userPassword : L"";
+    }
+
+    virtual HANDLE GetImpersonationToken(VOID) {
+        return hToken;
+    }
+
+    VOID SetImpersonationToken(HANDLE tkn) {
+        hToken = tkn;
+    }
+
+    virtual HANDLE GetPrimaryToken(VOID) {
+        return NULL;
+    }
+
+    virtual VOID ReferenceUser(VOID) {
+        InterlockedIncrement(&m_refs);
+    }
+
+    virtual VOID DereferenceUser(VOID) {
+        if (InterlockedDecrement(&m_refs) <= 0) {
+            if (hToken) CloseHandle(hToken);
+            delete this;
+        }
+    }
+
+    virtual BOOL SupportsIsInRole(VOID) {
+        return FALSE;
+    }
+
+    virtual HRESULT IsInRole(IN PCWSTR pszRoleName, OUT BOOL * pfInRole) {
+        return E_NOTIMPL;
+    }
+
+    virtual PVOID GetUserVariable(IN PCSTR pszVariableName) {
+        return NULL;
+    }
+
+    OpenAMUser(PCWSTR usrn, PCWSTR usrp, PCWSTR usrpcrypted,
+            BOOL showpass, BOOL dologon) : userName(usrn), userPassword(usrpcrypted), showPassword(showpass), status(FALSE), error(0) {
+        HANDLE tkn = NULL;
+        m_refs = 1;
+        if (dologon) {
+            if (usrn != NULL && usrp != NULL) {
+                status = LogonUserW(usrn, NULL, usrp,
+                        LOGON32_LOGON_NETWORK, LOGON32_PROVIDER_DEFAULT, &tkn);
+                error = GetLastError();
+                if (status) {
+                    SetImpersonationToken(tkn);
+                }
+            } else {
+                error = ERROR_INVALID_DATA;
+            }
+        } else {
+            SetImpersonationToken(tkn);
+            status = TRUE;
+        }
+    }
+
+    BOOL GetStatus() {
+        return status;
+    }
+
+    DWORD GetError() {
+        return error;
+    }
+
+private:
+
+    LONG m_refs;
+    PCWSTR userName;
+    PCWSTR userPassword;
+    HANDLE hToken;
+    BOOL status;
+    BOOL showPassword;
+    DWORD error;
+
+    virtual ~OpenAMUser() {
+    }
+};
 
 #endif

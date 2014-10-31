@@ -30,19 +30,11 @@
  * Portions Copyrighted 2012 - 2014 ForgeRock AS
  */
 
-#include "agent_module.h"
+#include "Iis7Agent.h"
 #include <wincrypt.h>
 #include <shlwapi.h>
 #include <string.h>
 #include <algorithm>
-#include "agent_ev.h"
-
-char agentInstPath[MAX_PATH];
-char agentDllPath[MAX_PATH];
-boolean_t agentInitialized = B_FALSE;
-BOOL readAgentConfigFile = FALSE;
-BOOL isCdssoEnabled = FALSE;
-CRITICAL_SECTION initLock;
 
 #define EMPTY_STRING            ""
 #define AGENT_DESCRIPTION       "ForgeRock OpenAM Policy Agent"
@@ -51,6 +43,17 @@ CRITICAL_SECTION initLock;
 #define BOOTSTRAP_FILE          "\\config\\OpenSSOAgentBootstrap.properties"
 #define CONFIG_FILE             "\\config\\OpenSSOAgentConfiguration.properties"
 #define RESOURCE_INITIALIZER    { NULL, 0, AM_POLICY_RESULT_INITIALIZER }
+#define TCP_PORT_ASCII_SIZE_MAX 5
+#define URL_SIZE_MAX            (20*1024)
+#define	F_OK                    0	/* test for existence of file */
+#define	W_OK                    0x02	/* test for write permission */
+#define	R_OK                    0x04	/* test for read permission */
+#define MAX_PATH_EXT            2048
+
+char agentInstPath[MAX_PATH_EXT];
+boolean_t agentInitialized = B_FALSE;
+BOOL readAgentConfigFile = FALSE;
+BOOL isCdssoEnabled = FALSE;
 
 const CHAR agentDescription[] = {AGENT_DESCRIPTION};
 const CHAR httpProtocol[] = "http";
@@ -61,64 +64,50 @@ const CHAR httpsPortDefault[] = "443";
 const CHAR httpPortDelimiter[] = ":";
 const CHAR pszCrlf[] = "\r\n";
 
-void print_windows_error(const char *fn, DWORD errc) {
-    LPTSTR lpMsgBuf;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
-            FORMAT_MESSAGE_MAX_WIDTH_MASK, NULL, errc, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR) & lpMsgBuf, 0, NULL);
-    if (agentInitialized) {
-        am_web_log_debug("%s: %s (%d)", fn, lpMsgBuf, errc);
-    } else {
-        OutputDebugString(fn);
-        OutputDebugString(lpMsgBuf);
-        OutputDebugString("\n");
-    }
-    LocalFree(lpMsgBuf);
-}
+typedef struct {
+    PCSTR cookies;
+    DWORD cbCookies;
+    am_policy_result_t result;
+} tOphResources;
 
-void event_log(const int sev, const char *fmt, ...) {
-    HANDLE eventLog;
-    DWORD event_id;
-    va_list ap;
+/* Forward declarations */
+static am_status_t get_request_url(IHttpContext* pHttpContext, std::string& requestURL,
+        std::string& origRequestURL, std::string& pathInfo, void* agent_config);
 
-    enum {
-        size = 1024
-    };
-    switch (sev) {
-        case EVENTLOG_ERROR_TYPE:
-            event_id = MSG_ERROR_1;
-            break;
-        case EVENTLOG_WARNING_TYPE:
-            event_id = MSG_WARNING_1;
-            break;
-        case EVENTLOG_INFORMATION_TYPE:
-            event_id = MSG_INFO_1;
-            break;
-        default:
-            event_id = MSG_INFO_1;
-            break;
-    }
-    char *buf = (char *) LocalAlloc(LPTR, size);
-    va_start(ap, fmt);
-    int needed = vsnprintf(buf, size, fmt, ap);
-    va_end(ap);
-    if (needed >= size) {
-        buf = (char *) LocalReAlloc(buf, needed, LMEM_ZEROINIT);
-        va_start(ap, fmt);
-        needed = vsnprintf(buf, needed, fmt, ap);
-        va_end(ap);
-    }
-    if ((eventLog = RegisterEventSourceA(0, AGENT_DESCRIPTION))) {
-        ReportEventA(eventLog, sev, 0, event_id, 0, 1, 0, (LPCSTR *) & buf, NULL);
-    }
-    LocalFree(buf);
-    DeregisterEventSource(eventLog);
-}
+static am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
+        PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired);
 
-BOOL RegisterAgentModule() {
-    InitializeCriticalSection(&initLock);
-    return TRUE;
-}
+static BOOL GetEntity(IHttpContext* pHttpContext, std::string& data);
+
+static am_status_t set_cookie(const char *header, void **args);
+
+static void set_method(void ** args, char * orig_req);
+
+static am_status_t reset_cookie(const char *header, void **args);
+
+static am_status_t set_header(const char *key, const char *values, void **args);
+
+static am_status_t set_cookie_in_response(const char *header, void **args);
+
+static am_status_t set_header_attr_as_cookie(const char *header, void **args);
+
+static am_status_t get_cookie_sync(const char *cookieName, char** dpro_cookie, void **args);
+
+static am_status_t set_request_headers(IHttpContext *pHttpContext, void** args);
+
+static REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
+        const char *redirect_url, const char *set_cookies_list);
+
+static am_status_t do_redirect(IHttpContext* pHttpContext, am_status_t status,
+        am_policy_result_t *policy_result, const char *original_url,
+        const char *method, void** args, void* agent_config);
+
+static am_status_t remove_key_in_headers(char* key, char** httpHeaders);
+
+static am_status_t set_headers_in_context(IHttpContext *pHttpContext,
+        std::string headersList, BOOL isRequest);
+
+static void do_deny(IHttpContext* pHttpContext);
 
 static am_status_t register_post_data(IHttpContext* pHttpContext,
         char *url, const char *key, char* response,
@@ -571,7 +560,12 @@ static void send_error_notimpl(IHttpContext* pHttpContext) {
     }
 }
 
-REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpContext, IN OUT IHttpEventProvider* pProvider) {
+static void OphResourcesFree(tOphResources * pOphResources) {
+    am_web_clear_attributes_map(&pOphResources->result);
+    am_policy_result_destroy(&pOphResources->result);
+}
+
+REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext *pHttpContext, IN OUT IHttpEventProvider *pProvider) {
     const char* thisfunc = "ProcessRequest()";
     am_status_t status = AM_SUCCESS;
     am_status_t status_tmp = AM_SUCCESS;
@@ -606,10 +600,11 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
         (void *) &set_cookies_list, (void *) &request_hdrs};
     void *agent_config = NULL;
     std::string response = "";
-
+    char agent_instance_dir[1024];
 
     IHttpRequest* req = pHttpContext->GetRequest();
     IHttpResponse* res = pHttpContext->GetResponse();
+    IHttpSite *site = pHttpContext->GetSite();
 
     userPasswordSize = 0;
     userPasswordCryptedSize = 0;
@@ -619,16 +614,48 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     userPassword = NULL;
     userPasswordCrypted = NULL;
 
-    am_web_log_debug("%s -- Starting", thisfunc);
+    memset(&agent_instance_dir[0], 0, sizeof (agent_instance_dir));
+    sprintf_s(agent_instance_dir, sizeof (agent_instance_dir), "%s%lu", agentInstPath,
+            site->GetSiteId());
+    /* 
+     * Test if Instance_{siteId} directory exists -
+     * if not - this site is not configured with the agent and
+     * let the request processor continue with other modules
+     */
+    if (_access(agent_instance_dir, F_OK) != 0) {
+        PCWSTR pwszSiteName = site->GetSiteName();
+        if (pwszSiteName != NULL) {
+            size_t pwszSiteNameSz = wcslen(pwszSiteName);
+            char *pszSiteName = (char *) pHttpContext->AllocateRequestMemory((DWORD) pwszSiteNameSz + 1);
+            if (pszSiteName != NULL) {
+                wcstombs(pszSiteName, pwszSiteName, pwszSiteNameSz);
+                if (readAgentConfigFile == TRUE) {
+                    am_web_log_debug("%s this agent instance is not configured with the site \"%s\" (%d)",
+                            thisfunc, pszSiteName, site->GetSiteId());
+                } else {
+                    WriteEventViewerLog("%s: this agent instance is not configured with the site \"%s\" (%d)",
+                            agentDescription, pszSiteName, site->GetSiteId());
+                }
+                return RQ_NOTIFICATION_CONTINUE;
+            }
+        }
+        if (readAgentConfigFile == TRUE) {
+            am_web_log_debug("%s this agent instance is not configured with the site id %d", thisfunc, site->GetSiteId());
+        } else {
+            WriteEventViewerLog("%s: this agent instance is not configured with the site id %d", agentDescription, site->GetSiteId());
+        }
+        return RQ_NOTIFICATION_CONTINUE;
+    }
+
+    am_web_log_debug("%s -- starting", thisfunc);
 
     if (readAgentConfigFile == FALSE) {
         EnterCriticalSection(&initLock);
         if (readAgentConfigFile == FALSE) {
-            if (loadAgentPropertyFile(pHttpContext) == FALSE) {
+            if (loadAgentPropertyFile(pHttpContext) != AM_SUCCESS) {
                 do_deny(pHttpContext);
-                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
                 LeaveCriticalSection(&initLock);
-                return retStatus;
+                return RQ_NOTIFICATION_FINISH_REQUEST;
             }
             readAgentConfigFile = TRUE;
         }
@@ -638,16 +665,14 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     if (agentInitialized != B_TRUE) {
         EnterCriticalSection(&initLock);
         if (agentInitialized != B_TRUE) {
-            am_web_log_debug("%s: Will call init", thisfunc);
-            init_at_request();
+            status = am_agent_init(&agentInitialized);
             if (agentInitialized != B_TRUE) {
-                am_web_log_error("%s: Agent intialization failed.", thisfunc);
+                am_web_log_error("%s: agent initialization failed, status: %d (%s)", thisfunc, status, am_status_to_string(status));
                 do_deny(pHttpContext);
-                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
                 LeaveCriticalSection(&initLock);
-                return retStatus;
+                return RQ_NOTIFICATION_FINISH_REQUEST;
             } else {
-                am_web_log_debug("%s: Agent intialized", thisfunc);
+                am_web_log_debug("%s: agent initialization succeeded", thisfunc);
             }
         }
         LeaveCriticalSection(&initLock);
@@ -673,7 +698,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
         am_web_delete_agent_configuration(agent_config);
         return RQ_NOTIFICATION_FINISH_REQUEST;
     }
-    
+
     if (status == AM_SUCCESS) {
         int vs = am_web_validate_url(agent_config, requestURL.c_str());
         if (vs != -1) {
@@ -690,7 +715,7 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
             }
         }
     }
-    
+
     // Get the request method
     if (status == AM_SUCCESS) {
         status = GetVariable(pHttpContext, "REQUEST_METHOD", &reqMethod, &requestMethodSize, TRUE);
@@ -1117,8 +1142,8 @@ char *read_registry_value(DWORD siteid) {
     HKEY key;
     char *bytes = NULL;
     const char *path = "Path";
-    char keypath[MAX_PATH];
-    DWORD status, size, bsize = MAX_PATH + 1;
+    char keypath[MAX_PATH_EXT];
+    DWORD status, size, bsize = MAX_PATH_EXT + 1;
     sprintf_s(keypath, sizeof (keypath), "SOFTWARE\\Sun Microsystems\\OpenSSO IIS7 Agent\\Identifier_%lu", siteid);
     if ((status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, (LPCSTR) keypath, 0, KEY_READ | KEY_WOW64_64KEY, &key)) == ERROR_SUCCESS) {
         if ((bytes = (char *) malloc(bsize)) != NULL) {
@@ -1147,53 +1172,57 @@ char *read_registry_value(DWORD siteid) {
  * invokes am_web_init.
  *
  * */
-BOOL loadAgentPropertyFile(IHttpContext* pHttpContext) {
-    am_status_t polsPolicyStatus = AM_SUCCESS;
-    char agent_bootstrap_file[MAX_PATH];
-    char agent_config_file[MAX_PATH];
+am_status_t CAgentModule::loadAgentPropertyFile(IHttpContext * pHttpContext) {
+    am_status_t status = AM_FAILURE;
+    char agent_bootstrap_file[MAX_PATH_EXT];
+    char agent_config_file[MAX_PATH_EXT];
     char *reg_path = NULL;
     IHttpSite *pHttpSite = pHttpContext->GetSite();
+    memset(&agent_bootstrap_file[0], 0, sizeof (agent_bootstrap_file));
+    memset(&agent_config_file[0], 0, sizeof (agent_config_file));
     if (NULL != pHttpSite) {
         reg_path = read_registry_value(pHttpSite->GetSiteId());
         if (reg_path == NULL) {
-            sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%lu%s", agentInstPath, pHttpSite->GetSiteId(), BOOTSTRAP_FILE);
-            sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%lu%s", agentInstPath, pHttpSite->GetSiteId(), CONFIG_FILE);
+            sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%lu%s", agentInstPath,
+                    pHttpSite->GetSiteId(), BOOTSTRAP_FILE);
+            sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%lu%s", agentInstPath,
+                    pHttpSite->GetSiteId(), CONFIG_FILE);
         } else {
             if (strstr(reg_path, "config") != NULL) PathRemoveFileSpecA(reg_path);
-            event_log(EVENTLOG_INFORMATION_TYPE, "%s: agent instance configuration read from registry:\n%s", agentDescription, reg_path);
+            WriteEventViewerLog("%s: agent instance configuration read from registry:\n%s", agentDescription, reg_path);
             sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%s", reg_path, BOOTSTRAP_FILE);
             sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%s", reg_path, CONFIG_FILE);
             free(reg_path);
         }
-        event_log(EVENTLOG_INFORMATION_TYPE, "%s: agent instance configuration files:\n%s,\n%s", agentDescription, agent_bootstrap_file, agent_config_file);
+        WriteEventViewerLog("%s: agent instance configuration files:\n%s,\n%s", agentDescription,
+                agent_bootstrap_file, agent_config_file);
     } else {
-        event_log(EVENTLOG_ERROR_TYPE, "%s: error locating agent instance configuration files", agentDescription);
-        return FALSE;
+        WriteEventViewerLog("%s: error fetching Site information", agentDescription);
+        return AM_FAILURE;
     }
-    if (AM_SUCCESS != (polsPolicyStatus = am_web_init(agent_bootstrap_file, agent_config_file))) {
-        event_log(EVENTLOG_ERROR_TYPE, "%s: initialization of the agent failed: status = %s (%d)",
-                agentDescription, am_status_to_string(polsPolicyStatus), polsPolicyStatus);
-        return FALSE;
-    }
-    return TRUE;
-}
 
-/*
- *Invoked when the agent module DLL is unloaded at shutdown.
- *
- * */
-void TerminateAgent() {
-    am_agent_cleanup();
-    am_web_cleanup();
-    am_shutdown_nss();
-    DeleteCriticalSection(&initLock);
+    if (_access(agent_bootstrap_file, R_OK) != 0) {
+        WriteEventViewerLog("%s: can't access instance bootstrap configuration file: %s",
+                agentDescription, agent_bootstrap_file);
+        return AM_NOT_FOUND;
+    }
+    if (_access(agent_config_file, R_OK) != 0) {
+        WriteEventViewerLog("%s: can't access instance configuration file: %s", agentDescription, agent_config_file);
+        return AM_NOT_FOUND;
+    }
+    if (AM_SUCCESS != (status = am_web_init(agent_bootstrap_file, agent_config_file))) {
+        WriteEventViewerLog("%s: initialization of the agent failed: status = %s (%d)",
+                agentDescription, am_status_to_string(status), status);
+        return AM_INIT_FAILURE;
+    }
+    return AM_SUCCESS;
 }
 
 /*
  * Retrieves the complete request URL in the context.
  *
  * */
-am_status_t get_request_url(IHttpContext* pHttpContext,
+static am_status_t get_request_url(IHttpContext* pHttpContext,
         std::string& requestURLStr,
         std::string& origRequestURLStr,
         std::string& pathInfo,
@@ -1343,7 +1372,7 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
 /*
  * Retrieves server variables using GetServerVariable.
  */
-am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
+static am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
         PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired) {
     const char* thisfunc = "GetVariable()";
     am_status_t status = AM_SUCCESS;
@@ -1370,7 +1399,7 @@ am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
     } else {
         if (pVarValSize) *pVarValSize = dw;
     }
-    
+
     if (status == AM_SUCCESS && isRequired &&
             (*pVarVal == NULL || (*pVarVal)[0] == '\0')) {
         am_web_log_error("%s: Server variable %s found in HttpContext is empty.", thisfunc, varName);
@@ -1380,18 +1409,10 @@ am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
     return status;
 }
 
-void OphResourcesFree(tOphResources* pOphResources) {
-    //cookies are not freed because they are allocated
-    //by httpContext.
-    am_web_clear_attributes_map(&pOphResources->result);
-    am_policy_result_destroy(&pOphResources->result);
-    return;
-}
-
 /*
  * Retrieves entity data from the request.
  **/
-BOOL GetEntity(IHttpContext* pHttpContext, std::string& data) {
+static BOOL GetEntity(IHttpContext* pHttpContext, std::string & data) {
     HRESULT hr;
     BOOL status = FALSE;
     IHttpRequest* pHttpRequest = pHttpContext->GetRequest();
@@ -1600,7 +1621,7 @@ static am_status_t set_header(const char *key, const char *values, void **args) 
     am_status_t status = AM_SUCCESS;
     CHAR** ptr = NULL;
     CHAR* set_headers_list = NULL;
-    
+
     if (key != NULL && args != NULL) {
         int cookie_length = 0;
         char* httpHeaderName = NULL;
@@ -1750,19 +1771,18 @@ static am_status_t set_cookie_in_response(const char *header, void **args) {
 }
 
 /*
- * Not implemented here. Similar fucntionality is implemented inside 
+ * Not implemented here. Similar functionality is implemented inside 
  * set_headers_in_context.
- * */
+ **/
 static am_status_t set_header_attr_as_cookie(const char *header, void **args) {
     return AM_SUCCESS;
 }
 
-
-// Not implemented.
-
+/*
+ * Not implemented.
+ **/
 static am_status_t get_cookie_sync(const char *cookieName, char** dpro_cookie, void **args) {
-    am_status_t status = AM_SUCCESS;
-    return status;
+    return AM_SUCCESS;
 }
 
 /*
@@ -1786,7 +1806,7 @@ void ConstructReqCookieValue(std::string& completeString, std::string value) {
 
 //Sets the headers in httpContext. Used when setting attributes as headers.
 
-am_status_t set_headers_in_context(IHttpContext *pHttpContext,
+static am_status_t set_headers_in_context(IHttpContext *pHttpContext,
         std::string headersList, BOOL isRequest) {
     const char *thisfunc = "set_headers_in_context()";
     am_status_t status = AM_SUCCESS;
@@ -1859,13 +1879,13 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
             pszCookie = "";
             cchCookie = 1;
         }
-        
+
         newCookie = (PCSTR) pHttpContext->AllocateRequestMemory(cchCookie +
                 (DWORD) (tmpCookieString.length()) + 1);
         if (newCookie == NULL) {
             return AM_FAILURE;
         }
-        
+
         strcpy((char*) newCookie, (char*) pszCookie);
         strcat((char*) newCookie, tmpCookieString.c_str());
         strcat((char*) newCookie, "\0");
@@ -1877,7 +1897,7 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
     return status;
 }
 
-am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
+static am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
     const char *thisfunc = "set_request_headers()";
     am_status_t status = AM_SUCCESS;
     PCSTR httpHeaders = NULL;
@@ -1934,7 +1954,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
             }
         }
     }
-    
+
     //set headers in pHttpContext
     std::string headersList = "";
     if (set_headers_list)
@@ -1993,7 +2013,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args) {
  * here.
  *
  * */
-REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
+static REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
         const char *redirect_url,
         const char *set_cookies_list) {
     am_web_log_debug("redirect_to_request_url: redirection URL is %s", redirect_url);
@@ -2208,7 +2228,7 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
  * This function checks if the profile attribute key is in the original 
  * request headers. If it is remove it in order to avoid tampering.
  */
-am_status_t remove_key_in_headers(char* key, char** httpHeaders) {
+static am_status_t remove_key_in_headers(char* key, char** httpHeaders) {
     const char *thisfunc = "remove_custom_attribute_in_header()";
     am_status_t status = AM_SUCCESS;
     CHAR* pStartHdr = NULL;
@@ -2247,22 +2267,10 @@ am_status_t remove_key_in_headers(char* key, char** httpHeaders) {
 }
 
 /*
- * Gets invoked at the first request. It initializes the agent toolkit.
- *
- * */
-void init_at_request() {
-    am_status_t status;
-    status = am_agent_init(&agentInitialized);
-    if (status != AM_SUCCESS) {
-        event_log(EVENTLOG_ERROR_TYPE, "%s: am_agent_init() returned failure: %s", agentDescription, am_status_to_string(status));
-    }
-}
-
-/*
  * Invoked when denying requests when the OpenAM is not responding
  * properly.
  * */
-void do_deny(IHttpContext* pHttpContext) {
+static void do_deny(IHttpContext * pHttpContext) {
     am_status_t status = AM_SUCCESS;
     HRESULT hr;
     IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
@@ -2293,7 +2301,6 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnAuthenticateRequest(IN IHttpContext 
             OpenAMUser *httpUser = new OpenAMUser(user, userPassword, userPasswordCrypted,
                     showPassword, doLogOn);
             if (httpUser == NULL || !httpUser->GetStatus()) {
-                print_windows_error(thisfunc, (httpUser == NULL ? GetLastError() : httpUser->GetError()));
                 am_web_log_error("%s: failed (invalid Windows/AD user credentials). Responding with HTTP403 error.", thisfunc);
                 do_deny(pHttpContext);
                 return RQ_NOTIFICATION_FINISH_REQUEST;
@@ -2322,9 +2329,8 @@ BOOL WINAPI DllMain(IN HINSTANCE hinstDll, IN DWORD fdwReason, IN LPVOID lpvCont
         case DLL_PROCESS_ATTACH:
         {
             DisableThreadLibraryCalls(hinstDll);
-            static char location[MAX_PATH];
-            if (!GetModuleFileNameA(hinstDll, location, sizeof (location))) return FALSE;
-            strcpy(agentDllPath, location);
+            char location[MAX_PATH_EXT];
+            if (!GetModuleFileNameA(hinstDll, location, sizeof (location) - 1)) return FALSE;
             if (!PathRemoveFileSpecA(location)) return FALSE;
             if (!PathRemoveFileSpecA(location)) return FALSE;
             size_t len = strlen(location);
