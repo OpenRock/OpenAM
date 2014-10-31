@@ -1,0 +1,7 @@
+The server docs are under openam/openam-documentation/openam-doc-source.
+
+A resolution to the following issue would likely move the DocBook XML here.
+
+https://bugster.forgerock.org/jira/browse/AME-4888 :
+Separate doc builds from project build
+
