@@ -1810,35 +1810,37 @@ am_web_remove_parameter_from_query(const char *inpString,
     am_status_t status = AM_FAILURE;
     try {
 	std::string inpStr = inpString;
-	std::string remStr = remove_str;
-	std::string outStr;
-	std::size_t i = 0, j = 0 ;
+        std::string remStr = remove_str;
+        std::string outStr;
+        std::size_t i = 0, j = 0;
+        std::size_t qpos = inpStr.find("?");
 
-	if((i = inpStr.find(remStr)) !=  std::string::npos){
-	    if(i != 0){
-		outStr.append(inpStr, 0 , i - 1 );
-	    }
-	    if((i = inpStr.find("&", i)) != std::string::npos) {
-		if(outStr.length() > 0){
-		    if((j = outStr.find("?")) != std::string::npos ||
-			(j = outStr.find("=")) != std::string::npos) {
-			outStr.append("&");
-		    }else {
-			outStr.append("?");
-		    }
-		    outStr.append(inpStr, i + 1, inpStr.size() - i);
-		} else {
-		    outStr.append(inpStr, i + 1, inpStr.size() - i);
-		}
-	    }
-	} else {
-	    outStr = inpStr;
-	}
-	am_web_log_debug("String before removal [%s]", inpStr.c_str());
-	strcpy(*outString, outStr.c_str());
-	am_web_log_debug("String after removal of %s [%s]",
-                         remove_str, *outString);
-	status = AM_SUCCESS;
+        if (qpos != std::string::npos &&
+                (i = inpStr.find(remStr, qpos)) != std::string::npos) {
+            if (i != 0) {
+                outStr.append(inpStr, 0, i - 1);
+            }
+            if ((i = inpStr.find("&", i)) != std::string::npos) {
+                if (outStr.length() > 0) {
+                    if ((j = outStr.find("?")) != std::string::npos ||
+                            (j = outStr.find("=")) != std::string::npos) {
+                        outStr.append("&");
+                    } else {
+                        outStr.append("?");
+                    }
+                    outStr.append(inpStr, i + 1, inpStr.size() - i);
+                } else {
+                    outStr.append(inpStr, i + 1, inpStr.size() - i);
+                }
+            }
+        } else {
+            outStr = inpStr;
+        }
+        am_web_log_debug("%s: string before removal [%s]", thisfunc, inpStr.c_str());
+        strcpy(*outString, outStr.c_str());
+        am_web_log_debug("%s: string after removal of %s [%s]", thisfunc,
+                remove_str, *outString);
+        status = AM_SUCCESS;
     }
     catch (std::bad_alloc& exb) {
 	status = AM_NO_MEMORY;
