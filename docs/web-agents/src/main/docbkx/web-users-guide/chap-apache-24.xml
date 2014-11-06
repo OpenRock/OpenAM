@@ -84,9 +84,13 @@
    directories under the <filename>web_agents/apache24_agent</filename>
    directory.</para>
 
-  <xinclude:include href="../shared/variablelist-agentadmin-folders.xml" />
+  <xinclude:include href="../shared/variablelist-agentadmin-folders.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
-  <xinclude:include href="../shared/sec-apache-mpm-tuning.xml"/>
+  <xinclude:include href="../shared/sec-apache-mpm-tuning.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
  </section>
 
  <section xml:id="install-apache24-web-agent">
@@ -99,9 +103,13 @@
 
   <para>Complete the following procedures to install the policy agent.</para>
 
-  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
+  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
-  <xinclude:include href="../shared/procedure-create-password-file.xml" />
+  <xinclude:include href="../shared/procedure-create-password-file.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
   <procedure xml:id="install-agent-into-apache24">
    <title>To Install the Policy Agent into Apache 2.4</title>
@@ -127,7 +135,13 @@ $ <userinput>/path/to/apache24/bin/apachectl -k stop</userinput>
    <step>
     <para>Run <command>./agentadmin --install</command> to install the agent.</para>
 
-    <xinclude:include  href="../shared/para-licensing-agreement-procedure.xml" />
+    <xinclude:include href="../shared/para-licensing-agreement-procedure.xml">
+     <xinclude:fallback>
+      <para>
+       Error: failed to include file
+      </para>
+     </xinclude:fallback>
+    </xinclude:include>
 
     <screen>
 $ <userinput>cd /path/to/web_agents/apache24_agent/bin/</userinput>

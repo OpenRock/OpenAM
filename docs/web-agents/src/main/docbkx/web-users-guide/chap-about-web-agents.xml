@@ -88,7 +88,9 @@
   </figure>
  </section>
 
- <xinclude:include href="../shared/sec-policy-agent-properties.xml" />
+ <xinclude:include href="../shared/sec-policy-agent-properties.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 
  <section xml:id="filter-modes">
   <title>Web Agent Filter Modes of Operation</title>

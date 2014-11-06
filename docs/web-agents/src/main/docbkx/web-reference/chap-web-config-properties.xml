@@ -466,7 +466,15 @@
    <varlistentry>
     <term><literal>com.forgerock.agents.conditional.login.url</literal></term>
 
-     <xinclude:include href="../shared/listitem-conditional-login-url-web.xml" />
+    <xinclude:include href="../shared/listitem-conditional-login-url-web.xml">
+     <xinclude:fallback>
+      <listitem>
+       <para>
+        Error: failed to include file
+       </para>
+      </listitem>
+     </xinclude:fallback>
+    </xinclude:include>
 
    </varlistentry>
 

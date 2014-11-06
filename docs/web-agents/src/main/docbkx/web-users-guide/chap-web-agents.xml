@@ -55,16 +55,28 @@
 
 
  <!-- The following sections are being reused in multiple docs -->
- <xinclude:include href="../shared/sec-gateway-or-policy-agent.xml" />
+ <xinclude:include href="../shared/sec-gateway-or-policy-agent.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 
- <xinclude:include href="../shared/sec-kinds-of-agent-profiles.xml" />
+ <xinclude:include href="../shared/sec-kinds-of-agent-profiles.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 
- <xinclude:include href="../shared/sec-create-agent-profiles.xml" />
+ <xinclude:include href="../shared/sec-create-agent-profiles.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 
- <xinclude:include href="../shared/sec-delegate-agent-profile-creation.xml" />
+ <xinclude:include href="../shared/sec-delegate-agent-profile-creation.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 
  <!-- The following section will be reused in the web policy agent users guide  -->
- <xinclude:include href="../shared/sec-configuring-web-policy-agents.xml" />
+ <xinclude:include href="../shared/sec-configuring-web-policy-agents.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 
- <xinclude:include href="../shared/sec-configure-agent-authenticators.xml" />
+ <xinclude:include href="../shared/sec-configure-agent-authenticators.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
 </chapter>

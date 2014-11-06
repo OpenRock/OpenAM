@@ -108,7 +108,9 @@
 
   <para>Complete the following procedures to install the policy agent.</para>
 
-  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
+  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
   <procedure xml:id="create-iis6-agent-pwdfile">
    <title>To Create the Password File</title>

@@ -234,7 +234,13 @@ Agreement (yes/no): [no]:</computeroutput>
    for installing and running OpenAM web policy agents.
   </para>
 
-  <xinclude:include href="../shared/para-requirements-support.xml" />
+  <xinclude:include href="../shared/para-requirements-support.xml">
+   <xinclude:fallback>
+    <para>
+     Error: failed to include file
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
 
   <para>TODO: Update for release</para>
 
@@ -246,16 +252,30 @@ Agreement (yes/no): [no]:</computeroutput>
     require a Java runtime environment for installation.
    </para>
 
-   <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
+   <xinclude:include href="../shared/itemizedlist-java-requirements.xml">
+    <xinclude:fallback>
+     <para>
+      Error: failed to include file
+     </para>
+    </xinclude:fallback>
+   </xinclude:include>
   </section>
 
-  <xinclude:include href="../shared/sec-browser-requirements.xml" />
+  <xinclude:include href="../shared/sec-browser-requirements.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
-  <xinclude:include href="../shared/sec-native-application-platforms.xml" />
+  <xinclude:include href="../shared/sec-native-application-platforms.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
-  <xinclude:include href="../shared/sec-web-pa-platform-requirements.xml" />
+  <xinclude:include href="../shared/sec-web-pa-platform-requirements.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
 
-  <xinclude:include href="../shared/sec-special-requests.xml" />
+  <xinclude:include href="../shared/sec-special-requests.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
  </section>
 
   <section xml:id="web-agent-compatibility">
