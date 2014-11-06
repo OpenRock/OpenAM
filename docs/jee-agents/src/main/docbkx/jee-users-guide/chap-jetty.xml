@@ -91,7 +91,13 @@ $ <userinput>echo $JAVA_HOME</userinput>
 
   <xinclude:include href="../shared/para-container-support.xml" />
 
-  <xinclude:include href="../shared/variablelist-agentadmin-folders.xml" />
+  <xinclude:include href="../shared/variablelist-agentadmin-folders.xml">
+   <xinclude:fallback>
+    <para>
+     Error: failed to include file
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
  </section>
  
  <section xml:id="install-jetty-agent">
@@ -99,9 +105,17 @@ $ <userinput>echo $JAVA_HOME</userinput>
   
   <para>Complete the following procedures to install the policy agent.</para>
 
-  <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml" />
+  <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml">
+   <xinclude:fallback>
+    <!-- Error: failed to include file -->
+   </xinclude:fallback>
+  </xinclude:include>
 
-  <xinclude:include href="../shared/procedure-create-password-file.xml" />
+  <xinclude:include href="../shared/procedure-create-password-file.xml">
+   <xinclude:fallback>
+    <!-- Error: failed to include file -->
+   </xinclude:fallback>
+  </xinclude:include>
 
      <procedure xml:id="install-agent-into-jetty">
    <title>To Install the Policy Agent into Jetty</title>
@@ -116,7 +130,13 @@ $ <userinput>echo $JAVA_HOME</userinput>
    <step>
     <para>Run <command>agentadmin --install</command> to install the agent.</para>
 
-    <xinclude:include  href="../shared/para-licensing-agreement-procedure.xml" />
+    <xinclude:include href="../shared/para-licensing-agreement-procedure.xml">
+     <xinclude:fallback>
+      <para>
+       Error: failed to include file
+      </para>
+     </xinclude:fallback>
+    </xinclude:include>
 
     <screen>
 $ <userinput>/path/to/j2ee_agents/jetty_v61_agent/bin/agentadmin --install --acceptLicense</userinput>

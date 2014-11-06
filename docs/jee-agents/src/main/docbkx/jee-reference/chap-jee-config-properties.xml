@@ -510,7 +510,11 @@
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.conditional.login.url</literal></term>
 
-     <xinclude:include href="../shared/listitem-conditional-login-url-jee.xml" />
+     <xinclude:include href="../shared/listitem-conditional-login-url-jee.xml">
+      <xinclude:fallback>
+       <listitem><para>Error: failed to include file</para></listitem>
+      </xinclude:fallback>
+     </xinclude:include>
 
    </varlistentry>
 
