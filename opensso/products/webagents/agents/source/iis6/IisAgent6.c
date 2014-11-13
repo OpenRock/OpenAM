@@ -80,6 +80,10 @@ const char INTERNAL_SERVER_ERROR_MSG[] = {
     "500 Internal Server Error"
 };
 
+const char NOT_IMPLEMENTED_ERROR_MSG[] = {
+    "501 Not Implemented"
+};
+
 #define AGENT_DESCRIPTION   "ForgeRock OpenAM Policy Agent 3.0 for Microsoft IIS 6.0"
 const CHAR agentDescription[]   = { AGENT_DESCRIPTION };
 #define	MAGIC_STR		"sunpostpreserve"
@@ -97,6 +101,7 @@ CHAR httpServerError[]          = "500 Internal Server Error";
 DWORD http200                   = 200;
 DWORD http302                   = 302;
 DWORD http500                   = 500;
+DWORD http501                   = 501;
 DWORD http403                   = 403;
 DWORD http404                   = 404;
 
@@ -113,6 +118,8 @@ const CHAR pszLocation[]        = "Location: ";
 const CHAR pszContentLengthNoBody[] = "Content-length: 0\r\n";
 const CHAR pszCrlf[]            = "\r\n";
 const CHAR pszEntityDelimiter[]     = "\r\n\r\n";
+const CHAR pszContentType[] = "Content-Type: text/html\r\n\r\n";
+
 // Response to cache invalidation notification request.
 //   I.e. UpdateAgentCacheServlet
 const CHAR HTTP_RESPONSE_OK[]     = {
@@ -347,13 +354,31 @@ am_status_t get_post_data(EXTENSION_CONTROL_BLOCK *pECB, char **body)
 DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB) {
     const char *thisfunc = "send_error()";
     const char *data = INTERNAL_SERVER_ERROR_MSG;
-    size_t data_len = sizeof (INTERNAL_SERVER_ERROR_MSG) - 1;
+    size_t data_len = strlen(INTERNAL_SERVER_ERROR_MSG);
     pECB->dwHttpStatusCode = http500;
     pECB->ServerSupportFunction(pECB->ConnID,
             HSE_REQ_SEND_RESPONSE_HEADER,
-            "500 Internal Server Error",
+            (LPVOID) INTERNAL_SERVER_ERROR_MSG,
             (LPDWORD) NULL,
-            (LPDWORD) "Content-Type: text/html\r\n\r\n");
+            (LPDWORD) pszContentType);
+    if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
+            (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
+        am_web_log_error("%s: WriteClient did not succeed: "
+                "Attempted message = %s ", thisfunc, data);
+    }
+    return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
+}
+
+DWORD send_notimplemented_error(EXTENSION_CONTROL_BLOCK *pECB) {
+    const char *thisfunc = "send_notimplemented_error()";
+    const char *data = NOT_IMPLEMENTED_ERROR_MSG;
+    size_t data_len = strlen(NOT_IMPLEMENTED_ERROR_MSG);
+    pECB->dwHttpStatusCode = http501;
+    pECB->ServerSupportFunction(pECB->ConnID,
+            HSE_REQ_SEND_RESPONSE_HEADER,
+            (LPVOID) NOT_IMPLEMENTED_ERROR_MSG,
+            (LPDWORD) NULL,
+            (LPDWORD) pszContentType);
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
@@ -365,13 +390,13 @@ DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB) {
 DWORD send_notfound(EXTENSION_CONTROL_BLOCK *pECB) {
     const char *thisfunc = "send_notfound()";
     const char *data = NOTFOUND_MSG;
-    size_t data_len = sizeof (NOTFOUND_MSG) - 1;
+    size_t data_len = strlen(NOTFOUND_MSG);
     pECB->dwHttpStatusCode = http404;
     pECB->ServerSupportFunction(pECB->ConnID,
             HSE_REQ_SEND_RESPONSE_HEADER,
-            "404 Not Found",
+            (LPVOID) NOTFOUND_MSG,
             (LPDWORD) NULL,
-            (LPDWORD) "Content-Type: text/html\r\n\r\n");
+            (LPDWORD) pszContentType);
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
@@ -383,13 +408,13 @@ DWORD send_notfound(EXTENSION_CONTROL_BLOCK *pECB) {
 DWORD do_deny(EXTENSION_CONTROL_BLOCK *pECB) {
     const char *thisfunc = "do_deny()";
     const char *data = FORBIDDEN_MSG;
-    size_t data_len = sizeof (FORBIDDEN_MSG) - 1;
+    size_t data_len = strlen(FORBIDDEN_MSG);
     pECB->dwHttpStatusCode = http403;
     pECB->ServerSupportFunction(pECB->ConnID,
             HSE_REQ_SEND_RESPONSE_HEADER,
-            "403 Forbidden",
+            (LPVOID) FORBIDDEN_MSG,
             (LPDWORD) NULL,
-            (LPDWORD) "Content-Type: text/html\r\n\r\n");
+            (LPDWORD) pszContentType);
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
@@ -1107,24 +1132,24 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                             NULL,
                             NULL);
                 } else {
-                    size_t data_len = sizeof (FORBIDDEN_MSG) - 1;
+                    size_t data_len = strlen(FORBIDDEN_MSG);
                     const char *data = FORBIDDEN_MSG;
                     if (redirect_status == httpServerError) {
                         data = INTERNAL_SERVER_ERROR_MSG;
-                        data_len = sizeof (INTERNAL_SERVER_ERROR_MSG) - 1;
+                        data_len = strlen(INTERNAL_SERVER_ERROR_MSG);
                         pECB->dwHttpStatusCode = http500;
                         pECB->ServerSupportFunction(pECB->ConnID,
                                 HSE_REQ_SEND_RESPONSE_HEADER,
-                                "500 Internal Server Error",
+                                (LPVOID) INTERNAL_SERVER_ERROR_MSG,
                                 (LPDWORD) NULL,
-                                (LPDWORD) "Content-Type: text/html\r\n\r\n");
+                                (LPDWORD) pszContentType);
                     } else {
                         pECB->dwHttpStatusCode = http403;
                         pECB->ServerSupportFunction(pECB->ConnID,
                                 HSE_REQ_SEND_RESPONSE_HEADER,
-                                "403 Forbidden",
+                                (LPVOID) FORBIDDEN_MSG,
                                 (LPDWORD) NULL,
-                                (LPDWORD) "Content-Type: text/html\r\n\r\n");
+                                (LPDWORD) pszContentType);
                     }
                     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
                             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
@@ -1569,27 +1594,39 @@ void OphResourcesFree(tOphResources* pOphResources)
     return;
 }
 
-DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
-                                    am_status_t request_status,
-                                    am_policy_result_t *policy_result,
-                                    char *requestURL,
-                                    void **args,
-                                    char **resp,
-                                    void* agent_config)
-{
+static int count_characters(const char *str, char character) {
+    const char *p = str;
+    int count = 0;
+    do {
+        if (*p == character) {
+            count++;
+        }
+    } while (*(p++));
+    return count;
+}
+
+static DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
+        am_status_t request_status,
+        am_policy_result_t *policy_result,
+        char *requestURL,
+        void **args,
+        char **resp,
+        void* agent_config) {
     const char *thisfunc = "process_request_with_post_data_preservation()";
     am_status_t status = AM_SUCCESS;
     DWORD returnValue = HSE_STATUS_SUCCESS;
     post_urls_t *post_urls = NULL;
     char *response = NULL;
+    char *content_type = NULL;
     int local_alloc = 1;
+    size_t response_size = 0;
 
     if (*resp != NULL) {
         response = *resp;
         local_alloc = 0;
     }
     status = am_web_create_post_preserve_urls(requestURL, &post_urls,
-                                              agent_config);
+            agent_config);
     if (status != AM_SUCCESS) {
         returnValue = send_error(pECB);
     }
@@ -1604,60 +1641,87 @@ DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
             }
         }
     }
-    if (status == AM_SUCCESS) {
-        if (response == NULL || strlen(response) == 0) {
-            // this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST
-            if ((response = realloc(response, strlen(AM_WEB_EMPTY_POST) + 1)) != NULL)
-                strcpy(response, AM_WEB_EMPTY_POST);
-        }
-        if (response != NULL && strlen(response) > 0) {
-            if (AM_SUCCESS == register_post_data(pECB,post_urls->action_url,
-                                       post_urls->post_time_key, response, 
-                                       agent_config)) 
-            {
-                char *lbCookieHeader = NULL;
-                // If using a LB in front of the agent and if the sticky 
-                // session mode is COOKIE, the lb cookie needs to be set there.
-                // If am_web_get_postdata_preserve_lbcookie()
-                // returns AM_INVALID_ARGUMENT, it means that the 
-                // sticky session feature is disabled (ie no LB) or
-                // that the sticky session mode is set to URL.
-                status = am_web_get_postdata_preserve_lbcookie(
-                          &lbCookieHeader, B_FALSE, agent_config);
-                if (status == AM_NO_MEMORY) {
-                    returnValue = send_error(pECB);
-                } else {
-                    if (status == AM_SUCCESS) {
-                        am_web_log_debug("%s: Setting LB cookie "
-                                         "for post data preservation.",
-                                         thisfunc);
-                        set_cookie(lbCookieHeader, args);
-                    }
-                    returnValue = do_redirect(pECB, request_status, 
-                                              policy_result,
-                                              post_urls->dummy_url, 
-                                              REQUEST_METHOD_POST, args,
-                                              agent_config);
-                }
-                if (lbCookieHeader != NULL) {
-                    am_web_free_memory(lbCookieHeader);
-                    lbCookieHeader = NULL;
-                }
+
+    response_size = response != NULL ? strlen(response) : 0;
+
+    if (status == AM_SUCCESS && response_size > 0) {
+        if (get_header_value(pECB, "CONTENT_TYPE", &content_type, TRUE, FALSE) == AM_SUCCESS) {
+            if (StrStrI((PTSTR) content_type, (PCTSTR) "multipart/form-data") == NULL &&
+                    StrStrI((PTSTR) content_type, (PCTSTR) "application/x-www-form-urlencoded") == NULL) {
+                am_web_log_error("%s: unsupported content type (%s)", thisfunc, content_type);
+                status = AM_INVALID_RESOURCE_FORMAT;
+                returnValue = send_notimplemented_error(pECB);
             } else {
-                am_web_log_error("%s: register_post_data() "
-                     "failed.", thisfunc);
-                returnValue = send_error(pECB);
+                int c1 = count_characters(response, '=');
+                int c2 = count_characters(response, '&');
+                if (c1 == 0 || (c1 != (c2 + 1))) {
+                    am_web_log_error("%s: invalid %s data (%s)", thisfunc, content_type, response);
+                    status = AM_INVALID_RESOURCE_FORMAT;
+                    returnValue = send_notimplemented_error(pECB);
+                }
             }
         } else {
-            am_web_log_debug("%s: This is a POST request with no post data. "
-                             "Redirecting as a GET request.", thisfunc);
-            returnValue = do_redirect(pECB, request_status,
-                                      policy_result,
-                                      requestURL, 
-                                      REQUEST_METHOD_GET, args,
-                                      agent_config);
+            am_web_log_error("%s: empty content type", thisfunc);
+            status = AM_INVALID_RESOURCE_FORMAT;
+            returnValue = send_notimplemented_error(pECB);
         }
-    } 
+    }
+
+    if (status == AM_SUCCESS && response_size == 0) {
+        /* this is empty POST, make sure PDP handler preserves it and sets up empty html form for re-POST */
+        if ((response = realloc(response, strlen(AM_WEB_EMPTY_POST) + 1)) != NULL) {
+            strcpy(response, AM_WEB_EMPTY_POST);
+            response_size = strlen(AM_WEB_EMPTY_POST);
+        }
+    }
+
+    if (status == AM_SUCCESS && response_size > 0) {
+        if (AM_SUCCESS == register_post_data(pECB, post_urls->action_url,
+                post_urls->post_time_key, response,
+                agent_config)) {
+            char *lbCookieHeader = NULL;
+            // If using a LB in front of the agent and if the sticky 
+            // session mode is COOKIE, the lb cookie needs to be set there.
+            // If am_web_get_postdata_preserve_lbcookie()
+            // returns AM_INVALID_ARGUMENT, it means that the 
+            // sticky session feature is disabled (ie no LB) or
+            // that the sticky session mode is set to URL.
+            status = am_web_get_postdata_preserve_lbcookie(
+                    &lbCookieHeader, B_FALSE, agent_config);
+            if (status == AM_NO_MEMORY) {
+                returnValue = send_error(pECB);
+            } else {
+                if (status == AM_SUCCESS) {
+                    am_web_log_debug("%s: Setting LB cookie "
+                            "for post data preservation.",
+                            thisfunc);
+                    set_cookie(lbCookieHeader, args);
+                }
+                returnValue = do_redirect(pECB, request_status,
+                        policy_result,
+                        post_urls->dummy_url,
+                        REQUEST_METHOD_POST, args,
+                        agent_config);
+            }
+            if (lbCookieHeader != NULL) {
+                am_web_free_memory(lbCookieHeader);
+                lbCookieHeader = NULL;
+            }
+        } else {
+            am_web_log_error("%s: register_post_data() "
+                    "failed.", thisfunc);
+            returnValue = send_error(pECB);
+        }
+    } else if (status != AM_INVALID_RESOURCE_FORMAT) {
+        am_web_log_debug("%s: This is a POST request with no post data. "
+                "Redirecting as a GET request.", thisfunc);
+        returnValue = do_redirect(pECB, request_status,
+                policy_result,
+                requestURL,
+                REQUEST_METHOD_GET, args,
+                agent_config);
+    }
+
     if (post_urls != NULL) {
         am_web_clean_post_urls(post_urls);
         post_urls = NULL;
@@ -1665,8 +1729,11 @@ DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
     if (response != NULL && local_alloc == 1) {
         free(response);
         response = NULL;
-    } 
-
+    }
+    if (content_type != NULL) {
+        free(content_type);
+        content_type = NULL;
+    }
     return returnValue;
 }
 
@@ -1741,7 +1808,7 @@ DWORD send_ok(EXTENSION_CONTROL_BLOCK *pECB)
 {
     const char *thisfunc = "send_ok()";
     const char *data = HTTP_RESPONSE_OK;
-    size_t data_len = sizeof(HTTP_RESPONSE_OK) - 1;
+    size_t data_len = strlen(HTTP_RESPONSE_OK);
     pECB->dwHttpStatusCode = http200;
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
                      (LPDWORD)&data_len, (DWORD) 0))==FALSE)
