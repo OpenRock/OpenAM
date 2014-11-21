@@ -520,6 +520,15 @@
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>Configuring Web Policy Agent Advanced Properties</citetitle></link>.
    </para>
+
+   <note>
+    <para>
+     Web policy agents support more than one agent instance running on the same
+     host by properly initializing the multi-process locks/semaphores
+     during the bootstrap process.
+    </para>
+   </note>
+
   </section>
 
  </section>
