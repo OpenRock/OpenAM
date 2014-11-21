@@ -31,7 +31,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 #ifndef AM_POLICY_H
@@ -53,6 +53,7 @@ typedef struct am_policy_result {
     am_map_t attr_session_map;
     am_map_t attr_response_map;
     const char *advice_string;
+    am_bool_t not_enforced;
 } am_policy_result_t;
 #define AM_POLICY_RESULT_INITIALIZER \
 { \
@@ -63,7 +64,8 @@ typedef struct am_policy_result {
     AM_MAP_NULL, \
     AM_MAP_NULL, \
     AM_MAP_NULL, \
-    NULL \
+    NULL, \
+    AM_FALSE \
 } \
 
 /**
