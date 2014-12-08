@@ -535,7 +535,8 @@ Build Machine: builds.forgerock.org
   using <command>agentadmin --install --acceptLicense --useResponse
   <replaceable>response-file</replaceable></command>.</para>
  </section>
- 
+
+ <?hard-pagebreak?>
  <section xml:id="uninstall-tomcat-agent">
   <title>Remove Tomcat Policy Agent Software</title>
 

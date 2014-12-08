@@ -306,7 +306,8 @@ $ <userinput>deploy --name agentapp --contextroot /agentapp \
    </step>
   </procedure>
  </section>
- 
+
+ <?hard-pagebreak?>
  <section xml:id="silent-glassfish-agent-installation">
   <title>Silent GlassFish Policy Agent Installation</title>
 

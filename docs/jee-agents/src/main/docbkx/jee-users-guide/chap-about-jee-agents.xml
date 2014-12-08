@@ -73,7 +73,8 @@
    Installing more than one policy agent in an application server is not supported.
   </para>
  </note>
- 
+
+ <?hard-pagebreak?>
  <section xml:id="example-j2ee-agent-components">
   <title>Java EE Policy Agent Components</title>
 
@@ -664,6 +665,7 @@
      <citetitle>Cookie Reset Properties</citetitle></link>.</para>
   </section>
 
+  <?hard-pagebreak?>
   <section xml:id="agent-cdsso">
    <title>Cross Domain Single Sign-On</title>
 

@@ -93,6 +93,7 @@ $ <userinput>echo $JAVA_HOME</userinput>
    </xinclude:fallback>
   </xinclude:include>
 
+   <?hard-pagebreak?>
   <procedure xml:id="install-with-ibm-jvm">
    <title>To Install With IBM Java</title>
 
