@@ -33,12 +33,25 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the JBoss 4 and 5 Application Server Policy Agent</title>
- <indexterm><primary>JBoss Application Server</primary></indexterm>
+
+ <indexterm>
+  <primary>JBoss Application Server</primary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for JBoss
  Application Server.</para>
 
-  <section xml:id="before-jboss4and5-agent-install">
+ <section xml:id="before-jboss4and5-agent-install">
   <title>Before You Install</title>
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>JBoss 4 &amp; 5</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>JBoss 4 &amp; 5</primary>
+    <secondary>before your install</secondary>
+   </indexterm>
   
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
@@ -84,7 +97,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
  
  <section xml:id="install-jboss4and5-agent">
   <title>Installing the JBoss Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>JBoss 4 &amp; 5 agent</primary>
+   <secondary>installing </secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml">
@@ -101,7 +119,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
   
   <procedure xml:id="install-agent4and5-into-jboss">
    <title>To Install the Policy Agent into JBoss</title>
-   
+
+   <indexterm>
+    <primary>JBoss 4 &amp; 5</primary>
+    <secondary>installing into </secondary>
+   </indexterm>
+
    <step>
     <para>Shut down the JBoss server where you plan to install the
     agent.</para>
@@ -244,7 +267,12 @@ Install log file location:
   
   <procedure xml:id="run-jboss-after-agent-installation">
    <title>To Run JBoss After Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>JBoss 4 &amp; 5 agent</primary>
+    <secondary>running after install</secondary>
+   </indexterm>
+
    <step>
     <para>Adjust the script to set the agent classpath executable.</para>
 
@@ -299,7 +327,12 @@ $ <userinput>cd $JBOSS_HOME ; ./bin/run.sh -b 0.0.0.0</userinput>
  
  <section xml:id="silent-jboss4and5-agent-installation">
   <title>Silent JBoss Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>JBoss 4 &amp; 5 agent</primary>
+   <secondary>silent install</secondary>
+  </indexterm>
+
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
@@ -310,7 +343,12 @@ $ <userinput>cd $JBOSS_HOME ; ./bin/run.sh -b 0.0.0.0</userinput>
  
  <section xml:id="uninstall4and5-jboss-agent">
   <title>Removing JBoss Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>JBoss 4 &amp; 5 agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>Shut down the JBoss server before you uninstall the
     policy agent.</para>
 

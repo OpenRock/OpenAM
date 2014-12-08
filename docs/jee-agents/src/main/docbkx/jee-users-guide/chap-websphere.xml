@@ -33,13 +33,22 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the IBM WebSphere Policy Agent</title>
- <indexterm><primary>IBM WebSphere Application Server</primary></indexterm>
+ <indexterm><primary>IBM WebSphere</primary></indexterm>
  <para>This chapter covers installation of the policy agent for IBM
  WebSphere.</para>
  
   <section xml:id="before-websphere-agent-install">
   <title>Before You Install</title>
-  
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>IBM WebSphere</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>IBM WebSphere</primary>
+    <secondary>before you install</secondary>
+   </indexterm>
+
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
@@ -87,6 +96,11 @@ $ <userinput>echo $JAVA_HOME</userinput>
   <procedure xml:id="install-with-ibm-jvm">
    <title>To Install With IBM Java</title>
 
+   <indexterm>
+    <primary>IBM WebSphere agent</primary>
+    <secondary>installing with IBM Java</secondary>
+   </indexterm>
+
    <para>The WebSphere policy agent runs with IBM Java. In order to install
    the policy agent using IBM Java on platforms other than AIX, you must first
    change the <command>agentadmin</command> script to use IBMJCE.</para>
@@ -121,7 +135,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
  
  <section xml:id="install-websphere-agent">
   <title>Installing the WebSphere Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>IBM WebSphere agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml">
@@ -138,7 +157,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
   
   <procedure xml:id="install-agent-into-websphere">
    <title>To Install the Policy Agent into WebSphere</title>
-   
+
+   <indexterm>
+    <primary>IBM WebSphere</primary>
+    <secondary>installing into</secondary>
+   </indexterm>
+
    <step>
     <para>Shut down the WebSphere server where you plan to install the
     agent.</para>
@@ -260,7 +284,12 @@ Install log file location:
   
   <procedure xml:id="protect-websphere-apps-after-agent-installation">
    <title>To Protect Applications After Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>IBM WebSphere agent</primary>
+    <secondary>protecting applications</secondary>
+   </indexterm>
+
    <step performance="optional">
     <para>Deploy the
     <filename>/path/to/j2ee_agents/websphere_v61_agent/etc/agentapp.war</filename>
@@ -302,7 +331,12 @@ Install log file location:
  
  <section xml:id="silent-websphere-agent-installation">
   <title>Silent WebSphere Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>IBM WebSphere agent</primary>
+   <secondary>silent install</secondary>
+  </indexterm>
+
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
@@ -327,6 +361,11 @@ Install log file location:
 
  <section xml:id="websphere-network-deployment">
   <title>Notes About WebSphere Network Deployment</title>
+
+  <indexterm>
+   <primary>IBM WebSphere agent</primary>
+   <secondary>about network deployment</secondary>
+  </indexterm>
 
   <para>When using WebSphere Application Server Network Deployment, you must
   install policy agents on the Deployment Manager, on each Node Agent, and

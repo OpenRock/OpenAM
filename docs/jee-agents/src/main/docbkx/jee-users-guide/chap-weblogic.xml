@@ -33,12 +33,17 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Oracle WebLogic Policy Agent</title>
- <indexterm><primary>Oracle WebLogic Server</primary></indexterm>
+ <indexterm><primary>Oracle WebLogic</primary></indexterm>
  <para>This chapter covers installation of the policy agent for Oracle
  WebLogic.</para>
  
   <section xml:id="before-weblogic-agent-install">
   <title>Before You Install</title>
+
+   <indexterm>
+    <primary>Oracle WebLogic agent</primary>
+    <secondary>before your install</secondary>
+   </indexterm>
   
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
@@ -85,7 +90,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
  
  <section xml:id="install-weblogic-agent">
   <title>Installing the WebLogic Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Oracle WebLogic agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml">
@@ -310,7 +320,12 @@ com.sun.identity.agents.filter.AmAgentFilter</computeroutput>
  
  <section xml:id="silent-weblogic-agent-installation">
   <title>Silent WebLogic Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Oracle WebLogic agent</primary>
+   <secondary>silent install</secondary>
+  </indexterm>
+
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
@@ -321,7 +336,12 @@ com.sun.identity.agents.filter.AmAgentFilter</computeroutput>
  
  <section xml:id="post-weblogic-agent-installation">
   <title>Post Installation of WebLogic Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Oracle WebLogic agent</primary>
+   <secondary>post-install</secondary>
+  </indexterm>
+
   <para>After installing WebLogic, some configuration is required before
   the policy agent will work.</para>
   <procedure xml:id="configure-weblogic-agent">
@@ -371,6 +391,11 @@ com.sun.identity.agents.filter.AmAgentFilter</computeroutput>
 
  <section xml:id="weblogic-agents-multi-server">
   <title>Installing WebLogic Policy Agents in Multi-Server Domains</title>
+
+  <indexterm>
+   <primary>Oracle WebLogic agent</primary>
+   <secondary>installing in multi-server domains</secondary>
+  </indexterm>
 
   <para>
    In many WebLogic domains, the administration server provides
@@ -491,7 +516,12 @@ $CLASSPATH</programlisting>
  
  <section xml:id="uninstall-weblogic-agent">
   <title>Removing WebLogic Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Oracle WebLogic agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>Shut down the WebLogic server before you uninstall the
     policy agent.</para>
 

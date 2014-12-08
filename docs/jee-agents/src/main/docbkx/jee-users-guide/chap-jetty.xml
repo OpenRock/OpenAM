@@ -33,12 +33,25 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Jetty Server Policy Agent</title>
- <indexterm><primary>Jetty Server</primary></indexterm>
+
+ <indexterm>
+  <primary>Java EE policy agents</primary>
+  <secondary>Jetty</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>Jetty</primary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for Jetty.</para>
 
   <section xml:id="before-jetty-agent-install">
   <title>Before You Install</title>
-  
+
+   <indexterm>
+    <primary>Jetty</primary>
+    <secondary>before you install</secondary>
+   </indexterm>
+
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
@@ -102,7 +115,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
  
  <section xml:id="install-jetty-agent">
   <title>Installing the Jetty Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Jetty agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml">
@@ -273,7 +291,12 @@ $ <userinput>cd /path/to/jetty ; java -jar start.jar</userinput>
  
  <section xml:id="silent-jetty-agent-installation">
   <title>Silent Jetty Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Jetty agent</primary>
+   <secondary>silent install</secondary>
+  </indexterm>
+
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --acceptLicense --saveResponse
   <replaceable>response-file</replaceable></command>
@@ -284,6 +307,11 @@ $ <userinput>cd /path/to/jetty ; java -jar start.jar</userinput>
  
  <section xml:id="uninstall-jetty-agent">
   <title>Removing Jetty Policy Agent Software</title>
+
+  <indexterm>
+   <primary>Jetty agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
 
   <para>Shut down the Jetty server before you uninstall the
     policy agent.</para>

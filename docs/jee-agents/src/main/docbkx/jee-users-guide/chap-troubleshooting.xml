@@ -31,12 +31,24 @@
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Troubleshooting</title>
- <indexterm><primary>Troubleshooting</primary></indexterm>
+ <indexterm>
+  <primary>Java EE policy agents</primary>
+  <secondary>troubleshooting</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>troubleshooting</primary>
+ </indexterm>
+
  <para>This chapter offers solutions to issues during installation of OpenAM
   policy agents.</para>
  
  <qandaset xml:id="solutions-to-common-issues" defaultlabel="qanda">
   <title>Solutions to Common Issues</title>
+
+  <indexterm>
+   <primary>troubleshooting</primary>
+   <secondary>solutions to common issues</secondary>
+  </indexterm>
 
    <para>This section offers solutions to common problems when installing 
    OpenAM policy agents.</para>

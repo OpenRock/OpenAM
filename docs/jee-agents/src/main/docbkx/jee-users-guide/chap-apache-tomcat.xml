@@ -39,6 +39,15 @@
  
   <section xml:id="before-tomcat-agent-install">
   <title>Before You Install</title>
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>Tomcat</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Tomcat agent</primary>
+    <secondary>before you install</secondary>
+   </indexterm>
   
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
@@ -127,6 +136,11 @@ $ <userinput>echo $JAVA_HOME</userinput>
 
   <procedure xml:id="install-agent-into-tomcat6">
    <title>To Install the Policy Agent into Tomcat 6</title>
+
+   <indexterm>
+    <primary>Tomcat 6</primary>
+    <secondary>installing into</secondary>
+   </indexterm>
 
    <para>
     The steps required for policy agent installation into Tomcat 6 are subtly
@@ -279,6 +293,11 @@ $ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
 
   <procedure xml:id="install-agent-into-tomcat7">
    <title>To Install the Policy Agent into Tomcat 7</title>
+
+   <indexterm>
+    <primary>Tomcat 7</primary>
+    <secondary>installing into</secondary>
+   </indexterm>
 
    <para>The steps required for policy agent installation into Tomcat 7 are subtly
     different from those required for Tomcat 6. For Tomcat 7, you should not install
@@ -458,7 +477,12 @@ $ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
   
   <procedure xml:id="check-tomcat-agent-installation">
    <title>To Check the Policy Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>Tomcat agent</primary>
+    <secondary>checking install</secondary>
+   </indexterm>
+
    <step>
     <para>Check the Tomcat server log after you start the server to make
     sure startup completed successfully.</para>
@@ -498,7 +522,12 @@ Build Machine: builds.forgerock.org
  
  <section xml:id="silent-tomcat-agent-installation">
   <title>Silent Tomcat Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Tomcat 6</primary>
+   <secondary>silent install</secondary>
+  </indexterm>
+
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
@@ -509,7 +538,12 @@ Build Machine: builds.forgerock.org
  
  <section xml:id="uninstall-tomcat-agent">
   <title>Remove Tomcat Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Tomcat agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>Shut down the Tomcat server before you uninstall the
     policy agent.</para>
   

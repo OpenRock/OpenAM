@@ -33,12 +33,25 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the GlassFish Policy Agent</title>
- <indexterm><primary>GlassFish Server</primary></indexterm>
+
+ <indexterm>
+  <primary>GlassFish</primary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for GlassFish.</para>
  
   <section xml:id="before-glassfish-agent-install">
   <title>Before You Install</title>
-  
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>GlassFish</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>GlassFish</primary>
+    <secondary>before you install</secondary>
+   </indexterm>
+
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
@@ -85,7 +98,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
  
  <section xml:id="install-glassfish-agent">
   <title>Installing the GlassFish Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>GlassFish agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-j2ee-agent-profile.xml">
@@ -102,7 +120,16 @@ $ <userinput>echo $JAVA_HOME</userinput>
   
   <procedure xml:id="install-agent-into-glassfish">
    <title>To Install the Policy Agent into GlassFish</title>
-   
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>GlassFish</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>GlassFish</primary>
+    <secondary>installing into</secondary>
+   </indexterm>
+
    <step>
     <para>Shut down the GlassFish domain where you plan to install the
     agent.</para>
@@ -282,7 +309,16 @@ $ <userinput>deploy --name agentapp --contextroot /agentapp \
  
  <section xml:id="silent-glassfish-agent-installation">
   <title>Silent GlassFish Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>GlassFish</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>GlassFish</primary>
+   <secondary>silent install</secondary>
+  </indexterm>
+
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>

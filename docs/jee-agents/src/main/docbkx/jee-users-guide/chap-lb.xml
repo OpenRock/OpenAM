@@ -31,7 +31,7 @@
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Configuring Java EE Policy Agents Behind Load Balancers</title>
  <indexterm>
-  <primary>Load balancers</primary>
+  <primary>load balancers</primary>
  </indexterm>
 
  <para>
@@ -41,6 +41,11 @@
 
  <section xml:id="lb-scenarios">
   <title>The Role of the Load Balancing Layer</title>
+
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>role of</secondary>
+  </indexterm>
 
   <para>
    A load balancing layer that stands between clients and protected servers
@@ -103,6 +108,11 @@
  <section xml:id="lb-configure-agent">
   <title>Configuring the Agent Behind the Load Balancer</title>
 
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>configuring agent behind</secondary>
+  </indexterm>
+
   <para>
    Configure your agent to map the agent host name
    to the load balancer host name,
@@ -113,6 +123,11 @@
 
   <procedure xml:id="lb-fqdn-mapping">
    <title>To Map the Agent Host Name to the Load Balancer Host Name</title>
+
+   <indexterm>
+    <primary>load balancers</primary>
+    <secondary>map agent host name to</secondary>
+   </indexterm>
 
    <para>
     Follow these steps to map the agent host name to
@@ -189,6 +204,11 @@
 
   <procedure xml:id="lb-alternate-agent-url">
    <title>To Set Alternate Agent URL Properties</title>
+
+   <indexterm>
+    <primary>load balancers</primary>
+    <secondary>setting alternate agent URL properties</secondary>
+   </indexterm>
 
    <para>
     Use the alternate agent URL properties to show the load balancer

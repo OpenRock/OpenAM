@@ -32,6 +32,11 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>About OpenAM Java EE Policy Agents</title>
+
+ <indexterm>
+  <primary>Java EE policy agents</primary>
+  <secondary>about</secondary>
+ </indexterm>
  
  <para>
   A <firstterm>Java EE policy agent</firstterm> is an OpenAM add-on component that
@@ -71,6 +76,11 @@
  
  <section xml:id="example-j2ee-agent-components">
   <title>Java EE Policy Agent Components</title>
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>components</secondary>
+  </indexterm>
 
   <para>The OpenAM Java EE policy agent is comprised
    of five main components: the <firstterm>policy agent filter</firstterm>,
@@ -193,6 +203,15 @@
 
  <section xml:id="filter-modes">
    <title>Java EE Agent Filter Modes of Operation</title>
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>filter modes</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>filter modes</primary>
+  </indexterm>
+
    <para>The agent filter intercepts all inbound client requests
     to access a protected resource and processes the request based on
     a global configuration property,
@@ -273,6 +292,17 @@
 
  <section xml:id="jee-agent-not-enforced-list">
   <title>Not-Enforced URI and Client IP Lists</title>
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>Not-Enforced URI lists</secondary>
+   <secondary>Not-Enforced Client IP lists</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Not-Enforced URI list</primary>
+   <primary>Not-Enforced Client IP list</primary>
+  </indexterm>
+
    <para>The Java EE policy agent supports properties to bypass authentication
     and grant immediate access to resources not requiring protection, such
     as images, stylesheets, or static HTML pages.</para>
@@ -314,6 +344,12 @@
 
  <section xml:id="j2ee-process-flow">
   <title>Java EE Process Flow</title>
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>process flow</secondary>
+  </indexterm>
+
   <para>To illustrate how Java EE policy agents work, it is first instructive to understand
    a simplified and generic web application example with OpenAM. While the specific
    configuration settings differ depending on the container or application server,
@@ -476,6 +512,12 @@
 
  <section xml:id="j2ee-agent-features">
   <title>Java EE Policy Agent Features</title>
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>features</secondary>
+  </indexterm>
+
   <para>The Java EE policy agent provides a number of additional features
    useful for your deployment.
   </para>
@@ -505,6 +547,15 @@
 
   <section xml:id="agent-login-attempt-limits">
    <title>Login Attempt Limits</title>
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>login attempt limits</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>login attempt limits</primary>
+   </indexterm>
+
    <para>When the user-agent does not present a valid SSO token, the agent
     will redirect the user to the login URL configured in OpenAM.
 
@@ -531,6 +582,15 @@
 
   <section xml:id="fqdn-checking">
    <title>FQDN Checking</title>
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>fully-qualified domain checking</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>fully-qualified domain checking</primary>
+   </indexterm>
+
    <para>The Java EE policy agent requires that clients accessing
     protected resources use valid URLs with fully qualified domain names (FQDNs).
     If invalid URLs are referenced, policy evaluation can
@@ -572,6 +632,15 @@
 
   <section xml:id="cookie-reset">
    <title>Cookie Reset Properties</title>
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>cookie reset</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>cookie reset</primary>
+   </indexterm>
+
    <para>OpenAM provides cookie reset properties that the agent carries out
     prior to redirecting the client to a login page for authentication.
    </para>
@@ -597,6 +666,15 @@
 
   <section xml:id="agent-cdsso">
    <title>Cross Domain Single Sign-On</title>
+
+   <indexterm>
+    <primary>Java EE policy agents</primary>
+    <secondary>cross domain single sign-on (CDSSO)</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>cross domain single sign-on (CDSSO)</primary>
+   </indexterm>
+
    <para>Cross domain single sign-on (CDSSO) allows the Java EE policy agent
     to transfer a validated session ID between an OpenAM domain and an application
     domain using a proprietary OpenAM mechanism.
@@ -631,6 +709,11 @@
 
  <section xml:id="j2ee-agent-configuration">
   <title>How Java EE Policy Agents are Configured</title>
+
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>how agents are configured</secondary>
+  </indexterm>
 
   <para>You install Java EE policy agents in the web application containers
    serving web applications that you want to protect. Java EE policy agents are
