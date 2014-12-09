@@ -31,7 +31,9 @@
 
 #include <iterator>
 #include <algorithm>
-#include <stdlib.h>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
 #include "url.h"
 #include "internal_exception.h"
 #include "http.h"
@@ -132,6 +134,82 @@ URL::URL(const URL &srcURL):
 			    icase(srcURL.icase){
 }
 
+/* Normalize URL path segments. RFC-2396, section-5.2 */
+static std::string normalize_path_segments(std::string uri) {
+    std::string path, normalized;
+    std::string func("URL::normalize_path_segments");
+
+    try {
+        /* check if we have url-encoded value */
+        path = Http::decode(uri);
+    } catch (...) {
+        path = uri;
+    }
+
+    if (!path.empty()) {
+        std::size_t start = 0, end = 0;
+        std::vector<std::string> path_segments;
+        /* split path into segments */
+        while ((end = path.find('/', start)) != std::string::npos) {
+            path_segments.push_back(path.substr(start, end - start));
+            start = end + 1;
+        }
+        path_segments.push_back(path.substr(start));
+        if (!path_segments.empty()) {
+            /* remove single dot segments */
+            std::vector<std::string>::iterator it0;
+            for (it0 = path_segments.begin(); it0 != path_segments.end();) {
+                if (*it0 == ".") {
+                    it0 = path_segments.erase(it0);
+                } else {
+                    ++it0;
+                }
+            }
+            /* remove double dot segments */
+            std::vector<std::string> normalized_segments;
+            for (std::size_t i = 0; i < path_segments.size(); ++i) {
+                if (path_segments.at(i) == "..") {
+                    /* in a valid path, the minimum number of segments is 1 */
+                    if (normalized_segments.size() <= 1) {
+                        /* RFC2396 5.2.(6).(g)
+                         * Implementations may handle this error: by removing them from 
+                         * the resolved path (i.e., discarding relative levels above the
+                         * root)
+                         */
+#ifdef RFC2396_526G_AVOID
+                        std::string msg("Invalid URL: ");
+                        msg.append(path);
+                        throw InternalException(func, msg, AM_INVALID_RESOURCE_FORMAT);
+#else
+                        continue;
+#endif
+                    }
+                    normalized_segments.pop_back();
+                } else {
+                    normalized_segments.push_back(path_segments.at(i));
+                }
+            }
+            /* join normalized segments */
+            std::stringstream normalized_stream;
+            std::vector<std::string>::iterator it1 = normalized_segments.begin();
+            while (true) {
+                normalized_stream << *it1++;
+                if (it1 != normalized_segments.end()) {
+                    normalized_stream << "/";
+                } else {
+                    break;
+                }
+            }
+            normalized = normalized_stream.str();
+        }
+
+    }
+    if (normalized.empty()) {
+        normalized = "/";
+    }
+    return normalized;
+}
+
 /**
  * Throws InternalException if there is an error in the format 
  * of the URL, such as invalid protocol or port number.
@@ -214,6 +292,7 @@ void URL::parseURLStr(const std::string &urlString, const std::string &pathInfo)
             last = *u;
             u++;
         }
+        uri = normalize_path_segments(uri);
         if (pathInfo.size() > 0) {
             std::string uriDec;
             std::size_t pPos = uri.rfind(pathInfo);
