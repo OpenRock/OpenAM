@@ -343,7 +343,7 @@ static int process_new_notification(pblock *param, Session *sn, Request *rq, voi
         return REQ_EXIT;
     }
     net_flush(sn->csd);
-    return REQ_PROCEED;
+    return REQ_ABORTED;
 }
 
 /*
