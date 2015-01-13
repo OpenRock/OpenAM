@@ -24,7 +24,7 @@
  *
  * $Id: IConstants.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.agents.tools.tomcat.v6;
 
@@ -113,6 +113,7 @@ public interface IConstants {
     public static final String STR_TOMCAT_VERSION = "STR_TOMCAT_VERSION";
     public static final String TOMCAT_VER_60 = "TOMCAT_VER_60";
     public static final String TOMCAT_VER_70 = "TOMCAT_VER_70";
+    public static final String TOMCAT_VER_80 = "TOMCAT_VER_80";
     public static final String STR_WEBAPP_DIR = "webapps";
     public static final String STR_AGENT_APP_WAR_FILE = "agentapp.war";
     public static final String INSTANCE_CONFIG_DIR_NAME = "config";

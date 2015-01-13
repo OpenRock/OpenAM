@@ -25,7 +25,7 @@
 
    $Id: configure.xml,v 1.3 2009/02/14 07:49:36 bakka Exp $
 
-   Portions Copyrighted 2014 ForgeRock AS.
+   Portions Copyrighted 2014-2015 ForgeRock AS.
 
 -->
 <configure>
@@ -99,6 +99,7 @@
             <interaction lookupkey="INSTALL_GLOBAL_WEB_XML">
                 <skipIf key="STR_TOMCAT_VERSION" ignorecase="true">
                     <value>TOMCAT_VER_70</value>
+                    <value>TOMCAT_VER_80</value>
                 </skipIf>
                 <i18n key="INT_GLOBAL_WEB_XML" group="tomcatv6Tools"/>
                 <default-value-finder>

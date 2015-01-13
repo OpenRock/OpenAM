@@ -24,7 +24,7 @@
  *
  * $Id: TomcatVersionValidator.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.agents.tools.tomcat.v6;
@@ -177,7 +177,8 @@ public class TomcatVersionValidator extends ValidatorBase
      * For the given ServerInfo output from org.apache.catalina.util.ServerInfo, return true or false depending on if
      * this version of Tomcat is supported.
      * @param serverInfo The out from the ServerInfo command.
-     * @return the version as a String from constants TOMCAT_VER_60, TOMCAT_VER_70 or null if not a valid version
+     * @return the version as a String from constants TOMCAT_VER_60, TOMCAT_VER_70, TOMCAT_VER_80
+     * or null if not a valid version
      */
     public static String getTomcatVersion(String serverInfo) {
 
@@ -202,11 +203,13 @@ public class TomcatVersionValidator extends ValidatorBase
             // Grab the version number, trimming any spaces in front/end to simplify the matching.
             String versionLine = serverInfo.substring(currentIndex, endIndex).trim();
 
-            // Only versions 6.0.x and 7.0.x are currently valid.
+            // Only versions 6.0.x, 7.0.x and 8.0.x are currently valid.
             if (versionLine.startsWith("6.0")) {
                 result = TOMCAT_VER_60;
             } else if (versionLine.startsWith("7.0")) {
                 result = TOMCAT_VER_70;
+            } else if (versionLine.startsWith("8.0")) {
+                result = TOMCAT_VER_80;
             }
 
             Debug.log("TomcatVersionValidator.getTomcatVersion() - version:" + versionLine +

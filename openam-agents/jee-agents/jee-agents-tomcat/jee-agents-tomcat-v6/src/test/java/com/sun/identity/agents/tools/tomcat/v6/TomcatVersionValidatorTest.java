@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.agents.tools.tomcat.v6;
 
@@ -82,9 +82,9 @@ public class TomcatVersionValidatorTest {
         Assert.assertEquals(IConstants.TOMCAT_VER_60, TomcatVersionValidator.getTomcatVersion(WINDOWS_TOMCAT6_SERVERINFO));
         Assert.assertEquals(IConstants.TOMCAT_VER_60, TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT6_SERVERINFO));
         Assert.assertEquals(IConstants.TOMCAT_VER_70, TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT7_SERVERINFO));
+        Assert.assertEquals(IConstants.TOMCAT_VER_80, TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT8_SERVERINFO));
 
         Assert.assertNull(TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT5_SERVERINFO));
-        Assert.assertNull(TomcatVersionValidator.getTomcatVersion(LINUX_TOMCAT8_SERVERINFO));
         Assert.assertNull(TomcatVersionValidator.getTomcatVersion(null));
         Assert.assertNull(TomcatVersionValidator.getTomcatVersion(""));
     }
