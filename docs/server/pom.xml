@@ -20,24 +20,27 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam-documentation</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <groupId>org.forgerock</groupId>
+        <artifactId>forgerock-parent</artifactId>
+        <version>1.2.7</version>
     </parent>
 
-    <!-- Documentation Module -->
-    <!-- Redundant: <groupId>org.forgerock.openam</groupId> -->
-    <artifactId>openam-doc-source</artifactId>
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>openam-server-doc</artifactId>
+    <version>13.0.0-SNAPSHOT</version>
 
-    <name>OpenAM Core Documentation Sources</name>
+    <name>OpenAM Server Documentation Sources</name>
 
     <inceptionYear>2011</inceptionYear>
     <packaging>jar</packaging>
@@ -45,6 +48,10 @@
         DocBook XML source for hand-written OpenAM core user documentation.
     </description>
 
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.org</url>
+    </organization>
     <url>http://openam.forgerock.org/</url>
 
     <mailingLists>
@@ -73,15 +80,16 @@
 
     <!-- Source Control -->
     <scm>
-        <url>https://svn.forgerock.org/openam/trunk/openam/</url>
-        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
+        <url>https://svn.forgerock.org/openam/trunk/docs/server/</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/docs/server/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/docs/server/</developerConnection>
     </scm>
 
     <issueManagement>
         <system>Jira</system>
         <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
     </issueManagement>
+
     <licenses>
         <license>
             <name>CDDL-1.0</name>
@@ -102,44 +110,53 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <frDocPluginVersion>2.1.5</frDocPluginVersion>
+
         <projectName>OpenAM</projectName>
 
         <serverDocTargetVersion>${project.version}</serverDocTargetVersion>
         <agentsDocTargetVersion>3.5.0-SNAPSHOT</agentsDocTargetVersion>
+
+        <!-- This should match the version in OpenAM's POM. -->
+        <commons.forgerock-util.version>1.3.5</commons.forgerock-util.version>
+
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
-        <coreDirectoryFile><![CDATA[OpenAM-${serverDocTargetVersion}.zip]]></coreDirectoryFile>
-        <coreLibrary><![CDATA[openam-core-${serverDocTargetVersion}.jar]]></coreLibrary>
-        <coreWarFile><![CDATA[OpenAM-${serverDocTargetVersion}.war]]></coreWarFile>
-        <clientsdkJarFile><![CDATA[ClientSDK-${serverDocTargetVersion}.jar]]></clientsdkJarFile>
-        <clientSDKExamplesCliFile><![CDATA[ExampleClientSDK-CLI-${serverDocTargetVersion}.zip]]></clientSDKExamplesCliFile>
-        <clientSDKExamplesWarFile><![CDATA[ExampleClientSDK-WAR-${serverDocTargetVersion}.war]]></clientSDKExamplesWarFile>
-        <ipdiscoWarFile><![CDATA[IDPDiscovery-${serverDocTargetVersion}.war]]></ipdiscoWarFile>
-        <distauthWarFile><![CDATA[OpenAM-DistAuth-${serverDocTargetVersion}.war]]></distauthWarFile>
-        <diagnosticsZipFile><![CDATA[SSODiagnosticTools-${serverDocTargetVersion}.zip]]></diagnosticsZipFile>
-        <fedletZipFile><![CDATA[Fedlet-${serverDocTargetVersion}.zip]]></fedletZipFile>
-        <sharedLibrary><![CDATA[openam-shared-${serverDocTargetVersion}.jar]]></sharedLibrary>
-        <federationLibrary><![CDATA[openam-federation-library-${serverDocTargetVersion}.jar]]></federationLibrary>
-        <forgerockUtilLibrary><![CDATA[forgerock-util-${commons.forgerock-util.version}.jar]]></forgerockUtilLibrary>
-        <ssoadminZipFile><![CDATA[SSOAdminTools-${serverDocTargetVersion}.zip]]></ssoadminZipFile>
-        <ssoconfigZipFile><![CDATA[SSOConfiguratorTools-${serverDocTargetVersion}.zip]]></ssoconfigZipFile>
-        <ssoconfigJarFile><![CDATA[openam-configurator-tool-${serverDocTargetVersion}.jar]]></ssoconfigJarFile>
-        <ssoconfigUpgradeJarFile><![CDATA[openam-upgrade-tool-${serverDocTargetVersion}.jar]]></ssoconfigUpgradeJarFile>
-        <serveronlyWarFile><![CDATA[OpenAM-ServerOnly-${serverDocTargetVersion}.war]]></serveronlyWarFile>
-        <configJarFile><![CDATA[openam-distribution-configurator-${serverDocTargetVersion}.jar]]></configJarFile>
-        <oauth2JarFile><![CDATA[oauth2-core-${serverDocTargetVersion}.jar]]></oauth2JarFile>
+        <coreDirectoryFile>OpenAM-${serverDocTargetVersion}.zip</coreDirectoryFile>
+        <coreLibrary>openam-core-${serverDocTargetVersion}.jar</coreLibrary>
+        <coreWarFile>OpenAM-${serverDocTargetVersion}.war</coreWarFile>
+        <clientsdkJarFile>ClientSDK-${serverDocTargetVersion}.jar</clientsdkJarFile>
+        <clientSDKExamplesCliFile>ExampleClientSDK-CLI-${serverDocTargetVersion}.zip</clientSDKExamplesCliFile>
+        <clientSDKExamplesWarFile>ExampleClientSDK-WAR-${serverDocTargetVersion}.war</clientSDKExamplesWarFile>
+        <ipdiscoWarFile>IDPDiscovery-${serverDocTargetVersion}.war</ipdiscoWarFile>
+        <distauthWarFile>OpenAM-DistAuth-${serverDocTargetVersion}.war</distauthWarFile>
+        <diagnosticsZipFile>SSODiagnosticTools-${serverDocTargetVersion}.zip</diagnosticsZipFile>
+        <fedletZipFile>Fedlet-${serverDocTargetVersion}.zip</fedletZipFile>
+        <sharedLibrary>openam-shared-${serverDocTargetVersion}.jar</sharedLibrary>
+        <federationLibrary>openam-federation-library-${serverDocTargetVersion}.jar</federationLibrary>
+        <forgerockUtilLibrary>forgerock-util-${commons.forgerock-util.version}.jar</forgerockUtilLibrary>
+        <ssoadminZipFile>SSOAdminTools-${serverDocTargetVersion}.zip</ssoadminZipFile>
+        <ssoconfigZipFile>SSOConfiguratorTools-${serverDocTargetVersion}.zip</ssoconfigZipFile>
+        <ssoconfigJarFile>openam-configurator-tool-${serverDocTargetVersion}.jar</ssoconfigJarFile>
+        <ssoconfigUpgradeJarFile>openam-upgrade-tool-${serverDocTargetVersion}.jar</ssoconfigUpgradeJarFile>
+        <serveronlyWarFile>OpenAM-ServerOnly-${serverDocTargetVersion}.war</serveronlyWarFile>
+        <configJarFile>openam-distribution-configurator-${serverDocTargetVersion}.jar</configJarFile>
+        <oauth2JarFile>oauth2-core-${serverDocTargetVersion}.jar</oauth2JarFile>
 
         <!--
           For release docs, these should point to the policy agent release docs:
             -DjeePaDocBase=http://docs.forgerock.org/en/openam-pa/${javaEEAgentsDocTargetVersion}
             -DwebPaDocBase=http://docs.forgerock.org/en/openam-pa/${webAgentsDocTargetVersion}
         -->
-        <jeePaDocBase>http://openam.forgerock.org/openam-documentation/openam-doc-source/doc</jeePaDocBase>
-        <webPaDocBase>http://openam.forgerock.org/openam-documentation/openam-doc-source/doc</webPaDocBase>
+        <jeePaDocBase>http://openam.forgerock.org/doc</jeePaDocBase>
+        <webPaDocBase>http://openam.forgerock.org/doc</webPaDocBase>
 
+        <!-- OpenAM includes OpenDJ 2.6.2. The latest full doc release is for 2.6.0. -->
         <opendjDocBase>http://docs.forgerock.org/en/opendj/2.6.0</opendjDocBase>
 
         <site-out>${project.build.outputDirectory}/site</site-out>
@@ -166,7 +183,99 @@
         <defaultRootSuffix>dc=openam,dc=forgerock,dc=org</defaultRootSuffix>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>forgerock-staging-repository</id>
+            <name>ForgeRock Release Repository</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>forgerock-snapshots-repository</id>
+            <name>ForgeRock Snapshot Repository</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-releases</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-snapshots</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+        </snapshotRepository>
+        <site>
+            <id>forgerock.org</id>
+            <name>OpenAM Project</name>
+            <url>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs/</url>
+        </site>
+    </distributionManagement>
+
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.forgerock.commons</groupId>
+                    <artifactId>forgerock-doc-maven-plugin</artifactId>
+                    <version>${frDocPluginVersion}</version>
+                    <configuration>
+                        <projectName>${projectName}</projectName>
+                        <projectVersion>${serverDocTargetVersion}</projectVersion>
+                        <latestJson>http://docs.forgerock.org/latest.json</latestJson>
+                        <googleAnalyticsId>${gaId}</googleAnalyticsId>
+                        <overwriteGeneratedSource>true</overwriteGeneratedSource>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>copy-common</id>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>boilerplate</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>filter-sources</id>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>filter</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>prepare-sources</id>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>prepare</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>build-doc</id>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>layout-doc</id>
+                            <phase>site</phase>
+                            <goals>
+                                <goal>layout</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
 
             <plugin>
@@ -234,48 +343,30 @@
             <plugin>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
-                <configuration>
-                    <projectName>${projectName}</projectName>
-                    <projectVersion>${serverDocTargetVersion}</projectVersion>
-                    <latestJson>http://docs.forgerock.org/latest.json</latestJson>
-                    <googleAnalyticsId>${gaId}</googleAnalyticsId>
-                    <overwriteGeneratedSource>true</overwriteGeneratedSource>
-                </configuration>
+            </plugin>
+
+            <!--
+                Most of the site is generated by the OpenAM project.
+                This project only contributes project documentation.
+
+                Therefore, skip site generation (reports, etc.)
+                to avoid overwriting OpenAM project site files
+                with reports from this project.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-common</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>boilerplate</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>filter-sources</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>filter</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>prepare-sources</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>prepare</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>build-doc</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>layout-doc</id>
+                        <id>default-site</id>
                         <phase>site</phase>
                         <goals>
-                            <goal>layout</goal>
+                            <goal>site</goal>
                         </goals>
+                        <configuration>
+                            <generateReports>false</generateReports>
+                            <skip>false</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
