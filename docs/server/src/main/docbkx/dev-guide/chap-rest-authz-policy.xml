@@ -1713,7 +1713,8 @@ $ <userinput>curl \
    Those field are
    <literal>"createdBy"</literal> and <literal>"lastModifiedBy"</literal>,
    which take strings holding universal identifier DNs as their values,
-   and <literal>"creationDate"</literal> and <literal>"lastModified"</literal>,
+   and <literal>"creationDate"</literal> and <literal>"lastModifiedDate
+   "</literal>,
    which take strings holding ISO-8601 timestamps.
   </para>
 
@@ -1792,7 +1793,7 @@ $ <userinput>curl \
   },
   "lastModifiedBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
-  "lastModified" : "2014-04-24T16:23:34Z",
+  "lastModifiedDate" : "2014-04-24T16:23:34Z",
   "createdBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
@@ -1864,7 +1865,7 @@ $ <userinput>curl \
   },
   "lastModifiedBy" :
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
-  "lastModified" : "2014-04-29T07:33:54Z",
+  "lastModifiedDate" : "2014-04-29T07:33:54Z",
   "createdBy" :
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-29T07:33:54Z"
@@ -1911,7 +1912,7 @@ $ <userinput>curl \
   },
   "lastModifiedBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
-  "lastModified" : "2014-04-24T16:23:34Z",
+  "lastModifiedDate" : "2014-04-24T16:23:34Z",
   "createdBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
@@ -1990,7 +1991,7 @@ $ <userinput>curl \
   },
   "lastModifiedBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
-  "lastModified" : "2014-04-24T16:44:01Z",
+  "lastModifiedDate" : "2014-04-24T16:44:01Z",
   "createdBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
@@ -2048,7 +2049,7 @@ $ <userinput>curl \
     },
     "lastModifiedBy" :
     "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
-    "lastModified" : "2014-04-24T16:48:01Z",
+    "lastModifiedDate" : "2014-04-24T16:48:01Z",
     "createdBy" :
     "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
     "creationDate" : "2014-04-24T16:23:34Z"
@@ -2226,7 +2227,7 @@ $ <userinput>curl \
 
     <listitem>
      <para>
-      <literal>"lastModified"</literal> (all comparisons are supported;
+      <literal>"lastModifiedDate"</literal> (all comparisons are supported;
       the date is either an
       <link xlink:show="new"
             xlink:href="http://www.w3.org/TR/NOTE-datetime"
@@ -3647,13 +3648,7 @@ $ <userinput>curl \
 
     <listitem>
      <para>
-      <literal>"lastModified"</literal> (date)
-     </para>
-    </listitem>
-
-    <listitem>
-     <para>
-      <literal>"lastModified"</literal>
+      <literal>"lastModifiedDate"</literal> (date)
      </para>
     </listitem>
    </itemizedlist>
@@ -4861,7 +4856,7 @@ $ <userinput>curl \
 
     <listitem>
      <para>
-      <literal>"lastModified"</literal> (all comparisons are supported;
+      <literal>"lastModifiedDate"</literal> (all comparisons are supported;
       the date is either an
       <link xlink:show="new"
             xlink:href="http://www.w3.org/TR/NOTE-datetime">ISO-8601</link>
