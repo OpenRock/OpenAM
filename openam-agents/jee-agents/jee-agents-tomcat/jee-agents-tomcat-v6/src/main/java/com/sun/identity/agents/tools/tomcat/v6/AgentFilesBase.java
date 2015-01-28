@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -59,6 +59,7 @@ public class AgentFilesBase implements IConstants, IConfigKeys {
         getAgentConfigLocation(stateAccess);
         status = removeAgentJarFiles();
         status = removeAgentLocaleFiles() && status;
+        status = removeAgentAppWar() && status;
         return status;
     }
     
@@ -92,5 +93,17 @@ public class AgentFilesBase implements IConstants, IConfigKeys {
         }
 
         return status;
+    }
+
+    protected boolean removeAgentAppWar() {
+
+        String agentAppWar = new StringBuilder(_catalinaHomeDir).append(File.separator)
+                .append(STR_WEBAPP_DIR).append(File.separator).append(STR_AGENT_APP_WAR_FILE).toString();
+
+        Debug.log("AgentFilesBase.removeAgentAppWar(): Removing file " + agentAppWar);
+
+        File file = new File(agentAppWar);
+
+        return file.delete();
     }
 }

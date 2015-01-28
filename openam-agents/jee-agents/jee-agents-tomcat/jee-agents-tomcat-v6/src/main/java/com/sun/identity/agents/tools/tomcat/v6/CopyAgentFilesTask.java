@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -33,7 +33,6 @@ import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.FileUtils;
 import java.io.File;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -55,6 +54,7 @@ public class CopyAgentFilesTask extends AgentFilesBase implements ITask {
             super.getAgentConfigLocation(stateAccess);
             status = status && copyAgentJarFiles();
             status = status && copyAgentLocaleFiles();
+            status = status && copyAgentAppWarFile();
         } catch (Exception ex) {
             status = false;
             Debug.log("CopyAgentFilesTask.execute() - encountered exception " +
@@ -101,6 +101,27 @@ public class CopyAgentFilesTask extends AgentFilesBase implements ITask {
             Debug.log("CopyAgentFilesTask.copyAgentLocaleFiles() - " +
                         "Error occured while copying locale files from " + srcDir +
                         " to " + destDir + ": " + ex.getMessage());
+            status = false;
+        }
+
+        return status;
+    }
+
+    private boolean copyAgentAppWarFile() {
+
+        boolean status = true;
+        String srcFile = new StringBuilder(ConfigUtil.getEtcDirPath()).append(File.separator)
+                .append(STR_AGENT_APP_WAR_FILE).toString();
+        String destFile = new StringBuilder(_catalinaHomeDir).append(File.separator).append(STR_WEBAPP_DIR)
+                .append(File.separator).append(STR_AGENT_APP_WAR_FILE).toString();
+
+        try {
+            FileUtils.copyFile(srcFile, destFile);
+            Debug.log("CopyAgentFilesTask.copyAgentAppWarFile() - copy "
+                    + STR_AGENT_APP_WAR_FILE + " from " + srcFile + " to " + destFile);
+        } catch (Exception e) {
+            Debug.log("CopyAgentFilesTask.copyAgentAppWarFile() - Error occurred while copying "
+                    + STR_AGENT_APP_WAR_FILE + " from " + srcFile + " to " + destFile, e);
             status = false;
         }
 
