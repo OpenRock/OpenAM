@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2014 ForgeRock AS
+  !      Copyright 2014-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-rest-sts'
@@ -31,7 +31,7 @@
          http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
 
- <title>The RESTful Security Token Service</title>
+ <title>The RESTful Security Token Service (REST-STS)</title>
 
   <para>
     This chapter specifies the configuration requirements associated with the
@@ -40,24 +40,24 @@
   </para>
 
   <para>
-   The REST-STS is inspired by the WS-Trust STS. The REST-STS supports one
+   REST-STS is inspired by WS-Trust STS. REST-STS supports one
    basic operation: token transformation. This chapter describes how you can
-   configure REST-STS token transformations through the OpenAM UI.
+   configure REST-STS token transformations by using the OpenAM UI.
   </para>
 
   <para>
-   Different Identity Relationship Management (IRM) services require different
-   token types. Given the variety of token types in use today, it can be
-   helpful to have a service that you can configure to transform tokens.
+   Different Identity Relationship Management (IRM) services may provide
+   differing token types. Given the variety of token types in use today, it
+   can be helpful to have a service that you can configure to transform tokens.
   </para>
 
    <section xml:id="sts-about">
-    <title>About the REST-STS</title>
+    <title>About REST-STS</title>
 
      <note>
       <para>
        Do not use the WSP and WSC agent UI tools described in <link xlink:show="new"
-       xlink:role="http://docbook.org/roles/xlink/role/olink"
+       xlink:role="http://docbook.org/xlink/role/olink"
        xlink:href="admin-guide#chap-agents"><citetitle>Configuring Policy Agent
        Profiles</citetitle>.</link>
       </para>
@@ -70,25 +70,29 @@
      </para>
 
      <para>
-      The REST-STS UI currently includes transformations from three types of
+      REST-STS supports transformations from the following types of
       tokens:
      </para>
 
      <itemizedlist>
       <listitem>
        <para>
-        <literal>UNT</literal>: Username Token. May be associated with
-        usernames and/or associated passwords.
+        <literal>UNT</literal>: Username Tokens. A tuple of username and password.
        </para>
       </listitem>
       <listitem>
        <para>
-        <literal>OpenID Connect</literal>: OpenID Connect token.
+        <literal>OpenID Connect</literal>: OpenID Connect tokens.
        </para>
       </listitem>
       <listitem>
        <para>
-        <literal>OpenAM</literal>: OpenAM session token.
+        <literal>OpenAM</literal>: OpenAM session tokens.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <literal>X.509</literal>: X.509 tokens.
        </para>
       </listitem>
      </itemizedlist>
@@ -123,11 +127,11 @@
     </mediaobject>
 
     <para>
-     The REST STS configuration menu is subdivided into four sections:
+     The REST STS configuration menu is subdivided into three sections:
     </para>
 
     <section xml:id="rest-sts-general">
-     <title>REST STS General Configuration</title>
+     <title>General Configuration</title>
 
      <para>
       At the top of the REST STS configuration menu, you can set up the
@@ -136,12 +140,12 @@
 
      <para>
       You will first add a name for the REST-STS token issuer. You can pick any
-      name; the REST-STS includes that name with the <literal>issuer</literal>
+      name; REST-STS includes that name with the <literal>issuer</literal>
       label for each token.
      </para>
 
      <para>
-      You can then select from one of the noted types of token transformations.
+      You can then select from the supported types of token transformations.
       Be aware, you should not select both "invalidate" and "don't invalidate"
       options for the same token transformation.
      </para>
@@ -149,7 +153,7 @@
     </section>
 
     <section xml:id="rest-sts-deployment">
-     <title>REST STS Deployment Configuration</title>
+     <title>Deployment Configuration</title>
 
      <para>
       In the Deployment Configuration section, you can assign a specific
@@ -172,11 +176,11 @@
      </para>
 
      <para>
-      Under Authentication Target Mappings, you can configure two or three
-      pieces of information related to each input token. The default options
-      shown in this field are known as a <literal>tuple</literal>, an ordered
-      list of elements. Each element is separated with a pipe character:
-      "<literal>|</literal>".
+      Under <literal>Authentication Target Mappings</literal>, you can
+      configure two or three  pieces of information related to each input token.
+      The default options shown in this field are known as a
+      <literal>tuple</literal>, an ordered list of elements. Each element is
+      separated with a pipe character: "<literal>|</literal>".
      </para>
      <variablelist>
       <varlistentry>
@@ -213,102 +217,44 @@
        </listitem>
       </varlistentry>
      </variablelist>
-    </section>
-
-    <section xml:id="rest-sts-keystore">
-     <title>REST STS Keystore Configuration</title>
-
-     <para>
-      The REST STS can use the same keystore as is used for OpenAM. While the
-      version of Java that you use includes its own version of the
-      <command>keytool</command> command, the location where you set up the
-      keystore file may vary.
-     </para>
-
-     <para>
-      For example, you may use the procedure <link xlink:show="new"
-      xlink:href="http://docbook.org/roles/xlink/role/olink
-      xlink:href=admin-guide#openam-with-https-on-tomcat"><citetitle>To Set Up
-      OpenAM With HTTPS on Tomcat</citetitle></link>, if you use Tomcat as
-      the container for OpenAM.
-     </para>
-
-     <para>
-      The following describes the purpose of each entry under 
-      <literal>Keystore Configuration</literal>:
-     </para>
-     
+     <para>Additional deployment configuration options are as follows:</para>
      <variablelist>
       <varlistentry>
-       <term>Keystore Path</term>
+       <term>Client Certificate Header Key</term>
        <listitem>
-        <para>
-         You can set this to the location of the keystore file of your choice.
-         For reference, the default OpenAM keystore file is
-         <filename>keystore.jks</filename>, and you can find it in the OpenAM
-         configuration directory, as described in the following installation
-         procedure: <link xlink:show="new"
-               xlink:role="http://docbook.org/roles/xlink/role/olink"
-               xlink:href="install-guide#deploy-openam"><citetitle>
-          To Deploy OpenAM</citetitle></link>
-        </para>
+        <para>Token transformations which take X509 Certificates as the input
+         token require that the X509 Certficate be presented by using two-way
+         TLS, so that the TLS handshake can validate client certificate
+         ownership.</para>
+        <para>A standard means of obtaining the client certificate presented via
+         two-way TLS is by using the <literal>javax.servlet.request.X509Certificate</literal>
+           attribute in the ServletRequest. However, in TLS-offloaded deployments, the
+         TLS-offloader must communicate the client certificate to its ultimate
+         destination by using an HTTP header.</para>
+        <para>When configuring a REST-STS instance that is to support
+         token transformations with X509 Certificate input, and OpenAM is
+         deployed in a TLS-offloaded context, set this value to the
+         header value which the TLS-offloading engine will use to set client
+         certificates presented by using the TLS handshake.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Keystore Password</term>
+       <term>Trusted Remote Hosts</term>
        <listitem>
-        <para>
-         Enter the password for the keystore file, normally
-         <filename>keystore.jks</filename>. The default password for that file
-         packaged with OpenAM is <literal>changeit</literal>.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Encryption Key Alias</term>
-       <listitem>
-        <para>
-         Alias used for the encryption key; you may use that alias with the
-         <command>keytool</command> command.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Encryption Key Password</term>
-       <listitem>
-        <para>
-         Enter the password for the encryption key.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Signature Key Alias</term>
-       <listitem>
-        <para>
-         The REST-STS uses a signature key to verify X.509 tokens. Enter the 
-         desired alias for that signature key.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Signature Key Password</term>
-       <listitem>
-        <para>
-         Enter the password for the signature key.
-        </para>
+        <para>Specify a list of IP addresses of TLS-offload engines from which to
+         accept client certificates from.</para>
        </listitem>
       </varlistentry>
      </variablelist>
-
     </section>
 
     <section xml:id="rest-sts-saml2">
-     <title>REST STS SAML2 Token Configuration</title>
+     <title>Issued SAML2 Token Configuration</title>
 
      <para>
       This REST-STS configuration UI supports token transformations from
-      username, Open ID Connect, and OpenAM tokens to SAML2 format. Configure
-      the options shown in this part of the REST-STS UI menu to customize
+      username, Open ID Connect, OpenAM, and x509 tokens to SAML2 format.
+      Configure the options shown in this part of the REST-STS UI menu to customize
       how OpenAM will create those SAML2 tokens.
      </para>
 
@@ -319,6 +265,37 @@
      </para>
 
      <variablelist>
+      <varlistentry>
+       <term>Service Provider Entity Id</term>
+       <listitem>
+        <para>
+         Enter an audience attribute value to populate the
+         <literal>AudienceRestriction</literal> element of the
+         <literal>Conditions</literal> element.
+        </para>
+        <note>
+         <para>This value is required when issuing Bearer assertions.</para>
+        </note>
+        <para>For more information, see section 4.1.4.2 of <link
+         xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf"
+         >http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf</link>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Service Provider Assertion Consumer Service Url</term>
+       <listitem>
+        <para>
+         Enter a recipient attribute value to populate the
+         <literal>SubjectConfirmation</literal> element.
+        </para>
+        <note>
+         <para>This value is required when issuing Bearer assertions.</para>
+        </note>
+        <para>For more information, see section 4.1.4.2 of <link
+         xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf"
+         >http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf</link>.</para>
+       </listitem>
+      </varlistentry>
       <varlistentry>
 
        <!-- TODO question: are we supporting SAML 1 name-id formats? It's among
@@ -372,7 +349,7 @@
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Custom Authentication Statements Class Name (optional)</term>
+       <term>Custom AuthenticationStatements Class Name (optional)</term>
        <listitem>
         <para>
          If you need to create a custom authentication statement for the SAML2
@@ -386,7 +363,7 @@
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Custom Attribute Statements Class Name (optional)</term>
+       <term>Custom AttributeStatements Class Name (optional)</term>
        <listitem>
         <para>
          If you need to define a custom attribute statement for the SAML2
@@ -439,46 +416,7 @@
          implemented by the<literal>
          org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl
          </literal> class, enter the class name of the following
-         interface:<literal>
-          org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthnContextMapper
-        </literal>.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Canonicalization Algorithm</term>
-       <listitem>
-        <para>
-         For more information on the two options shown see the W3C
-         Recommendation document entitled: <link xlink:show="new"
-         xlink:href="http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/">
-         <citetitle>Exclusive XML Canonicalization</citetitle>.
-         </link>
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Sign Assertion</term>
-       <listitem>
-        <para>
-         If checked, this implementation of the REST-STS will sign the
-         assertion of the associated token.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Assertion audiences</term>
-       <listitem>
-        <para>
-         If you need to restrict the audience for the newly created SAML2
-         tokens, enter appropriate assertion audiences here. Values so entered
-         will be used to populate the <literal>Audience</literal> based on the
-         <literal>AudienceRestriction</literal> element, as defined in section
-         4.1.4.2 of the OASIS document entitled: <link xlink:show="new"
-         xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">
-         <citetitle>Profiles for the OASIS Security Assertion Markup Language
-         (SAML) v2.0</citetitle>.
-         </link>
+         interface: <literal>org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthnContextMapper</literal>.
         </para>
        </listitem>
       </varlistentry>
@@ -509,7 +447,7 @@
         <para>
          If the attribute value is enclosed in quotes, that quoted value will
          be included in the attribute without mapping. Binary attributes should
-         be followed by <literal>';binary'</literal>
+         be followed by <literal>';binary'</literal>.
         </para>
         <para>
          Beyond that, examples for appropriate mappings include:
@@ -523,10 +461,138 @@
         <screen>urn:oasis:names:tc:SAML:2.0:attrname-format:uri|photo=photo;binary</screen>
        </listitem>
       </varlistentry>
+      <varlistentry>
+       <term>Sign Assertion</term>
+       <listitem>
+        <para>
+         If checked, this implementation of REST-STS will sign the
+         assertion of the associated token.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Encrypt Assertion</term>
+       <listitem>
+        <para>
+         Encrypt the entire assertion. If enabled, do not enable the Encrypt
+         Attributes or Encrypt NameID options.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Encrypt Attributes</term>
+       <listitem>
+        <para>
+         Encrypt the assertion Attributes. If enabled, do not enable the Encrypt
+         Assertion option.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Encrypt NameID</term>
+       <listitem>
+        <para>
+         Encrypt the assertion NameID. If enabled, do not enable the Encrypt
+         Assertion option.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Encryption Algorithm</term>
+       <listitem>
+        <para>
+         Select the algorithm used to encrypt assertions.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Keystore Path</term>
+       <listitem>
+        <para>
+         REST-STS can use the same keystore that is used for OpenAM. While
+         the  version of Java that you use includes its own version of the
+         <command>keytool</command> command, the location where you set up the
+         keystore file may vary.
+        </para>
+
+        <para>
+         For example, you may use the procedure <link xlink:show="new"
+         xlink:role="http://docbook.org/xlink/role/olink"
+         xlink:href="admin-guide#openam-with-https-on-tomcat"><citetitle>To Set
+         Up OpenAM With HTTPS on Tomcat</citetitle></link>, if you use Tomcat as
+         the container for OpenAM.
+        </para>
+        <para>
+         Set this to the location of the keystore file of your choice.
+         For reference, the default OpenAM keystore file is
+         <filename>keystore.jks</filename>, found in the OpenAM
+         configuration directory, as described in the following installation
+         procedure: <link xlink:show="new"
+                          xlink:role="http://docbook.org/xlink/role/olink"
+                          xlink:href="install-guide#deploy-openam"><citetitle>
+         To Deploy OpenAM</citetitle></link>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Keystore Password</term>
+       <listitem>
+        <para>
+         Enter the password for the keystore file, normally
+         <filename>keystore.jks</filename>. The default password for that file
+         packaged with OpenAM is <literal>changeit</literal>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Confirm Keystore Password</term>
+       <listitem>
+        <para>
+         Re-enter the password for the keystore file to confirm.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Encryption Key Alias</term>
+       <listitem>
+        <para>
+         Alias used for the encryption key; you may use that alias with the
+         <command>keytool</command> command.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Signature Key Alias</term>
+       <listitem>
+        <para>
+         REST-STS uses a signature key to verify X.509 tokens. Enter the
+         desired alias for that signature key.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Signature Key Password</term>
+       <listitem>
+        <para>
+         Enter the password for the signature key.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Confirm Signature Key Password</term>
+       <listitem>
+        <para>
+         Re-enter the password for the signature key to confirm.
+        </para>
+       </listitem>
+      </varlistentry>
      </variablelist>
-
     </section>
-
    </section>
-
  </chapter>
