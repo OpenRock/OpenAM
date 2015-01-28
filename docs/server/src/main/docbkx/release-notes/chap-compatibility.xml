@@ -337,30 +337,18 @@
 
    <listitem>
     <para>The response returned when submitting incorrect credentials to
-     <literal>/json/authenticate</literal> has changed.</para>
-    <table pgwide="1">
-     <title>Failed Authentication Message</title>
+     <literal>/json/authenticate</literal> has changed, as follows:</para>
 
-     <tgroup cols="2">
-      <colspec colnum="1" colwidth="1*"/>
-      <colspec colnum="2" colwidth="1*"/>
-
-      <thead>
-       <row>
-        <entry>OpenAM 11.0.1</entry>
-        <entry>OpenAM 12.0.0</entry>
-       </row>
-      </thead>
-
-      <tbody>
-       <row>
-        <entry>
+    <itemizedlist>
+     <listitem>
+      <para><emphasis>OpenAM 11.0.1</emphasis></para>
 <programlisting language="javascript">{
  "errorMessage": "Authentication Failed!!",
  "failureUrl": "https://openam.example.com:8443"
-}</programlisting>
-        </entry>
-        <entry>
+ }</programlisting>
+     </listitem>
+     <listitem>
+      <para><emphasis>OpenAM 12.0.0</emphasis></para>
 <programlisting language="javascript">{
  "code": 401,
  "reason": "Unauthorized",
@@ -369,11 +357,8 @@
   "failureUrl": "https://openam.example.com:8443"
  }
 }</programlisting>
-        </entry>
-       </row>
-      </tbody>
-     </tgroup>
-    </table>
+     </listitem>
+    </itemizedlist>
    </listitem>
 
    <listitem>
