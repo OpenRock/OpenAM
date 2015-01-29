@@ -366,8 +366,8 @@ $ <userinput>/path/to/apache/bin/apachectl -k start</userinput>
      </step>
      
      <step>
-      <para>Browse to the home page, such as
-      <literal>http://www.example.com:8000</literal>.</para>
+      <para>Point your browser to following URL:
+      <link xlink:show="new" xlink:href="http://www.example.com:8000"/>.</para>
 
       <mediaobject xml:id="figure-web-server-home-page">
        <alt>Apache HTTP Server home page stating It works!</alt>
@@ -457,17 +457,15 @@ $ <userinput>chmod +x /path/to/tomcat/bin/*.sh</userinput>
    </step>
 
    <step>
-    <para>Edit Tomcat's <filename>catalina.sh</filename> script to set the
+    <para>Create a Tomcat <filename>setenv.sh</filename> (Unix/Linux) or
+     <filename>setenv.bat</filename> (Windows) script to set the
     <literal>JAVA_HOME</literal> environment variable to the file system
     location of the Java Development Kit, and to set the heap and permanent
     generation size appropriately.</para>
 
     <screen>
-$ <userinput>vi /path/to/tomcat/bin/catalina.sh</userinput>
-$ <userinput>grep ^JAVA_HOME /path/to/tomcat/bin/catalina.sh</userinput>
-<computeroutput>JAVA_HOME=/path/to/jdk</computeroutput>
-$ <userinput>grep ^CATALINA /path/to/tomcat/bin/catalina.sh</userinput>
-<computeroutput>CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</computeroutput>
+<userinput>export JAVA_HOME="/path/to/usr/jdk"</userinput>
+<userinput>export CATALINA_OPTS="$CATALINA_OPTS -Xmx1024m -XX:MaxPermSize=256m"</userinput>
     </screen>
    </step>
 
@@ -550,7 +548,7 @@ $ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
     <para>Deploy the .war file in Tomcat as <filename>openam.war</filename>.</para>
 
     <screen>
-$ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</userinput>
+$ <userinput>mv ~/Downloads/${coreWarFile} /path/to/tomcat/webapps/openam.war</userinput>
     </screen>
 
     <para>Tomcat deploys OpenAM under the
@@ -933,7 +931,7 @@ $ <userinput>/path/to/apache/bin/apachectl stop</userinput>
 
     <screen>
 $ <userinput>cd /path/to</userinput>
-$ <userinput>unzip ~/Downloads/apache_v22_Linux_agent*.zip</userinput>
+$ <userinput>unzip ~/Downloads/Apache-v22-Linux-64-Agent-${webAgentsDocTargetVersion}.zip</userinput>
     </screen>
    </step>
 
@@ -969,7 +967,7 @@ Agent Profile Password file name : /tmp/pwd.txt
     <screen>
 $ <userinput>/path/to/apache/bin/apachectl -k start</userinput>
 $ <userinput>tail /path/to/apache/logs/error_log</userinput>
-<computeroutput>...[notice] Apache/2.2.25 (Unix) Web Policy Agent/3.0 configured -- resuming
+<computeroutput>...[notice] Apache/2.2.25 (Unix) OpenAM WPA/${webAgentsDocTargetVersion} configured -- resuming
  normal operations</computeroutput>
     </screen>
 
