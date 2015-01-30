@@ -20,8 +20,8 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
-  !    
+  !      Copyright 2011-2015 ForgeRock AS.
+  !
 -->
 <chapter xml:id='chap-auth-spi'
  xmlns='http://docbook.org/ns/docbook'
@@ -51,7 +51,7 @@
 
  <section xml:id="about-custom-auth-module">
   <title>About the Sample Authentication Module</title>
-  
+
   <para>The sample authentication module prompts for a user name and password
   to authenticate the user, and handles error conditions. The sample shows how
   you integrate an authentication module into OpenAM such that you can
@@ -60,7 +60,7 @@
 
   <variablelist>
    <!-- Perhaps this could be stored on a ForgeRock git server at some point. -->
-   <para>The <link xlink:href="https://github.com/markcraig/openam-auth-sample"
+   <para>The <link xlink:href="https://github.com/ForgeRock/openam-auth-sample"
    xlink:show="new">sample authentication module source</link> is available
    online. Get a local clone so that you can try the sample on your system.
    In the sources you find the following files.</para>
@@ -133,7 +133,7 @@
 
  <section xml:id="properties-sample-auth-module">
   <title>Sample Auth Properties</title>
-  
+
   <para>OpenAM uses a Java properties file per locale to retrieve the
    appropriate, localized strings for the authentication module.</para>
 
@@ -155,19 +155,19 @@ sampleauth-error-2=Error 2 occurred during the authentication</programlisting>
 
  <section xml:id="callbacks-file-sample-auth-module">
   <title>Sample Auth Callbacks</title>
-  
+
   <para>OpenAM callbacks XML files are used to build the classic UI to prompt
   the user for identity information needed to process the authentication.
   The document type for a callback XML file is described in
   <filename>WEB-INF/Auth_Module_Properties.dtd</filename> where OpenAM is
   deployed.</para>
-  
+
   <example xml:id="full-callbacks-file">
    <title>Sample Auth Callbacks File</title>
-   
+
    <para>The following is the <filename>SampleAuth.xml</filename> callbacks
    file.</para>
-   
+
    <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!DOCTYPE ModuleProperties PUBLIC
  "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -190,7 +190,7 @@ sampleauth-error-2=Error 2 occurred during the authentication</programlisting>
         &lt;/NameCallback&gt;
     &lt;/Callbacks&gt;
 &lt;/ModuleProperties&gt;</programlisting>
-   
+
    <orderedlist>
     <para>This file specifies three states.</para>
     <listitem>
@@ -218,15 +218,15 @@ sampleauth-error-2=Error 2 occurred during the authentication</programlisting>
 
  <section xml:id="authentication-logic-sample-auth-module">
   <title>The Sample Authentication Logic</title>
-  
+
   <para>An OpenAM authentication module must extend the
   <literal>com.sun.identity.authentication.spi.AMLoginModule</literal> abstract
   class, and must implement the methods shown below.</para>
-  
+
   <para>See the <link xlink:href="${javadocBase}" xlink:show="new"
   ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
   reference.</para>
-  
+
   <programlisting language="java">
 // OpenAM calls the init() method once when the module is created.
 public void init(Subject subject, Map sharedState, Map options)
@@ -240,11 +240,11 @@ public int process(Callback[] callbacks, int state) throws LoginException
 // OpenAM expects the getPrincipal() method to return an implementation of
 // the java.security.Principal interface.
 public Principal getPrincipal()</programlisting>
-  
+
   <para>OpenAM does not reuse authentication module instances. This means that
   you can store information specific to the authentication process in the
   instance.</para>
-  
+
   <para>The implementation, <filename>SampleAuth.java</filename>, is shown
   below.</para>
 
@@ -446,7 +446,7 @@ public class SampleAuth extends AMLoginModule
 
  <section xml:id="principal-sample-auth-module">
   <title>The Sample Auth Principal</title>
-  
+
   <para>The implementation, <filename>SampleAuthPrincipal.java</filename>, is
   shown below.</para>
 
@@ -592,13 +592,13 @@ public class SampleAuthPrincipal implements Principal, Serializable
 
  <section xml:id="service-conf-sample-auth-module">
   <title>The Sample Auth Service Configuration</title>
-  
+
   <para>OpenAM requires that all authentication modules be configured by means
   of an OpenAM service. At minimum, the service must include an authentication
   level attribute. Your module can access these configuration attributes in
   the <literal>options</literal> parameter passed to the
   <literal>init()</literal> method.</para>
-  
+
   <itemizedlist>
    <para>Some observations about the service configuration file follow in the
    list below.</para>
@@ -635,12 +635,12 @@ public class SampleAuthPrincipal implements Principal, Serializable
     configured through OpenAM console.</para>
    </listitem>
   </itemizedlist>
-  
+
   <para>The service configuration file,
   <filename>amAuthSampleAuth.xml</filename>, is shown below.
    Save a local copy of this file, which you use when registering the module.
   </para>
-  
+
   <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -716,10 +716,10 @@ public class SampleAuthPrincipal implements Principal, Serializable
 
  <section xml:id="build-config-sample-auth-module">
   <title>Building &amp; Installing the Sample Auth Module</title>
-  
+
   <para>Build the module with Apache Maven, and install the module in
   OpenAM.</para>
-  
+
   <section xml:id="building-sample-auth-module">
    <title>Building the Module</title>
 
@@ -751,10 +751,10 @@ $ <userinput>mvn install</userinput>
    <para>After you successfully build the module, you find the .jar in
    the <filename>target/</filename> directory of the project.</para>
   </section>
-  
+
   <section xml:id="installing-sample-auth-module">
    <title>Installing the Module</title>
-   
+
    <para>Installing the sample authentication module consists of copying the
    .jar to OpenAM's <filename>WEB-INF/lib/</filename> directory, registering
    the module with OpenAM, and then restarting OpenAM or the web application
@@ -816,7 +816,7 @@ $ <userinput>tail -1 /path/to/tomcat/logs/catalina.out</userinput>
 
  <section xml:id="configuring-testing-sample-auth-module">
   <title>Configuring &amp; Testing the Sample Auth Module</title>
-  
+
   <para>Authentication modules are registered as services with OpenAM globally,
   and then set up for use in a particular realm. In this example, you set up
   the sample authentication module for use in the realm / (Top Level Realm).</para>
@@ -826,7 +826,7 @@ $ <userinput>tail -1 /path/to/tomcat/logs/catalina.out</userinput>
   &gt; / (Top Level Realm) &gt; Authentication &gt; Module Instances.
   Then click New, and create an instance of the Sample Authentication Module.
   Name the module <literal>Sample</literal>.</para>
-  
+
   <mediaobject xml:id="figure-register-sample-auth">
    <alt>Sample authentication module registration</alt>
    <imageobject>
@@ -839,7 +839,7 @@ $ <userinput>tail -1 /path/to/tomcat/logs/catalina.out</userinput>
 
   <para>After creating the module, click the name in the Module Instances
   list, and configure as appropriate.</para>
-  
+
   <mediaobject xml:id="figure-sampleauth-conf">
    <alt>Sample authentication module configuration</alt>
    <imageobject>
@@ -850,7 +850,7 @@ $ <userinput>tail -1 /path/to/tomcat/logs/catalina.out</userinput>
     Service Specific Attribute.</para>
    </textobject>
   </mediaobject>
-  
+
   <para>Now that the module is configured, logout of OpenAM console.</para>
 
   <para>Finally, try the module by specifying the <literal>Sample</literal>

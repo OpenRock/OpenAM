@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2013-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-custom-quota-exhaustion-action'
@@ -137,7 +137,7 @@ public class SampleQuotaExhaustionAction implements QuotaExhaustionAction {
 
   <para>
    The <link
-   xlink:href="https://github.com/markcraig/openam-examples-quotaexhaustionaction/"
+   xlink:href="https://github.com/ForgeRock/openam-examples-quotaexhaustionaction/"
    xlink:show="new">sample plugin source</link> is available online.
    Get a local clone so that you can try the sample on your system.
    In the sources you find the following files.

@@ -20,8 +20,8 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2014 ForgeRock AS
-  !    
+  !      Copyright 2012-2015 ForgeRock AS.
+  !
 -->
 <chapter xml:id='chap-oauth2-scopes'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
@@ -250,7 +250,7 @@ public class CustomScopeValidator implements ScopeValidator {
   <para>
    The
    <link
-    xlink:href="https://github.com/markcraig/openam-scope-sample"
+    xlink:href="https://github.com/ForgeRock/openam-scope-sample"
     xlink:show="new">sample scope validator plugin source</link>
    is available online.
    Get a local clone so that you can try the sample on your system.

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2014 ForgeRock AS
+  !      Copyright 2012-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-oauth2'
@@ -45,7 +45,7 @@
  framework. The chapter begins by showing where OpenAM fits into the OAuth 2.0
  authorization framework, and then shows how to configure the
  functionality.</para>
- 
+
  <section xml:id="about-oauth2-support">
   <title>About OAuth 2.0 Support in OpenAM</title>
 
@@ -356,7 +356,7 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
     <para>
      A sample Java-based client is
      <link
-      xlink:href="https://github.com/markcraig/jwt-bearer-client"
+      xlink:href="https://github.com/ForgeRock/jwt-bearer-client"
       xlink:show="new"
      >available online</link>.
     </para>
@@ -1408,7 +1408,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
       <varlistentry>
        <term>Account Mapper</term>
        <listitem>
-        <para>In this example, 
+        <para>In this example,
         <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal>.</para>
        </listitem>
       </varlistentry>

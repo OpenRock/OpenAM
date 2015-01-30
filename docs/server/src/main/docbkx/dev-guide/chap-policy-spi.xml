@@ -20,8 +20,8 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
-  !    
+  !      Copyright 2011-2015 ForgeRock AS.
+  !
 -->
 <chapter xml:id='chap-policy-spi'
  xmlns='http://docbook.org/ns/docbook'
@@ -53,17 +53,17 @@
 
  <section xml:id="about-sample-policy-plugins">
   <title>About the Sample Plugin</title>
-  
+
   <para>
    The OpenAM policy framework lets you build plugins that extend
    subject conditions, environment conditions, and resource attributes.
-   The <link xlink:href="https://github.com/markcraig/openam-policy-eval-sample"
+   The <link xlink:href="https://github.com/ForgeRock/openam-policy-eval-sample"
    xlink:show="new">sample policy plugin source</link>
    is available online.
    Get a local clone so that you can read the source and try the sample on your system.
    In the sources you find the following files.
   </para>
-  
+
   <variablelist>
    <varlistentry>
     <term><filename>pom.xml</filename></term>
@@ -201,10 +201,10 @@ $ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userin
   </step>
  </procedure>
  </section>
- 
+
  <section xml:id="configuring-sample-policy-plugin">
   <title>Configuring a Sample Policy Plugin</title>
-  
+
   <para>
    This section shows how to edit OpenAM policy editor settings
    to allow policy administrators to configure policies
