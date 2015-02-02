@@ -6116,8 +6116,7 @@ ssoadm \
    <literal>goto</literal> and <literal>gotoOnFail</literal> query string parameters
    supplied to the authentication interface in the login URL.
    You can increase security against possible phishing attacks through open redirect
-   by specifying a list of valid URL resources using the Valid
-   <literal>goto</literal> URL Resource service.
+   by specifying a list of valid URL resources using the Validation Service.
   </para>
 
   <para>

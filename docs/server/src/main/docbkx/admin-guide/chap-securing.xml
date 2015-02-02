@@ -64,15 +64,6 @@
    </listitem>
 
    <listitem>
-    <para>Set valid goto URL domains for OpenAM in the core authentication
-    module configuration. The parameter is described in the section providing
-    <link xlink:show="new" xlink:href="admin-guide#core-module-conf-hints"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
-    Core Authentication Module</citetitle></link> (<literal
-    >iplanet-am-auth-valid-goto-domains</literal>).</para>
-   </listitem>
-
-   <listitem>
     <para>Create an administrator in the top-level realm with a different ID
     than the default <literal>amadmin</literal>.</para>
    </listitem>
