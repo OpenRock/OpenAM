@@ -1985,7 +1985,7 @@ $ <userinput>jar cvf ../openam.war *</userinput>
  com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
     </para>
    </section>
- <section xml:id="prepare-oracle-weblogic-11g-or-earlier">
+ <section xml:id="prepare-oracle-weblogic-12c-or-later">
   <title>Preparing Oracle WebLogic 12c or Later</title>
     <para>
      When using WebLogic 12.1.1 with Java 6,
