@@ -1892,16 +1892,19 @@ $ <userinput>jar cvf ../openam.war *</userinput>
 
    <para>Before you deploy OpenAM, update the JVM options as described in
    <xref linkend="prepare-java" />.</para>
+   <section xml:id="prepare-oracle-weblogic-11g-or-earlier">
+    <title>Preparing Oracle WebLogic 11g or Earlier</title>
 
    <orderedlist>
     <para>
-     Next, edit the WebLogic domain configuration
+     Edit the WebLogic domain configuration
      to allow basic authentication credentials to be passed back to OpenAM.
      By default, WebLogic attempts to resolve authentication credentials itself.
-     When you change the WebLogic domain configuration, you make sure that
+     When you change the WebLogic domain configuration, you ensure that
      the OpenAM OAuth 2.0 providers receive basic authentication credentials
      for OAuth 2.0 grants that rely on basic authentication.
     </para>
+    <para>To edit the WebLogic domain configuration:</para>
 
     <listitem>
      <para>
@@ -1964,8 +1967,6 @@ $ <userinput>jar cvf ../openam.war *</userinput>
      message <literal>java.lang.UnsupportedOperationException:
      This class does not support SAAJ 1.1</literal>,
      and to fail to authenticate users in some cases.
-
-     No change is necessary when deploying OpenAM on WebLogic 12c.
     </para>
 
     <para>
@@ -1983,7 +1984,9 @@ $ <userinput>jar cvf ../openam.war *</userinput>
  -Djavax.xml.soap.MessageFactory=\
  com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
     </para>
-
+   </section>
+ <section xml:id="prepare-oracle-weblogic-11g-or-earlier">
+  <title>Preparing Oracle WebLogic 12c or Later</title>
     <para>
      When using WebLogic 12.1.1 with Java 6,
      if you plan to use the <command>ssoadm</command> command to configure OpenAM,
@@ -1993,22 +1996,20 @@ $ <userinput>jar cvf ../openam.war *</userinput>
      Change the following line:
     </para>
 
-    <literallayout class="monospaced"
-    >${DOMAIN_HOME}/startWebLogic.sh</literallayout>
+  <programlisting language="shell">${DOMAIN_HOME}/startWebLogic.sh</programlisting>
 
     <para>
      To this:
     </para>
 
-    <literallayout class="monospaced"
-    >${DOMAIN_HOME}/bin/startWebLogic.sh \
+  <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh \
  -Djavax.xml.soap.MessageFactory=\
- com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</literallayout>
+ com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
 
     <para>
      Restart WebLogic for the change to take effect.
     </para>
-
+   </section>
    <indexterm class="endofrange" startref="idx-weblogic">
     <primary>Oracle WebLogic</primary>
     <secondary>preparing</secondary>
