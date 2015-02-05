@@ -734,7 +734,24 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/authenticate</userinput>
 <computeroutput>{ "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</computeroutput>
    </screen>
-
+   <tip><para>When authenticating with Windows Desktop SSO, add an
+    <literal>Authorization</literal> header containing the string
+    <literal>Basic </literal>, followed by a Base64 encoded string
+    of the username, a colon character, and the password. In the following
+    example, the credentials <literal>demo:changeit</literal> are
+    base64 encoded into the string <literal>ZGVtbzpjaGFuZ2VpdA==</literal>:
+   </para>
+<screen>
+ $ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Authorization: Basic ZGVtbzpjaGFuZ2VpdA==" \
+ --header "Content-Type: application/json" \
+ --data "{}" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+ <computeroutput>{ "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</computeroutput>
+</screen></tip>
    <para>This "zero page login" mechanism works only for name/password
    authentication. If you include a POST body with the request, it must
    be an empty JSON string as shown in the example. Alternatively, you can
@@ -1527,7 +1544,8 @@ userdetails.attribute.value=6319</computeroutput>
 
   <itemizedlist>
    <listitem>
-    <para><emphasis role="bold">amRest.access</emphasis>. Records accesses to a
+    <para><emphasis role="bold">amRest.access</emphasis>. Records accesses
+     to a
      CREST endpoint, regardless of whether the request successfully reached the
      endpoint through policy authorization.
     </para>
