@@ -88,8 +88,6 @@
    </xinclude:fallback>
   </xinclude:include>
 
-  <para>TODO: Update for release</para>
-
   <section xml:id="java-requirements-javaee-agents">
    <title>Java EE Agents Java Requirements</title>
 
