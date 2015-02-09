@@ -562,7 +562,7 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
 
    <step>
     <para>In the OpenAM console under Access Control &gt; <replaceable>Realm
-    Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; Agent, click
+    Name</replaceable> &gt; Agents &gt; OAuth 2.0/OpenID Connect Client &gt; Agent, click
     New..., then provide the client identifier and client password, and
     finally click Create to create the profile.</para>
    </step>

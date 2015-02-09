@@ -985,7 +985,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      </step>
      <step>
       <para>In the OpenAM console under Access Control &gt; <replaceable>Realm
-      Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; Agent, click
+      Name</replaceable> &gt; Agents &gt; OAuth 2.0/OpenID Connect Client &gt; Agent, click
       New, then provide the client identifier and client password, and
       finally click Create to create the profile.</para>
       <para>This page requires that you perform additional configuration
@@ -1009,7 +1009,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
    <step>
     <para>In the OpenAM console, browse to Access Control &gt;
-    <replaceable>Realm Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client
+    <replaceable>Realm Name</replaceable> &gt; Agents &gt; OAuth 2.0/OpenID Connect Client
     &gt; Agent &gt; <replaceable>Client Name</replaceable> to open the Edit
     <replaceable>Client Name</replaceable> page.</para>
    </step>
@@ -1451,7 +1451,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      </para>
 
      <para>Under Access Control &gt; / (Top-Level Realm) &gt; Agents &gt;
-     OAuth 2.0 Client &gt; Agents &gt; <literal>myClientID</literal>, adjust
+     OAuth 2.0/OpenID Connect Client &gt; Agents &gt; <literal>myClientID</literal>, adjust
      the following settings.</para>
 
      <variablelist>
@@ -1745,7 +1745,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
     <para>On the service provider and authorization server OpenAM server, set
     up an OAuth 2.0 client profile with the same name as the service
     provider under Access Control &gt; <replaceable>realm</replaceable> &gt;
-    Agents &gt; OAuth 2.0 Client &gt; New...</para>
+    Agents &gt; OAuth 2.0/OpenID Connect Client &gt; New...</para>
 
     <para>For example, if the service provider name is
     <literal>https://www.sp.example:8443/openam</literal>, then that is also

@@ -945,7 +945,7 @@
   through OpenAM console, then create an OAuth 2.0 Client agent profile.
   After creating the agent profile, you can further configure the properties
   in the OpenAM console under Access Control &gt; <replaceable>Realm
-  Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; <replaceable>Client
+  Name</replaceable> &gt; Agents &gt; OAuth 2.0/OpenID Connect Client &gt; <replaceable>Client
   Name</replaceable>.</para>
 
   <itemizedlist>
