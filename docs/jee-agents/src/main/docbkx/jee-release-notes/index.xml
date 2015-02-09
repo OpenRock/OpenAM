@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS
   !    
 -->
 <book xml:id='jee-release-notes'
@@ -39,7 +39,7 @@
    Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2014</year>
+   <year>2011-2015</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
@@ -50,12 +50,12 @@
    </author>
    <author>
     <personname>
-     <firstname>Mike </firstname><surname>Jang</surname>
+     <firstname>Gene </firstname><surname>Hirayama</surname>
     </personname>
    </author>
    <author>
     <personname>
-     <firstname>Vanessa </firstname><surname>Richie</surname>
+     <firstname>Mike </firstname><surname>Jang</surname>
     </personname>
 
     <xinclude:include href="../shared/affiliation-fr.xml"/>

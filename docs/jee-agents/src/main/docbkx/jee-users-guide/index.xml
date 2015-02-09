@@ -61,16 +61,6 @@
     <personname>
      <firstname>Mike </firstname><surname>Jang</surname>
     </personname>
-   </author>
-   <author>
-    <personname>
-     <firstname>Chris </firstname><surname>Lee</surname>
-    </personname>
-   </author>
-   <author>
-    <personname>
-     <firstname>Vanessa </firstname><surname>Richie</surname>
-    </personname>
 
     <xinclude:include href="../shared/affiliation-fr.xml"/>
 
@@ -88,8 +78,8 @@
   <xinclude:include href="preface.xml" />
   <xinclude:include href='chap-about-jee-agents.xml' />
   <xinclude:include href='chap-apache-tomcat.xml' />
-  <xinclude:include href='chap-glassfish.xml' />
-  <xinclude:include href='chap-jboss-4and5.xml' />
+  <!--xinclude:include href='chap-glassfish.xml' /-->
+  <!--xinclude:include href='chap-jboss-4and5.xml' /-->
   <xinclude:include href='chap-jboss-7.xml' />
   <xinclude:include href='chap-jetty.xml' />
   <xinclude:include href='chap-weblogic.xml' />

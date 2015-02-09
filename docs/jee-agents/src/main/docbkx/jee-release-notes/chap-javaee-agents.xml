@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2014 ForgeRock AS
+  !      Copyright 2012-2015 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-javaee-agents'
@@ -41,64 +41,33 @@
 
   <itemizedlist>
    <listitem>
-    <para><emphasis role="bold">Click-Through Licensing</emphasis>. The
-     <command>agentadmin --install</command>command now displays a
-     software license acceptance prompt prior to installing a J2EE agent. You can
-     scroll through the license by pressing &lt;Enter&gt;.
-     At the prompt, enter <literal>yes</literal> to accept the license and
-     continue the installation.</para>
-
-    <screen>
-$ <userinput>bin/agentadmin --install</userinput>
-<computeroutput>
-Please read the following License Agreement carefully:
-
-[Press &lt;Enter> to continue...] or [Enter n To Finish]
-
-Do you completely agree with all the terms and conditions of this License
-Agreement (yes/no): [no]:</computeroutput>
-    </screen>
-
-    <para>For scripted or silent installs, you can include the
-     <option>--acceptLicense</option> option on the command line to suppress the
-     license acceptance prompt. Using the option indicates that you have read and
-     accepted the terms stated in the license.</para>
+    <para><emphasis role="bold">Java 8 Support</emphasis>. Java EE policy agents
+     now fully support Java 8 environments.
+    </para>
    </listitem>
    <listitem>
-    <para><emphasis role="bold">JBoss 7 Support</emphasis>. A new Java EE policy agent for JBoss 7 has been added. The new agent
-    simplifies integration with JBoss AS 7 (EAP 6) application servers by
-    leveraging the module system introduced in JBoss 7 (<link xlink:show="new"
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1806"
-    >OPENAM-1806</link>, <link xlink:show="new"
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1735"
-    >OPENAM-1735</link>).</para>
+    <para><emphasis role="bold">Redhat Support</emphasis>. Java EE policy agents
+     can now be installed on Redhat Linux servers.
+     (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2801"
+      xlink:show="new">OPENAM-2801</link>).
+    </para>
    </listitem>
    <listitem>
-    <para><emphasis role="bold">Java 7 Support</emphasis>. Java EE policy agents now fully support Java 7 environments.</para>
+    <para><emphasis role="bold">Reintroduce installing agent.war during Tomcat agent installation</emphasis>.
+     The manual step to add the <literal>agentapp.war</literal> file is no longer
+     required as the Java agent installers now automatically install the
+     <literal>.war</literal> file
+     (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4514"
+      xlink:show="new">OPENAM-4514</link>).</para>
    </listitem>
    <listitem>
-    <para><emphasis role="bold">Modifiable goto URL</emphasis>. The Java EE agent goto URL can now be modified (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
-    xlink:show="new">OPENAM-1299</link>).</para>
-   </listitem>
-   <listitem>
-    <para><emphasis role="bold">Tomcat 7 Support</emphasis>. The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
-    xlink:show="new">OPENAM-1273</link>, <link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-591"
-    xlink:show="new">OPENAM-591</link>).</para>
-   </listitem>
-   <listitem>
-    <para><emphasis role="bold">Conditional Redirect</emphasis>. Java EE policy agents can now conditionally redirect users based on
-    the incoming request URL (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
-    xlink:show="new">OPENAM-1265</link>).</para>
-   </listitem>
-   <listitem>
-    <para><emphasis role="bold">Auto-Submitting Form Parses Valid XML</emphasis>. The auto-submitting form in <filename>FormLoginContent.txt</filename>
-    now parses as valid XML (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
-    xlink:show="new">OPENAM-674</link>).</para>
+    <para><emphasis role="bold">Tomcat 8 Support</emphasis>.
+     The Apache Tomcat policy agent now supports Tomcat 8
+     (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5407"
+      xlink:show="new">OPENAM-5407</link>).</para>
    </listitem>
   </itemizedlist>
  </section>
@@ -114,7 +83,7 @@ Agreement (yes/no): [no]:</computeroutput>
   <xinclude:include href="../shared/para-requirements-support.xml">
    <xinclude:fallback>
     <para>
-     Error: failed to include file
+     Error: failed to include para-requirements-support.xml
     </para>
    </xinclude:fallback>
   </xinclude:include>
@@ -132,7 +101,7 @@ Agreement (yes/no): [no]:</computeroutput>
    <xinclude:include href="../shared/itemizedlist-java-requirements.xml">
     <xinclude:fallback>
      <para>
-      Error: failed to include file
+      Error: failed to include itemizedlist-java-requirements.xml
      </para>
     </xinclude:fallback>
    </xinclude:include>
@@ -163,6 +132,8 @@ Agreement (yes/no): [no]:</computeroutput>
     <!-- Error: failed to include file -->
    </xinclude:fallback>
   </xinclude:include>
+
+
  </section>
 
  <section xml:id="javaee-agent-compatibility">
@@ -192,6 +163,29 @@ Agreement (yes/no): [no]:</computeroutput>
 
    <para>Support for Oracle WebLogic 10g is deprecated and is likely to be
    removed in a future release.</para>
+   <para>Support for the following containers is deprecated:</para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      IBM WebSphere Application Server 7
+     </para>
+    </listitem>
+    <listitem>
+    <para>
+     Jetty 7
+    </para>
+   </listitem>
+    <listitem>
+     <para>
+      Oracle WebLogic Server 10g
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      GlassFish 2 &amp; 3
+     </para>
+    </listitem>
+   </itemizedlist>
   </section>
 
   <section xml:id="javaee-agent-removed">
@@ -212,7 +206,7 @@ Agreement (yes/no): [no]:</computeroutput>
    <title>Key Fixes</title>
 
     <para>
-     The following bugs were fixed in release ${agentsDocTargetVersion}.
+     The following issues were fixed in release ${agentsDocTargetVersion}.
      For details, see the
      <link
       xlink:show="new"
@@ -220,7 +214,26 @@ Agreement (yes/no): [no]:</computeroutput>
      >OpenAM issue tracker</link>.
     </para>
 
-   <para>TODO</para>
+   <!-- List generated at 13:00:46 20150206 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+%22j2ee+agents%22+AND+fixVersion%3D%22JEEAgents-3.5.0%22+AND+resolution+%3D+Fixed+ORDER+BY+issue&startAt=0&maxResults=500&fields=summary-->
+   <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2726" xlink:show="new">OPENAM-2726</link>: Installer must not offer option to apply agent filter in global web.xml for Apache Tomcat Version 7</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2732" xlink:show="new">OPENAM-2732</link>: Agent responds with HTTP 500 when not enforced ip is set to 127.0.0.1</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2747" xlink:show="new">OPENAM-2747</link>: JEE Policy Agent Installer fails on all version of VMware tc Server except 2.7.1</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2752" xlink:show="new">OPENAM-2752</link>: agentapp from JBoss 7 agent loses its MANIFEST file upon installation</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2782" xlink:show="new">OPENAM-2782</link>: Bootstrap and Configuration files refer to incorrect PA version</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2801" xlink:show="new">OPENAM-2801</link>: Tomcat agent fails to install on Redhat</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3209" xlink:show="new">OPENAM-3209</link>: Tomcat 6 agent custom-install does not modify global web.xml</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3228" xlink:show="new">OPENAM-3228</link>: Configuration for FQDN checking required even when FQDN checking is disabled</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3255" xlink:show="new">OPENAM-3255</link>: J2EE Agent cannot handle doublequote in POSTed value in PDP</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3492" xlink:show="new">OPENAM-3492</link>: Clean up the JavaEE Agent Maven build process to improve the handling of dependencies and their versions</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3650" xlink:show="new">OPENAM-3650</link>: JPA removes a trailing '?' from a resource URL being evaluated</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3817" xlink:show="new">OPENAM-3817</link>: com.sun.identity.agents.common.URLFailoverHelper is missing 'toString()' method</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4084" xlink:show="new">OPENAM-4084</link>: JBoss agent fails to install on AS 7.0.0.Final due to incorrect module namespace version</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4416" xlink:show="new">OPENAM-4416</link>: AgentException's details thrown during AmFilter.initialize are not logged in enough detail to help with diagnosis.</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4451" xlink:show="new">OPENAM-4451</link>: Java EE agents can't be compiled using Maven 3.1.0+</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4514" xlink:show="new">OPENAM-4514</link>: Reintroduce installing agentapp.war during Tomcat agent installation</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5407" xlink:show="new">OPENAM-5407</link>: Provide Java Policy Agent support for Tomcat 8</para></listitem>
+   </itemizedlist>
   </section>
 
   <section xml:id="javaee-agent-limitations">
@@ -244,7 +257,15 @@ Agreement (yes/no): [no]:</computeroutput>
      >OpenAM issue tracker</link>.
    </para>
 
-   <para>TODO</para>
+   <!-- List generated at 13:11:03 20150206 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+%22j2ee+agents%22+AND+type+%3D+%22bug%22+AND+cases+%21%3D+NULL+AND+resolution+%3D+Unresolved+ORDER+BY+issue&startAt=0&maxResults=500&fields=summary-->
+   <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-211" xlink:show="new">OPENAM-211</link>: J2EE agents are unable to work, if the container was started prior to OpenAM</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1279" xlink:show="new">OPENAM-1279</link>: Policy Agent fail-over error when the first naming service host is unavailable</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3294" xlink:show="new">OPENAM-3294</link>: Agents should not probe the loginURL / logoutURL before redirecting by default</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4849" xlink:show="new">OPENAM-4849</link>: FormLoginTaskHandler is only called if URI listed as 'Form Login URI' is a protected resource</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5358" xlink:show="new">OPENAM-5358</link>: Support is missing for installing JBoss Policy Agent against a specific profile when there are multiple defined.</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5448" xlink:show="new">OPENAM-5448</link>: CompositeAdviceForm.txt does not allow advice submission when javascript is disabled</para></listitem>
+   </itemizedlist>
   </section>
  </section>
 </chapter>
