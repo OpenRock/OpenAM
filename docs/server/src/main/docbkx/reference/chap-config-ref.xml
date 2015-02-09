@@ -4204,7 +4204,7 @@
 
   <para>After changing server configurations, restart OpenAM or the web
   application container where OpenAM runs for the changes to take
-  effect.</para>
+  effect unless otherwise noted.</para>
 
   <itemizedlist>
    <para>
@@ -4333,6 +4333,10 @@
     <term>Debug Level</term>
     <listitem>
      <para>Set the log level shared across components for debug logging.</para>
+     <para>
+      Changes to this property take effect immediately. No server
+      restart is necessary.
+     </para>
 
      <para>property:
      <literal>com.iplanet.services.debug.level</literal></para>
@@ -4345,7 +4349,10 @@
      <para>If on, then OpenAM writes all debug log messages to a single file,
      <filename>debug.out</filename>. By default, OpenAM writes a debug log
      per component.</para>
-
+     <para>
+      Changes to this property take effect immediately. No server
+      restart is necessary.
+     </para>
      <para>property:
      <literal>com.iplanet.services.debug.mergeall</literal></para>
     </listitem>
@@ -4355,7 +4362,10 @@
     <term>Debug Directory</term>
     <listitem>
      <para>File system directory where OpenAM writes debug logs.</para>
-
+     <para>
+      Changes to this property do not take effect until you
+      restart the OpenAM server.
+     </para>
      <para>property:
      <literal>com.iplanet.services.debug.directory</literal></para>
     </listitem>

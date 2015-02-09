@@ -1030,8 +1030,9 @@ $ <userinput>ssoadm \
    </para>
 
    <para>
-    After changing this setting, restart OpenAM or the container in which
-    it runs for the change to take effect.
+    OpenAM logs to a single file immediately after you change this property.
+    You do not need to restart OpenAM or the container in which it runs for
+    the change to take effect.
    </para>
   </section>
   
@@ -1116,9 +1117,13 @@ $ <userinput>ssoadm \
     </varlistentry>
    </variablelist>
 
-   <para>After you edit the <filename>debugconfig.properties</filename> file,
-   you must restart OpenAM or the web container where it runs for the changes
-   to take effect.</para>
+   <para>
+    Changes to properties in the
+    <filename>debugconfig.properties</filename> file
+    take effect immediately.
+    You do not need to restart OpenAM or the container in which it runs for
+    the changes to take effect.
+   </para>
   </section>
  </section>
 
