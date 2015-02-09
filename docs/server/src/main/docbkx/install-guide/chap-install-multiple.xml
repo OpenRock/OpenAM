@@ -360,8 +360,9 @@
     Core Token Service session store is preferred for performance reasons.
    </para>
    <para>
-    Requests to log out or set a session attribute always use crosstalk to
-    ensure the integrity of the update requests.
+    Requests to update sessions, such as requests to log out, reset the session
+    idle time, or set a session attribute, always use crosstalk to ensure the
+    integrity of the update requests.
    </para>
    <para>
    See
