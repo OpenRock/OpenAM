@@ -18,7 +18,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2014 ForgeRock AS
+  !      Copyright 2014-15 ForgeRock AS
   !
 -->
 <section xml:id="jee-pa-platform-requirements"
@@ -70,9 +70,8 @@
        <member>IBM Web Sphere Application Server 8, 8.5</member>
        <member>JBoss Enterprise Application Platform 6</member>
        <member>JBoss Application Server 7</member>
-       <member>Jetty 8 (at least 8.1.13), 9</member>
+       <member>Jetty 8 (at least 8.1.13)</member>
        <member>Oracle WebLogic Server 11g, 12c</member>
-       <member>WildFly 8</member>
       </simplelist>
      </entry>
     </row>
@@ -132,9 +131,8 @@
        <member>IBM Web Sphere Application Server 8, 8.5</member>
        <member>JBoss Enterprise Application Platform 6</member>
        <member>JBoss Application Server 7</member>
-       <member>Jetty 8 (at least 8.1.13), 9</member>
+       <member>Jetty 8 (at least 8.1.13)</member>
        <member>Oracle WebLogic Server 11g, 12c</member>
-       <member>WildFly 8</member>
       </simplelist>
      </entry>
     </row>
