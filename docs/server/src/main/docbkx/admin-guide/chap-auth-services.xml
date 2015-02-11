@@ -5344,8 +5344,6 @@ ssoadm \
    <para>The Web Service Security (WSSAuth) module lets OpenAM validate a
    user name, password combination received as an authentication token in
    a request from a Web Service Client to a Web Service Provider.</para>
-
-   <xinclude:include href="../shared/note-old-sts.xml" />
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthWSSAuthModuleService</literal></para>

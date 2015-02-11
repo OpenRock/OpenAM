@@ -86,8 +86,6 @@
   both validate incoming web service requests from Web Service Clients (WSC),
   and also secure outgoing responses sent back to WSCs.</para>
 
-  <xinclude:include href="../shared/note-old-sts.xml" />
-
   <para>After creating a WSP profile, you access WSP properties in the
   OpenAM console under Access Control &gt; <replaceable>Realm Name</replaceable>
   &gt; Agents &gt; Web Service Provider &gt; <replaceable>Agent
@@ -380,8 +378,6 @@
   both secure outgoing requests sent to Web Service Providers (WSP),
   and also validate incoming from WSPs.</para>
 
-  <xinclude:include href="../shared/note-old-sts.xml" />
-
   <para>After creating a WSC profile, you access WSC properties in the
   OpenAM console under Access Control &gt; <replaceable>Realm Name</replaceable>
   &gt; Agents &gt; Web Service Client &gt; <replaceable>Agent
@@ -662,8 +658,6 @@
   incoming requests from trust authorities. You can configure STS clients to
   work with OpenAM's Security Token Service and with its Discovery
   Service.</para>
-
-  <xinclude:include href="../shared/note-old-sts.xml" />
 
   <para>After creating an STS Client profile, you access STS Client properties
   in the OpenAM console under Access Control &gt; <replaceable>Realm
