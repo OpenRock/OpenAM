@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
+# Copyright (c) 2010-2015 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -165,17 +165,29 @@ apache22.obj : $(AM_APA22_SRC)
 	$(CC) $(CFLAGS) /I"extlib\WINNT\apache22\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /Iagents\source\apache22 /Foagents\source\apache22\ /Tc $(AM_APA22_SRC)
 
 apache2i : apache22.obj
-	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache22\lib" $(DEP_LIBPATH) \
-		/PDB:"agents\source\apache22\libamapc22.pdb" \
-		/DLL /OUT:agents\source\apache22\libamapc22.dll /LIBPATH:"extlib\WINNT\apache2\lib" agents\source\apache22\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) \
+            /PDB:"agents\source\apache22\libamapc22.pdb" \
+            /DLL /OUT:agents\source\apache22\libamapc22.dll agents\source\apache22\apache_agent.obj \
+            /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib \
+!IFDEF X64 
+            /LIBPATH:"extlib\WINNT\apache22\lib_64"
+!ELSE
+            /LIBPATH:"extlib\WINNT\apache22\lib"
+!ENDIF
 
 apache24.obj : $(AM_APA24_SRC)
 	$(CC) $(CFLAGS) /I"extlib\WINNT\apache24\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DAPACHE24 /Iagents\source\apache24 /Foagents\source\apache24\ /Tc $(AM_APA24_SRC)
 
 apache24i : apache24.obj
-	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) \
-		/PDB:"agents\source\apache24\libamapc24.pdb" \
-		/DLL /OUT:agents\source\apache24\libamapc24.dll /LIBPATH:"extlib\WINNT\apache24\lib" agents\source\apache24\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) \
+            /PDB:"agents\source\apache24\libamapc24.pdb" \
+            /DLL /OUT:agents\source\apache24\libamapc24.dll agents\source\apache24\apache_agent.obj \
+            /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib \
+!IFDEF X64 
+            /LIBPATH:"extlib\WINNT\apache24\lib_64"
+!ELSE
+            /LIBPATH:"extlib\WINNT\apache24\lib"
+!ENDIF
 
 
 #

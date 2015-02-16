@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2014 ForgeRock AS
+    Portions Copyrighted 2010-2015 ForgeRock AS.
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -192,6 +192,7 @@
     <target name="all64" depends="get-arch" unless="is64bit">
         <antcall target="iis6" />
         <antcall target="iis7" />
+        <antcall target="apache22" />
         <antcall target="apache24" />
         <antcall target="sdk" />
         <antcall target="jsFiles64" />
@@ -361,8 +362,6 @@
               tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
               tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
-        <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
-              tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
     </target>
 
     <target name="jsFiles64">
@@ -374,6 +373,8 @@
               tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
               tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
+              tofile="${webagents.dist.dir}/apache_v22_${build.os}-${build.type}-build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
               tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
     </target>
