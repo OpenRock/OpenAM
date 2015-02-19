@@ -26,7 +26,8 @@
  *
  */
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 /*
@@ -456,9 +457,17 @@ am_status_t AgentProfileService::getAgentAttributes(
         } else {
             try {
                 status = parseAgentResponse(xmlResponse, properties);
+            } catch(XMLTree::ParseException &ex) {
+                Log::log(logModule, Log::LOG_ERROR, 
+                    "parseAgentResponse(): Attribute xml parsing error: '%s'", ex.getMessage().c_str());
+                status = AM_REST_ATTRS_SERVICE_FAILURE;
+            } catch(std::exception &exs) {
+                Log::log(logModule, Log::LOG_ERROR, 
+                    "parseAgentResponse(): Exception encountered during parsing attribute xml: '%s'", exs.what());
+                status = AM_REST_ATTRS_SERVICE_FAILURE;
             } catch(...) {
                 Log::log(logModule, Log::LOG_ERROR, 
-                    "parseAgentResponse(): Attribute xml parsing error");
+                    "parseAgentResponse(): Unknown exception encountered during parsing attribute xml.");
                 status = AM_REST_ATTRS_SERVICE_FAILURE;
             }
         }
