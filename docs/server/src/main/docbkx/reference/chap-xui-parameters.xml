@@ -34,8 +34,17 @@
     <title>XUI Configuration Parameters</title>
 
     <para>The configuration of the XUI is based on settings in the <filename>themeConfig.json</filename>
-    file. When OpenAM is installed, this file can be found in the <filename>/path/to/webapps/XUI</filename>
+    file. When OpenAM is installed, this file can be found in the <filename>/path/to/webapps/openam/XUI</filename>
     directory.</para>
+
+    <para>The XUI derives page style using
+     <link xlink:show="new"
+           xlink:href="http://lesscss.org"
+       >Less CSS</link>.
+     For specific information about how the parameters in the <filename>themeConfig.json</filename> file
+     interrelate, review the <filename>layout.less</filename> file in the
+     <filename>/path/to/webapps/openam/XUI/css/common</filename> directory.
+    </para>
 
     <para>
      Interface Stability:
@@ -101,7 +110,7 @@
                                 Standard background color; use hex or standard color words.</para>
                             </listitem>
                             <listitem>
-                                <para><literal>background-image</literal>: URL or relative path to file image</para>
+                                <para><literal>background-image</literal>: URL or relative path to file image.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>background-repeat</literal>: If set to <literal>repeat</literal>,
@@ -117,16 +126,29 @@
                                 footer area; hex or standard color words accepted.</para>
                             </listitem>
                             <listitem>
-                                <para><literal>column-padding</literal>: Distance between columns.</para>
+                                <para><literal>background-font-color</literal>: Color of non-link text that
+                                appears on the background.</para>
                             </listitem>
                             <listitem>
-                                <para><literal>login-container-width</literal>: Width of view box with
-                                login text boxes</para>
+                                <para><literal>column-padding</literal>: Distance between columns.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>login-container-label-align</literal>: Alignment of labels
                                 in the login container, such as <literal>left</literal>,
                                 <literal>right</literal>, or <literal>center</literal>.</para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>login-container-width</literal>: Width of the view box of
+                                a login container. Login containers appear inside of medium width
+                                containers. Therefore, the value of <literal>login-container-width</literal>
+                                must be smaller than the value of <literal>medium-container-width</literal>.</para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>medium-container-width</literal>: Width of the view box of a
+                                medium-sized container. </para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>site-width</literal>: Total width available for the login screen.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>message-background-color</literal>: Login message background
@@ -140,13 +162,10 @@
                             </listitem>
                             <listitem>
                                 <para><literal>font-size</literal>: Despite the name, this is the distance
-                                between login labels and text boxes</para>
+                                between login labels and text boxes.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>font-family</literal>: Available fonts.</para>
-                            </listitem>
-                            <listitem>
-                                <para><literal>site-width</literal>: Total width available for the login screen.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>line-height</literal>: Height of text lines.</para>
@@ -173,9 +192,6 @@
                                 inactive menu options.</para>
                             </listitem>
                             <listitem>
-                                <para><literal>active-menu-color</literal>: Color of active menu option.</para>
-                            </listitem>
-                            <listitem>
                                 <para><literal>button-hover-lightness</literal>: Reduction in color, in percent.</para>
                             </listitem>
                             <listitem>
@@ -183,7 +199,7 @@
                             </listitem>
                             <listitem>
                                 <para><literal>href-color-hover</literal>: Color of text links of the option
-                                currently being hovered over by the pointer </para>
+                                currently being hovered over by the pointer.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>color-error</literal>: Color of error text.</para>
@@ -199,6 +215,17 @@
                             </listitem>
                             <listitem>
                                 <para><literal>color-inactive</literal>: Text color of inactive messages.</para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>input-background-color</literal>: Color of input fields. </para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>input-background-invalid-color</literal>: Color that an input
+                                field's background changes to when an invalid value is entered.</para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>input-border-invalid-color</literal>: Color that the border of
+                                an input field turns to when an entered value is invalid.</para>
                             </listitem>
                             <listitem>
                                 <para><literal>input-border-basic</literal>: Border color of active input text
