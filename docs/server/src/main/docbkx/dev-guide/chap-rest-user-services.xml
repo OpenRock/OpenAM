@@ -138,9 +138,9 @@ $ <userinput>curl \
 
     <literallayout class="monospaced"
     >https://openam.example.com:8443/openam/XUI/confirm.html?
-     confirmationId=f4x0Dh6iZCXtX8nhiSb3xahNxrg=
-     &amp;email=newuser@example.com
-     &amp;tokenId=yA26LZ6SxFEgNuF86/SIXfimGlg=
+     confirmationId=f4x0Dh6iZCXtX8nhiSb3xahNxrg%3D
+     &amp;email=newuser%40example.com
+     &amp;tokenId=yA26LZ6SxFEgNuF86%2FSIXfimGlg%3D
      &amp;realm=/</literallayout>
    </step>
    <step>
