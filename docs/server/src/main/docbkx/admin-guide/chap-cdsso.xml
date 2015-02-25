@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-cdsso'
@@ -48,7 +48,7 @@
  in other DNS domains.</para>
 
  <para>Single sign on depends on cookies to store session information. Yet for
- for security reasons, browsers do not let a web site in one domain to get
+ security reasons, browsers do not let a web site in one domain to get
  access to a cookie from another domain. With CDSSO, the policy agents work
  around this by negotiating with OpenAM to allow access.</para>
 

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS
   !    
 -->
 <refentry xml:id='agentadmin-1'
@@ -164,15 +164,6 @@
     <term><option>--listAgents</option></term>
     <listitem>
      <para>Displays details of all the configured agents.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><option>--agentInfo</option></term>
-    <listitem>
-     <para>Displays details of the agent corresponding to the specified agent
-     ID.</para>
-     <para>Usage: <command>agentadmin --agentInfo
-     <replaceable>agent-id</replaceable></command></para>
     </listitem>
    </varlistentry>
    <varlistentry>

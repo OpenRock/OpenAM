@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-custom-ui'
@@ -207,7 +207,7 @@
          </listitem>
          <listitem>
              <para>Each of the <literal>lessVars</literal> parameters are based on variables defined in files
-             in the <filename>XUI/css/user</filename> directory.</para>
+             in the <filename>XUI/css/common</filename> directory.</para>
          </listitem>
          <listitem>
              <para>After making changes, use available tools to make sure the file uses correct JSON syntax.</para>
