@@ -5325,8 +5325,10 @@
    <varlistentry>
     <term><literal>com.iplanet.am.session.agentSessionIdleTime</literal></term>
     <listitem>
-     <para>Time in minutes after which a policy agent session expires.</para>
-     <para>Default: 0, meaning never time out. Range is 0-30 (minutes).</para>
+     <para>Time in <emphasis>minutes</emphasis> after which a policy agent session
+      expires.</para>
+     <para>Default: 0 (never time out). You can set this property
+      to 0, or 30 and higher (no maximum limit).</para>
     </listitem>
    </varlistentry>
 
