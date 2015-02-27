@@ -1469,8 +1469,7 @@ admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
    
     <para>You can create realms using an HTTP POST of the JSON representation 
     of the profile to <literal>/json/realms/?_action=create</literal>, as shown in 
-    the following example. The only required field is <literal>realm</literal>, 
-    but the realm will not be active if the status is not set.</para>
+    the following example. The only required data field is <literal>realm</literal>.</para>
    
      <screen>
 $ <userinput>curl \
@@ -1499,20 +1498,27 @@ $ <userinput>curl \
      <screen>
 $ <userinput>curl \
  --request PUT \
+ --header "If-None-Match: *" \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
  --data '{ }' \
  https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
+<computeroutput>
+ {
+  "realmCreated": "/myRealm"
+ }
+</computeroutput>
      </screen>
-
     <para>
-     OpenAM returns the JSON representation of the profile on success.
-     On failure, OpenAM returns a JSON representation of the error including the
+     OpenAM returns an HTTP 201 Created status code, and the JSON representation
+     of the realm on success. On failure, OpenAM returns a JSON representation
+     of the error including the
      <link
       xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
       xlink:show="new"
-     >HTTP status code</link>.
-    </para>
+     >HTTP status code</link>. For example, if the
+     <literal>If-None-Match</literal> header with a value of <literal>*</literal>
+     is absent, an HTTP 404 Not Found status code is returned.</para>
    </section>
 
   <section xml:id="rest-api-read-realm">
@@ -1587,12 +1593,10 @@ $ <userinput>curl \
    </screen>
 
    <para>
-    If the realm you want to read is not an immediate subrealm
-    of the top-level realm,
-    specify its parent realm to the left
-    of <literal>realms</literal> in the URL, and specify
-    the realm's final qualifier to the right of <literal>realms</literal>. For example,
-    to read the <literal>/myRealm/myRealmsChildRealm</literal> realm:
+    If the realm you want to read is not an immediate subrealm of the top-level realm,
+    specify its parent realm to the left of <literal>realms</literal> in the URL,
+    and specify the realm's final qualifier to the right of <literal>realms</literal>.
+    For example, to read the <literal>/myRealm/myRealmsChildRealm</literal> realm:
    </para>
    <screen>
 $ <userinput>curl \
