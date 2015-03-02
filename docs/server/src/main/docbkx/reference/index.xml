@@ -114,7 +114,6 @@
    <!-- Failed to unpack and include generated log message reference -->
   </xinclude:fallback>
  </xinclude:include>
- <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />
  <xinclude:include href='chap-standards.xml' />
