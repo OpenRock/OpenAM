@@ -50,14 +50,15 @@
     
  <para>As every service endpoint is a potential security issue, it may be appropriate
   to restrict access to some of those endpoints that you do not use. But be careful.
-  Some endpoints, such as <literal>isAlive.jsp</literal> in the main
-  /path/to/tomcat/webapps/openam directory, are essential and should not be
-  blocked or changed.</para>
+  Some endpoints, such as <literal>isAlive.jsp</literal> in the
+  main <filename>/path/to/tomcat/webapps/openam</filename> directory,
+  are essential and should not be blocked or changed.</para>
 
  <para>Given the large number of available endpoints, this chapter has been
   organized primarily by subdirectory.
   Most of the directories were created when the OpenAM war archive was copied to
-  the appropriate web application container, such as the webapps/ subdirectory.</para>
+  the appropriate web application container, such as
+  the <filename>webapps</filename> subdirectory.</para>
         
 <!--
      Is there a webapps/ subdirectory in all the containers we support?
@@ -102,15 +103,6 @@
  <para>In general, this chapter does not include dynamic endpoints, such as those
   that may include security tokens. The endpoints described in this chapter are
   based on files included in the installation of an OpenAM server.</para>
-
- <para>There have been two security advisories related to OpenAM endpoints:
-  <link xlink:show="new"
-        xlink:href="http://www.forgerock.org/security_advisory1.html">OpenAM
-         Security Advisory #201203</link> and
-        <link xlink:show="new"
-              xlink:href="http://www.forgerock.org/security_advisory2.html">OpenAM
-         Security Advisory #201204</link>
- </para>
 
  <itemizedlist>
   <para>Several options are available for endpoints at risk. Recommendations
@@ -938,10 +930,9 @@
             validate incoming requests from Web Service Providers (WSP). For more information, see the chapter on
             <link xlink:href="admin-guide#chap-agents"
                   xlink:role="http://docbook.org/xlink/role/olink">
-            <citetitle>Configuring Policy Agent Profiles</citetitle> in the Administrative Guide</link>.</para>
-
-        <para>If you are not using agent functionality such as that related to the Security Token Service (STS), the
-        related endpoints listed in this section may not be essential in a production deployment.</para>
+            <citetitle>Configuring Policy Agent Profiles</citetitle> in the Administrative Guide</link>.
+            If you are not using agent functionality such as that related to the Security Token Service (STS), the
+            related endpoints listed in this section may not be essential in a production deployment.</para>
   <variablelist>
 
   <varlistentry>
@@ -981,10 +972,10 @@
       </varlistentry>
 
       <varlistentry>
-          <term><literal>AgentGroup.jsp</literal></term>
+          <term><literal>AgentGroupAdd.jsp</literal></term>
           <listitem>
               <para>Includes a newly created agent group for common web agents within a specified realm.
-                  The AgentGroup page appears in the OpenAM console after an agent is added to a realm.</para>
+                  The AgentGroupAdd page appears in the OpenAM console after an agent group is added to a realm.</para>
           </listitem>
       </varlistentry>
 
@@ -1001,6 +992,13 @@
               <para>Enables access to a form to specify a new agent to add. The same form is used for every category of
               new agents configured from the OpenAM console, when you navigate to Access Control -> [Realm name] ->
               Agents.</para>
+          </listitem>
+      </varlistentry>
+
+      <varlistentry>
+          <term><literal>GenericAgentProfile.jsp</literal></term>
+          <listitem>
+              <para>A template that the OpenAM console uses when it builds pages for editing agent properties.</para>
           </listitem>
       </varlistentry>
 
@@ -1060,23 +1058,27 @@
             <tertiary>Console Ajax</tertiary>
         </indexterm>
 
-        <para>The only JSP file that appears to be active in this subdirectory is AjaxProxy.jsp, which appears to be
-        used by several other endpoints.</para>
+        <para>You can find console AJAX endpoints in the console/ajax subdirectory. The
+         AJAX endpoints provide AJAX functionality triggered from other JSP
+         endpoints.</para>
 
         <variablelist>
             <varlistentry>
                 <term><literal>AjaxProxy.jsp</literal></term>
                 <listitem>
-                    <para>Specifies an element used by several other endpoints, including ConfigureGoogleApps.jsp
-                        and ConfigureSalesForceApps.jsp.</para>
+                    <para>Specifies an element used by endpoints triggered from
+                     the OpenAM console's Common Tasks tab, including
+                     the ConfigureGoogleApps.jsp and ConfigureSalesForceApps.jsp
+                     endpoints.</para>
                 </listitem>
             </varlistentry>
 
         <varlistentry>
             <term><literal>FileUpload.jsp</literal></term>
             <listitem>
-                <para>Used by the FileUploader.jsp endpoint, described in the section on Federation Console JSP
-                    Endpoints.</para>
+                <para>Provides functionality used for file uploading. This JSP is
+                used for uploading federation metadata files and scripts, such
+                as for scripted authentication modules.</para>
             </listitem>
         </varlistentry>
     </variablelist>
@@ -1150,6 +1152,13 @@
                 <listitem>
                     <para>Supports a change in sequence of authentication criteria; to access, select an existing
                         Authentication Chaining service under the Authentication tab for a specified realm.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>ScriptUploader.jsp</literal></term>
+                <listitem>
+                    <para>Supports uploading a script when configuring a scripted authentication module.</para>
                 </listitem>
             </varlistentry>
 
@@ -1961,7 +1970,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             </varlistentry>
 
             <varlistentry>
-                <term><literal>G11NCharsetAliasEdit.jsp</literal></term>
+                <term><literal>G11NSupportedCharsetEdit.jsp</literal></term>
                 <listitem>
                     <para>Supports the editing of an existing character set supported by a locale. Accessible from the
                         Globalization Settings &gt; Charsets Supported by Each Locale submenu.</para>
@@ -2199,17 +2208,26 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>ServerEditAdvanced.jsp</literal></term>
                 <listitem>
                     <para>Supports the editing of advanced properties for default servers, in the configuration of
-                        servers for SFO. To access, select Configuration &gt; Severs and Sites &gt; Default Server
+                        servers for SFO. To access, select Configuration &gt; Servers and Sites &gt; Default Server
                         Settings, and click Advanced.</para>
                 </listitem>
             </varlistentry>
 
             <varlistentry>
+                <term><literal>ServerEditCTS.jsp</literal></term>
+                <listitem>
+                    <para>Supports the editing of properties for the Core Token Service.
+                     To access, select Configuration &gt; Servers and Sites &gt; Default Server
+                     Settings, and click CTS.</para>
+                </listitem>
+            </varlistentry>
+
+           <varlistentry>
                 <term><literal>ServerEditGeneral.jsp</literal></term>
                 <listitem>
                     <para>Supports the editing of general properties for default servers, such as the base directory,
                         default locale, debug level, mail server for notifications, and more. Relates to the
-                        configuration of servers for SFO. To access, select Configuration &gt; Severs and Sites &gt;
+                        configuration of servers for SFO. To access, select Configuration &gt; Servers and Sites &gt;
                         Default Server Settings, and click General.</para>
                 </listitem>
             </varlistentry>
@@ -2220,7 +2238,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                     <para>Supports the editing of SDK-related properties for default servers, associated with SFO.
                         Supports editing of settings such as datastore notifications, event service connection retries,
                         LDAP connections, Time To Live (TTL) for user entries, and more. To access, select Configuration
-                        &gt; Severs and Sites &gt; Default Server Settings, and click SDK.</para>
+                        &gt; Servers and Sites &gt; Default Server Settings, and click SDK.</para>
                 </listitem>
             </varlistentry>
 
@@ -2229,7 +2247,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Supports the editing of security properties for default servers; associated with SFO.
                         Includes default security settings such as encryption keys, cookie encoding, key stores, and
-                        certificate management. To access, select Configuration &gt; Severs and Sites &gt;
+                        certificate management. To access, select Configuration &gt; Servers and Sites &gt;
                         Default Server Settings, and click Security.</para>
                 </listitem>
             </varlistentry>
@@ -2240,7 +2258,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                     <para>Supports the editing of session properties for default servers; associated with SFO.
                         Note the Session Limit default specifies a maximum of 5000, well short of the 100,000 sessions
                         that can be handled by a standard 3GB dual-core production system. To access, select
-                        Configuration &gt; Severs and Sites &gt; Default Server Settings, and click Session.</para>
+                        Configuration &gt; Servers and Sites &gt; Default Server Settings, and click Session.</para>
                 </listitem>
             </varlistentry>
 
@@ -2326,14 +2344,6 @@ to a runtime exception with messages that I think suggest that it needed to be c
                     <para>Supports a review and configuration of the Discovery Server, for global attributes, the
                         ResourceID Mapper plug-in, and bootstrapping.</para>
                     <!-- Best guess, based on info from the screen that appears -->
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>SMG11N.jsp</literal></term>
-                <listitem>
-                    <para>Allows you to configure globalization settings for OpenAM; accessible via Configuration &gt;
-                        Console &gt; Globalization Settings.</para>
                 </listitem>
             </varlistentry>
 
@@ -2493,8 +2503,25 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>ConfigureSalesForceAppsFinishWarning.jsp</literal></term>
                 <listitem>
-                    <para>Sets up a warning message related to a need for a Salesforce Login URL for the configuration.
+                    <para>Includes a warning message related to the ConfigureSalesForceApps.jsp endpoint. The
+                    message is self-explanatory, though grammatically questionable: "Unable to configure because there
+                    are no circle of trust with Identity Provider."</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>ConfigureSalesForceAppsWarning.jsp</literal></term>
+                <listitem>
+                    <para>Sets up a warning message related to a need for a circle of trust for the configuration.
                         </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>ConfigureSocialAuthN.jsp</literal></term>
+                <listitem>
+                    <para>Accessible when you select one of the Configure Social Authentication options shown in the
+                     main GUI console.</para>
                 </listitem>
             </varlistentry>
 
@@ -2721,8 +2748,56 @@ to a runtime exception with messages that I think suggest that it needed to be c
         </variablelist>
     </section>
 
+    <section xml:id="console-reststs-jsp-endpoints">
+        <title>REST STS Console JSP Endpoints</title>
+        <indexterm>
+            <primary>Endpoints</primary>
+            <secondary>JSP</secondary>
+            <tertiary>Console REST STS</tertiary>
+        </indexterm>
+
+        <para>
+         The OpenAM console uses the JSP files in this section to configure REST STS instances.
+         The endpoints in this section are accessible from the OpenAM console and can be
+         reached by using the path Access Control &gt; <replaceable>Realm Name</replaceable> &gt; STS.
+        </para>
+        <para>
+         You can find the JSP files in the console/reststs subdirectory.
+        </para>
+
+        <variablelist>
+
+            <varlistentry>
+                <term><literal>RestSTSAdd.jsp</literal></term>
+                <listitem>
+                    <para>Provides functionality to add a REST STS instance.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>RestSTSEdit.jsp</literal></term>
+                <listitem>
+                    <para>Provides functionality to edit a REST STS instance.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>RestSTSHome.jsp</literal></term>
+                <listitem>
+                    <para>Provides the functionality that lists existing REST STS instances
+                     making them available for editing and deletion. Also lets users
+                     trigger <filename>RestSTSAdd.jsp</filename> to add a new REST STS
+                     instance.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+         </variablelist>
+
+    </section>
+
     <section xml:id="oauth-jsp-endpoints">
-        <title>OAuth JSP Endpoints</title>
+        <title>OAuth and Related JSP Endpoints</title>
         <indexterm>
             <primary>Endpoints</primary>
             <secondary>JSP</secondary>
@@ -2775,6 +2850,17 @@ to a runtime exception with messages that I think suggest that it needed to be c
             </varlistentry>
 
             <varlistentry>
+                <term><literal>checkSession.jsp</literal></term>
+                <listitem>
+                    <para>Enables retrieval of session status change notifications for OpenID Connect 1.0.
+                    For more information, see the Session Status Change Notification section in the
+                        <link xlink:href="http://openid.net/specs/openid-connect-session-1_0.html" xlink:show="new">
+                            <citetitle>OpenID Connect Session Management 1.0 specification</citetitle></link>.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
                 <term><literal>registerClient.jsp</literal></term>
                 <listitem>
                     <para>Enables registration of an OAuth 2.0 client with the OpenAM OAuth 2.0 authorization service.
@@ -2789,7 +2875,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>OAuthLogout.jsp</literal></term>
                 <listitem>
-                    <para>Used to log out the resource owner with teh OAuth 2.0 provider. For more information, see
+                    <para>Used to log out the resource owner with the OAuth 2.0 provider. For more information, see
                         the Administration Guide chapter on
                         <link xlink:href="admin-guide#register-oauth2-client"
                               xlink:role="http://docbook.org/xlink/role/olink">
@@ -2901,6 +2987,34 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <citetitle>Managing SAML2 Federation in the Administration Guide</citetitle></link>.</para>
 
         <variablelist>
+
+           <varlistentry>
+                <term><literal>autologout.jsp</literal></term>
+                <listitem>
+                    <para>May be dispatched to perform a single logout. Invoked by FSSingleLogoutHandler.java.</para>
+                </listitem>
+            </varlistentry>
+
+           <varlistentry>
+                <term><literal>autologoutwml.jsp</literal></term>
+                <listitem>
+                    <para>May be dispatched to perform a single logout in a WML environment. Invoked by FSSingleLogoutHandler.java.</para>
+                </listitem>
+           </varlistentry>
+
+           <varlistentry>
+                <term><literal>autosubmitaccessrights.jsp</literal></term>
+                <listitem>
+                    <para>Auto-submitting form used to post an error message and relay state. Used by the Fedlet.</para>
+                </listitem>
+           </varlistentry>
+
+           <varlistentry>
+                <term><literal>autosubmittingerror.jsp</literal></term>
+                <listitem>
+                    <para>Auto-submitting form used to post error messages.</para>
+                </listitem>
+           </varlistentry>
 
            <varlistentry>
                 <term><literal>default.jsp</literal></term>
@@ -3195,6 +3309,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
         </variablelist>
     </section>
 
+
     <section xml:id="web-inf-endpoints">
         <title>WEB-INF Endpoints</title>
         <indexterm>
@@ -3202,1219 +3317,139 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <secondary>WEB-INF</secondary>
             </indexterm>
 
-        <para>The OpenAM WAR archive includes pointers to different URL patterns in the web.xml file. The following
-            section includes a description of each of the identified URL patterns.</para>
-
-        <para>Many of the endpoints in this section are based on what you would add to an OpenAM URL. Many of the
-        endpoints described in the web.xml file are not directly related to the .jsp files described in other parts
-        of this chapter.</para>
-
-        <para>The endpoints in this chapter are taken from all items tagged with the <literal>url-pattern</literal>
-        label. These endpoints are listed in that they appear in the web.xml file available at the time of this writing;
-        the list is changed frequently. If you want to disable one or more of these endpoints, you may be able to
-            delete them from the web.xml file.</para>
-
-        <para>Each of the <literal>url-pattern</literal>s shown in the web.xml file is associated with elements such as
-        a <literal>filter-name</literal> or a <literal>servlet-name</literal>. The definitions that follow use those
-             elements to help identify the function
-        of each endpoint listed in the web.xml file. Many of these elements can be directly related to a .java file.
+        <para>
+         The OpenAM WAR archive includes the deployment descriptor file,
+         <filename>/path/to/webapps/openam/WEB-INF/web.xml</filename>,
+         which contains references to different URL patterns that OpenAM accesses
+         as endpoints. These endpoints are based on what could be added to an
+         OpenAM URL. Many of the endpoints that appear in the
+         <filename>web.xml</filename> file are not directly related to the .jsp
+         files described in other parts of this chapter.
         </para>
 
-        <para>The endpoints in this section are in the order found in the list of <literal>url-pattern</literal> entries
-        shown in the web.xml file at the time of this writing.</para>
+        <para>
+         Endpoints in the <filename>web.xml</filename> file are tagged
+         with the <literal>url-pattern</literal> label.
+         Each of the <literal>url-pattern</literal> entries shown in the
+         <filename>web.xml</filename> file is associated with
+         a <literal>filter-name</literal> or a <literal>servlet-name</literal>
+         element. The definitions that follow use those elements to help identify
+         the function of each endpoint.
+        </para>
+
+        <para>
+         If you want to disable one or more of these endpoints, you may be able to
+         delete them from the <filename>web.xml</filename> file.
+        </para>
+
+        <para>
+         The <filename>web.xml</filename> file changes from release to release
+         of OpenAM. If you do choose to remove endpoints from this file in order
+         to disable access to parts of the OpenAM configuration,
+         be sure to review the <filename>web.xml</filename> file when you upgrade
+         to a new release of OpenAM. You will need to remove the restricted
+         endpoints after each upgrade, and you should review new endpoints to
+         determine whether you want to disable them.
+        </para>
 
-        <variablelist>
-
-            <varlistentry>
-                <term><literal>/*</literal></term>
-                <listitem>
-                    <para>This entry is more of a filter for all endpoints. It's associated with the
-                        ResponseValidationFilter, which checks for valid URLs. It's also associated with the
-                    AMSetupFilter.java file; on systems not yet configured, it redirects users to the setup wizard.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>ws/*</literal></term>
-                <listitem>
-                    <para>Specifies a group of URLs related to authentication endpoints, as it is associated with the
-                    AuthNFilter.java and AuthZFilter.java files. However, those files (and the associated
-                        RestServiceManager.java file) are not called by any other files in the trunk.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/login</literal></term>
-                <listitem>
-                    <para>With the help of the LoginLogoutMapping.java file, this would forward to the /UI/Login.jsp
-                        endpoint.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/logout</literal></term>
-                <listitem>
-                    <para>With the help of the LoginLogoutMapping.java file, this would forward to the /UI/Logout.jsp
-                        endpoint.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/UI/*</literal></term>
-                <listitem>
-                    <para>With the help of the LoginServlet.java file, this forwards to the default login page for
-                        an OpenAM system.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/config/configurator</literal></term>
-                <listitem>
-                    <para>Uses the AMSetupServlet, which as noted in the associated .java file, "is the first class
-                        to get loaded by the Servlet * container"</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/setup/setSetupProgress</literal></term>
-                <listitem>
-                    <para>Used by the installation wizard to display the progress.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/upgrade/setUpgradeProgress</literal></term>
-                <listitem>
-                    <para>Used by the upgrade wizard to display progress.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ui/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named PWResetServlet,
-                     associated with password resets.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/gateway</literal></term>
-                <listitem>
-                    <para>Used with the servlet named GatewayServlet. Associated with the Gateway.java file, which takes
-                        an authentication module and forwards it to a login URL.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/GetHttpSession</literal></term>
-                <listitem>
-                    <para>The associated .java file is associated with Session Failover (SFO).</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/sessionservice, /profileservice, /policyservice, /namingservice, /loggingservice,
-                /authservice, /notificationservice</literal></term>
-                <listitem>
-                    <para>All of these endpoints are associated with
-                        <link xlink:show="new"
-                          xlink:href="http://www.forgerock.org/security_advisory1.html">
-                            OpenAM Security Advisory #201203</link>. As suggested in the advisory, if you're using
-                    OpenAM version 9.5.4 or 10.0.0, you should be sure to apply the updates required to upgrade your
-                    systems to versions 9.5.5 or 10.0.1 (or higher).</para>
-                    <!-- Wild guess on /notificationservice, as it's now redirected to the same OpenSSO output as
-                    the other listed endpoints. -->
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/jaxrpc/*, /identityservices/*</literal></term>
-                <listitem>
-                    <para>These endpoints provide information on configured web services, including the port name,
-                        status, URL, and implementation class. Both endpoints show the same data. The IdentityServices
-                        servlet name points to the following description: "Web Service Endpoint - Identity Services".
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SMSServlet</literal></term>
-                <listitem>
-                    <para>Includes system configuration information when available, as documented in the comments to
-                    the AMSystemConfig.java file.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/notification</literal></term>
-                <listitem>
-                    <para>The associated servlet named notificationservlet appears to be commonly used. When the URL is
-                    entered, the default output is 200, associated with an URL success message.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/entitlementmonitor</literal></term>
-                <listitem>
-                    <para>Used by the NetworkMonitor.java file, which is essential to the monitoring of OpenAM
-                        services.</para>
-            <!-- I might be going to far with this one -->
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/identity/*</literal></term>
-                <listitem>
-                    <para>Possibly a legacy endpoint. While the associated IdentityServicesHandler servlet is identified
-                        as "REST Endpoint - Identity Services", it is only cited in the IdentityServicesHandler.java
-                        file.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/resources/*</literal></term>
-                <listitem>
-                    <para>Linked to an oauth servlet. The associated
-                        com.sun.identity.oauth.service.RestService class is rarely used.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/authentication/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named AuthServlet. The associated AuthServer.java file is the
-                    controller servlet for realm authentication pages. When the URL is entered prior to login, it
-                    defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/base/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named AMBaseServlet. While the associated AMBaseServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/service/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named SCServlet. While the associated SCServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/session/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named SMServlet. While the associated SMServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/realm/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named RMServlet. While the associated RMServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/policy/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named PMServlet. While the associated PMServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idm/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named IDMServlet. While the associated IDMServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/user/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named UMServlet. While the associated UMServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/delegation/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named DelegationServlet. While the associated
-                        DelegationServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/task/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named TaskServlet. While the associated TaskServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/agentconfig/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named AgentConfigurationServlet. The associated
-                        AgentConfigurationServlet class is called by the amAccessControl.xml file, which
-                        suggests that it can be configured from the GUI console, through the Agents section of the
-                        Access Control menu. It is rarely used otherwise. The URL prior to login defaults to the
-                    standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ccversion/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named click-servlet. There is no associated click-servlet.java
-                        or ClickServlet.java file.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/federation/*</literal></term>
-                <listitem>
-                    <para>Associated with the servlet named FSServlet. While the associated FSServlet.java file
-                        is rarely used, the URL prior to login defaults to the standard login page.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/webservices</literal></term>
-                <listitem>
-                    <para>Used by the WSServlet.java and SecurityTokenService.java files. If you're using web services
-                        and/or the Security Token Service (STS), you may want to keep this in place.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/sts</literal></term>
-                <listitem>
-                    <para>Associated with the STS. Be aware, this endpoint exposes basic service and port information
-                        for STS, Metadata Exchange (MEX), Simple Object Access Protocol 1.1 (SOAP11),
-                        and Web Service Definition Language (WSDL) endpoints
-                        without logons.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/sts/mex</literal></term>
-                <listitem>
-                    <para>Associated with the STS. Be aware, this endpoint exposes basic service and port information
-                        for STS, Metadata Exchange (MEX), Simple Object Access Protocol 1.1 (SOAP11),
-                        and Web Service Definition Language (WSDL) endpoints
-                        without logons.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/sts/soap11</literal></term>
-                <listitem>
-                    <para>Associated with the STS. Be aware, this endpoint exposes basic service and port information
-                        for STS, Metadata Exchange (MEX), Simple Object Access Protocol 1.1 (SOAP11),
-                        and Web Service Definition Language (WSDL) endpoints
-                        without logons.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/sts/mexsoap11</literal></term>
-                <listitem>
-                    <para>Associated with the STS. Unlike related STS endpoints, it returns a 404 message by default.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPMniSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SPMniSoap; associated with a
-                        com.sun.identity.saml2.servlet.SPManageNameIDServiceSOAP servlet class. The associated .java
-                        file works with Manage Name ID communications using SOAP binding from the SP. As the former
-                        spMNISOAP.jsp file no longer exists in the trunk, this may be a legacy endpoint.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPMniPOST/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spMNIPOST.jsp; previously defined in the SAML2 JSP Endpoints section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPMniRedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spMNIRedirect.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPMniInit/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spMNIRequestInit.jsp; previously defined in the SAML2 JSP Endpoints section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPECP/*</literal></term>
-                <listitem>
-                    <para>The associated SPECPService class receives and processes single logout (SLO) requests, using
-                        SOAP bindings on the SP. <!-- The associated SPECService.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPSloSoap/*</literal></term>
-                <listitem>
-                    <para>The associated SPSingleLogoutServiceSOAP class receives and processes single logout
-                        (SLO) requests, using SOAP bindings on the SP. <!-- The associated SPSingleLogoutServiceSOAP.java
-                        file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPSloPOST/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spSingleLogoutPOST.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPSloRedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spSingleLogoutRedirect.jsp; previously defined in the SAML2 JSP
-                        Endpoints section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SPSloInit/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spSingleLogoutInit.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/Consumer/*, /SSORedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spAssertionConsumer.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SSOPOST/*, /SSORedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSSOFederate.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SSORedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSSOFederate.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/NIMSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named NameIDMappingServiceSOAP. <!--  The associated NameIDMappingServiceSOAP.java
-                        file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/AIDReqUri/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
-                        AssertionIDRequestURI.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/AIDReqSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
-                        AssertionIDRequestSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/AuthnQueryServiceSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named AuthnQueryServiceSoap. <!-- The associated
-                        AuthnQueryServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/AttributeServiceSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named AttributeServiceSoap. <!-- The associated
-                        AttributeServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be  in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SSOSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SSOSoap. <!-- The associated
-                        IDPSingleSignOnServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPMniSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named IDPMniSoap. <!-- The associated
-                        IDPManageNameIDServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPMniPOST/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpMNIPOST.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPMniRedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpMNIRedirect.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPMniInit/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpMNIRequestInit.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPSloSoap/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named IDPSloSoap. <!-- The associated
-                        IDPSingleLogoutServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPSloPOST/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSingleLogoutPOST.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPSloRedirect/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSingleLogoutRedirect.jsp; previously defined in the SAML2 JSP
-                        Endpoints section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IDPSloInit/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSingleLogoutInit.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ArtifactResolver/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named IDPArtifactResolver. <!-- The associated
-                        IDPArtifactResolutionServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/spssoinit</literal></term>
-                <listitem>
-                    <para>Used by a servlet named spSSOInit.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idpssoinit</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSSOInit.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idpSSOFederate</literal></term>
-                <listitem>
-                    <para>Used by a servlet named idpSSOFederate.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idpsaehandler/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SA_IDP.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/spsaehandler/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named IDP_SP.jsp; previously defined in the SAML2 JSP Endpoints
-                        section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idpfinder</literal></term>
-                <listitem>
-                    <para>Used by a servlet named IDPFinderService; The associated
-                        FSIDPFinderService.java file can be used to find a preferred IDP with a common domain cookie.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/cdcservlet</literal></term>
-                <listitem>
-                    <para>Used by a servlet named CDCServlet. It is associated with a Cross Domain Controller Servlet,
-                        as described in the
-                        the chapter on <link xlink:href="admin-guide#chap-cdsso"
-                                             xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Configuring Cross-Domain Single Sign On in the Administration Guide
-                            </citetitle></link>.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SAMLAwareServlet</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SAMLAwareServlet. It is associated with communications between a
-                        client, an SP, and an IDP. The transfer service on the IDP is the SAML Aware Servlet, and is
-                        part of the client web browser artifact profile. It validates a session token from a request run
-                        through the IDP.
-                        <!-- ref http://docs.oracle.com/cd/E19354-01/817-5710/prog_saml.html -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SAMLPOSTProfileServlet</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SAMLPOSTProfileServlet. It is associated with communications between a
-                        client, an SP, and an IDP. The transfer service on the IDP is the SAML Aware Servlet, and is
-                        part of the client web browser POST profile, which supplies assertion IDs, and returns the
-                        response to the client browser.
-                        <!-- ref http://docs.oracle.com/cd/E19354-01/817-5710/prog_saml.html -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SAMLSOAPReceiver</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SAMLSOAPReceiver. The servlet extracts a SAML request from a message
-                        sent in SOAP format. That message can be a query for authorization, attributes, or
-                        authentication. It supports POST messages only.
-                        <!-- ref http://docs.oracle.com/cd/E19462-01/819-4674/admer/index.html -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/AssertionManagerServlet/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named AssertionManagerServlet. It supports dynamic substitution, using
-                        the host name, port number, and the deployment location.
-                        <!-- ref http://docs.oracle.com/cd/E19854-01/819-2357/gayli/index.html -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/FSAssertionManagerServlet/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named FSAssertionManagerServlet. It provides remote interfaces for the
-                        assertion manager class.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SecurityTokenManagerServlet/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SecurityTokenManagerServlet. It supports dynamic substitution, using
-                        session parameters.
-                        <!-- ref http://docs.oracle.com/cd/E19316-01/820-3886/ghjez/index.html -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/preLogin</literal></term>
-                <listitem>
-                    <para>Used by a servlet named preLoginHandler. As there is no associated .java or .jsp file, it
-                        may be a legacy endpoint.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/postLogin/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named postLoginHandler. As there is no associated .java or .jsp file, it
-                        may be a legacy endpoint.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/federation</literal></term>
-                <listitem>
-                    <para>Used by a servlet named FederationServlet. Associated with the
-                        com.sun.identity.federation.login.FSFederationHandler class. The matching
-                        FSFederationHandler.java file processes requests to initiate a federation.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/consentHandler</literal></term>
-                <listitem>
-                    <para>Used by a servlet named consentHandler. Associated with the
-                        com.sun.identity.federation.login.FSConsentHandler class. The matching
-                        FSConsentHandler.java file processes redirect requests
-                        in an existing federation.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ProcessLogout/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ProcessLogout. Associated with the
-                        FSProcessLogoutServlet class. It is designed to handle single logout requests related to
-                        Kantara / Liberty ID-FF processes.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ReturnLogout/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ReturnLogout. Associated with the
-                        FSReturnLogoutServlet class. It is designed to handle single logout responses related to
-                        Kantara / Liberty ID-FF processes. (Note the subtle
-                     difference with the ProcessLogout endpoint which handles logout requests.)
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/liberty-logout</literal></term>
-                <listitem>
-                    <para>Used by a servlet named LogoutServlet. Associated with the
-                        FSSingleLogoutServlet class. It is designed to start single logout requests related to
-                        Kantara / Liberty ID-FF processes.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/SingleSignOnService/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SingleSignOnService. Associated with the
-                        FSSSOAndFedService class. Configured for SSO on the IDP.
- <!-- per http://download.forgerock.org/downloads/openam/javadocs/internal/com/sun/identity/federation/services/fednsso/FSSSOAndFedService.html -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/IntersiteTransferService</literal></term>
-                <listitem>
-                    <para>Used by a servlet named IntersiteTransferService. Associated with the
-                        FSIntersiteTransferService class. It is designed to send a <literal>AuthnRequest</literal> to an
-                        IDP.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/AssertionConsumerService/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named AssertionConsumerService. Associated with the
-                        FSAssertionConsumerService class. For more information, see the chapter on
-                       <link xlink:href="admin-guide#chap-federation"  xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Managing SAML 2.0 Federation in the Administration Guide</citetitle></link>.
-                    </para>
-                </listitem>
-            </varlistentry>
-
- <!-- Many of the following defined with the help of http://docs.oracle.com/cd/E19575-01/820-3886/ggwvp/index.html -->
-
-            <varlistentry>
-                <term><literal>/SOAPReceiver/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named SOAPReceiver. Associated with the
-                        FSSOAPReceiver class. SOAP endpoint that handles federation and specifies a URI to the SP.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/federation-terminate</literal></term>
-                <listitem>
-                    <para>Used by a servlet named FederationTerminationServlet. Associated with the
-                        FSTerminationInitiationServlet.java file, used to initiate termination of a federation
-                        connection. The IDP will send the termination request to the associated URL.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ProcessTermination/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ProcessTermination. Associated with the
-                        FSTerminationRequestServlet class. The associated .java file is used when a request is
-                        received by a remote SP.
-                    <!-- I think remote SP, not 100% sure, per http://download.forgerock.org/downloads/openam
-                 /javadocs/internal/com/sun/identity/federation/services/termination/FSTerminationRequestServlet.html-->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ReturnTermination/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ReturnTermination. Associated with the
-                        FSTerminationReturnServlet class. The associated .java file is used to define a URL used by an
-                        IP to send termination responses.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/InitiateRegistration/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named InitiateRegistration. Associated with the
-                        FSRegistrationInitiationServlet class. The associated .java file is used to handle the
-                        registration request from a remote IDP.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ProcessRegistration/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ProcessRegistration. Associated with the
-                        FSRegistrationRequestServlet class. Processes registration requests from remote SPs.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/ReturnRegistration/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ReturnRegistration. Associated with the
-                        FSRegistrationReturnServlet class. Defines a URL for IDPs to send registration responses.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/Liberty/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named WSSOAPReceiver. Associated with the
-                        SOAPReceiver class. Defines an endpoint that handles SOAP requests.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/WSPRedirectHandler/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named WSPRedirectHandler. Associated with the
-                        WSPRedirectHandlerServlet class. Used by the SP for user redirects.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idffwriter, /saml2writer</literal></term>
-                <listitem>
-                    <para>Used by a servlet with a matching name (idffwriter, saml2writer). Associated with the
-                        CookieWriterServlet class. Used by the IDP to help the web container find app-specific info
-                        such as Java classes or Java Archives (JARs).
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/idffreader, /saml2reader</literal></term>
-                <listitem>
-                    <para>Used by a servlet with a matching name (idffreader, saml2reader). Associated with the
-                        CookieReaderServlet class. Used by the SP to help find the preferred IDP.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/multiprotocolrelay</literal></term>
-                <listitem>
-                    <para>Used by a servlet named MultiProtocolRelayServlet. Associated with the
-                        MultiProtocolRelayServlet class. Used as a RelayState to continue to the next protocol;
-                        associated with a federation.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/WSFederationServlet/*, /FederationMetadata/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named WSFederationServlet. Associated with the
-                        WSFederationServlet class. Used as a service endpoint for WS-Federation.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/RealmSelection/*</literal></term>
-                <listitem>
-                    <para>Used by am endpoint named realmSelection.jsp. Previously defined in the WS-Federation
-                        JSP Endpoints section.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/saml2query/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named saml2query. Associated with the QueryHandlerServlet class. The
-                        corresponding .java file receives and processes SAML2 queries.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/federationws/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named federationrest. Associated with the ServletContainer class. Does not
-                        appear to be included in any current .java or .jsp file, so it may be a legacy endpoint.
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/xacml/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named XACMLContentAdapter. Associated with the XacmlContentHandlerService
-                        class. Provides the main endpoint for all XACML requests. <!--For more information, see the next
-                        section on XACML 3 REST Endpoints. -->
-                    </para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/frrest/oauth2/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named OAuth2Rest. Associated with the RestTokenDispatcher class.
-                        class.  For more information, see the
-                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
-                                             xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/oauth2/registerClient.jsp</literal></term>
-                <listitem>
-                    <para>Used by a servlet named OAuth2RegisterClient. For more information, see the
-                        the Administration Guide chapter on <link xlink:href="admin-guide#chap-oauth2"
-                                             xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Managing OAuth 2.0 Authorization</citetitle></link>.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/oauth2/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named OAuth2RestletAdapter. Associated with the RestTokenDispatcher class.
-                        For more information, see the chapter on
-                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
-                                             xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>/json/*</literal></term>
-                <listitem>
-                    <para>Used by a servlet named ForgeRockRest. Associated with the HttpServlet class.
-                        For more information, see the chapter on
-                        <link xlink:href="dev-guide#chap-rest"
-                                             xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Using RESTful Web Services</citetitle></link>. In addition, you
-                    can read more about associated REST endpoints in <link xlink:href="reference#json-rest-endpoints"
-                    xlink:role="http://docbook.org/xlink/role/olink" />
-                    <citetitle>JSON REST Endpoints</citetitle></para>
-                </listitem>
-            </varlistentry>
-
-
-
-        </variablelist>
     </section>
 
  <section xml:id="json-rest-endpoints">
-  <title>JSON REST Endpoints</title>
+  <title>REST API Endpoints</title>
   <indexterm>
    <primary>REST</primary>
-   <secondary>JSON</secondary>
   </indexterm>
 
-  <para>The endpoints in this section document the REST-based JSON interfaces
-   used for authentication and authorization.</para>
+  <para>
+   The <citetitle>OpenAM Developer's Guide</citetitle> describes the OpenAM REST API endpoints in detail.
+   Please see the following sections in the <citetitle>Developer's Guide</citetitle> for more information:
+  </para>
         
   <variablelist>
+
    <varlistentry>
-    <term>/json/agents</term>
+    <term>
+     <link xlink:href="dev-guide#chap-rest"
+                xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>RESTful Web Services</citetitle></link>
+    </term>
     <listitem>
-     <para>Authorization: Supports the PassThroughAuthorizationFilter.
-      No authorization logic is performed in the filter. Information is logged.
-      The authorization logic is performed by the underlying identity services.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/applications</term>
-    <listitem>
-     <para>Authorization: sets constraints for the policies that can be defined
-      for a particular application.
-      Application resources are represented in JSON and built from standard JSON
-      objects and values (strings, numbers, objects, arrays, true, false, and null).
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/applicationtypes</term>
-    <listitem>
-     <para>Authorization: sets constraints for the policies that can be defined
-      for a particular application.
-      Application resources are represented in JSON and are built from standard
-      JSON objects and values (strings, numbers, objects, arrays, true, false, and null).
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/authenticate</term>
-     <listitem>
-      <para>Authentication: Supports HTTP GET and POST methods. Can handle
-       Integrated Windows Authentication.
-      </para>
-      <para>Authorization: No filter.</para>
-     </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/conditiontypes</term>
-    <listitem>
-     <para>Authorization: describe the JSON representation of conditions that
-      you can use in policy definitions.
-      Condition types are server-wide, and do not differ by realm. Hence the URI
-      for the conditiontypes API does not contain a realm component.
-     </para>
-    </listitem>
-
-   </varlistentry>
-   <varlistentry>
-    <term>/json/dashboard</term>
-    <listitem>
-     <para>Authorization: Supports the PassThroughAuthorizationFilter.
-      No authorization logic is performed in the filter. Information is logged.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/decisioncombiners</term>
-    <listitem>
-     <para>Authorization: Decision combiners describe how to resolve policy
-      decisions when multiple policies apply.
-      Decision combiners are server-wide, and do not differ by realm.
-      Hence the URI for the decision combiners API does not contain a realm component.
-      No authorization logic is performed in the filter. Information is logged.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/groups</term>
-    <listitem>
-     <para>Authorization: Supports the PassThroughAuthorizationFilter.
-      No authorization logic is performed in the filter. Information is logged.
-      The authorization logic is performed by the underlying identity services.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json[/<replaceable>realm</replaceable>][/
-     <replaceable>subrealm</replaceable>]/policies</term>
-    <listitem>
-     <para>Authorization: Supports the management of policies; both for
-      requesting policy decisions, and also for administering policy definitions.
-      You can specify for specific realms.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/serverinfo</term>
-    <listitem>
-     <para>Authorization: Supports the PassThroughAuthorizationFilter.
-      No authorization logic is performed in the filter. Information is logged.
-      One sub-endpoint, <literal>/json/serverinfo/cookieDomains</literal>, supports
-      HTTP GET.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/sessions</term>
-    <listitem>
-     <para>Authorization: Supports the SessionResourceAuthZFilter.
-      Allows POST <literal>_action=logout</literal> for all users. Other functionality is limited
-      to the administrative superuser, which is typically <literal>amadmin</literal>.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/subjectattributes</term>
-    <listitem>
-     <para>Authorization:
-      Search for all names of available subject attributes to which
-      a policy applies.
-      There are no restrictions on the search and no pagination cookie is set.
-      The subject attribute names are all returned as one
-      in a "result" array named <literal>applicationTypeNames</literal>.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/subjecttypes</term>
-    <listitem>
-     <para>Authorization: Describe the JSON representation of subjects that you
-      can use in policy definitions. Subject types are server-wide, and do not
-      differ by realm. Hence, the URI for the subject types API does not contain
-      a realm component.
-     </para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>/json/tokens</term>
-    <listitem>
-     <para>Authorization: Supports the AdminAuthorizationFilter. Access limited
-      to the <literal>amadmin</literal> administrative superuser.
-     </para>
-
      <para>
-      Access is disabled by default.
+      How to use the OpenAM REST APIs for direct integration between web client applications and OpenAM,
+      including REST API versioning, token encoding, authentication, logout, and logging.
      </para>
     </listitem>
    </varlistentry>
 
    <varlistentry>
-    <term>/json/users</term>
+    <term>
+     <link xlink:href="dev-guide#chap-rest-authz-policy"
+           xlink:role="http://docbook.org/xlink/role/olink">
+      <citetitle>RESTful Authorization and Policy Management Services</citetitle></link>
+    </term>
     <listitem>
-     <para>Authentication: Supports HTTP POST. Uses the <literal>_action</literal>
-      query parameter with the following allowed values: <literal>register</literal>,
-      <literal>confirm</literal>, <literal>forgotPassword</literal>, and
-      <literal>forgotPasswordReset</literal>.
-     </para>
-     <para>Authorization: Supports the PassThroughAuthorizationFilter.
-      No authorization logic is performed in the filter. Information is logged.
-      The authorization logic is performed by the underlying identity services.
+     <para>
+      How to use the OpenAM REST APIs for authorization and policy management.
      </para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>
+     <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
+           xlink:role="http://docbook.org/xlink/role/olink">
+      <citetitle>RESTful OAuth 2.0 and OpenID Connect 1.0 Services</citetitle></link>
+    </term>
+    <listitem>
+     <para>
+      How to use the OpenAM REST APIs for OAuth 2.0 and OpenID Connect 1.0.
+     </para>
+    </listitem>
+   </varlistentry>
+
+  <varlistentry>
+   <term>
+    <link xlink:href="dev-guide#chap-rest-user-services"
+          xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>RESTful User Self-Service</citetitle></link>
+   </term>
+   <listitem>
+    <para>
+     How to use the OpenAM REST APIs for user self-registration and forgotten password reset.
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>
+    <link xlink:href="dev-guide#chap-rest-identity-realm-mgmt"
+          xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>RESTful Identity and Realm Management Services</citetitle></link>
+   </term>
+   <listitem>
+    <para>
+     How to use the OpenAM REST APIs for managing OpenAM identities and realms.
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>
+    <link xlink:href="dev-guide#chap-rest-sts"
+          xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>RESTful Secure Token Service</citetitle></link>
+   </term>
+   <listitem>
+    <para>
+     How to use the OpenAM REST APIs to manage OpenAM's RESTful Security Token Service,
+     which lets you bridge identities across web and enterprise identity access management
+     (IAM) systems through its token transformation process.
+    </para>
+   </listitem>
+  </varlistentry>
+
   </variablelist>
+
 
  </section>
 
