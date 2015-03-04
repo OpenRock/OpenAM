@@ -900,10 +900,11 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
    <step>
     <para>
-     Set a multi-valued, string syntax profile attribute
-     where OpenAM can store a resource owner's decisions to authorize clients
-     without further interaction
-     in the Saved Consent Attribute Name field.
+     Add a multi-valued, string syntax profile attribute to your identity
+     repository. OpenAM stores resource owners' consent to authorize client
+     access in this profile attribute. On subsequent requests from the same
+     client for the same scopes, the resource owner no longer sees the
+     authorization page.
     </para>
 
     <para>
@@ -931,6 +932,14 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      >Customizing Profile Attributes</citetitle></link>,
      which demonstrates adding a custom attribute
      when using OpenDJ directory services to store user profiles.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Navigate to Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
+     Services &gt; OAuth2 Provider and specify the name of the attribute created
+     in the previous step in the Saved Consent Attribute Name field.
     </para>
    </step>
 
