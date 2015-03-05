@@ -1761,14 +1761,20 @@
    <varlistentry>
     <term>Cookie Domains</term>
     <listitem>
-     <para>Set the list of domains into which OpenAM writes cookies. If you
-     set multiple cookie domains, OpenAM still only sets the cookie in the
-     domain the client uses to access OpenAM. You can also configure cross
-     domain single sign on (CDSSO) to allow single sign on across multiple
-     domains managed by your organization. See the <citetitle>Administration
-     Guide</citetitle> chapter on <link xlink:href="admin-guide#chap-cdsso"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
-     Cross-Domain Single Sign On</citetitle></link> for details.</para>
+     <para>Set the list of domains into which OpenAM writes cookies.</para>
+     <para>If you set multiple cookie domains, OpenAM still only sets the cookie
+      in the domain the client uses to access OpenAM. If this property is left
+      blank, then the fully qualified domain name of the server is used to set
+      the cookie domain, meaning that a host cookie rather than a domain cookie
+      is set.
+     </para>
+     <para>You can also configure cross domain single sign on (CDSSO) to allow
+      single sign on across multiple domains managed by your organization. See
+      the <citetitle>Administration Guide</citetitle> chapter on <link
+       xlink:href="admin-guide#chap-cdsso"
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+     Cross-Domain Single Sign On</citetitle></link> for details.
+     </para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-platform-cookie-domains</literal></para>

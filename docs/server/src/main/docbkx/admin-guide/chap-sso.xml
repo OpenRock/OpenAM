@@ -60,9 +60,14 @@
                     <varname>Domain</varname><literal>=example.net</literal>. This is also known as the cookie domain,
                     as defined in the
                     <link xlink:href="reference#chap-config-ref" xlink:role="http://docbook.org/xlink/role/olink">
-                    <citetitle>Configuration Reference</citetitle></link> chapter of the Reference document.
-                    A cookie domain set to <literal>example.net</literal> will work for subdomains such as
+                    <citetitle>Configuration Reference</citetitle></link>
+                     chapter of the <citetitle>Reference</citetitle>.</para>
+                    <para>A cookie domain set to <literal>example.net</literal> will work for subdomains such as
                     <literal>app1.example.net</literal> and <literal>service1.example.net</literal>.
+                     If a cookie domain is not specified, OpenAM will use
+                     the fully qualified domain name of the server as the
+                     cookie domain, meaning that a host cookie rather than a
+                     domain cookie is issued, and subdomains will not work.
                     </para>
                 </listitem>
             </varlistentry>
