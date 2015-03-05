@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-prepare-install'
@@ -147,7 +147,8 @@
     </varlistentry>
    </variablelist>
 
-   <para>For additional JVM tuning recommendations, see <link xlink:show="new"
+   <para>For additional JVM tuning and security recommendations, see <link
+    xlink:show="new"
    xlink:href="admin-guide#tuning-jvm-for-openam"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Java Virtual
    Machine Settings</citetitle></link>.</para>
@@ -686,7 +687,7 @@ $ <userinput>bin/ldapmodify \
   --bindDN "cn=Directory Manager" \
   --bindPassword pwd \
   --defaultAdd \
-  --useSSL \
+  --useStartTLS \
   --trustAll \
   --filename add-config-entries.ldif</userinput>
      </screen>
@@ -760,7 +761,7 @@ $ <userinput>bin/ldapmodify \
   --port 4444 \
   --bindDN "cn=Directory Manager" \
   --bindPassword pwd \
-  --useSSL \
+  --useStartTLS \
   --trustAll \
   --fileName cts-add-schema.ldif</userinput>
      </screen>
@@ -1184,6 +1185,12 @@ $ <userinput>jar -cf ../openam.war *</userinput>
    in the paths of URIs are correctly decoded by the container.
    This is particularly useful when applications use the OpenAM REST APIs,
    and some identifiers such as user names can contain special characters.
+  </para>
+
+  <para>
+   You should also ensure <literal>sslProtocol</literal> is set to
+   <literal>TLS</literal>, which disables the potentially vulnerable SSL v3.0
+   protocol.
   </para>
 
   <para>

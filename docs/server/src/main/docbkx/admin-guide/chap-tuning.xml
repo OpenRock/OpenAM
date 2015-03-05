@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock, Inc
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-tuning'
@@ -609,7 +609,32 @@
     </tbody>
    </tgroup>
   </table>
-  
+  <table xml:id="tuning-security" pgwide="1">
+   <title>Security Settings</title>
+   <tgroup cols="3">
+    <colspec colnum="1" colwidth="3*"/>
+    <colspec colnum="2" colwidth="2*"/>
+    <colspec colnum="3" colwidth="2*"/>
+    <thead>
+     <row>
+      <entry>JVM Parameters</entry>
+      <entry>Suggested Value</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry><para><literal>-Dhttps.protocols</literal></para></entry>
+      <entry>
+       <para><literal>TLSv1,TLSv1.1,TLSv1.2</literal> (for JDK 7, JDK 8)</para>
+       <para><literal>TLSv1</literal> (for JDK 6)</para></entry>
+      <entry><para>Controls the protocols used for outbound HTTPS
+       connections from OpenAM.</para>
+       <para>This applies only to Sun/Oracle Java environments.</para></entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
   <table xml:id="tuning-garbage-collection" pgwide="1">
    <title>Garbage Collection Settings</title>
    <tgroup cols="3">
