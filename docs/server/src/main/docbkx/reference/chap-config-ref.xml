@@ -69,7 +69,12 @@
   customized modules you have added.</para>
   
   <para>The following are the global fields you can configure for the Core Authentication 
-  module under the <literal>Configuration</literal> tab.</para>
+  module under the <literal>Configuration</literal> tab. The realm attributes
+  are described in the
+  <link xlink:href="admin-guide#core-module-conf-hints"
+        xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Hints for the Core Authentication Module</citetitle>
+  </link>section of the <citetitle>Administration Guide</citetitle>.</para>
   
    <variablelist>
     <varlistentry>
@@ -78,22 +83,6 @@
       <para>Add class names for custom authentication modules to this list.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-authenticators</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
-     <listitem>
-      <para>Sets a minimum and maximum number of LDAP connections in the pool
-      for connecting to a directory server. When tuning for production, start
-      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
-      for specific servers override the default.</para>
-      <para>This attribute is for LDAP and Membership authentication services
-      only.</para>
-      <para>This connection pool is different than the SDK connection pool
-      configured in <filename>serverconfig.xml</filename>.</para>
-      <para><command>ssoadm</command> attributes:
-      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
-      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -954,7 +943,7 @@
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term>Charsets Aliases</term>
+    <term>Charset Aliases</term>
     <listitem>
      <para>Use this list to map between different character set names used in
      Java and in MIME.</para>
@@ -1255,7 +1244,7 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Syslog server protocol</term>
+    <term>Syslog transport protocol</term>
     <listitem>
      <para>The protocol to use to connect to the syslog server. Either
       <literal>UDP</literal> or <literal>TCP</literal>.</para>
@@ -1825,12 +1814,6 @@
 
    <listitem>
     <para>
-     <xref linkend="multi-federation-protocol-configuration" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
      <xref linkend="oauth2-provider-configuration" />
     </para>
    </listitem>
@@ -1849,7 +1832,7 @@
 
    <listitem>
     <para>
-     <xref linkend="rest-security-configuration" />
+     <xref linkend="rest-apis-service-configuration" />
     </para>
    </listitem>
 
@@ -1882,6 +1865,19 @@
      <xref linkend="user-configuration-attributes" />
     </para>
    </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-security-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="validation-service-configuration" />
+    </para>
+   </listitem>
+
   </itemizedlist>
 
   <variablelist xml:id="common-federation-configuration">
@@ -2117,10 +2113,15 @@
                                                           -->
   <variablelist xml:id="dashboard-configuration">
    <title>Dashboard Configuration</title>
-   
+
    <para><command>ssoadm</command> service name:
    <literal>dashboardService</literal></para>
 
+   <para>
+    The following properties are available for each
+    Dashboard Service secondary configuration instance.
+   </para>
+   
    <varlistentry>
     <term>Dashboard Class Name</term>
     <listitem>
@@ -2377,160 +2378,6 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>XMLSigningOn</literal></para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
-
-  <variablelist xml:id="liberty-interaction-service-configuration">
-   <title>Liberty Interaction Service</title>
-
-   <para><command>ssoadm</command> service name:
-   <literal>sunFAMLibertyInteractionService</literal></para>
-
-   <varlistentry>
-    <term>WSP to redirect user for interaction</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSPWillRedirect</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSP to redirect user for interaction for data</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSPWillRedirectForData</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSP's expected duration for interaction</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSPRedirectTime</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSP to enforce that returnToURL must be SSL</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSPWillEnforceHttpsCheck</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSP to enforce return to host be the same as request host</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSPWillEnforceReturnToHostEqualsRequestHost</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>HTML style sheet location</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>HTMLStyleSheetLocation</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WML style sheet location</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WMLStyleSheetLocation</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSP interaction URL</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSPRedirectHandlerURL</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSP interaction URL if behind load balancer</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>LBWSPRedirectHandler</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>List of interaction URLs of WSP cluster (site) behind the load
-    balancer</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>TrustedWspRedirectHandlers</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Interaction Configuration Class</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>InteractionConfigClass</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Options for WSC to participate in interaction</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSCSpecifiedInteractionChoice</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSC to include userInteractionHeader</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSCWillIncludeUserInteractionHeader</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSC to redirect user for interaction</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSCWillRedirect</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSC's expected duration for interaction</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSCSpecifiedMaxInteractionTime</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>WSC to enforce that redirection URL must be SSL</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSCWillEnforceHttpsCheck</literal></para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
-
-  <variablelist xml:id="multi-federation-protocol-configuration">
-   <title>Multi-Federation Protocol</title>
-
-   <para><command>ssoadm</command> service name:
-   <literal>sunMultiFederationProtocol</literal></para>
-
-   <varlistentry>
-    <term>Single Logout Handler List</term>
-    <listitem>
-     <para>List of logout handlers used for each different federation
-     protocol</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>SingleLogoutHandlerList</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -3377,107 +3224,42 @@
    </varlistentry>
   </variablelist>
 
-  <variablelist xml:id="rest-security-configuration">
-   <title>User Self Service</title>
+  <variablelist xml:id="rest-apis-service-configuration">
+   <title>REST APIs Service Configuration</title>
 
    <para><command>ssoadm</command> service name:
-   <literal>RestSecurity</literal></para>
-
-   <para>The order of options that appear in the console may vary depending on whether you are running from
-   a new installation or an upgrade of OpenAM.</para>
-
-   <!-- May be affected by OPENAM-3027, where, in an upgrade situation,
-   the  Forgot Password Token LifeTime (seconds) label has
-   been incorrectly replaced with another instance of Forgot Password for Users -->
+   <literal>RestApisService</literal></para>
 
    <varlistentry>
-    <term>Self-Registration for Users</term>
+    <term>Default version</term>
     <listitem>
-     <para>If enabled, new users can sign up using a REST API client.</para>
-     <para>Default: not enabled</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>forgerockRESTSecuritySelfRegistrationEnabled</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Self-Registration Token LifeTime (seconds)</term>
-    <listitem>
-     <para>Maximum life time for the token allowing user self-registration using
-     the REST API.</para>
-
-     <para>Default: 900 (seconds)</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>forgerockRESTSecuritySelfRegTokenTTL</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Self-Registration Confirmation Email URL</term>
-    <listitem>
+     <para>The API version to use when the REST request does not specify a
+      desired version. Values are <literal>Latest</literal>, <literal>Oldest</literal>,
+      and <literal>None</literal>.</para>
      <para>
-      This page handles the HTTP GET request
-      when the user clicks the link sent by email in the confirmation request.
-     </para>
-
-     <para>
-      Default:
-      <literal><replaceable>deployment-base-url</replaceable>/XUI/confirm.html</literal>
-      where <replaceable>deployment-base-url</replaceable> is something like
-      <literal>https://openam.example.com:8443/openam</literal>
+      Default: <literal>Latest</literal> for new OpenAM installations,
+      <literal>Oldest</literal> for upgraded OpenAM installations
      </para>
 
      <para><command>ssoadm</command> attribute:
-     <literal>forgerockRESTSecuritySelfRegConfirmationUrl</literal></para>
+     <literal>openam-rest-apis-default-version</literal></para>
     </listitem>
    </varlistentry>
 
    <varlistentry>
-    <term>Forgot Password for Users</term>
+    <term>Warning header</term>
     <listitem>
-      <para>If enabled, users can assign themselves a new password using a REST API client.</para>
-      <para>Default: not enabled</para>
-
-      <para><command>ssoadm</command> attribute:
-      <literal>forgerockRESTSecurityForgotPasswordEnabled</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Forgot Password Token LifeTime (seconds)</term>
-    <listitem>
-     <para>Maximum life time for the token allowing user to process a forgotten
-     password using the REST API.</para>
-
-     <para>Default: 900 (seconds)</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>forgerockRestSecurityForgotPassTokenTTL</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Forgot Password Confirmation Email URL</term>
-    <listitem>
+     <para>Whether to include a warning header in the response to a request
+      that fails to include the Accept-API-Version header. Values are
+      <literal>Enabled</literal> and <literal>Disabled</literal>.</para>
      <para>
-      This page handles the HTTP GET request
-      when the user clicks the link sent by email in the confirmation request.
-     </para>
-
-     <para>
-      Default:
-      <literal><replaceable>deployment-base-url</replaceable>/XUI/confirm.html</literal>
-      where <replaceable>deployment-base-url</replaceable> is something like
-      <literal>https://openam.example.com:8443/openam</literal>
+      Default: <literal>Enabled</literal>
      </para>
 
      <para><command>ssoadm</command> attribute:
-     <literal>forgerockRESTSecurityForgotPassConfirmationUrl</literal></para>
+     <literal>openam-rest-apis-header-warning</literal></para>
     </listitem>
    </varlistentry>
-
   </variablelist>
 
   <variablelist xml:id="saml2-service-configuration">
@@ -3507,7 +3289,7 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Attribute name for NAME ID information key</term>
+    <term>Attribute name for Name ID information key</term>
     <listitem>
      <para>User entry attribute to store the name identifier key</para>
 
@@ -3614,6 +3396,29 @@
      <literal>bufferLength</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Metadata signing key alias</term>
+    <listitem>
+     <para>Private key alias that is used when requesting signed metadata
+      (either using <filename>exportmetadata.jsp</filename> or
+      <filename>ssoadm</filename>) to sign the entity's metadata.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>metadataSigningKey</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Metadata signing key password</term>
+    <listitem>
+     <para>The password used to retrieve the signing key from the keystore.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>metadataSigningKeyPass</literal></para>
+    </listitem>
+   </varlistentry>
+
   </variablelist>
 
   <variablelist xml:id="saml2-soap-configuration">
@@ -3801,10 +3606,23 @@
    <varlistentry>
     <term>Encryption Algorithm</term>
     <listitem>
-     <para>Specifies the algorithm used to encrypt responses</para>
+     <para>Specifies the algorithm used to encrypt responses.
+     AES and 3DES are supported.</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>EncryptionAlgorithm</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Encryption Strength</term>
+    <listitem>
+     <para>Specifies the strength of the encryption algorithm.
+     For AES, key strengths of 128, 192, 256 are supported.
+     For 3DES, 0, 112 or 168 are supported.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>EncryptionStrength</literal></para>
     </listitem>
    </varlistentry>
 
@@ -4190,6 +4008,184 @@
     </listitem>
    </varlistentry>
   </variablelist>
+
+  <variablelist xml:id="rest-security-configuration">
+   <title>User Self Service</title>
+
+   <para><command>ssoadm</command> service name:
+   <literal>RestSecurity</literal></para>
+
+   <para>The order of options that appear in the console may vary depending on whether you are running from
+   a new installation or an upgrade of OpenAM.</para>
+
+   <!-- May be affected by OPENAM-3027, where, in an upgrade situation,
+   the  Forgot Password Token LifeTime (seconds) label has
+   been incorrectly replaced with another instance of Forgot Password for Users -->
+
+   <varlistentry>
+    <term>Two Factor Authentication Enabled</term>
+    <listitem>
+     <para>This option is reserved for future use.</para>
+     <para>Default: False</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecurityTwoFactorAuthEnabled</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Two Factor Authentication Required</term>
+    <listitem>
+     <para>This option is reserved for future use.</para>
+     <para>Default: False</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecurityTwoFactorAuthMandatory</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Self-Registration for Users</term>
+    <listitem>
+     <para>If enabled, new users can sign up using a REST API client.</para>
+     <para>Default: not enabled</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecuritySelfRegistrationEnabled</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Self-Registration Token LifeTime (seconds)</term>
+    <listitem>
+     <para>Maximum life time for the token allowing user self-registration using
+     the REST API.</para>
+
+     <para>Default: 900 (seconds)</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecuritySelfRegTokenTTL</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Self-Registration Confirmation Email URL</term>
+    <listitem>
+     <para>
+      This page handles the HTTP GET request
+      when the user clicks the link sent by email in the confirmation request.
+     </para>
+
+     <para>
+      Default:
+      <literal><replaceable>deployment-base-url</replaceable>/XUI/confirm.html</literal>
+      where <replaceable>deployment-base-url</replaceable> is something like
+      <literal>https://openam.example.com:8443/openam</literal>
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecuritySelfRegConfirmationUrl</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password for Users</term>
+    <listitem>
+      <para>If enabled, users can assign themselves a new password using a REST API client.</para>
+      <para>Default: not enabled</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerockRESTSecurityForgotPasswordEnabled</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password Token LifeTime (seconds)</term>
+    <listitem>
+     <para>Maximum life time for the token allowing user to process a forgotten
+     password using the REST API.</para>
+
+     <para>Default: 900 (seconds)</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRestSecurityForgotPassTokenTTL</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password Confirmation Email URL</term>
+    <listitem>
+     <para>
+      This page handles the HTTP GET request
+      when the user clicks the link sent by email in the confirmation request.
+     </para>
+
+     <para>
+      Default:
+      <literal><replaceable>deployment-base-url</replaceable>/XUI/confirm.html</literal>
+      where <replaceable>deployment-base-url</replaceable> is something like
+      <literal>https://openam.example.com:8443/openam</literal>
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecurityForgotPassConfirmationUrl</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Destination After Successful Self-Registration</term>
+    <listitem>
+     <para>Specifies the action to be taken after a user successfully registers a new account. Values are
+      <literal>default</literal> (user is sent to a successful registration page, without being logged in),
+      <literal>login</literal> (user is sent to the login page to authenticate),
+      and <literal>autologin</literal> (user is automatically logged in and sent to the appropriate page within the system).</para>
+     <para>This option applies to XUI deployments only.</para>
+     <para>Default: <literal>default</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecuritySuccessfulUserRegistrationDestination</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Protected User Attributes</term>
+    <listitem>
+     <para>A list of user profile attributes. Users modifying
+      any of the attributes in this list will be required to
+      enter a password as confirmation before the change is accepted.</para>
+     <para>This option applies to XUI deployments only.</para>
+     <para>Default: No user attributes are protected.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecurityProtectedUserAttributes</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="validation-service-configuration">
+   <title>Validation Service Configuration</title>
+
+   <para><command>ssoadm</command> service name:
+   <literal>validationService</literal></para>
+
+   <varlistentry>
+    <term>Valid goto URL Resources</term>
+    <listitem>
+     <para>By default, OpenAM redirects the user to one of the URLs specified in the
+      goto parameter supplied to the authentication interface. To enhance security,
+      a list of valid URL resources can be specified here so OpenAM can validate
+      the goto URL against them. OpenAM will only redirect a user if the goto URL
+      matches any of the resources specified in this setting. If no setting is present,
+      it is assumed that the goto URL is valid. Resources defined here can have the
+      "*" wildcard defined, where "*" matches all characters except "?".</para>
+     <para>Default: No validation URLs are specified. OpenAM accepts goto URLs without validation.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>openam-auth-valid-goto-resources</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
  </section>
 
  <section xml:id="servers-and-sites-configuration">
@@ -5088,24 +5084,28 @@
       <para>
        Access the directory service using StartTLS or LDAPS.
       </para>
-     </listitem>
-    </varlistentry>
-
-    <varlistentry>
-     <term>Directory Name</term>
-     <listitem>
       <para>
-       The hostname of the external server.
+       You can configure this field for external token stores only.
       </para>
      </listitem>
     </varlistentry>
 
     <varlistentry>
-     <term>Port</term>
+     <term>Connection String(s)</term>
      <listitem>
       <para>
-       Specifies the TCP/IP port number used for communication
-       with the external datastore, such as 389 for LDAP.
+       Specifies the ordered list of connection strings for external OpenDJ
+       directory servers. The format is <literal>HOST:PORT[|SERVERID[|SITEID]]</literal>,
+       where <literal>SERVERID</literal> and <literal>SITEID</literal> are
+       optional parameters that let you prioritize the particular connection
+       when used by the specified node(s).
+      </para>
+      <para>
+       Example:
+       <literal>opendj.example.com:389, opendj2.example.com:50389|server1|site1</literal>
+      </para>
+      <para>
+       You can configure this field for external token stores only.
       </para>
      </listitem>
     </varlistentry>
@@ -5118,6 +5118,9 @@
        The user needs sufficient privileges to read and write
        to the root suffix of the external datastore.
       </para>
+      <para>
+       You can configure this field for external token stores only.
+      </para>
      </listitem>
     </varlistentry>
 
@@ -5126,6 +5129,9 @@
      <listitem>
       <para>
        Specifies the password associated with the Login Id.
+      </para>
+      <para>
+       You can configure this field for external token stores only.
       </para>
      </listitem>
     </varlistentry>
@@ -5146,6 +5152,9 @@
         xlink:role="http://docbook.org/xlink/role/olink"
        ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
       </para>
+      <para>
+       You can configure this field for external token stores only.
+      </para>
      </listitem>
     </varlistentry>
       
@@ -5156,6 +5165,9 @@
        Specifies how often OpenAM should send a heartbeat request to the directory server
        to ensure that the connection does not remain idle, in seconds.
        Default: 10.
+      </para>
+      <para>
+       You can configure this field for external token stores only.
       </para>
      </listitem>
     </varlistentry>
