@@ -25,6 +25,9 @@
  * $Id: policy_resource.h,v 1.3 2008/06/25 08:14:34 qcheng Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2015 ForgeRock AS.
+ */
 
 #ifndef __RESOURCE_H__
 #define __RESOURCE_H__
@@ -44,15 +47,15 @@ class ResourceName {
  public:
 
     ResourceName(const ResourceName &resName) {
-	resourceStr = resName.resourceStr;
+	resourceStr = resName.resourceStr.c_str();
     }
 
     ResourceName& operator=(const std::string &resName) {
-	resourceStr = resName;
+	resourceStr = resName.c_str();
 	return *this;
     }
 
-    ResourceName(const std::string &str): resourceStr(str) {
+    ResourceName(const std::string &str): resourceStr(str.c_str()) {
     }
 
     bool getResourceRoot(const am_resource_traits_t &, std::string &);

@@ -31,7 +31,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 #ifndef SESSION_INFO_H
@@ -61,9 +61,9 @@ public:
 
     SessionInfo(const SessionInfo& copy) :
 	ssoToken(copy.ssoToken),
-	sessionType(copy.sessionType),
-	id(copy.id),
-	domain(copy.domain),
+	sessionType(copy.sessionType.c_str()),
+	id(copy.id.c_str()),
+	domain(copy.domain.c_str()),
 	maxSessionTime(copy.maxSessionTime),
 	maxIdleTime(copy.maxIdleTime),
 	maxCachingTime(copy.maxCachingTime),

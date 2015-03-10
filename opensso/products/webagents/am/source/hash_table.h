@@ -30,7 +30,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 #ifndef HASH_TABLE_H
@@ -107,12 +107,12 @@ private:
     public:
 	Entry(const std::string& str, const ElementType &entry,
 	      time_t lifeTime) : expirationTime(lifeTime),
-				 key(str), value(entry)
+				 key(str.c_str()), value(entry)
 	{
 	}
 
 	Entry(const Entry& rhs)
-	    : expirationTime(rhs.expirationTime), key(rhs.key), value(rhs.value)
+	    : expirationTime(rhs.expirationTime), key(rhs.key.c_str()), value(rhs.value)
 	{
 	}
 
@@ -122,7 +122,7 @@ private:
 	{
 	    if (this != &rhs) {
 		expirationTime = rhs.expirationTime;
-		key = rhs.key;
+		key = rhs.key.c_str();
 		value = rhs.value;
 	    }
 

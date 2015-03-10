@@ -27,7 +27,10 @@
  * Abstract:
  * 
  * Class representing a AM SSOToken.
- */ 
+ */
+/*
+ * Portions Copyrighted 2015 ForgeRock AS.
+ */
 
 #ifndef SSO_TOKEN_H
 #define SSO_TOKEN_H
@@ -50,15 +53,15 @@ public:
     SSOToken(const std::string &tok) {
 	if(tok.find('%') != std::string::npos) {
 	    token = Http::decode(tok);
-	    encodedToken = tok;
+	    encodedToken = tok.c_str();
 	} else {
-	    token = tok;
+	    token = tok.c_str();
 	    encodedToken = Http::encode(tok);
 	}
     }
 
     SSOToken(const std::string& tok, const std::string& encodedTok)
-	: token(tok), encodedToken(encodedTok)
+	: token(tok.c_str()), encodedToken(encodedTok.c_str())
     {
     }
 
