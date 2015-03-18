@@ -1,0 +1,6 @@
+{
+    global:
+            amagent_module;
+    local:
+            *;
+};

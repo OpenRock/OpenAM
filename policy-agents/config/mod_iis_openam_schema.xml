@@ -1,0 +1,7 @@
+<configSchema>
+    <sectionSchema name="system.webServer/OpenAmModule">
+        <attribute name="enabled" type="bool" defaultValue="false"/>
+        <attribute name="configFile" type="string" defaultValue="c:\web_agents\iis\instances\agent_1\conf\agent.conf" 
+                   validationType="nonEmptyString" />
+    </sectionSchema>
+</configSchema>
