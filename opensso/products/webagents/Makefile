@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2013-2014 ForgeRock AS. All Rights Reserved
+# Copyright (c) 2013-2015 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -26,8 +26,8 @@
 #  64=1 builds 64bit binary
 #  DEBUG=1 builds debug version of binary
 
-AGENT_MAJOR_VER := 4
-AGENT_MINOR_VER := 0
+AGENT_MAJOR_VER := 3
+AGENT_MINOR_VER := 5
 AGENT_MICRO_VER := 0
 AGENT_RELEASE_NAME := SNAPSHOT
 
