@@ -23,7 +23,7 @@
  */
 
 enum {
-    NUMBER = 0, STRING, NUMBER_LIST, STRING_LIST
+    NUMBER = 0, STRING, NUMBER_LIST, STRING_LIST, DEBUG_LEVEL, ATTR_MODE, AUDIT_LEVEL
 };
 
 struct val_string_list {
@@ -83,12 +83,56 @@ static void *parse_value(const char *line, const char *name,
             switch (value_type) {
                 case NUMBER:
                     value = (int *) malloc(sizeof (int));
-                    if (strcasecmp(token, "on") == 0 || strcasecmp(token, "true") == 0) {
+                    if (strcasecmp(token, "on") == 0 || strcasecmp(token, "true") == 0 || strcasecmp(token, "local") == 0) {
                         *((int *) value) = 1;
-                    } else if (strcasecmp(token, "off") == 0 || strcasecmp(token, "false") == 0) {
+                    } else if (strcasecmp(token, "off") == 0 || strcasecmp(token, "false") == 0 || strcasecmp(token, "centralized") == 0) {
                         *((int *) value) = 0;
                     } else {
                         *((int *) value) = strtol(token, NULL, 10);
+                    }
+                    break;
+                case DEBUG_LEVEL:
+                    value = (int *) malloc(sizeof (int));
+                    if (strncasecmp(token, "all", 3) == 0) {
+                        *((int *) value) = AM_LOG_DEBUG;
+                    } else if (strcasecmp(token, "error") == 0) {
+                        *((int *) value) = AM_LOG_ERROR;
+                    } else if (strcasecmp(token, "info") == 0) {
+                        *((int *) value) = AM_LOG_INFO;
+                    } else if (strcasecmp(token, "message") == 0) {
+                        *((int *) value) = AM_LOG_WARNING;
+                    } else if (strcasecmp(token, "warning") == 0) {
+                        *((int *) value) = AM_LOG_WARNING;
+                    } else {
+                        *((int *) value) = AM_LOG_NONE;
+                    }
+                    break;
+                case ATTR_MODE:
+                    value = (int *) malloc(sizeof (int));
+                    if (strcasecmp(token, "HTTP_HEADER") == 0) {
+                        *((int *) value) = SET_ATTRS_AS_HEADER;
+                    } else if (strcasecmp(token, "HTTP_COOKIE") == 0) {
+                        *((int *) value) = SET_ATTRS_AS_COOKIE;
+                    } else {
+                        *((int *) value) = SET_ATTRS_NONE;
+                    }
+                    break;
+                case AUDIT_LEVEL:
+                    value = (int *) malloc(sizeof (int));
+                    if (strcasecmp(token, "LOG_ALLOW") == 0) {
+                        *((int *) value) |= AM_LOG_AUDIT_ALLOW;
+                    } else if (strcasecmp(token, "LOG_BOTH") == 0) {
+                        *((int *) value) |= AM_LOG_AUDIT_ALLOW;
+                        *((int *) value) |= AM_LOG_AUDIT_DENY;
+                    } else if (strcasecmp(token, "LOG_DENY") == 0) {
+                        *((int *) value) |= AM_LOG_AUDIT_DENY;
+                    } else if (strcasecmp(token, "ALL") == 0) {
+                        *((int *) value) |= AM_LOG_AUDIT;
+                        *((int *) value) |= AM_LOG_AUDIT_REMOTE;
+                    } else if (strcasecmp(token, "LOCAL") == 0) {
+                        *((int *) value) |= AM_LOG_AUDIT;
+                    } else if (strcasecmp(token, "REMOTE") == 0) {
+                        *((int *) value) |= AM_LOG_AUDIT_REMOTE;
                     }
                     break;
                 case STRING:
@@ -217,7 +261,7 @@ static void *parse_value(const char *line, const char *name,
         else \
             am_log_debug(instance_id, "am_get_config_file() %s is set to '%s'",\
                 prm, itm == NULL ? "NULL" : itm);\
-    } while(0);
+    } while(0)
 
 #define PARSE_NUMBER(line,prm,itm) \
     do {\
@@ -229,7 +273,43 @@ static void *parse_value(const char *line, const char *name,
         if (value != NULL) free(value);\
         am_log_debug(instance_id, "am_get_config_file() %s is set to '%d'",\
             prm, itm);\
-    } while (0);
+    } while (0)
+
+#define PARSE_DEBUG_LOG_LEVEL(line,prm,itm) \
+    do {\
+        int *value = NULL;\
+        if (compare_property(line,prm) != 0) break;\
+        value = (int *) parse_value(line, prm, \
+            DEBUG_LEVEL, NULL);\
+        itm = value == NULL ? 0 : *value;\
+        if (value != NULL) free(value);\
+        am_log_debug(instance_id, "am_get_config_file() %s is set to '%d'",\
+            prm, itm);\
+    } while (0)
+
+#define PARSE_ATTR_FETCH_MODE(line,prm,itm) \
+    do {\
+        int *value = NULL;\
+        if (compare_property(line,prm) != 0) break;\
+        value = (int *) parse_value(line, prm, \
+            ATTR_MODE, NULL);\
+        itm = value == NULL ? 0 : *value;\
+        if (value != NULL) free(value);\
+        am_log_debug(instance_id, "am_get_config_file() %s is set to '%d'",\
+            prm, itm);\
+    } while (0)
+
+#define PARSE_AUDIT_LOG_LEVEL(line,prm,itm) \
+    do {\
+        int *value = NULL;\
+        if (compare_property(line,prm) != 0) break;\
+        value = (int *) parse_value(line, prm, \
+            AUDIT_LEVEL, NULL);\
+        itm = value == NULL ? 0 : *value;\
+        if (value != NULL) free(value);\
+        am_log_debug(instance_id, "am_get_config_file() %s is set to '%d'",\
+            prm, itm);\
+    } while (0)
 
 #define PARSE_STRING_LIST(line,prm,sep,itmsz,itm) \
     do {\
@@ -242,7 +322,7 @@ static void *parse_value(const char *line, const char *name,
         if (value != NULL) free(value);\
         am_log_debug(instance_id, "am_get_config_file() %s is set to %d value(s)",\
             prm, itmsz);\
-    } while (0);
+    } while (0)
 
 #define PARSE_NUMBER_LIST(line,prm,sep,itmsz,itm) \
     do {\
@@ -255,7 +335,7 @@ static void *parse_value(const char *line, const char *name,
         if (value != NULL) free(value);\
         am_log_debug(instance_id, "am_get_config_file() %s is set to %d value(s)",\
             prm, itmsz);\
-    } while (0);
+    } while (0)
 
 #define PARSE_STRING_MAP(line,prm,itmsz,itm) \
     do {\
@@ -271,7 +351,7 @@ static void *parse_value(const char *line, const char *name,
         (&itm[old_sz])->value = value + strlen(value) + 1;\
         am_log_debug(instance_id, "am_get_config_file() %s is set to %d value(s)",\
             prm, itmsz);\
-    } while (0);
+    } while (0)
 
 am_config_t *am_get_config_file(unsigned long instance_id, const char *filename) {
     const char *thisfunc = "am_get_config_file():";
@@ -315,9 +395,9 @@ am_config_t *am_get_config_file(unsigned long instance_id, const char *filename)
         PARSE_STRING(line, AM_AGENTS_CONFIG_KEY, r->key);
         PARSE_NUMBER(line, AM_AGENTS_CONFIG_DEBUG_OPT, r->debug);
         PARSE_STRING(line, AM_AGENTS_CONFIG_DEBUG_FILE, r->debug_file);
-        PARSE_NUMBER(line, AM_AGENTS_CONFIG_DEBUG_LEVEL, r->debug_level);
+        PARSE_DEBUG_LOG_LEVEL(line, AM_AGENTS_CONFIG_DEBUG_LEVEL, r->debug_level);
         PARSE_STRING(line, AM_AGENTS_CONFIG_AUDIT_FILE, r->audit_file);
-        PARSE_NUMBER(line, AM_AGENTS_CONFIG_AUDIT_LEVEL, r->audit_level);
+        PARSE_AUDIT_LOG_LEVEL(line, AM_AGENTS_CONFIG_AUDIT_LEVEL, r->audit_level);
         PARSE_NUMBER(line, AM_AGENTS_CONFIG_AUDIT_OPT, r->audit);
 
         PARSE_STRING(line, AM_AGENTS_CONFIG_CERT_KEY_FILE, r->cert_key_file);
@@ -363,11 +443,11 @@ am_config_t *am_get_config_file(unsigned long instance_id, const char *filename)
             PARSE_STRING(line, AM_AGENTS_CONFIG_UID_PARAM, r->userid_param);
             PARSE_STRING(line, AM_AGENTS_CONFIG_UID_PARAM_TYPE, r->userid_param_type);
 
-            PARSE_NUMBER(line, AM_AGENTS_CONFIG_ATTR_PROFILE_MODE, r->profile_attr_fetch);
+            PARSE_ATTR_FETCH_MODE(line, AM_AGENTS_CONFIG_ATTR_PROFILE_MODE, r->profile_attr_fetch);
             PARSE_STRING_MAP(line, AM_AGENTS_CONFIG_ATTR_PROFILE_MAP, r->profile_attr_map_sz, r->profile_attr_map);
-            PARSE_NUMBER(line, AM_AGENTS_CONFIG_ATTR_SESSION_MODE, r->session_attr_fetch);
+            PARSE_ATTR_FETCH_MODE(line, AM_AGENTS_CONFIG_ATTR_SESSION_MODE, r->session_attr_fetch);
             PARSE_STRING_MAP(line, AM_AGENTS_CONFIG_ATTR_SESSION_MAP, r->session_attr_map_sz, r->session_attr_map);
-            PARSE_NUMBER(line, AM_AGENTS_CONFIG_ATTR_RESPONSE_MODE, r->response_attr_fetch);
+            PARSE_ATTR_FETCH_MODE(line, AM_AGENTS_CONFIG_ATTR_RESPONSE_MODE, r->response_attr_fetch);
             PARSE_STRING_MAP(line, AM_AGENTS_CONFIG_ATTR_RESPONSE_MAP, r->response_attr_map_sz, r->response_attr_map);
 
             PARSE_NUMBER(line, AM_AGENTS_CONFIG_LB_ENABLE, r->lb_enable);
@@ -403,7 +483,7 @@ am_config_t *am_get_config_file(unsigned long instance_id, const char *filename)
             PARSE_STRING(line, AM_AGENTS_CONFIG_LOGOUT_REDIRECT_URL, r->logout_redirect_url);
             PARSE_STRING_MAP(line, AM_AGENTS_CONFIG_LOGOUT_COOKIE_RESET, r->logout_cookie_reset_map_sz, r->logout_cookie_reset_map);
 
-            PARSE_NUMBER(line, AM_AGENTS_CONFIG_POLICY_SCOPE, r->policy_scope_subtree); /*0 - self, 1 - subtree*/
+            PARSE_NUMBER(line, AM_AGENTS_CONFIG_POLICY_SCOPE, r->policy_scope_subtree);
 
             PARSE_NUMBER(line, AM_AGENTS_CONFIG_RESOLVE_CLIENT_HOST, r->resolve_client_host);
             PARSE_NUMBER(line, AM_AGENTS_CONFIG_POLICY_ENCODE_SPECIAL_CHAR, r->policy_eval_encode_chars);
@@ -538,394 +618,4 @@ void am_config_free(am_config_t **cp) {
         free(c);
         c = NULL;
     }
-}
-
-int am_config_update_xml(am_config_t *c, char all, char **xml, size_t *xml_sz) {
-    int i;
-    size_t xsz;
-    char *x = NULL, *e = NULL;
-
-    if (c == NULL) return AM_EINVAL;
-
-    if (all == AM_TRUE && !ISVALID(*xml)) {
-        /* local configuration only */
-        am_asprintf(xml, "<identitydetails><name value=\"%s\"/><type value=\"agent\"/>"
-                "<realm value=\"%s\"/></identitydetails>",
-                NOTNULL(c->user), NOTNULL(c->realm));
-    }
-
-    e = xml != NULL && ISVALID(*xml) ? strstr(*xml, "</identitydetails>") : NULL;
-    if (e == NULL) return AM_ENOMEM;
-
-    am_asprintf(&x, "<attribute name=\""AM_AGENTS_CONFIG_LOCAL"\">"
-            "<value>%d</value></attribute>", c->local);
-    am_asprintf(&x, "<attribute name=\""AM_AGENTS_CONFIG_POSTDATA_PRESERVE_DIR"\">"
-            "<value>%s</value></attribute>", NOTNULL(c->pdp_dir));
-
-    if (c->naming_url_sz > 0) {
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NAMING_URL"\">", x);
-        for (i = 0; i < c->naming_url_sz; i++) {
-            char *v = c->naming_url[i];
-            if (ISVALID(v)) {
-                am_asprintf(&x, "%s<value>%s</value>", x, v);
-            }
-        }
-        am_asprintf(&x, "%s</attribute>", x);
-    }
-
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_REALM"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->realm));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_USER"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->user));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_PASSWORD"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->pass));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_KEY"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->key));
-
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_DEBUG_OPT"\">"
-            "<value>%d</value></attribute>", x, c->debug);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_DEBUG_FILE"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->debug_file));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_DEBUG_LEVEL"\">"
-            "<value>%d</value></attribute>", x, c->debug_level);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_AUDIT_FILE"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->audit_file));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_AUDIT_LEVEL"\">"
-            "<value>%d</value></attribute>", x, c->audit_level);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_AUDIT_OPT"\">"
-            "<value>%d</value></attribute>", x, c->audit);
-
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CERT_KEY_FILE"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->cert_key_file));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CERT_KEY_PASSWORD"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->cert_key_pass));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CERT_FILE"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->cert_file));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CA_FILE"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->cert_ca_file));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CIPHERS"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->ciphers));
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_TRUST_CERT"\">"
-            "<value>%s</value></attribute>", x, c->cert_trust ? "true" : "false");
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_TLS_OPT"\">"
-            "<value>%s</value></attribute>", x, NOTNULL(c->tls_opts));
-
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NET_TIMEOUT"\">"
-            "<value>%d</value></attribute>", x, c->net_timeout);
-
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_URL_VALIDATE_LEVEL"\">"
-            "<value>%d</value></attribute>", x, c->valid_level);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_URL_VALIDATE_PING_INTERVAL"\">"
-            "<value>%d</value></attribute>", x, c->valid_ping);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_URL_VALIDATE_PING_MISS"\">"
-            "<value>%d</value></attribute>", x, c->valid_ping_miss);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_URL_VALIDATE_PING_OK"\">"
-            "<value>%d</value></attribute>", x, c->valid_ping_ok);
-    if (c->valid_default_url_sz > 0) {
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_URL_VALIDATE_DEFAULT_SET"\">", x);
-        for (i = 0; i < c->valid_default_url_sz; i++) {
-            int v = c->valid_default_url[i];
-            am_asprintf(&x, "%s<value>%d</value>", x, v);
-        }
-        am_asprintf(&x, "%s</attribute>", x);
-    }
-
-    if (c->hostmap_sz > 0) {
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_HOST_MAP"\">", x);
-        for (i = 0; i < c->hostmap_sz; i++) {
-            char *v = c->hostmap[i];
-            if (ISVALID(v)) {
-                am_asprintf(&x, "%s<value>%s</value>", x, v);
-            }
-        }
-        am_asprintf(&x, "%s</attribute>", x);
-    }
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_RETRY_MAX"\">"
-            "<value>%d</value></attribute>", x, c->retry_max);
-    am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_RETRY_WAIT"\">"
-            "<value>%d</value></attribute>", x, c->retry_wait);
-
-    if (all == AM_TRUE) {
-
-        /* convert local configuration options to xml */
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_AGENT_URI"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->agenturi));
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_COOKIE_NAME"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->cookie_name));
-
-        if (c->login_url_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_LOGIN_URL_MAP"\">", x);
-            for (i = 0; i < c->login_url_sz; i++) {
-                am_config_map_t v = c->login_url[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_COOKIE_SECURE"\">"
-                "<value>%d</value></attribute>", x, c->cookie_secure);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NOTIF_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->notif_enable);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NOTIF_URL"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->notif_url));
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CMP_CASE_IGNORE"\">"
-                "<value>%d</value></attribute>", x, c->url_eval_case_ignore);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_POLICY_CACHE_VALID"\">"
-                "<value>%d</value></attribute>", x, c->policy_cache_valid);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_TOKEN_CACHE_VALID"\">"
-                "<value>%d</value></attribute>", x, c->token_cache_valid);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_UID_PARAM"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->userid_param));
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_UID_PARAM_TYPE"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->userid_param_type));
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_PROFILE_MODE"\">"
-                "<value>%d</value></attribute>", x, c->profile_attr_fetch);
-        if (c->profile_attr_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_PROFILE_MAP"\">", x);
-            for (i = 0; i < c->profile_attr_map_sz; i++) {
-                am_config_map_t v = c->profile_attr_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_SESSION_MODE"\">"
-                "<value>%d</value></attribute>", x, c->session_attr_fetch);
-        if (c->session_attr_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_SESSION_MAP"\">", x);
-            for (i = 0; i < c->session_attr_map_sz; i++) {
-                am_config_map_t v = c->session_attr_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_RESPONSE_MODE"\">"
-                "<value>%d</value></attribute>", x, c->response_attr_fetch);
-        if (c->response_attr_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_RESPONSE_MAP"\">", x);
-            for (i = 0; i < c->response_attr_map_sz; i++) {
-                am_config_map_t v = c->response_attr_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_LB_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->lb_enable);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_SSO_ONLY"\">"
-                "<value>%d</value></attribute>", x, c->sso_only);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ACCESS_DENIED_URL"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->access_denied_url));
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_FQDN_CHECK_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->fqdn_check_enable);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_FQDN_DEFAULT"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->fqdn_default));
-        if (c->fqdn_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_FQDN_MAP"\">", x);
-            for (i = 0; i < c->fqdn_map_sz; i++) {
-                am_config_map_t v = c->fqdn_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_COOKIE_RESET_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->cookie_reset_enable);
-        if (c->cookie_reset_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_COOKIE_RESET_MAP"\">", x);
-            for (i = 0; i < c->cookie_reset_map_sz; i++) {
-                am_config_map_t v = c->cookie_reset_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        if (c->not_enforced_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NOT_ENFORCED_URL"\">", x);
-            for (i = 0; i < c->not_enforced_map_sz; i++) {
-                am_config_map_t v = c->not_enforced_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NOT_ENFORCED_INVERT"\">"
-                "<value>%d</value></attribute>", x, c->not_enforced_invert);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NOT_ENFORCED_ATTR"\">"
-                "<value>%d</value></attribute>", x, c->not_enforced_fetch_attr);
-        if (c->not_enforced_ip_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_NOT_ENFORCED_IP"\">", x);
-            for (i = 0; i < c->not_enforced_ip_map_sz; i++) {
-                am_config_map_t v = c->not_enforced_ip_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_PDP_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->pdp_enable);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_PDP_VALID"\">"
-                "<value>%d</value></attribute>", x, c->pdp_cache_valid);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_PDP_COOKIE"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->pdp_lb_cookie));
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CLIENT_IP_VALIDATE"\">"
-                "<value>%d</value></attribute>", x, c->client_ip_validate);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_COOKIE_PREFIX"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->cookie_prefix));
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_ATTR_COOKIE_MAX_AGE"\">"
-                "<value>%d</value></attribute>", x, c->cookie_maxage);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CDSSO_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->cdsso_enable);
-        if (c->cdsso_login_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CDSSO_LOGIN"\">", x);
-            for (i = 0; i < c->cdsso_login_map_sz; i++) {
-                am_config_map_t v = c->cdsso_login_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-        if (c->cdsso_cookie_domain_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CDSSO_DOMAIN"\">", x);
-            for (i = 0; i < c->cdsso_cookie_domain_map_sz; i++) {
-                am_config_map_t v = c->cdsso_cookie_domain_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        if (c->openam_logout_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_LOGOUT_URL"\">", x);
-            for (i = 0; i < c->openam_logout_map_sz; i++) {
-                am_config_map_t v = c->openam_logout_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-        if (c->logout_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_APP_LOGOUT_URL"\">", x);
-            for (i = 0; i < c->logout_map_sz; i++) {
-                am_config_map_t v = c->logout_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_LOGOUT_REDIRECT_URL"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->logout_redirect_url));
-        if (c->logout_cookie_reset_map_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_LOGOUT_COOKIE_RESET"\">", x);
-            for (i = 0; i < c->logout_cookie_reset_map_sz; i++) {
-                am_config_map_t v = c->logout_cookie_reset_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_POLICY_SCOPE"\">"
-                "<value>%d</value></attribute>", x, c->policy_scope_subtree);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_RESOLVE_CLIENT_HOST"\">"
-                "<value>%d</value></attribute>", x, c->resolve_client_host);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_POLICY_ENCODE_SPECIAL_CHAR"\">"
-                "<value>%d</value></attribute>", x, c->policy_eval_encode_chars);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_COOKIE_ENCODE_SPECIAL_CHAR"\">"
-                "<value>%d</value></attribute>", x, c->cookie_encode_chars);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_OVERRIDE_PROTO"\">"
-                "<value>%d</value></attribute>", x, c->override_protocol);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_OVERRIDE_HOST"\">"
-                "<value>%d</value></attribute>", x, c->override_host);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_OVERRIDE_PORT"\">"
-                "<value>%d</value></attribute>", x, c->override_port);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_OVERRIDE_NOTIFICATION_URL"\">"
-                "<value>%d</value></attribute>", x, c->override_notif_url);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_VALID"\">"
-                "<value>%d</value></attribute>", x, c->config_valid);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_PASSWORD_REPLAY_KEY"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->password_replay_key));
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_POLICY_CLOCK_SKEW"\">"
-                "<value>%d</value></attribute>", x, c->policy_clock_skew);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_GOTO_PARAM_NAME"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->url_redirect_param));
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CACHE_CONTROL_ENABLE"\">"
-                "<value>%d</value></attribute>", x, c->cache_control_enable);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_USE_REDIRECT_ADVICE"\">"
-                "<value>%d</value></attribute>", x, c->use_redirect_for_advice);
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CLIENT_IP_HEADER"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->client_ip_header));
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CLIENT_HOSTNAME_HEADER"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->client_hostname_header));
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_INVALID_URL"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->url_check_regex));
-
-        if (c->cond_login_url_sz > 0) {
-            am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_CONDITIONAL_LOGIN_URL"\">", x);
-            for (i = 0; i < c->cond_login_url_sz; i++) {
-                am_config_map_t v = c->cond_login_url[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    am_asprintf(&x, "%s<value>[%s]=%s</value>", x, v.name, v.value);
-                }
-            }
-            am_asprintf(&x, "%s</attribute>", x);
-        }
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_COOKIE_HTTP_ONLY"\">"
-                "<value>%d</value></attribute>", x, c->cookie_http_only);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_MULTI_VALUE_SEPARATOR"\">"
-                "<value>%s</value></attribute>", x, NOTNULL(c->multi_attr_separator));
-
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_IIS_LOGON_USER"\">"
-                "<value>%d</value></attribute>", x, c->logon_user_enable);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_IIS_PASSWORD_HEADER"\">"
-                "<value>%d</value></attribute>", x, c->password_header_enable);
-        am_asprintf(&x, "%s<attribute name=\""AM_AGENTS_CONFIG_PDP_JS_REPOST"\">"
-                "<value>%d</value></attribute>", x, c->pdp_js_repost);
-    }
-
-    *e = 0;
-    am_asprintf(&x, "%s%s</identitydetails>", *xml, x);
-
-    free(*xml); /* release the original value as we are replacing it here*/
-    *xml = NULL;
-    xsz = ISVALID(x) ? strlen(x) : 0;
-    if (xsz > 0) {
-        *xml = x;
-        *xml_sz = xsz;
-    }
-
-    return 0;
 }

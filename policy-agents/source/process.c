@@ -248,7 +248,7 @@ static am_return_t handle_notification(am_request_t *r) {
         int compare_status = r->conf->url_eval_case_ignore == AM_TRUE ?
                 strcasecmp(url, r->conf->notif_url) : strcmp(url, r->conf->notif_url);
         /*int compare_status = r->conf->url_eval_case_ignore == AM_TRUE ?
-                (stristr(url, r->conf->notif_url) != NULL ? 0 : 1) :
+                (stristr((char *) url, r->conf->notif_url) != NULL ? 0 : 1) :
                 (strstr(url, r->conf->notif_url) != NULL ? 0 : 1);*/
         if (compare_status == 0) {
             struct notification_worker_data *wd = malloc(sizeof (struct notification_worker_data));
@@ -682,10 +682,32 @@ static am_return_t validate_policy(am_request_t *r) {
     if ((status == AM_SUCCESS && cache_ts > 0) || status != AM_SUCCESS) {
         struct am_policy_result *policy_cache_new = NULL;
         struct am_namevalue *session_cache_new = NULL;
+        struct am_ssl_options info;
         unsigned int max_retry = 0;
         const char *service_url = get_valid_openam_url(r);
         unsigned int retry = 0, retry_wait = 2; //TODO: conf values
         max_retry = retry = 3;
+
+        memset(&info, 0, sizeof (struct am_ssl_options));
+        if (ISVALID(r->conf->ciphers)) {
+            snprintf(info.name[0], sizeof (info.name[0]), "%s", r->conf->ciphers);
+        }
+        if (ISVALID(r->conf->cert_ca_file)) {
+            snprintf(info.name[1], sizeof (info.name[1]), "%s", r->conf->cert_ca_file);
+        }
+        if (ISVALID(r->conf->cert_file)) {
+            snprintf(info.name[2], sizeof (info.name[2]), "%s", r->conf->cert_file);
+        }
+        if (ISVALID(r->conf->cert_key_file)) {
+            snprintf(info.name[3], sizeof (info.name[3]), "%s", r->conf->cert_key_file);
+        }
+        if (ISVALID(r->conf->cert_key_pass)) {
+            snprintf(info.name[4], sizeof (info.name[4]), "%s", r->conf->cert_key_pass);
+        }
+        if (ISVALID(r->conf->tls_opts)) {
+            snprintf(info.name[5], sizeof (info.name[5]), "%s", r->conf->tls_opts);
+        }
+        info.verifypeer = r->conf->cert_trust == AM_TRUE ? AM_FALSE : AM_TRUE;
 
         /* entry is found, but is not valid, or nothing is found,
          * do a policy+session call in either way
@@ -699,6 +721,7 @@ static am_return_t validate_policy(am_request_t *r) {
                     r->conf->token, r->token,
                     url,
                     r->conf->notif_url, am_scope_to_str(scope), r->client_ip, pattrs,
+                    &info,
                     &session_cache_new,
                     &policy_cache_new);
             if (status == AM_SUCCESS && session_cache_new != NULL && policy_cache_new != NULL) {
@@ -1236,7 +1259,7 @@ static void set_user_attributes(am_request_t *r) {
                     AM_COOKIE_SET_EXT(r, r->conf->cookie_name, r->token, NULL);
                 }
             }
-        } 
+        }
 
         /* if attributes mode is none, we're done */
         if (r->conf->profile_attr_fetch == SET_ATTRS_NONE &&
@@ -1284,14 +1307,10 @@ static char *find_active_login_server(am_request_t *r, char add_goto_value) {
     int i, j, map_sz = 0;
     am_config_map_t *map = NULL;
     char local_alloc = AM_FALSE;
-
     char *cdsso_elements = NULL;
     char *login_url = NULL;
-
     const char *url = r->normalized_url;
-
     int valid_idx = get_valid_url_index(r->instance_id);
-    //TODO: cond_login_url ? match_conditional_url
 
     if (r->conf->cdsso_enable == AM_TRUE) {
         long msec = 0;
@@ -1337,8 +1356,55 @@ static char *find_active_login_server(am_request_t *r, char add_goto_value) {
         map = r->conf->login_url;
     }
 
+    if (r->conf->cond_login_url_sz > 0 && r->conf->cond_login_url != NULL) {
+        for (i = 0; i < r->conf->cond_login_url_sz; i++) {
+            am_config_map_t m = r->conf->cond_login_url[i];
+            char *cl = strdup(m.value);
+            if (cl != NULL) {
+                char compare_status, *sep = strchr(cl, '|');
+                if (sep != NULL && *(sep + 1) != '\0') {
+                    *sep = 0;
+                } else {
+                    free(cl);
+                    continue;
+                }
+                /*try to locate given pattern in a request url*/
+                compare_status = r->conf->url_eval_case_ignore == AM_TRUE ?
+                        (stristr((char *) url, cl) != NULL ? AM_TRUE : AM_FALSE) :
+                        (strstr(url, cl) != NULL ? AM_TRUE : AM_FALSE);
+
+                am_log_debug(r->instance_id, "%s conditional login pattern: %s, url: %s, match status: %s",
+                        thisfunc, cl, url, compare_status == AM_TRUE ? "match" : "no match");
+
+                if (compare_status == AM_TRUE) {
+                    /*found a match*/
+                    char *tk, *tmp = strdup(cl + strlen(cl) + 1), *o = tmp;
+                    if (tmp == NULL) break;
+                    /*set up url list*/
+                    map_sz = char_count(tmp, ',', NULL) + 1;
+                    map = (am_config_map_t *) malloc(map_sz * sizeof (am_config_map_t));
+                    if (map != NULL) {
+                        j = 0;
+                        while ((tk = am_strsep(&tmp, ",")) != NULL) {
+                            char *v = strdup(tk);
+                            trim(v, ' ');
+                            (&map[j])->name = v;
+                            (&map[j])->value = v;
+                            j++;
+                        }
+                        local_alloc = AM_TRUE;
+                    }
+                    free(o);
+                    free(cl);
+                    break;
+                }
+                free(cl);
+            }
+        }
+    }
+
     /*use url-validator confirmed (index) value*/
-    if (map_sz > 0) {
+    if (map_sz > 0 && map != NULL) {
         am_config_map_t m = (valid_idx >= map_sz) ? map[0] : map[valid_idx];
         if (add_goto_value == AM_TRUE) {
             char *goto_encoded = url_encode(r->overridden_url);
@@ -1363,11 +1429,6 @@ static char *find_active_login_server(am_request_t *r, char add_goto_value) {
             }
         }
         am_log_debug(r->instance_id, "%s selected login url: %s", thisfunc, LOGEMPTY(login_url));
-    }
-
-    for (i = 0; i < map_sz; i++) {
-        am_config_map_t m = map[i];
-        am_log_debug(r->instance_id, "%s [%s] [%s]", thisfunc, m.name, m.value);
     }
 
     if (local_alloc == AM_TRUE) {
@@ -1432,6 +1493,26 @@ static am_return_t handle_exit(am_request_t *r) {
                         if (oam != NULL) {
                             wd->token = strdup(r->token);
                             wd->openam = strdup(oam);
+                            memset(&wd->info, 0, sizeof (struct am_ssl_options));
+                            if (ISVALID(r->conf->ciphers)) {
+                                snprintf(wd->info.name[0], sizeof (wd->info.name[0]), "%s", r->conf->ciphers);
+                            }
+                            if (ISVALID(r->conf->cert_ca_file)) {
+                                snprintf(wd->info.name[1], sizeof (wd->info.name[1]), "%s", r->conf->cert_ca_file);
+                            }
+                            if (ISVALID(r->conf->cert_file)) {
+                                snprintf(wd->info.name[2], sizeof (wd->info.name[2]), "%s", r->conf->cert_file);
+                            }
+                            if (ISVALID(r->conf->cert_key_file)) {
+                                snprintf(wd->info.name[3], sizeof (wd->info.name[3]), "%s", r->conf->cert_key_file);
+                            }
+                            if (ISVALID(r->conf->cert_key_pass)) {
+                                snprintf(wd->info.name[4], sizeof (wd->info.name[4]), "%s", r->conf->cert_key_pass);
+                            }
+                            if (ISVALID(r->conf->tls_opts)) {
+                                snprintf(wd->info.name[5], sizeof (wd->info.name[5]), "%s", r->conf->tls_opts);
+                            }
+                            wd->info.verifypeer = r->conf->cert_trust == AM_TRUE ? AM_FALSE : AM_TRUE;
 
                             if (am_worker_dispatch(session_logout_worker, wd) != 0) {
                                 r->status = AM_ERROR;
@@ -1492,8 +1573,10 @@ static am_return_t handle_exit(am_request_t *r) {
             /*set user attributes*/
             set_user_attributes(r);
 
-            am_log_audit(r->instance_id, AUDIT_ALLOW_USER_MESSAGE,
-                    LOGEMPTY(r->user), LOGEMPTY(r->client_ip), LOGEMPTY(r->normalized_url));
+            if ((r->conf->audit_level & AM_LOG_AUDIT_ALLOW) == AM_LOG_AUDIT_ALLOW) {
+                am_log_audit(r->instance_id, AUDIT_ALLOW_USER_MESSAGE,
+                        LOGEMPTY(r->user), LOGEMPTY(r->client_ip), LOGEMPTY(r->normalized_url));
+            }
 
             if (r->token_in_post == AM_TRUE && r->conf->cdsso_enable == AM_TRUE &&
                     r->is_dummypost_url == AM_FALSE && r->am_set_custom_response_f != NULL) {
@@ -1631,7 +1714,8 @@ static am_return_t handle_exit(am_request_t *r) {
         case AM_ACCESS_DENIED:
         case AM_INVALID_FQDN_ACCESS:
 
-            if (status == AM_ACCESS_DENIED) {
+            if (status == AM_ACCESS_DENIED &&
+                    (r->conf->audit_level & AM_LOG_AUDIT_DENY) == AM_LOG_AUDIT_DENY) {
                 am_log_audit(r->instance_id, AUDIT_DENY_USER_MESSAGE,
                         LOGEMPTY(r->user), LOGEMPTY(r->client_ip), LOGEMPTY(r->normalized_url));
             }
@@ -1723,7 +1807,7 @@ static am_return_t handle_exit(am_request_t *r) {
                         if (repost_uri != NULL) free(repost_uri);
                     }
 
-                } else if (status == AM__INVALID_FQDN_ACCESS) {
+                } else if (status == AM_INVALID_FQDN_ACCESS) {
                     /* if previous status was invalid fqdn access,
                      * redirect to the valid fqdn url
                      */

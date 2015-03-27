@@ -75,8 +75,8 @@ static const char *am_set_opt(cmd_parms *c, void *cfg, const char *arg) {
                 if (ac != NULL) {
                     conf->debug_file = ac->debug_file != NULL ? apr_pstrdup(c->pool, ac->debug_file) : NULL;
                     conf->audit_file = ac->audit_file != NULL ? apr_pstrdup(c->pool, ac->audit_file) : NULL;
-                    conf->debug_level = AM_LOG_DEBUG;
-                    conf->audit_level = AM_LOG_AUDIT;
+                    conf->debug_level = ac->debug_level;
+                    conf->audit_level = ac->audit_level;
                     conf->error = AM_SUCCESS;
                     am_config_free(&ac);
                 } else {

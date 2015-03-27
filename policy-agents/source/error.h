@@ -17,7 +17,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-#define AM__UNKNOWN                 (-26)
+#define AM__UNKNOWN                 (-27)
+#define AM__ENOSSL                  (-26)
 #define AM__NOTIFICATION_DONE       (-25)
 #define AM__INVALID_AGENT_SESSION   (-24)
 #define AM__INTERNAL_REDIRECT       (-23)
@@ -53,6 +54,7 @@
 
 #define AM_ERRNO_MAP(AE) \
   AE(EINVAL, "invalid argument") \
+  AE(ENOSSL, "no ssl/library support") \
   AE(INTERNAL_REDIRECT, "internal redirect") \
   AE(EOPNOTSUPP, "operation not supported") \
   AE(ECONNREFUSED, "connection refused") \

@@ -1,5 +1,5 @@
 
-org.forgerock.agents.config.local = true
+com.sun.identity.agents.config.repository.location = centralized
 org.forgerock.agents.config.postdata.preserve.dir =
 com.sun.identity.agents.config.naming.url = AM_OPENAM_URL
 com.sun.identity.agents.config.organization.name = AM_AGENT_REALM
@@ -8,10 +8,10 @@ com.sun.identity.agents.config.password = AM_AGENT_PASSWORD
 com.sun.identity.agents.config.key = AM_AGENT_KEY
 com.sun.identity.agents.config.local.logfile = AM_DEBUG_FILE_PATHdebug.log
 com.sun.identity.agents.config.local.audit.logfile = AM_AUDIT_FILE_PATHaudit.log
-com.sun.identity.agents.config.debug.opt = 0
+com.sun.identity.agents.config.debug.file.size = 0
 com.sun.identity.agents.config.debug.level = 
-com.sun.identity.agents.config.audit.level = 
-com.sun.identity.agents.config.audit.opt = 0
+com.sun.identity.agents.config.audit.accesstype = 
+com.sun.identity.agents.config.local.log.size = 0
 com.sun.identity.agents.config.sslcert.dir = 
 com.sun.identity.agents.config.certdb.prefix = 
 com.sun.identity.agents.config.certdb.password = 

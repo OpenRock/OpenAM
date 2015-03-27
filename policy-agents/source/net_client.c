@@ -62,17 +62,25 @@ if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 
         free(es);}}} while(0)
 #endif
 
-void net_init() {
+void net_init_ssl();
+void net_shutdown_ssl();
+void net_connect_ssl(am_net_t *n);
+void net_close_ssl(am_net_t *n);
+int net_read_ssl(am_net_t *n, const char *buf, int sz);
+
+void am_net_init() {
 #ifdef _WIN32
     WSADATA w;
     WSAStartup(MAKEWORD(2, 2), &w);
 #endif
+    net_init_ssl();
 }
 
-void net_shutdown() {
+void am_net_shutdown() {
 #ifdef _WIN32
     WSACleanup();
 #endif
+    net_shutdown_ssl();
 }
 
 static int net_error() {
@@ -208,7 +216,6 @@ static void net_async_poll_timeout(union sigval si) {
 }
 
 static void net_async_poll(am_net_t *n) {
-    const char *thisfunc = "net_async_poll()";
     int ev = 0;
     char first_run = 1;
 #ifdef _WIN32
@@ -272,7 +279,6 @@ static void net_async_poll(am_net_t *n) {
             first_run = 0;
         }
 
-
         if (wait_for_exit_event(n->de) != 0) {
             break;
         }
@@ -297,16 +303,24 @@ static void net_async_poll(am_net_t *n) {
             if (error != 0) break;
 
             got = recv(n->sock, tmp, sizeof (tmp), 0);
-            if (got < 0) {
-                if (!net_in_progress(errno)) {
+            if (n->ssl.on == AM_TRUE) {
+                error = net_read_ssl(n, tmp, got);
+                if (error != AM_SUCCESS) {
                     if (n->on_close) n->on_close(n->data, 0);
                     break;
                 }
-            } else if (got == 0) {
-                if (n->on_close) n->on_close(n->data, 0);
-                break;
             } else {
-                size_t parsed = http_parser_execute(n->hp, n->hs, tmp, got);
+                if (got < 0) {
+                    if (!net_in_progress(errno)) {
+                        if (n->on_close) n->on_close(n->data, 0);
+                        break;
+                    }
+                } else if (got == 0) {
+                    if (n->on_close) n->on_close(n->data, 0);
+                    break;
+                } else {
+                    http_parser_execute(n->hp, n->hs, tmp, got);
+                }
             }
         }
     }
@@ -325,43 +339,54 @@ int am_net_write(am_net_t *n, const char *data, size_t data_sz) {
                 set_event(n->ce);
                 return n->error;
             }
-
+            if (n->ssl.on == AM_TRUE) {
+                n->ssl.request_data_sz = 0;
+                if (n->ssl.request_data != NULL) free(n->ssl.request_data);
+                n->ssl.request_data = malloc(data_sz);
+                if (n->ssl.request_data != NULL) {
+                    memcpy(n->ssl.request_data, data, data_sz);
+                    n->ssl.request_data_sz = data_sz;
+                } else {
+                    set_event(n->ce);
+                    return AM_ENOMEM;
+                }
+            } else {
 #ifdef MSG_NOSIGNAL
-            flags |= MSG_NOSIGNAL;
+                flags |= MSG_NOSIGNAL;
 #endif 
-            er = getsockopt(n->sock, SOL_SOCKET, SO_ERROR, (void *) &error, &errlen);
-            while (sent < len) {
-                int rv = send(n->sock, buf + sent, (int) len - sent, flags);
-                if (rv < 0) {
-                    if (net_in_progress(
+                er = getsockopt(n->sock, SOL_SOCKET, SO_ERROR, (void *) &error, &errlen);
+                while (sent < len) {
+                    int rv = send(n->sock, buf + sent, (int) len - sent, flags);
+                    if (rv < 0) {
+                        if (net_in_progress(
 #ifdef _WIN32                 
-                            WSAGetLastError()
+                                WSAGetLastError()
 #else
-                            errno
+                                errno
 #endif
-                            )) {
+                                )) {
 #ifdef _WIN32
-                        WSAPOLLFD fds[1];
+                            WSAPOLLFD fds[1];
 #else
-                        struct pollfd fds[1];
+                            struct pollfd fds[1];
 #endif
-                        memset(fds, 0, sizeof (fds));
-                        fds[0].fd = n->sock;
-                        fds[0].events = connect_ev;
-                        fds[0].revents = 0;
-                        if (sockpoll(fds, 1, -1) == -1) {
-                            break;
+                            memset(fds, 0, sizeof (fds));
+                            fds[0].fd = n->sock;
+                            fds[0].events = connect_ev;
+                            fds[0].revents = 0;
+                            if (sockpoll(fds, 1, -1) == -1) {
+                                break;
+                            }
+                            continue;
                         }
-                        continue;
+                        break;
                     }
-                    break;
+                    if (rv == 0) {
+                        break;
+                    }
+                    sent += rv;
                 }
-                if (rv == 0) {
-                    break;
-                }
-                sent += rv;
             }
-
             set_event(n->ce);
         }
     }
@@ -375,7 +400,6 @@ static void *net_async_connect(void *arg) {
     struct addrinfo *rp, hints;
     int err = 0, on = 1;
     char port[7];
-
     am_timer_t tmr;
 
     memset(&hints, 0, sizeof (struct addrinfo));
@@ -445,6 +469,9 @@ static void *net_async_connect(void *arg) {
                         thisfunc, n->uv.host, n->uv.port,
                         rp->ai_family == AF_INET ? "IPv4" : "IPv6");
                 n->error = 0;
+                if (n->uv.ssl == AM_TRUE) {
+                    net_connect_ssl(n);
+                }
                 net_async_poll(n);
                 break;
 
@@ -470,6 +497,9 @@ static void *net_async_connect(void *arg) {
                                 rp->ai_family == AF_INET ? "IPv4" : "IPv6");
 
                         n->error = 0;
+                        if (n->uv.ssl == AM_TRUE) {
+                            net_connect_ssl(n);
+                        }
                         net_async_poll(n);
                         break;
 
@@ -570,6 +600,7 @@ int am_net_connect(am_net_t *n) {
 void am_net_diconnect(am_net_t *n) {
     if (n != NULL) {
         set_exit_event(n->de);
+        net_close_ssl(n);
         net_close_socket(n->sock);
         n->sock = INVALID_SOCKET;
     }

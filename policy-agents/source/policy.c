@@ -207,6 +207,22 @@ static char compare_pattern_resource(am_request_t *r, const char *ptn, const cha
     return status;
 }
 
+static void policy_get_proto_host_port(const char *string, int *c) {
+    int j;
+    for (j = 0; string[j]; j++) {
+        if (string[j] == ':') {
+            if (c[0] == 0) c[0] = j;
+            else c[1] = j;
+        } else if (string[j] == '/') {
+            c[2] += 1;
+        }
+        if (c[2] == 3) {
+            c[2] = j;
+            break;
+        }
+    }
+}
+
 char policy_compare_url(am_request_t *r, const char *pattern, const char *resource) {
     const char *thisfunc = "policy_compare_url():";
     char has_wildcard = AM_FALSE;
@@ -243,7 +259,55 @@ char policy_compare_url(am_request_t *r, const char *pattern, const char *resour
     }
 
     if (has_wildcard == AM_TRUE) {
-        if (compare_pattern_resource(r, pattern, resource) == AM_TRUE) {
+        int pi[3] = {0, 0, 0};
+        int ri[3] = {0, 0, 0};
+        char *a, *b, match;
+
+        /*wildcard in a proto/host/port is not the same as in uri match*/
+        policy_get_proto_host_port(pattern, pi);
+        policy_get_proto_host_port(resource, ri);
+
+        /*quick sanity check for field indicators*/
+        if (pi[0] == 0 || pi[2] < 3 || pi[1] >= pi[2] ||
+                ri[0] == 0 || ri[2] < 3 || ri[1] >= pi[2]) return AM_NO_MATCH;
+
+        a = strndup(pattern, pi[0]);
+        b = strndup(resource, ri[0]);
+        if (a == NULL || b == NULL) return AM_NO_MATCH;
+        /*compare protocol*/
+        match = compare_pattern_resource(r, a, b);
+        free(a);
+        free(b);
+        if (match == AM_FALSE) return AM_NO_MATCH;
+        if (pi[1] == 0 && ri[1] == 0) {
+            /*port is not set, compare host*/
+            a = strndup(pattern + pi[0] + 3, pi[2] - pi[0] - 3);
+            b = strndup(resource + ri[0] + 3, ri[2] - ri[0] - 3);
+            if (a == NULL || b == NULL) return AM_NO_MATCH;
+            match = compare_pattern_resource(r, a, b);
+            free(a);
+            free(b);
+            if (match == AM_FALSE) return AM_NO_MATCH;
+        } else if (pi[1] > 0 && ri[1] > 0) {
+            /*port is set, compare host first*/
+            a = strndup(pattern + pi[0] + 3, pi[1] - pi[0] - 3);
+            b = strndup(resource + ri[0] + 3, ri[1] - ri[0] - 3);
+            if (a == NULL || b == NULL) return AM_NO_MATCH;
+            match = compare_pattern_resource(r, a, b);
+            free(a);
+            free(b);
+            if (match == AM_FALSE) return AM_NO_MATCH;
+            /*compare port*/
+            a = strndup(pattern + pi[1] + 1, pi[2] - pi[1] - 1);
+            b = strndup(resource + ri[1] + 1, ri[2] - ri[1] - 1);
+            if (a == NULL || b == NULL) return AM_NO_MATCH;
+            match = compare_pattern_resource(r, a, b);
+            free(a);
+            free(b);
+            if (match == AM_FALSE) return AM_NO_MATCH;
+        }
+
+        if (compare_pattern_resource(r, pattern + pi[2], resource + ri[2]) == AM_TRUE) {
             /*am_log_debug(instance_id, "%s '%s' and '%s' matched (%s)",
                     thisfunc, resource, pattern, am_policy_strerror(AM_EXACT_PATTERN_MATCH));*/
             return AM_EXACT_PATTERN_MATCH;

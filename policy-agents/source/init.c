@@ -16,87 +16,33 @@
 
 #include "platform.h"
 #include "am.h"
-#include "thread.h"
+#include "net_client.h"
+
+#ifdef _WIN32
 
 struct am_main_init {
-#ifdef _WIN32
     HANDLE id;
-#else
-    int id;
-#endif
     int error;
 };
 
 struct am_main_init init = {
-#ifdef _WIN32
     NULL,
-#else
-    -1,
-#endif
     AM_ERROR
 };
 
 static void am_main_create() {
-#ifdef _WIN32
     init.id = CreateMutex(NULL, FALSE, "Global\\am_main_init_lock");
     if (init.id == NULL && GetLastError() == ERROR_ACCESS_DENIED) {
         init.id = OpenMutexA(SYNCHRONIZE, TRUE, "Global\\am_main_init_lock");
     }
-#else
-    struct sembuf op;
-    if ((init.id = semget(IPC_PRIVATE, 1, 0600 | IPC_CREAT)) < 0) {
-        init.error = AM_ENOMEM;
-        return;
-    }
-    op.sem_num = 0;
-    op.sem_op = +1;
-    op.sem_flg = 0;
-    if (semop(init.id, &op, 1) < 0) {
-        init.error = AM_EINVAL;
-    } else {
-        init.error = AM_SUCCESS;
-    }
-#endif
 }
 
 static void am_main_destroy() {
-#ifdef _WIN32
     CloseHandle(init.id);
     init.error = AM_ERROR;
-#else
-    if (semctl(init.id, 0, IPC_RMID) < 0) {
-        init.error = AM_ERROR;
-    } else {
-        init.error = AM_SUCCESS;
-    }
-#endif
-}
-
-static void am_main_init_lock() {
-#ifdef _WIN32
-    DWORD status = WaitForSingleObject(init.id, INFINITE);
-    if (status == WAIT_OBJECT_0) {
-        init.error = AM_SUCCESS;
-    } else if (status == WAIT_ABANDONED) {
-        init.error = AM_EAGAIN;
-    } else {
-        init.error = AM_ERROR;
-    }
-#else
-    struct sembuf op;
-    op.sem_num = 0;
-    op.sem_op = -1;
-    op.sem_flg = 0;
-    if (semop(init.id, &op, 1) < 0) {
-        init.error = AM_ERROR;
-    } else {
-        init.error = AM_SUCCESS;
-    }
-#endif
 }
 
 static void am_main_init_timed_lock() {
-#ifdef _WIN32
     DWORD status = WaitForSingleObject(init.id, 1000);
     if (status == WAIT_OBJECT_0) {
         init.error = AM_SUCCESS;
@@ -107,51 +53,19 @@ static void am_main_init_timed_lock() {
     } else {
         init.error = AM_ERROR;
     }
-#else
-    int status;
-    struct sembuf op;
-    struct timeval now = {0, 0};
-    struct timespec ts = {0, 0};
-    gettimeofday(&now, NULL);
-    ts.tv_sec = now.tv_sec + 1;
-    ts.tv_nsec = now.tv_usec * 1000;
-    op.sem_num = 0;
-    op.sem_op = -1;
-    op.sem_flg = 0;
-#ifdef __APPLE__
-    status = -1;
-#else
-    status = semtimedop(init.id, &op, 1, &ts);
-#endif
-    if (status == -1) {
-        init.error = errno == EAGAIN ? AM_ETIMEDOUT : AM_ERROR;
-    } else {
-        init.error = AM_SUCCESS;
-    }
-#endif
 }
 
 static void am_main_init_unlock() {
-#ifdef _WIN32
     ReleaseMutex(init.id);
     init.error = AM_SUCCESS;
-#else
-    struct sembuf op;
-    op.sem_num = 0;
-    op.sem_op = +1;
-    op.sem_flg = 0;
-    if (semop(init.id, &op, 1) < 0) {
-        init.error = AM_ERROR;
-    } else {
-        init.error = AM_SUCCESS;
-    }
-#endif
 }
+
+#endif
 
 int am_init() {
     int rv = AM_SUCCESS;
 #ifndef _WIN32
-    am_main_create();
+    am_net_init();
     am_log_init(AM_SUCCESS);
     am_configuration_init();
     rv = am_cache_init();
@@ -163,12 +77,17 @@ int am_shutdown() {
     am_cache_shutdown();
     am_configuration_shutdown();
     am_log_shutdown();
+#ifdef _WIN32
     am_main_destroy();
+#else
+    am_net_shutdown();
+#endif
     return 0;
 }
 
 int am_init_worker() {
 #ifdef _WIN32
+    am_net_init();
     am_main_create();
     am_main_init_timed_lock();
     am_log_init_worker(init.error);
@@ -180,15 +99,22 @@ int am_init_worker() {
 }
 
 int am_re_init_worker() {
+#ifdef _WIN32
     am_main_init_timed_lock();
     if (init.error == AM_SUCCESS || init.error == AM_EAGAIN) {
         am_log_re_init(AM_RETRY_ERROR);
     }
+#endif
     return 0;
 }
 
 int am_shutdown_worker() {
+#ifdef _WIN32
     am_main_init_unlock();
+#endif
     am_worker_pool_shutdown();
+#ifdef _WIN32
+    am_net_shutdown();
+#endif
     return 0;
 }

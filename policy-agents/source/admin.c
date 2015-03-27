@@ -739,10 +739,10 @@ restart_remote:
     install_log("validating configuration parameters...");
     fprintf(stdout, "\nValidating...\n");
 
-    net_init();
+    am_net_init();
 
     rv = am_agent_login(0, openam_url, NULL,
-            agent_user, agent_password, NULL, agent_realm, AM_TRUE,
+            agent_user, agent_password, NULL, agent_realm, AM_TRUE, NULL,
             &agent_token, NULL, NULL, NULL, install_log);
 
     if (rv != AM_SUCCESS) {
@@ -757,7 +757,7 @@ restart_remote:
 
     if (agent_token != NULL) {
         fprintf(stdout, "\nCleaning up validation data...\n");
-        am_agent_logout(0, openam_url, agent_token, install_log);
+        am_agent_logout(0, openam_url, agent_token, NULL, install_log);
     }
 
     if (validated == AM_TRUE) {
@@ -785,7 +785,7 @@ restart_remote:
     SetConsoleCtrlHandler((PHANDLER_ROUTINE) exit_handler, FALSE);
 #endif
     install_log("installation exit");
-    net_shutdown();
+    am_net_shutdown();
 }
 
 static void install_silent(int argc, char **argv) {
@@ -841,7 +841,7 @@ static void install_silent(int argc, char **argv) {
         trim(agent_password, '\n');
         trim(agent_password, '\r');
 
-        net_init();
+        am_net_init();
 
         install_log("validating configuration parameters...");
         fprintf(stdout, "\nValidating...\n");
@@ -852,7 +852,7 @@ static void install_silent(int argc, char **argv) {
 
         if (1 == 0)
             rv = am_agent_login(0, argv[3], NULL,
-                argv[6], agent_password, NULL, argv[5], AM_TRUE,
+                argv[6], agent_password, NULL, argv[5], AM_TRUE, NULL,
                 &agent_token, NULL, NULL, NULL, install_log);
         if (rv != AM_SUCCESS) {
             fprintf(stdout, "\nError validating OpenAM - Agent configuration.\n"
@@ -866,7 +866,7 @@ static void install_silent(int argc, char **argv) {
 
         if (agent_token != NULL) {
             fprintf(stdout, "\nCleaning up validation data...\n");
-            am_agent_logout(0, argv[3], agent_token, install_log);
+            am_agent_logout(0, argv[3], agent_token, NULL, install_log);
         }
 
         if (validated == AM_TRUE) {
@@ -890,7 +890,7 @@ static void install_silent(int argc, char **argv) {
 
         if (agent_password != NULL) free(agent_password);
 
-        net_shutdown();
+        am_net_shutdown();
     } else {
 
     }

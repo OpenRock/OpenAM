@@ -21,7 +21,7 @@
 64=1
 DEBUG=1
 
-VERSION := AME-1131
+VERSION := 4.0.0-SNAPSHOT
 
 ifneq ("$(PROGRAMFILES)$(ProgramFiles)","")
  OS_ARCH := Windows

@@ -62,10 +62,11 @@ typedef struct {
     char *pass;
     char *key;
 
-    int debug; /* debug and audit logging */
+    /* debug and audit logging */
+    int debug; /*0 do not rotate, x rotate at x bytes, -1 rotate once a day*/
     int debug_level;
     char *debug_file;
-    int audit;
+    int audit; /*0 do not rotate, x rotate at x bytes, -1 rotate once a day*/
     int audit_level;
     char *audit_file;
 
@@ -175,7 +176,7 @@ typedef struct {
     int openam_logout_map_sz;
     am_config_map_t *openam_logout_map; /*OpenAM logout url list*/
 
-    int policy_scope_subtree;
+    int policy_scope_subtree; /*0 - self, 1 - subtree*/
     int resolve_client_host;
     int policy_eval_encode_chars;
     int cookie_encode_chars;
@@ -217,7 +218,7 @@ typedef struct {
 
 /* bootstrap options */
 
-#define AM_AGENTS_CONFIG_LOCAL "org.forgerock.agents.config.local"
+#define AM_AGENTS_CONFIG_LOCAL "com.sun.identity.agents.config.repository.location"
 #define AM_AGENTS_CONFIG_POSTDATA_PRESERVE_DIR "org.forgerock.agents.config.postdata.preserve.dir"
 #define AM_AGENTS_CONFIG_NAMING_URL "com.sun.identity.agents.config.naming.url"
 #define AM_AGENTS_CONFIG_REALM "com.sun.identity.agents.config.organization.name"
@@ -225,12 +226,12 @@ typedef struct {
 #define AM_AGENTS_CONFIG_PASSWORD "com.sun.identity.agents.config.password"
 #define AM_AGENTS_CONFIG_KEY "com.sun.identity.agents.config.key"
 
-#define AM_AGENTS_CONFIG_DEBUG_OPT "com.sun.identity.agents.config.debug.opt" /*0 do not rotate, x rotate at x bytes, -1 rotate once a day*/
+#define AM_AGENTS_CONFIG_DEBUG_OPT "com.sun.identity.agents.config.debug.file.size"
 #define AM_AGENTS_CONFIG_DEBUG_FILE "com.sun.identity.agents.config.local.logfile"
 #define AM_AGENTS_CONFIG_DEBUG_LEVEL "com.sun.identity.agents.config.debug.level"
 #define AM_AGENTS_CONFIG_AUDIT_FILE "com.sun.identity.agents.config.local.audit.logfile"
-#define AM_AGENTS_CONFIG_AUDIT_LEVEL "com.sun.identity.agents.config.audit.level"
-#define AM_AGENTS_CONFIG_AUDIT_OPT "com.sun.identity.agents.config.audit.opt" /*0 do not rotate, x rotate at x bytes, -1 rotate once a day*/ //TODO: remote?
+#define AM_AGENTS_CONFIG_AUDIT_LEVEL "com.sun.identity.agents.config.audit.accesstype"
+#define AM_AGENTS_CONFIG_AUDIT_OPT "com.sun.identity.agents.config.local.log.size"
 
 #define AM_AGENTS_CONFIG_CERT_KEY_FILE "com.forgerock.agents.config.cert.key"
 #define AM_AGENTS_CONFIG_CERT_KEY_PASSWORD "com.forgerock.agents.config.cert.key.password"

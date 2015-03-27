@@ -93,10 +93,10 @@ int am_cache_init() {
         return cache->error;
     }
 
-    am_shm_lock(cache);
     if (cache->init == AM_TRUE) {
         struct am_cache *cache_data = (struct am_cache *) am_shm_alloc(cache, sizeof (struct am_cache));
         if (cache_data != NULL) {
+            am_shm_lock(cache);
             cache_data->count = 0;
             /* initialize head nodes */
             for (i = 0; i < AM_SHARED_CACHE_SIZE; i++) {
@@ -105,15 +105,13 @@ int am_cache_init() {
             cache->user = cache_data;
             /*store table offset (for other processes)*/
             am_shm_set_user_offset(cache, am_get_offset(cache->pool, cache_data));
+            am_shm_unlock(cache);
         } else {
             cache->user = NULL;
             status = AM_ENOMEM;
         }
-    } else {
-        struct am_cache *cache_data = (struct am_cache *) cache->user;
     }
 
-    am_shm_unlock(cache);
     return status;
 }
 
@@ -168,9 +166,17 @@ static struct am_cache_entry *get_cache_entry(const char *key, int *index) {
 
 static int delete_cache_entry(int entry_index, struct am_cache_entry *e) {
     int rv = 0;
+    struct am_cache_entry_data *i, *t, *h;
     struct am_cache *cache_data = (struct am_cache *) cache->user;
 
     if (e == NULL) return AM_EINVAL;
+    /* cleanup cache entry data */
+    h = (struct am_cache_entry_data *) am_get_pointer(cache->pool, e->data.prev);
+    
+    am_offset_list_for_each(cache->pool, h, i, t, struct am_cache_entry_data) {
+        am_shm_free(cache, i);
+    }
+    
     /* remove a node from a doubly linked list */
     if (e->lh.prev == 0) {
         cache_data->table[entry_index].prev = e->lh.next;
@@ -346,6 +352,7 @@ int am_add_pdp_cache_entry(am_request_t *r, const char *key, const char *url,
     ca->value[ca->size[0] + ca->size[1] + 1] = 0;
     memcpy(ca->value + ca->size[0] + ca->size[1] + 2, content_type, ca->size[2]);
     ca->value[ca->size[0] + ca->size[1] + ca->size[2] + 2] = 0;
+    ca->lh.next = ca->lh.prev = 0;
 
     am_offset_list_insert(cache->pool, ca, &(c->data), struct am_cache_entry_data);
 
@@ -588,6 +595,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
             x->value[x->size[0] + x->size[1] + 1] = 0;
             /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
             x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
+            x->lh.next = x->lh.prev = 0;
 
             am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
         }
@@ -628,6 +636,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->value[x->size[0] + x->size[1] + 1] = 0;
                 memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
                 x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
+                x->lh.next = x->lh.prev = 0;
 
                 am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
             }
@@ -656,6 +665,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->value[x->size[0] + x->size[1] + 1] = 0;
                 /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
                 x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
+                x->lh.next = x->lh.prev = 0;
 
                 am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
             }
@@ -688,6 +698,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                     x->value[x->size[0] + x->size[1] + 1] = 0;
                     memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
                     x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
+                    x->lh.next = x->lh.prev = 0;
 
                     am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
                 }
@@ -716,6 +727,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                     x->value[x->size[0] + x->size[1] + 1] = 0;
                     /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
                     x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
+                    x->lh.next = x->lh.prev = 0;
 
                     am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
                 }
@@ -745,6 +757,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->value[x->size[0] + x->size[1] + 1] = 0;
                 /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
                 x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
+                x->lh.next = x->lh.prev = 0;
 
                 am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
             }

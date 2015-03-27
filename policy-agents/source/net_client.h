@@ -50,6 +50,19 @@ typedef struct {
     const char *url;
     struct url uv;
 
+    struct ssl {
+        char on;
+        void *ssl_handle;
+        void *ssl_context;
+        void *read_bio;
+        void *write_bio;
+        int error;
+        int sys_error;
+        struct am_ssl_options info;
+        char *request_data;
+        size_t request_data_sz;
+    } ssl;
+
     http_parser_settings *hs;
     http_parser *hp;
     unsigned int http_status;
@@ -72,5 +85,8 @@ int am_net_write(am_net_t *n, const char *data, size_t data_sz);
 
 void am_net_diconnect(am_net_t *n); /*disconnect socket (client side)*/
 int am_net_close(am_net_t *n);
+
+void am_net_init();
+void am_net_shutdown();
 
 #endif

@@ -68,6 +68,7 @@ static void on_complete_cb(void *udata, int status) {
 
 int am_agent_login(unsigned long instance_id, const char *openam, const char *notifyurl,
         const char *user, const char *pass, const char *key, const char *realm, int is_local,
+        struct am_ssl_options *info,
         char **agent_token, char **pxml, size_t *pxsz, struct am_namevalue **session_list,
         void(*log)(const char *, ...)) {
     const char *thisfunc = "am_agent_login():";
@@ -92,6 +93,9 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
     n.instance_id = instance_id;
     n.timeout = AM_NET_CONNECT_TIMEOUT;
     n.url = openam;
+    if (info != NULL) {
+        memcpy(&n.ssl.info, info, sizeof (struct am_ssl_options));
+    }
 
     ld.rf = create_event();
     if (ld.rf == NULL) return AM_ENOMEM;
@@ -320,7 +324,7 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
 }
 
 int am_agent_logout(unsigned long instance_id, const char *openam,
-        const char *token, void(*log)(const char *, ...)) {
+        const char *token, struct am_ssl_options *info, void(*log)(const char *, ...)) {
     const char *thisfunc = "am_agent_logout():";
     char *get = NULL;
     am_net_t n;
@@ -340,6 +344,9 @@ int am_agent_logout(unsigned long instance_id, const char *openam,
     n.instance_id = instance_id;
     n.timeout = AM_NET_CONNECT_TIMEOUT;
     n.url = openam;
+    if (info != NULL) {
+        memcpy(&n.ssl.info, info, sizeof (struct am_ssl_options));
+    }
 
     ld.rf = create_event();
     if (ld.rf == NULL) return AM_ENOMEM;
@@ -556,6 +563,7 @@ int am_agent_session_request(unsigned long instance_id, const char *openam,
 int am_agent_policy_request(unsigned long instance_id, const char *openam,
         const char *token, const char *user_token, const char *req_url,
         const char *notif_url, const char *scope, const char *cip, const char *pattr,
+        struct am_ssl_options *info,
         struct am_namevalue **session_list,
         struct am_policy_result **policy_list) {
     const char *thisfunc = "am_agent_policy_request():";
@@ -576,6 +584,9 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
     n.instance_id = instance_id;
     n.timeout = AM_NET_CONNECT_TIMEOUT;
     n.url = openam;
+    if (info != NULL) {
+        memcpy(&n.ssl.info, info, sizeof (struct am_ssl_options));
+    }
 
     ld.rf = create_event();
     if (ld.rf == NULL) return AM_ENOMEM;

@@ -48,9 +48,8 @@ typedef struct {
     DWORD error;
 #else
     int fd;
-    sem_t *sem;
+    void *lock;
     int error;
-    int lock;
 #endif
     void *pool;
     void *user;
@@ -104,6 +103,7 @@ struct logout_worker_data {
     unsigned long instance_id;
     char *token;
     char *openam;
+    struct am_ssl_options info;
 };
 
 typedef struct {
@@ -190,9 +190,6 @@ char *am_strsep(char **sp, const char *sep);
 
 int compare_property(const char *line, const char *property);
 
-void net_init();
-void net_shutdown();
-
 int am_make_path(const char *path);
 int am_delete_file(const char *fn);
 int am_delete_directory(const char *path);
@@ -206,13 +203,14 @@ int create_am_action_decision_node(char a, char m, unsigned long long ttl,
         struct am_action_decision **node);
 
 int am_agent_logout(unsigned long instance_id, const char *openam,
-        const char *token, void(*log)(const char *, ...));
+        const char *token, struct am_ssl_options *info, void(*log)(const char *, ...));
 int am_agent_naming_request(unsigned long instance_id, const char *openam, const char *token);
 int am_agent_session_request(unsigned long instance_id, const char *openam,
         const char *token, const char *user_token, const char *notif_url);
 int am_agent_policy_request(unsigned long instance_id, const char *openam,
         const char *token, const char *user_token, const char *req_url,
         const char *notif_url, const char *scope, const char *cip, const char *pattr,
+        struct am_ssl_options *info,
         struct am_namevalue **session_list,
         struct am_policy_result **policy_list);
 
@@ -225,7 +223,6 @@ int am_get_policy_cache_entry(am_request_t *r, const char *key);
 int am_add_policy_cache_entry(am_request_t *r, const char *key, int valid);
 
 int am_get_agent_config(unsigned long instance_id, const char *config_file, am_config_t **cnf);
-int am_config_update_xml(am_config_t *c, char all, char **xml, size_t *xml_sz);
 
 void remove_agent_instance_byname(const char *name);
 
@@ -233,7 +230,6 @@ void am_agent_init_set_value(unsigned long instance_id, char lock, int val);
 int am_agent_init_get_value(unsigned long instance_id, char lock);
 int am_agent_instance_init_init();
 void am_agent_instance_init_lock();
-int am_agent_instance_init_timedlock(int timeout_sec);
 void am_agent_instance_init_unlock();
 void am_agent_instance_init_release(char unlink);
 

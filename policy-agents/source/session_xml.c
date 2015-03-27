@@ -39,6 +39,7 @@ void delete_am_namevalue_list(struct am_namevalue **list) {
 typedef struct {
     int depth;
     unsigned long instance_id;
+    char resource_name;
     struct am_namevalue *list;
     void *parser;
 } am_xml_parser_ctx_t;
@@ -170,17 +171,24 @@ static void start_element(void *userData, const char *name, const char **atts) {
                 }
             }
         }
-    } else if (strcmp(name, "PolicyChangeNotification") == 0) {
-        //TODO: implementme
+    } else if (strcmp(name, "ResourceName") == 0) {
+        ctx->resource_name = AM_TRUE;
     }
 }
 
 static void end_element(void * userData, const char * name) {
     am_xml_parser_ctx_t *ctx = (am_xml_parser_ctx_t *) userData;
     ctx->depth--;
+    ctx->resource_name = AM_FALSE;
 }
 
 static void character_data(void *userData, const char *val, int len) {
+    am_xml_parser_ctx_t *ctx = (am_xml_parser_ctx_t *) userData;
+    struct am_namevalue *el = NULL;
+    if (ctx->resource_name == AM_FALSE || len <= 0) return;
+    if (create_am_namevalue_node("ResourceName", 12, val, len, &el) == 0) {
+        am_list_insert(ctx->list, el);
+    }
 }
 
 static void entity_declaration(void *userData, const XML_Char *entityName,
@@ -197,7 +205,7 @@ void *am_parse_session_xml(unsigned long instance_id, const char *xml, size_t xm
     struct am_namevalue *r = NULL;
 
     am_xml_parser_ctx_t xctx = {.depth = 0, .instance_id = instance_id,
-        .list = NULL, .parser = NULL};
+        .list = NULL, .parser = NULL, .resource_name = AM_FALSE};
 
     if (xml == NULL || xml_sz == 0) {
         am_log_error(instance_id, "%s memory allocation error", thisfunc);
