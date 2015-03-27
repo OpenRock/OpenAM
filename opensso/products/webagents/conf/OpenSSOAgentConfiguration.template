@@ -22,7 +22,7 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-# Portions Copyrighted 2014 ForgeRock AS
+# Portions Copyrighted 2014-2015 ForgeRock AS
 #
 
 #------------------------------------------------------------------------------
@@ -760,7 +760,7 @@ com.sun.identity.agents.config.auth.connection.timeout =
 #
 # Hot-Swap Enabled: Yes
 #
-com.sun.identity.agents.config.ignore.server.check = false
+com.sun.identity.agents.config.ignore.server.check = true
 
 #
 # POLL PRIMARY OpenAM SERVER
