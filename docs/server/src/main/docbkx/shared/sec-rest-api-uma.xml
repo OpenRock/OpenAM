@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2015 ForgeRock AS.
+  !    
+-->
+<section xml:id='sec-rest-uma'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+<!-- Dev Guide -->
+ <title>User-Managed Access (UMA)</title>
+
+ <indexterm>
+  <primary>User-Managed Access (UMA)</primary>
+  <secondary>REST API</secondary>
+ </indexterm>
+
+ <para>User-Managed Access (UMA) is a profile of OAuth 2.0 that lets resource
+  owners control access to protected resources on any number of resource
+  servers from arbitrary requesting parties.</para>
+
+ <para>OpenAM acts as the centralized authorization server and governs
+  access using policies created by resource owners.</para>
+
+  <itemizedlist>
+   <para>OpenAM exposes the following REST endpoints for <link xlink:show="new"
+   xlink:href="${umaSpecUrl}"
+    >User-Managed Access</link> purposes:</para>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-uma-well-known"
+    >automatic configuration and registration of the Authorization Server</link>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-uma-resource-set-registration"
+     >registering sets of resources</link>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-uma-policies"
+     >managing UMA policies</link>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-uma-access-protected-resources"
+     >requesting and granting authorization for access to resources</link>.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="rest-api-uma-well-known">
+   <title>Discovering UMA Configuration</title>
+
+   <para>OpenAM exposes an endpoint for discovering
+    information about the UMA provider configuration.</para>
+
+   <para>A resource server or client can perform an HTTP GET on
+   <literal>/uma<replaceable>{/realm}</replaceable>/.well-known/uma-configuration</literal> to
+    retrieve a JSON object indicating the UMA configuration.</para>
+
+   <para>For an example, see <link xlink:show="new"
+                                   xlink:href="admin-guide#configure-uma-discovery"
+                                   xlink:role="http://docbook.org/xlink/role/olink"
+    >Configuring OpenAM For UMA Discovery</link>.</para>
+
+
+  </section>
+
+  <section xml:id="rest-api-uma-resource-set-registration">
+  <title>Managing UMA Resource Sets</title>
+
+  <para>UMA uses the <link xlink:show="new"
+         xlink:href="${oauthRRegSpecUrl}"
+         xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>OAuth 2.0 Resource Set Registration standard</citetitle></link>
+   for registration and management of resources. The endpoint is
+   <literal>/oauth2/resource_set/</literal>. For details, see the
+   <citetitle>Administration Guide</citetitle> chapter
+   <link xlink:show="new"
+         xlink:href="admin-guide#managing-uma-resource-sets"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Managing UMA Resource Sets</citetitle></link>.</para>
+   <para>OpenAM also provides a read-only endpoint for viewing a user's resource
+    sets, and if available policy definitions. For more information, see
+    <xref linkend="rest-api-oauth2-resourceset-endpoint" />.</para>
+ </section>
+
+ <section xml:id="rest-api-uma-policies">
+  <title>Managing UMA Policies</title>
+
+  <para>OpenAM exposes the following endpoint for managing UMA policies:</para>
+  <variablelist>
+   <varlistentry>
+    <term>
+     <literal>/json/users/<replaceable>username</replaceable>/uma/policies</literal>
+    </term>
+    <listitem>
+     <para>For managing UMA policies.  For details, see the
+      <citetitle>Administration Guide</citetitle> chapter
+      <link xlink:show="new"
+            xlink:href="admin-guide#sec-uma-policies"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+       >Managing UMA Policies</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="rest-api-uma-access-protected-resources">
+  <title>Accessing UMA Protected Resources</title>
+
+  <para>OpenAM exposes the following endpoints for managing UMA workflow and
+   accessing protected resources:</para>
+  <variablelist>
+   <varlistentry>
+    <term>
+     <literal>/uma/permission_request</literal>
+    </term>
+    <listitem>
+     <para>For registering permission requests. For more information, see
+      <link xlink:show="new"
+            xlink:href="admin-guide#to-register-an-uma-permission-request"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+       >To Register an UMA Permission Request</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>/uma/authz_request</literal></term>
+    <listitem>
+     <para>For acquiring requesting party tokens. For more information, see
+      <link xlink:show="new"
+            xlink:href="admin-guide#uma-acquire-rpt"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+       >To Acquire a Requesting Party Token</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+</section>

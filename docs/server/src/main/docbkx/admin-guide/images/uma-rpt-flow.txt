@@ -1,0 +1,58 @@
+@startuml uma-rpt-flow.png
+
+/'
+    CCPL HEADER START
+   
+    This work is licensed under the Creative Commons
+    Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+    To view a copy of this license, visit
+    http://creativecommons.org/licenses/by-nc-nd/3.0/
+    or send a letter to Creative Commons, 444 Castro Street,
+    Suite 900, Mountain View, California, 94041, USA.
+   
+    You can also obtain a copy of the license at
+    src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+    See the License for the specific language governing permissions
+    and limitations under the License.
+   
+    If applicable, add the following below this CCPL HEADER, with the fields
+    enclosed by brackets "[]" replaced with your own identifying information:
+         Portions Copyright [yyyy] [name of copyright owner]
+   
+    CCPL HEADER END
+   
+         Copyright 2015 ForgeRock AS.
+
+    To generate a sequence diagram from this file, process
+    it with PlantUML, http://plantuml.sourceforge.net/sequence.html
+'/
+
+title Accessing an UMA-Protected Resource
+autonumber
+
+participant "Requesting Party\nusing Client Application" as RP
+participant "Resource\nServer" as RS
+participant "OpenAM\nAuthorization Server" as AS
+
+RP->RS: Request to an\nUMA-protected resource
+
+RS-->AS: Permission request and PAT
+
+AS-->RS: Permission ticket
+
+RS-->RP: Permission ticket
+
+RP-->AS: Permission ticket and AAT
+note over AS: Policy decision
+
+AS-->RP: Requesting Party Token (RPT)
+
+RP-->RS: RPT
+
+RS-->AS: Introspect RPT to check validity
+
+AS-->RS: Validity confirmed
+
+RS->RP: Access to requested resource
+
+@enduml

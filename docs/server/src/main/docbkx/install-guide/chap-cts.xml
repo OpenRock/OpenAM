@@ -39,9 +39,9 @@
   </indexterm>
 
  <para>The Core Token Service (CTS) provides persistent and highly available
-  token storage for OpenAM session, OAuth 2.0, and SAML 2.0 tokens.
+  token storage for OpenAM session, OAuth 2.0, SAML 2.0 and UMA tokens.
   CTS is set up in a generalized token storage format, which by default is
-  always used for OAuth 2.0 tokens.
+  always used for OAuth 2.0 and UMA tokens.
   If configured, it can also be used to persist session and SAML 2.0 tokens.</para>
 
  <para>The easiest CTS configuration is to run the default configuration
@@ -926,6 +926,9 @@ $ <userinput>backup \
       <para>SAML 2.0 for token persistence</para>
      </listitem>
      <listitem>
+      <para>UMA for token persistence</para>
+     </listitem>
+     <listitem>
       <para>REST API for functions like Forgotten passwords</para>
      </listitem>
     </orderedlist>
@@ -1048,9 +1051,10 @@ $ <userinput>backup \
       to move the CTS token storage to one or more dedicated systems as
       CTS generally causes much more replication traffic than less volatile
       configuration data.
-      Alternatively, if you need global replication of session, SAML 2.0, and
-      OAuth 2.0 tokens, this would also justify a move to dedicated systems as
-      it provides an extra level of control over how much replication is taking place.
+      Alternatively, if you need global replication of session, SAML 2.0, UMA
+      and OAuth 2.0 tokens, this would also justify a move to dedicated systems
+      as it provides an extra level of control over how much replication is
+      taking place.
      </para>
 
      <para>

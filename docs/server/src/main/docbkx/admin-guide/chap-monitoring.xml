@@ -204,7 +204,7 @@ $ <userinput>ssoadm \
    xlink:role="http://docbook.org/xlink/role/olink">OpenAM Core
    Token Service</link> (CTS) provides persistent and highly available
    token storage for a several components within OpenAM, including
-   user sessions, OAuth 2.0 and SAML 2.0 tokens.
+   user sessions, OAuth 2.0, SAML 2.0 and UMA tokens.
   </para>
 
   <para>

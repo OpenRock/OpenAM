@@ -155,6 +155,23 @@
    </listitem>
   </varlistentry>
 
+  <varlistentry xml:id="uma-1.0">
+   <term><link
+    xlink:href="${umaHomeUrl}">User-Managed Access (UMA) 1.0</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>UMA 1.0</secondary>
+    </indexterm>
+    <para><link xlink:show="new" xlink:href="${umaHomeUrl}"
+     >User-Managed Access (UMA) Profile of OAuth 2.0 (Draft)</link>, in which
+     OpenAM can play the role of authorization server.</para>
+    <para><link xlink:show="new" xlink:href="${oauthRRegSpecUrl}"
+     >OAuth 2.0 Resource Set Registration</link>, in which
+     OpenAM plays the role of authorization server.</para>
+   </listitem>
+  </varlistentry>
+
   <varlistentry xml:id="rest">
    <term><link
    xlink:href="http://en.wikipedia.org/wiki/Representational_state_transfer"

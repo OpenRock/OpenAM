@@ -62,7 +62,8 @@ I don't think it's a big deal, but am not sure. -->
    <imagedata fileref="images/cts-top-diagram.png" format="PNG" />
   </imageobject>
   <textobject>
-   <para>A visual diagram of OIDs related to the Core Token Service.</para>
+   <para>A visual representation of OIDs related to the Core Token Service
+    .</para>
   </textobject>
  </mediaobject>
 

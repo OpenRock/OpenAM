@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2015 ForgeRock AS.
+  !    
+-->
+<section xml:id='sec-uma-intro'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM and the UMA Workflow</title>
+
+ <para>UMA defines a workflow for allowing resource owners to manage
+ access to their protected resources by creating authorization policies on a
+ centralized authorization server, such as OpenAM.</para>
+
+ <figure xml:id="figure-uma-intro-workflow">
+  <title>The Role OpenAM Plays in the UMA Workflow</title>
+  <mediaobject>
+   <alt>Diagram of the UMA workflow, and participants.</alt>
+   <imageobject>
+    <imagedata fileref="images/uma-workflow-overview.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM acts as the Authorization Server in the UMA
+    workflow.</para>
+   </textobject>
+  </mediaobject>
+ </figure>
+
+ <para>The actions that form the UMA workflow are as follows:</para>
+
+ <variablelist>
+  <varlistentry>
+  <term>1. Manage</term>
+  <listitem>
+   <para>The resource owner manages their resources on the resource server.</para>
+  </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>2. Protect</term>
+  <listitem>
+   <para>The resource
+    owner links their resource server and chosen authorization server,
+    for example an OpenAM instance.</para>
+   <para>The authorization server provides a protection API so that the resource
+    server can register sets of resources. Use of the protection API requires a
+    protection API token (PAT) - an OAuth 2.0 token with a specific scope.</para>
+   <para>For more information, see <xref linkend="managing-uma-resource-sets" />.</para>
+  </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>3. Control</term>
+  <listitem>
+   <para>The resource
+    owner controls who has access to their registered resources by
+    creating policies on the authorization server.</para>
+   <para>For more information, see <xref linkend="sec-uma-policies" />.</para>
+  </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>4. Authorize</term>
+  <listitem>
+   <para>The client, acting on behalf of the requesting party, uses the
+    authorization server's authorization API to acquire a requesting party token
+    (RPT). The requesting party or client may need further interaction with the
+    authorization server at this point, for example to supply identity claims.
+    Use of the authorization API requires an authorization API token (AAT) - an
+    OAuth 2.0 token with a specific scope.</para>
+   <para>For more information, see <xref linkend="accessing-uma-protected-resources" />.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>5. Access</term>
+  <listitem>
+   <para>The client presents the RPT to the resource server, which verifies its
+    validity with the authorization server and, if both valid and containing
+    sufficient permissions, returns the protected resource to the requesting
+    party.</para>
+   <para>For more information, see <xref linkend="accessing-uma-protected-resources" />.</para>
+    </listitem>
+  </varlistentry>
+ </variablelist>
+</section>

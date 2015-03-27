@@ -1820,6 +1820,12 @@
 
    <listitem>
     <para>
+     <xref linkend="uma-provider-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
      <xref linkend="password-reset-configuration" />
     </para>
    </listitem>
@@ -2739,6 +2745,139 @@
      </para>
     </listitem>
    </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="uma-provider-configuration">
+   <title>UMA Provider Configuration</title>
+
+   <para><command>ssoadm</command> service name:
+    <literal>UmaProvider</literal></para>
+
+    <varlistentry>
+     <term>Requesting Party Token Lifetime (seconds)</term>
+     <listitem>
+      <para>The maximum life of a Requesting Party Token (RPT) before it
+       expires, in seconds.</para>
+      <para>
+       Default: <literal>3600</literal>
+      </para>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-rpt-lifetime</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Permission Ticket Lifetime (seconds)</term>
+     <listitem>
+      <para>The maximum life of a permission ticket before it expires, in seconds.</para>
+      <para>
+       Default: <literal>60</literal>
+      </para>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-permission-ticket-lifetime</literal></para>
+     </listitem>
+    </varlistentry>
+   <varlistentry>
+    <term>Delete user policies when Resource Server is removed</term>
+    <listitem>
+     <para>Whether to delete all user policies that relate to a Resource Server
+      when removing the OAuth2 agent entry or removing the "uma_protection"
+      scope from the OAuth2 agent.</para>
+     <para>
+      Default: <literal>true</literal> (Enabled)
+     </para>
+     <para><command>ssoadm</command> attribute:
+      <literal>uma-delete-policies-on-resource-server-deletion</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Delete resource sets when Resource Server is removed</term>
+    <listitem>
+     <para>Whether to delete all resource sets that relate to a Resource Server
+      when removing the OAuth2 agent entry or removing the "uma_protection"
+      scope from the OAuth2 agent.</para>
+     <para>
+      Default: <literal>true</literal> (Enabled)
+     </para>
+     <para><command>ssoadm</command> attribute:
+      <literal>uma-delete-resource-sets-on-resource-server-deletion</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>The cache size for the UMA backend policies</term>
+    <listitem>
+     <para>The number of UMA user-created policies to cache, per user. </para>
+     <para>
+      Default: <literal>1000</literal>
+     </para>
+     <para><command>ssoadm</command> attribute:
+      <literal>uma-backend-policy-cache-size</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+     <term>Supported Permission API Token Profiles</term>
+     <listitem>
+      <para>A list of the <emphasis>Permission API</emphasis> profiles this
+       instance of the UMA provider service supports. The
+       <literal>bearer</literal> profile <emphasis>MUST</emphasis> be in this
+       list, and is currently the only profile that OpenAM supports.
+      </para>
+      <para>
+       Default: <literal>bearer</literal>
+      </para>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-supported-pat-profiles</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Supported Authorization API Token Profiles</term>
+     <listitem>
+      <para>A list of the <emphasis>Authorization API</emphasis> profiles
+       this instance of the UMA provider service supports. The
+       <literal>bearer</literal> profile <emphasis>MUST</emphasis> be in this
+       list, and is currently the only profile that OpenAM supports.
+      </para>
+      <para>
+       Default: <literal>bearer</literal>
+      </para>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-supported-aat-profiles</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Supported Requesting Party Token Profiles</term>
+     <listitem>
+      <para>A list of the <emphasis>Requesting Party Token (RPT)</emphasis>
+       profiles this instance of the UMA provider service supports. The
+       <literal>bearer</literal> profile <emphasis>MUST</emphasis> be in this
+       list, and is currently the only profile that OpenAM supports.
+      </para>
+      <para>
+       Default: <literal>bearer</literal>
+      </para>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-supported-rpt-profiles</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Supported Claim Token Profiles</term>
+     <listitem>
+      <para>A list of the <emphasis>Claim Token</emphasis>
+       profiles this instance of the UMA provider service supports.</para>
+      <note><para>Currently OpenAM does not support any Claim Token profiles.</para></note>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-supported-claim-token-profiles</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Supported UMA Profiles</term>
+     <listitem>
+      <para>A list of the <emphasis>UMA extension</emphasis>
+       profiles this instance of the UMA provider service supports.</para>
+      <note><para>Currently OpenAM does not support any UMA extension profiles.</para></note>
+      <para><command>ssoadm</command> attribute:
+       <literal>uma-supported-uma-profiles</literal></para>
+     </listitem>
+    </varlistentry>
   </variablelist>
 
   <variablelist xml:id="password-reset-configuration">
@@ -4251,6 +4390,12 @@
 
    <listitem>
     <para>
+     <xref linkend="servers-uma" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
      <xref linkend="servers-advanced-configuration" />
     </para>
    </listitem>
@@ -4799,7 +4944,7 @@
    <varlistentry>
     <term>Enable Datastore Notification</term>
     <listitem>
-     <para>If yes, then OpenAM uses datastore notification. Otherwise, OpenAM
+     <para>If yes, then OpenAM uses data store notification. Otherwise, OpenAM
      uses in-memory notification.</para>
 
      <para>property:
@@ -5043,7 +5188,7 @@
        <listitem>
         <para>
          If selected, CTS tokens are stored
-         in the same external or embedded datastore
+         in the same external or embedded data store
          as is used on an OpenAM configuration store.
          If you use the default token store,
          you can only configure the <literal>Root Suffix</literal>.
@@ -5073,7 +5218,7 @@
        such as <literal>dc=cts,dc=forgerock,dc=com</literal>.
        The <literal>Root Suffix</literal> would be a database
        that can be maintained and replicated separately
-       from the standard user datastore.
+       from the standard user data store.
       </para>
      </listitem>
     </varlistentry>
@@ -5116,7 +5261,7 @@
       <para>
        Specifies the user, in DN format, needed to authenticate.
        The user needs sufficient privileges to read and write
-       to the root suffix of the external datastore.
+       to the root suffix of the external data store.
       </para>
       <para>
        You can configure this field for external token stores only.
@@ -5140,7 +5285,8 @@
      <term>Max Connections</term>
      <listitem>
       <para>
-       Notes the maximum number of remote connections to the external datastore.
+       Notes the maximum number of remote connections to the external data
+       store.
       </para>
 
       <para>
@@ -5171,6 +5317,119 @@
       </para>
      </listitem>
     </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="servers-uma">
+   <title>Servers &gt; UMA</title>
+   <para>OpenAM stores information about registered resource sets, and also audit
+    information generated when users manage access to their protected resources.
+    OpenAM provides a default store, or you can configure external stores to
+    maintain this information.</para>
+
+   <para>The following settings can be configured separately for both the data
+    store used for storing registered resource sets, and the data store for UMA
+    audit information.</para>
+
+   <para><emphasis role="bold">Resource Sets Store / UMA Audit Store</emphasis></para>
+
+   <varlistentry>
+    <term>Default Token Store</term>
+    <listitem>
+     <para>
+      If selected, tokens are stored in the OpenAM configuration store.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>External Token Store</term>
+    <listitem>
+     <para>
+      If selected, tokens are stored in a separate external data store.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Root Suffix</term>
+    <listitem>
+     <para>
+      Enter the base DN for storage information in LDAP format,
+      such as <literal>dc=uma-rs,dc=forgerock,dc=com</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="servers-uma-external">
+   <para><emphasis role="bold">External Store Configuration</emphasis></para>
+
+   <para>The options in this section become available when
+    <literal>External Token Store</literal> is selected.</para>
+
+   <varlistentry>
+    <term>SSL/TLS Enabled</term>
+    <listitem>
+     <para>
+      Specifies if SSL or TLS is enabled for the connection to the store.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Connection String(s)</term>
+    <listitem>
+     <para>
+      Each connection string is composed as follows:
+      <literal><replaceable>HOST</replaceable>:<replaceable>PORT</replaceable>[|<replaceable>SERVERID</replaceable>[|<replaceable>SITEID</replaceable>]]</literal>, where
+      <replaceable>SERVERID</replaceable> and <replaceable>SITEID</replaceable>
+      are optional parameters that will prioritize that connection for use by
+      the specified nodes. Multiple connection strings should be comma-separated,
+      for example, <literal>host1:389,host2:50389|server1|site1,host3:50389</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Login Id</term>
+    <listitem>
+     <para>
+      The DN of the data store user that OpenAM authenticates to the
+      directory with. This user needs sufficient privileges to read and
+      write to the root suffix of the data store.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Password</term>
+    <listitem>
+     <para>
+      Specifies the password associated with the Login Id.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Max Connections</term>
+    <listitem>
+     <para>
+      Sets the maximum number of remote connections to the external data store.
+     </para>
+
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Heartbeat</term>
+    <listitem>
+     <para>
+      Specifies how often OpenAM should send a heartbeat request to the
+      data store to ensure that the connection does not remain idle, in seconds.
+      Default: 10.
+     </para>
+    </listitem>
+   </varlistentry>
   </variablelist>
 
   <variablelist xml:id="servers-advanced-configuration">

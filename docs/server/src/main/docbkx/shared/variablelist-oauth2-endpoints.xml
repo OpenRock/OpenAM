@@ -26,12 +26,15 @@
 <variablelist
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <para>In addition to the standard authorization and token endpoints
  described in RFC 6749, OpenAM also exposes a token information endpoint
  for resource servers to get information about access tokens so they can
- determine how to respond to requests for protected resources. OpenAM as
+ determine how to respond to requests for protected resources, and an
+  introspection endpoint to retrieve metadata about a token, such as approved
+  scopes and the context in which the token was issued. OpenAM as
  authorization server exposes the following endpoints for clients and
  resource servers.</para>
 
@@ -62,6 +65,102 @@
    <literal>expires_in</literal>, <literal>scope</literal>, and the
    <literal>access_token</literal> ID.</para>
    <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/tokeninfo</literal></para>
+  </listitem>
+ </varlistentry>
+ <varlistentry>
+  <term><literal>/oauth2/introspect</literal></term>
+  <listitem>
+   <para>Endpoint defined in
+    <link
+     xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-introspection-04"
+     >draft-ietf-oauth-introspection-04</link>, used to retrieve
+    metadata about a token, such as approved scopes and the context in which the
+    token was issued.</para>
+   <para>Given an access token, a client can perform an HTTP POST on
+    <literal>/oauth2/introspect?token=<replaceable>access_token</replaceable></literal>
+    to retrieve a JSON object indicating the following:
+    <variablelist>
+
+     <varlistentry>
+      <term><literal>active</literal></term>
+      <listitem>
+       <para>Is the token active.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>scope</literal></term>
+      <listitem>
+       <para>A space-separated list of the scopes associated with the token.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>client_id</literal></term>
+      <listitem>
+       <para>Client identifier of the client that requested the token.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>user_id</literal></term>
+      <listitem>
+       <para>The user who authorized the token.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>token_type</literal></term>
+      <listitem>
+       <para>The type of token.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>exp</literal></term>
+      <listitem>
+       <para>When the token expires, in seconds since January 1 1970 UTC.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>sub</literal></term>
+      <listitem>
+       <para>Subject of the token.</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>iss</literal></term>
+      <listitem>
+       <para>Issuer of the token.</para>
+      </listitem>
+     </varlistentry>
+
+    </variablelist></para>
+   <para>The endpoint requires authentication, and supports basic
+    authorization (a base64-encoded string of
+    <literal><replaceable>client_id</replaceable>:<replaceable>client_secret</replaceable></literal>),
+    <literal><replaceable>client_id</replaceable></literal> and
+    <literal><replaceable>client_secret</replaceable></literal> passed as header
+    values, or a JWT bearer token.</para>
+   <para>The following example demonstrates basic authorization:</para>
+<screen>$ <userinput>curl \
+ --request POST \
+ --header "Authorization: Basic ZGVtbzpjaGFuZ2VpdA==" \
+ https://openam.example.com:8443/openam/oauth2/introspect\
+ ?token=f9063e26-3a29-41ec-86de-1d0d68aa85e9</userinput>
+ <computeroutput>{
+  "active": true,
+  "scope": "mail cn",
+  "client_id": "myOAuth2Client",
+  "user_id": "demo",
+  "token_type": "Bearer",
+  "exp": 1419356238,
+  "sub": "https://resources.example.com/",
+  "iss": "https://openam.example.com/"
+  }</computeroutput>
+</screen>
   </listitem>
  </varlistentry>
 </variablelist>

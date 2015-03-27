@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -50,7 +50,8 @@
    The designs of both HTTP 1.1 and also URIs follow RESTful principles.
    The World Wide Web is no doubt the largest and best known REST application.
    Many other web services also follow the REST architectural style.
-   Examples include OAuth 2.0 and OpenID Connect 1.0.
+   Examples include OAuth 2.0, OpenID Connect 1.0 and User-Managed Access
+   (UMA) 1.0.
   </para>
 
   <para>
@@ -61,7 +62,8 @@
 
   <para>
    Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs.
-   (In contrast, OAuth 2.0 and OpenID Connect 1.0 APIs follow the standards.)
+   (In contrast, OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 APIs follow their
+   respective standards.)
    APIs covered in sections labelled (Legacy API) predate CREST,
    and do not use the CREST verbs.
   </para>
@@ -241,14 +243,14 @@
       xlink:show="new"
       xlink:href="dev-guide#chap-rest-authz-policy"
       xlink:role="http://docbook.org/xlink/role/olink"
-      >Authorization</link>
+      >Authorization and Policy Management</link>
     </para>
    </listitem>
    <listitem>
     <para>
      <link
       xlink:show="new"
-      xlink:href="dev-guide#chap-rest-oauth2-oidc"
+      xlink:href="dev-guide#rest-api-oauth2"
       xlink:role="http://docbook.org/xlink/role/olink"
       >OAuth 2.0 Authorization</link>
     </para>
@@ -256,9 +258,16 @@
    <listitem>
     <para><link
      xlink:show="new"
-     xlink:href="dev-guide#chap-rest-oauth2-oidc"
+     xlink:href="dev-guide#rest-api-openid-connect"
      xlink:role="http://docbook.org/xlink/role/olink"
      >OpenID Connect 1.0</link></para>
+   </listitem>
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#sec-rest-uma"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >User-Managed Access (UMA) 1.0</link></para>
    </listitem>
    <listitem>
     <para>
@@ -442,7 +451,12 @@
         </row>
         <row>
          <entry> </entry>
-         <entry>/users/<emphasis>{user-id}</emphasis>/devices/trusted</entry>
+         <entry>/users/<emphasis>{user}</emphasis>/devices/trusted</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/users/<emphasis>{user}</emphasis>/uma/policies</entry>
          <entry>1.0</entry>
         </row>
         <row>

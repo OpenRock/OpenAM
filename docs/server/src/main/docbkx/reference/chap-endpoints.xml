@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2013-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-endpoints'
@@ -3352,6 +3352,1020 @@ to a runtime exception with messages that I think suggest that it needed to be c
          determine whether you want to disable them.
         </para>
 
+        <para>The endpoints in this section are in the order found in the list of <literal>url-pattern</literal> entries
+        shown in the web.xml file at the time of this writing.</para>
+
+        <variablelist>
+
+            <varlistentry>
+                <term><literal>/*</literal></term>
+                <listitem>
+                    <para>This entry is more of a filter for all endpoints. It's associated with the
+                        ResponseValidationFilter, which checks for valid URLs. It's also associated with the
+                    AMSetupFilter.java file; on systems not yet configured, it redirects users to the setup wizard.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>ws/*</literal></term>
+                <listitem>
+                    <para>Specifies a group of URLs related to authentication endpoints, as it is associated with the
+                    AuthNFilter.java and AuthZFilter.java files. However, those files (and the associated
+                        RestServiceManager.java file) are not called by any other files in the trunk.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/login</literal></term>
+                <listitem>
+                    <para>With the help of the LoginLogoutMapping.java file, this would forward to the /UI/Login.jsp
+                        endpoint.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/logout</literal></term>
+                <listitem>
+                    <para>With the help of the LoginLogoutMapping.java file, this would forward to the /UI/Logout.jsp
+                        endpoint.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/UI/*</literal></term>
+                <listitem>
+                    <para>With the help of the LoginServlet.java file, this forwards to the default login page for
+                        an OpenAM system.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/config/configurator</literal></term>
+                <listitem>
+                    <para>Uses the AMSetupServlet, which as noted in the associated .java file, "is the first class
+                        to get loaded by the Servlet * container"</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/setup/setSetupProgress</literal></term>
+                <listitem>
+                    <para>Used by the installation wizard to display the progress.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/upgrade/setUpgradeProgress</literal></term>
+                <listitem>
+                    <para>Used by the upgrade wizard to display progress.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ui/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named PWResetServlet,
+                     associated with password resets.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/gateway</literal></term>
+                <listitem>
+                    <para>Used with the servlet named GatewayServlet. Associated with the Gateway.java file, which takes
+                        an authentication module and forwards it to a login URL.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/GetHttpSession</literal></term>
+                <listitem>
+                    <para>The associated .java file is associated with Session Failover (SFO).</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/sessionservice, /profileservice, /policyservice, /namingservice, /loggingservice,
+                /authservice, /notificationservice</literal></term>
+                <listitem>
+                    <para>All of these endpoints are associated with
+                        <link xlink:show="new"
+                          xlink:href="http://www.forgerock.org/security_advisory1.html">
+                            OpenAM Security Advisory #201203</link>. As suggested in the advisory, if you're using
+                    OpenAM version 9.5.4 or 10.0.0, you should be sure to apply the updates required to upgrade your
+                    systems to versions 9.5.5 or 10.0.1 (or higher).</para>
+                    <!-- Wild guess on /notificationservice, as it's now redirected to the same OpenSSO output as
+                    the other listed endpoints. -->
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/jaxrpc/*, /identityservices/*</literal></term>
+                <listitem>
+                    <para>These endpoints provide information on configured web services, including the port name,
+                        status, URL, and implementation class. Both endpoints show the same data. The IdentityServices
+                        servlet name points to the following description: "Web Service Endpoint - Identity Services".
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SMSServlet</literal></term>
+                <listitem>
+                    <para>Includes system configuration information when available, as documented in the comments to
+                    the AMSystemConfig.java file.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/notification</literal></term>
+                <listitem>
+                    <para>The associated servlet named notificationservlet appears to be commonly used. When the URL is
+                    entered, the default output is 200, associated with an URL success message.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/entitlementmonitor</literal></term>
+                <listitem>
+                    <para>Used by the NetworkMonitor.java file, which is essential to the monitoring of OpenAM
+                        services.</para>
+            <!-- I might be going to far with this one -->
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/identity/*</literal></term>
+                <listitem>
+                    <para>Possibly a legacy endpoint. While the associated IdentityServicesHandler servlet is identified
+                        as "REST Endpoint - Identity Services", it is only cited in the IdentityServicesHandler.java
+                        file.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/resources/*</literal></term>
+                <listitem>
+                    <para>Linked to an oauth servlet. The associated
+                        com.sun.identity.oauth.service.RestService class is rarely used.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/authentication/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named AuthServlet. The associated AuthServer.java file is the
+                    controller servlet for realm authentication pages. When the URL is entered prior to login, it
+                    defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/base/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named AMBaseServlet. While the associated AMBaseServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/service/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named SCServlet. While the associated SCServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/session/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named SMServlet. While the associated SMServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/realm/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named RMServlet. While the associated RMServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/policy/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named PMServlet. While the associated PMServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idm/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named IDMServlet. While the associated IDMServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/user/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named UMServlet. While the associated UMServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/delegation/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named DelegationServlet. While the associated
+                        DelegationServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/task/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named TaskServlet. While the associated TaskServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/agentconfig/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named AgentConfigurationServlet. The associated
+                        AgentConfigurationServlet class is called by the amAccessControl.xml file, which
+                        suggests that it can be configured from the GUI console, through the Agents section of the
+                        Access Control menu. It is rarely used otherwise. The URL prior to login defaults to the
+                    standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ccversion/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named click-servlet. There is no associated click-servlet.java
+                        or ClickServlet.java file.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/federation/*</literal></term>
+                <listitem>
+                    <para>Associated with the servlet named FSServlet. While the associated FSServlet.java file
+                        is rarely used, the URL prior to login defaults to the standard login page.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/webservices</literal></term>
+                <listitem>
+                    <para>Used by the WSServlet.java and SecurityTokenService.java files. If you're using web services
+                        and/or the Security Token Service (STS), you may want to keep this in place.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/sts</literal></term>
+                <listitem>
+                    <para>Associated with the STS. Be aware, this endpoint exposes basic service and port information
+                        for STS, Metadata Exchange (MEX), Simple Object Access Protocol 1.1 (SOAP11),
+                        and Web Service Definition Language (WSDL) endpoints
+                        without logons.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/sts/mex</literal></term>
+                <listitem>
+                    <para>Associated with the STS. Be aware, this endpoint exposes basic service and port information
+                        for STS, Metadata Exchange (MEX), Simple Object Access Protocol 1.1 (SOAP11),
+                        and Web Service Definition Language (WSDL) endpoints
+                        without logons.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/sts/soap11</literal></term>
+                <listitem>
+                    <para>Associated with the STS. Be aware, this endpoint exposes basic service and port information
+                        for STS, Metadata Exchange (MEX), Simple Object Access Protocol 1.1 (SOAP11),
+                        and Web Service Definition Language (WSDL) endpoints
+                        without logons.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/sts/mexsoap11</literal></term>
+                <listitem>
+                    <para>Associated with the STS. Unlike related STS endpoints, it returns a 404 message by default.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPMniSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SPMniSoap; associated with a
+                        com.sun.identity.saml2.servlet.SPManageNameIDServiceSOAP servlet class. The associated .java
+                        file works with Manage Name ID communications using SOAP binding from the SP. As the former
+                        spMNISOAP.jsp file no longer exists in the trunk, this may be a legacy endpoint.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPMniPOST/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spMNIPOST.jsp; previously defined in the SAML2 JSP Endpoints section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPMniRedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spMNIRedirect.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPMniInit/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spMNIRequestInit.jsp; previously defined in the SAML2 JSP Endpoints section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPECP/*</literal></term>
+                <listitem>
+                    <para>The associated SPECPService class receives and processes single logout (SLO) requests, using
+                        SOAP bindings on the SP. <!-- The associated SPECService.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPSloSoap/*</literal></term>
+                <listitem>
+                    <para>The associated SPSingleLogoutServiceSOAP class receives and processes single logout
+                        (SLO) requests, using SOAP bindings on the SP. <!-- The associated SPSingleLogoutServiceSOAP.java
+                        file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPSloPOST/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spSingleLogoutPOST.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPSloRedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spSingleLogoutRedirect.jsp; previously defined in the SAML2 JSP
+                        Endpoints section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SPSloInit/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spSingleLogoutInit.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/Consumer/*, /SSORedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spAssertionConsumer.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SSOPOST/*, /SSORedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSSOFederate.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SSORedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSSOFederate.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/NIMSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named NameIDMappingServiceSOAP. <!--  The associated NameIDMappingServiceSOAP.java
+                        file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/AIDReqUri/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
+                        AssertionIDRequestURI.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/AIDReqSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
+                        AssertionIDRequestSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/AuthnQueryServiceSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named AuthnQueryServiceSoap. <!-- The associated
+                        AuthnQueryServiceSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/AttributeServiceSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named AttributeServiceSoap. <!-- The associated
+                        AttributeServiceSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be  in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SSOSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SSOSoap. <!-- The associated
+                        IDPSingleSignOnServiceSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPMniSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named IDPMniSoap. <!-- The associated
+                        IDPManageNameIDServiceSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPMniPOST/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpMNIPOST.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPMniRedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpMNIRedirect.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPMniInit/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpMNIRequestInit.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPSloSoap/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named IDPSloSoap. <!-- The associated
+                        IDPSingleLogoutServiceSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPSloPOST/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSingleLogoutPOST.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPSloRedirect/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSingleLogoutRedirect.jsp; previously defined in the SAML2 JSP
+                        Endpoints section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IDPSloInit/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSingleLogoutInit.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ArtifactResolver/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named IDPArtifactResolver. <!-- The associated
+                        IDPArtifactResolutionServiceSOAP.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/spssoinit</literal></term>
+                <listitem>
+                    <para>Used by a servlet named spSSOInit.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idpssoinit</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSSOInit.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idpSSOFederate</literal></term>
+                <listitem>
+                    <para>Used by a servlet named idpSSOFederate.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idpsaehandler/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SA_IDP.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/spsaehandler/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named IDP_SP.jsp; previously defined in the SAML2 JSP Endpoints
+                        section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idpfinder</literal></term>
+                <listitem>
+                    <para>Used by a servlet named IDPFinderService; The associated
+                        FSIDPFinderService.java file can be used to find a preferred IDP with a common domain cookie.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/cdcservlet</literal></term>
+                <listitem>
+                    <para>Used by a servlet named CDCServlet. It is associated with a Cross Domain Controller Servlet,
+                        as described in the
+                        the chapter on <link xlink:href="admin-guide#chap-cdsso"
+                                             xlink:role="http://docbook.org/xlink/role/olink">
+                            <citetitle>Configuring Cross-Domain Single Sign On in the Administration Guide
+                            </citetitle></link>.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SAMLAwareServlet</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SAMLAwareServlet. It is associated with communications between a
+                        client, an SP, and an IDP. The transfer service on the IDP is the SAML Aware Servlet, and is
+                        part of the client web browser artifact profile. It validates a session token from a request run
+                        through the IDP.
+                        <!-- ref http://docs.oracle.com/cd/E19354-01/817-5710/prog_saml.html -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SAMLPOSTProfileServlet</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SAMLPOSTProfileServlet. It is associated with communications between a
+                        client, an SP, and an IDP. The transfer service on the IDP is the SAML Aware Servlet, and is
+                        part of the client web browser POST profile, which supplies assertion IDs, and returns the
+                        response to the client browser.
+                        <!-- ref http://docs.oracle.com/cd/E19354-01/817-5710/prog_saml.html -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SAMLSOAPReceiver</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SAMLSOAPReceiver. The servlet extracts a SAML request from a message
+                        sent in SOAP format. That message can be a query for authorization, attributes, or
+                        authentication. It supports POST messages only.
+                        <!-- ref http://docs.oracle.com/cd/E19462-01/819-4674/admer/index.html -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/AssertionManagerServlet/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named AssertionManagerServlet. It supports dynamic substitution, using
+                        the host name, port number, and the deployment location.
+                        <!-- ref http://docs.oracle.com/cd/E19854-01/819-2357/gayli/index.html -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/FSAssertionManagerServlet/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named FSAssertionManagerServlet. It provides remote interfaces for the
+                        assertion manager class.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SecurityTokenManagerServlet/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SecurityTokenManagerServlet. It supports dynamic substitution, using
+                        session parameters.
+                        <!-- ref http://docs.oracle.com/cd/E19316-01/820-3886/ghjez/index.html -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/preLogin</literal></term>
+                <listitem>
+                    <para>Used by a servlet named preLoginHandler. As there is no associated .java or .jsp file, it
+                        may be a legacy endpoint.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/postLogin/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named postLoginHandler. As there is no associated .java or .jsp file, it
+                        may be a legacy endpoint.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/federation</literal></term>
+                <listitem>
+                    <para>Used by a servlet named FederationServlet. Associated with the
+                        com.sun.identity.federation.login.FSFederationHandler class. The matching
+                        FSFederationHandler.java file processes requests to initiate a federation.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/consentHandler</literal></term>
+                <listitem>
+                    <para>Used by a servlet named consentHandler. Associated with the
+                        com.sun.identity.federation.login.FSConsentHandler class. The matching
+                        FSConsentHandler.java file processes redirect requests
+                        in an existing federation.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ProcessLogout/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ProcessLogout. Associated with the
+                        FSProcessLogoutServlet class. It is designed to handle single logout requests related to
+                        Kantara / Liberty ID-FF processes.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ReturnLogout/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ReturnLogout. Associated with the
+                        FSReturnLogoutServlet class. It is designed to handle single logout responses related to
+                        Kantara / Liberty ID-FF processes. (Note the subtle
+                     difference with the ProcessLogout endpoint which handles logout requests.)
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/liberty-logout</literal></term>
+                <listitem>
+                    <para>Used by a servlet named LogoutServlet. Associated with the
+                        FSSingleLogoutServlet class. It is designed to start single logout requests related to
+                        Kantara / Liberty ID-FF processes.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/SingleSignOnService/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SingleSignOnService. Associated with the
+                        FSSSOAndFedService class. Configured for SSO on the IDP.
+ <!-- per http://download.forgerock.org/downloads/openam/javadocs/internal/com/sun/identity/federation/services/fednsso/FSSSOAndFedService.html -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/IntersiteTransferService</literal></term>
+                <listitem>
+                    <para>Used by a servlet named IntersiteTransferService. Associated with the
+                        FSIntersiteTransferService class. It is designed to send a <literal>AuthnRequest</literal> to an
+                        IDP.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/AssertionConsumerService/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named AssertionConsumerService. Associated with the
+                        FSAssertionConsumerService class. For more information, see the chapter on
+                       <link xlink:href="admin-guide#chap-federation"  xlink:role="http://docbook.org/xlink/role/olink">
+                            <citetitle>Managing SAML 2.0 Federation in the Administration Guide</citetitle></link>.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+ <!-- Many of the following defined with the help of http://docs.oracle.com/cd/E19575-01/820-3886/ggwvp/index.html -->
+
+            <varlistentry>
+                <term><literal>/SOAPReceiver/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named SOAPReceiver. Associated with the
+                        FSSOAPReceiver class. SOAP endpoint that handles federation and specifies a URI to the SP.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/federation-terminate</literal></term>
+                <listitem>
+                    <para>Used by a servlet named FederationTerminationServlet. Associated with the
+                        FSTerminationInitiationServlet.java file, used to initiate termination of a federation
+                        connection. The IDP will send the termination request to the associated URL.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ProcessTermination/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ProcessTermination. Associated with the
+                        FSTerminationRequestServlet class. The associated .java file is used when a request is
+                        received by a remote SP.
+                    <!-- I think remote SP, not 100% sure, per http://download.forgerock.org/downloads/openam
+                 /javadocs/internal/com/sun/identity/federation/services/termination/FSTerminationRequestServlet.html-->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ReturnTermination/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ReturnTermination. Associated with the
+                        FSTerminationReturnServlet class. The associated .java file is used to define a URL used by an
+                        IP to send termination responses.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/InitiateRegistration/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named InitiateRegistration. Associated with the
+                        FSRegistrationInitiationServlet class. The associated .java file is used to handle the
+                        registration request from a remote IDP.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ProcessRegistration/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ProcessRegistration. Associated with the
+                        FSRegistrationRequestServlet class. Processes registration requests from remote SPs.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/ReturnRegistration/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ReturnRegistration. Associated with the
+                        FSRegistrationReturnServlet class. Defines a URL for IDPs to send registration responses.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/Liberty/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named WSSOAPReceiver. Associated with the
+                        SOAPReceiver class. Defines an endpoint that handles SOAP requests.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/WSPRedirectHandler/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named WSPRedirectHandler. Associated with the
+                        WSPRedirectHandlerServlet class. Used by the SP for user redirects.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idffwriter, /saml2writer</literal></term>
+                <listitem>
+                    <para>Used by a servlet with a matching name (idffwriter, saml2writer). Associated with the
+                        CookieWriterServlet class. Used by the IDP to help the web container find app-specific info
+                        such as Java classes or Java Archives (JARs).
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/idffreader, /saml2reader</literal></term>
+                <listitem>
+                    <para>Used by a servlet with a matching name (idffreader, saml2reader). Associated with the
+                        CookieReaderServlet class. Used by the SP to help find the preferred IDP.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/multiprotocolrelay</literal></term>
+                <listitem>
+                    <para>Used by a servlet named MultiProtocolRelayServlet. Associated with the
+                        MultiProtocolRelayServlet class. Used as a RelayState to continue to the next protocol;
+                        associated with a federation.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/WSFederationServlet/*, /FederationMetadata/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named WSFederationServlet. Associated with the
+                        WSFederationServlet class. Used as a service endpoint for WS-Federation.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/RealmSelection/*</literal></term>
+                <listitem>
+                    <para>Used by am endpoint named realmSelection.jsp. Previously defined in the WS-Federation
+                        JSP Endpoints section.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/saml2query/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named saml2query. Associated with the QueryHandlerServlet class. The
+                        corresponding .java file receives and processes SAML2 queries.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/federationws/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named federationrest. Associated with the ServletContainer class. Does not
+                        appear to be included in any current .java or .jsp file, so it may be a legacy endpoint.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/xacml/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named XACMLContentAdapter. Associated with the XacmlContentHandlerService
+                        class. Provides the main endpoint for all XACML requests. <!--For more information, see the next
+                        section on XACML 3 REST Endpoints. -->
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/frrest/oauth2/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named OAuth2Rest. Associated with the RestTokenDispatcher class.
+                        class.  For more information, see the
+                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
+                                             xlink:role="http://docbook.org/xlink/role/olink">
+                            <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/oauth2/registerClient.jsp</literal></term>
+                <listitem>
+                    <para>Used by a servlet named OAuth2RegisterClient. For more information, see the
+                        the Administration Guide chapter on <link xlink:href="admin-guide#chap-oauth2"
+                                             xlink:role="http://docbook.org/xlink/role/olink">
+                            <citetitle>Managing OAuth 2.0 Authorization</citetitle></link>.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/oauth2/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named OAuth2RestletAdapter. Associated with the RestTokenDispatcher class.
+                        For more information, see the chapter on
+                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
+                                             xlink:role="http://docbook.org/xlink/role/olink">
+                            <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><literal>/json/*</literal></term>
+                <listitem>
+                    <para>Used by a servlet named ForgeRockRest. Associated with the HttpServlet class.
+                        For more information, see the chapter on
+                        <link xlink:href="dev-guide#chap-rest"
+                                             xlink:role="http://docbook.org/xlink/role/olink">
+                            <citetitle>Using RESTful Web Services</citetitle></link>. In addition, you
+                    can read more about associated REST endpoints in <link xlink:href="reference#json-rest-endpoints"
+                    xlink:role="http://docbook.org/xlink/role/olink" />
+                    <citetitle>JSON REST Endpoints</citetitle></para>
+                </listitem>
+            </varlistentry>
+
+
+
+        </variablelist>
     </section>
 
  <section xml:id="json-rest-endpoints">
@@ -3474,6 +4488,18 @@ to a runtime exception with messages that I think suggest that it needed to be c
         <para>Exposes OpenID Provider configuration by HTTP GET as specified by
         OpenID Connect Discovery 1.0. No query string parameters are
         required.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><literal>/uma/.well-known/uma-configuration</literal></term>
+       <listitem>
+        <para>Exposes User-Managed Access (UMA) configuration by HTTP GET as
+         specified by UMA Profile of OAuth 2.0. No query string parameters are
+         required.</para>
+        <para>For an example, see <link xlink:show="new"
+              xlink:href="dev-guide#rest-api-uma-well-known"
+              xlink:role="http://docbook.org/xlink/role/olink"
+         ><citetitle>Discovering User-Managed Access Configuration</citetitle></link>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>

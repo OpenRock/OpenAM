@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2015 ForgeRock AS.
+  !    
+-->
+<section xml:id='sec-uma-policies'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Managing UMA Policies</title>
+ <indexterm>
+  <primary>Policies</primary>
+  <secondary>Configuring</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>UMA</primary>
+ </indexterm>
+
+  <para>
+   UMA authorization servers must manage the resource owner's authorization
+   policies, so that registered resource sets can be protected.
+  </para>
+
+  <para>OpenAM provides the
+   <literal>/json/users/<replaceable>{user}</replaceable>/uma/policies/</literal> REST
+   endpoint for creating and managing user-managed authorization policies.</para>
+
+  <para>Managing UMA policies requires that a resource set is
+   registered to the user in the URL. For information on registering resource
+   sets, see the <citetitle>Administration Guide</citetitle> chapter <link xlink:show="new"
+         xlink:href="admin-guide#managing-uma-resource-sets"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Managing UMA Resource Sets</citetitle></link>.
+  </para>
+
+  <para>Once a resource set is registered to the user, use the
+   <literal>/json/users/<replaceable>{user}</replaceable>/uma/policies/</literal>
+   REST endpoint for the following operations:</para>
+  <itemizedlist>
+   <listitem>
+    <para><xref linkend="to-create-an-uma-policy" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-read-an-uma-policy" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-update-an-uma-policy" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-delete-an-uma-policy" /></para>
+   </listitem>
+   <listitem>
+   <para><xref linkend="to-query-uma-policies" /></para>
+  </listitem>
+  </itemizedlist>
+
+
+  <procedure xml:id="to-create-an-uma-policy">
+   <title>To Create an UMA Policy</title>
+
+   <para>To create a policy, the resource owner must be logged in to the
+    authorization server and have an SSO token issued to them, and must also
+    know the
+    <link xlink:show="new"
+          xlink:href="admin-guide#to-register-an-uma-resource-set"
+          xlink:role="http://docbook.org/xlink/role/olink">ID of the resource set</link>
+    to be protected. This information is used when creating policies.</para>
+   <note><para>Only the resource owner can create a policy to protect
+    a resource set. Administrator users such as <literal>amadmin</literal> cannot
+    create policies on behalf of a resource owner.</para></note>
+   <step>
+    <para>Create a POST request to the policies endpoint, including the
+     SSO token in a header based on the configured session cookie name (default:
+     <literal>iPlanetDirectoryPro</literal>), and the resource set ID as the
+     value of <literal>policyId</literal> in the body.</para>
+    <note><para>The SSO token must have been issued to the user specified in the
+     URL. In this example, the user is <literal>demo</literal>.</para></note>
+    <para>The following example uses an SSO token to create a policy to
+     share a resource set belonging to user <replaceable>demo</replaceable>
+     with two subjects, with different scopes for each:</para>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5wM2LY4S...Q4MTE4NTA2*" \
+ --data \
+ '{
+     "policyId": "43225628-4c5b-4206-b7cc-5164da81decd0",
+     "permissions":
+     [
+         {
+             "subject": "id=alice,ou=user,dc=openam,dc=forgerock,dc=org",
+             "scopes": ["http://photoz.example.com/dev/scopes/view"]
+         },
+         {
+             "subject": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org",
+             "scopes": [
+                 "http://photoz.example.com/dev/scopes/view",
+                 "http://photoz.example.com/dev/scopes/all"
+             ]
+         }
+     ]
+ }' \
+ https://openam.example.com:8443/openam/json/users/demo/uma/policies?_action=create</userinput>
+<computeroutput>{}</computeroutput>
+</screen>
+    <para>On success, an HTTP 201 Created status code is returned, with
+     an empty JSON body as the response.</para>
+    <para>If the permissions are not correct, an HTTP 400 Bad Request status
+     code is returned, for example:
+<screen><computeroutput>{
+     "code": 400,
+     "reason": "Bad Request",
+     "message": "Invalid UMA policy permission. Missing required attribute, 'subject'."
+ }</computeroutput></screen></para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-read-an-uma-policy">
+   <title>To Read an UMA Policy</title>
+
+   <para>To read a policy, the resource owner or an administrator user must be
+    logged in to the authorization server and have an SSO token issued to
+    them. The
+    <link xlink:show="new"
+          xlink:href="admin-guide#to-create-an-uma-policy"
+          xlink:role="http://docbook.org/xlink/role/olink">ID of the
+     policy</link> to read must also be known.</para>
+   <tip><para>The ID used for a policy is always identical to the ID of the
+    resource set it protects.</para></tip>
+   <step>
+   <para>Create a GET request to the policies endpoint, including the
+    SSO token in a header based on the configured session cookie name (default:
+    <literal>iPlanetDirectoryPro</literal>), and the resource set ID as part of
+    the URL.</para>
+    <note><para>The SSO token must have been issued to the user specified in the
+     URL, or to an administrative user such as <literal>amadmin</literal>.
+     In this
+     example, the user is <literal>demo</literal>.</para></note>
+    <para>The following example uses an SSO token to read a specific policy
+     with ID <literal>43225628-4c5b-4206-b7cc-5164da81decd0</literal> belonging
+     to user <replaceable>demo</replaceable>:</para>
+<screen>
+$ <userinput>curl \
+--header "iPlanetDirectoryPro: AQIC5wM2LY4S...Q4MTE4NTA2*" \
+https://openam.example.com:8443/openam/json/users/demo\
+/uma/policies/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+<computeroutput>{
+ "policyId": "43225628-4c5b-4206-b7cc-5164da81decd0",
+ "name": "Photo Album",
+ "permissions": [
+     {
+         "subject": "id=alice,ou=user,dc=openam,dc=forgerock,dc=org",
+         "scopes": [
+             "http://photoz.example.com/dev/scopes/view"
+         ]
+     },
+     {
+         "subject": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org",
+         "scopes": [
+             "http://photoz.example.com/dev/scopes/view",
+             "http://photoz.example.com/dev/scopes/all"
+         ]
+     }
+ ]
+}</computeroutput>
+</screen>
+    <para>On success, an HTTP 200 OK status code is returned, with
+     a JSON body representing the policy.</para>
+    <para>If the policy ID does not exist, an HTTP 404 Not Found status code is
+     returned, as follows:
+<screen><computeroutput>{
+     "code": 404,
+     "reason": "Not Found",
+     "message": "UMA Policy not found, 43225628-4c5b-4206-b7cc-5164da81decd0"
+}</computeroutput></screen></para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-update-an-uma-policy">
+   <title>To Update an UMA Policy</title>
+
+   <para>To update a policy, the resource owner or an administrator user must be
+    logged in to the authorization server and have an SSO token issued to
+    them. The
+    <link xlink:show="new"
+          xlink:href="admin-guide#to-create-an-uma-policy"
+          xlink:role="http://docbook.org/xlink/role/olink">ID of the
+     policy</link> to read must also be known.</para>
+   <tip><para>The ID used for a policy is always identical to the ID of the
+    resource set it protects.</para></tip>
+   <step>
+    <para>Create a PUT request to the policies endpoint, including the
+     SSO token in a header based on the configured session cookie name (default:
+     <literal>iPlanetDirectoryPro</literal>), and the resource set ID as both
+     the value of <literal>policyId</literal> in the body and also as part of the URL.</para>
+
+    <note><para>The SSO token must have been issued to the user specified in the
+     URL. In this example, the user is <literal>demo</literal>.</para></note>
+    <para>The following example uses an SSO token to update a policy with ID
+     <literal>43225628-4c5b-4206-b7cc-5164da81decd0</literal> belonging to user
+     <replaceable>demo</replaceable> with a new scope for one of the subjects:</para>
+<screen>
+ $ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5wM2LY4S...Q4MTE4NTA2*" \
+ --data \
+ '{
+     "policyId": "43225628-4c5b-4206-b7cc-5164da81decd0",
+     "permissions":
+     [
+         {
+             "subject": "id=alice,ou=user,dc=openam,dc=forgerock,dc=org",
+             "scopes": [
+                 "http://photoz.example.com/dev/scopes/view",
+                 "http://photoz.example.com/dev/scopes/all"
+             ]
+         },
+         {
+             "subject": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org",
+             "scopes": [
+                 "http://photoz.example.com/dev/scopes/view",
+                 "http://photoz.example.com/dev/scopes/all"
+             ]
+         }
+     ]
+ }' \
+https://openam.example.com:8443/openam/json/users/demo\
+/uma/policies/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+ <computeroutput>{}</computeroutput>
+</screen>
+    <para>On success, an HTTP 204 Empty status code is returned, with
+     an empty JSON body as the response.</para>
+    <para>If the policy ID does not exist, an HTTP 404 Not Found status code is
+     returned, as follows:
+<screen><computeroutput>{
+    "code": 404,
+    "reason": "Not Found",
+    "message": "UMA Policy not found, 43225628-4c5b-4206-b7cc-5164da81decd0"
+ }</computeroutput></screen></para>
+    <para>If the permissions are not correct, an HTTP 400 Bad Request status
+     code is returned, for example:
+<screen><computeroutput>{
+    "code": 400,
+    "reason": "Bad Request",
+    "message": "Invalid UMA policy permission. Missing required attribute, 'subject'."
+ }</computeroutput></screen></para>
+    <para>If the policy ID in the URL does not match the policy ID used in
+     the sent JSON body, an HTTP 400 Bad Request status code is returned, for example:
+<screen><computeroutput>{
+    "code": 400,
+    "reason": "Bad Request",
+    "message": "Policy ID does not match policy ID in the body."
+ }</computeroutput></screen></para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-delete-an-uma-policy">
+   <title>To Delete an UMA Policy</title>
+
+   <para>To delete a policy, the resource owner or an administrator user must be
+    logged in to the authorization server and have an SSO token issued to
+    them. The
+    <link xlink:show="new"
+          xlink:href="admin-guide#to-create-an-uma-policy"
+          xlink:role="http://docbook.org/xlink/role/olink">ID of the
+     policy</link> to read must also be known.</para>
+   <tip><para>The ID used for a policy is always identical to the ID of the
+    resource set it protects.</para></tip>
+   <step>
+    <para>Create a DELETE request to the policies endpoint, including the
+     SSO token in a header based on the configured session cookie name (default:
+     <literal>iPlanetDirectoryPro</literal>), and the resource set ID as part of
+     the URL.</para>
+
+    <note><para>The SSO token must have been issued to the user specified in the
+     URL. In this example, the user is <literal>demo</literal>.</para></note>
+    <para>The following example uses an SSO token to delete a policy with ID
+     <literal>43225628-4c5b-4206-b7cc-5164da81decd0</literal> belonging to user
+     <replaceable>demo</replaceable>:</para>
+<screen>
+$ <userinput>curl \
+--request DELETE \
+--header "iPlanetDirectoryPro: AQIC5wM2LY4S...Q4MTE4NTA2*" \
+https://openam.example.com:8443/openam/json/users/demo\
+/uma/policies/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+ <computeroutput>{}</computeroutput>
+</screen>
+    <para>On success, an HTTP 200 OK status code is returned, with an empty JSON
+     body as the response.</para>
+    <para>If the policy ID does not exist, an HTTP 404 Not Found status code is
+     returned, as follows:
+<screen><computeroutput>{
+     "code": 404,
+     "reason": "Not Found",
+     "message": "UMA Policy not found, 43225628-4c5b-4206-b7cc-5164da81decd0"
+ }</computeroutput></screen></para>
+   </step>
+  </procedure>
+
+ <procedure xml:id="to-query-uma-policies">
+  <title>To Query UMA Policies</title>
+
+  <para>To query policies, the resource owner or an administrator user
+   must be logged in to the authorization server and have an SSO token issued to
+   them. The
+   <link xlink:show="new"
+         xlink:href="admin-guide#to-create-an-uma-policy"
+         xlink:role="http://docbook.org/xlink/role/olink">ID of the
+    policy</link> to read must also be known.</para>
+
+  <step>
+   <para>Create a GET request to the policies endpoint, including the
+    SSO token in a header based on the configured session cookie name (default:
+    <literal>iPlanetDirectoryPro</literal>).</para>
+   <note><para>The SSO token must have been issued to the user specified in the
+    URL, or to an administrative user such as <literal>amadmin</literal>.
+   </para>
+    <para>In this example, the user is <literal>demo</literal>.</para></note>
+    <para>Use the following query string parameters to affect
+     the returned results:</para>
+    <variablelist>
+     <varlistentry>
+      <term><literal>_sortKeys=[+-]<replaceable>field</replaceable>[,<replaceable>field</replaceable>...]</literal></term>
+      <listitem>
+       <para>Sort the results returned, where <replaceable>field</replaceable>
+        represents a field in the JSON policy objects returned.</para>
+       <para>For UMA policies, only the <literal>policyId</literal> and
+        <literal>name</literal> fields can be sorted.</para>
+       <para>Optionally use the <literal>+</literal> prefix to sort in ascending order (the
+        default), or <literal>-</literal> to sort in descending order.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><literal>_pageSize=<replaceable>integer</replaceable></literal></term>
+      <listitem>
+       <para>Limit the number of results returned.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><literal>_pagedResultsOffset=<replaceable>integer</replaceable></literal></term>
+      <listitem>
+       <para>Start the returned results from the specified index.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><literal>_queryFilter</literal></term>
+      <listitem>
+       <para>The _queryFilter parameter can take <literal>true</literal> to match every
+        policy, <literal>false</literal> to match no policies, or a filter of the
+        following form to match field values:
+        <literal><replaceable>field</replaceable> <replaceable>operator</replaceable> <replaceable>value</replaceable></literal>
+        where <replaceable>field</replaceable> represents the field name,
+        <replaceable>operator</replaceable> is the operator code,
+        <replaceable>value</replaceable> is the value to match, and the entire
+        filter is URL-encoded. Only the equals (<literal>eq</literal>) operator
+        is supported by the <literal>/uma/policies</literal> endpoint.</para>
+        <para>The <replaceable>field</replaceable> value can take the following values:</para>
+      <itemizedlist>
+      <listitem><para><literal>resourceServer</literal> - the resource
+       server that created the resource set.</para></listitem>
+       <listitem><para><literal>permissions/subject</literal> - the
+        list of subjects that are assigned scopes in the policy.</para></listitem>
+       </itemizedlist>
+       <para>Filters can be composed of multiple expressions by a using boolean
+ operator <literal>AND</literal>, and by using parentheses,
+ <literal>(<replaceable>expression</replaceable>)</literal>, to group expressions.</para>
+ <note><para>You must URL encode the filter expression in
+       <literal>_queryFilter=<replaceable>filter</replaceable></literal>. So
+  for example the following filter:</para>
+  <para><literal>resourceServer eq "UMA-Resource-Server" AND permissions/subject eq "id=bob,ou=user,dc=openam,dc=forgerock,dc=org"</literal></para>
+  <para>When URL encoded becomes:</para>
+      <para><literal>resourceServer%20eq%20%22UMA-Resource-Server%22%20AND%20permissions%2Fsubject%20eq%20%22id%3Dbob%2Cou%3Duser%2Cdc%3Dopenam%2Cdc%3Dforgerock%2Cdc%3Dorg%22</literal>
+      </para></note>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+   <para>The following example uses an SSO token to query the policies belonging
+    to user <replaceable>demo</replaceable> which have a subject
+    <literal>bob</literal> in the permissions:</para>
+<screen>
+ $ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5wM2LY4S...Q4MTE4NTA2*" \
+ --get \
+ --data-urlencode '_sortKeys=policyId,name' \
+ --data-urlencode '_pageSize=1' \
+ --data-urlencode '_pagedResultsOffset=0' \
+ --data-urlencode \
+  '_queryFilter=permissions/subject eq "id=bob,ou=user,dc=openam,dc=forgerock,dc=org"' \
+ https://openam.example.com:8443/openam/json/users/demo/uma/policies</userinput>
+<computeroutput>{
+     "result": [
+         {
+         "policyId": "52645907-e20b-4351-8e0c-523ebe0d44710",
+         "name": "Photo Album",
+         "permissions": [
+             {
+                 "subject": "id=alice,ou=user,dc=openam,dc=forgerock,dc=org",
+                 "scopes": [
+                     "http://photoz.example.com/dev/scopes/view"
+                 ]
+             },
+             {
+                 "subject": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org",
+                 "scopes": [
+                     "http://photoz.example.com/dev/scopes/all",
+                     "http://photoz.example.com/dev/scopes/view"
+                 ]
+             }
+         ]
+     }
+ ],
+ "resultCount": 1,
+ "pagedResultsCookie": null,
+ "remainingPagedResults": 0
+}</computeroutput>
+   </screen>
+   <para>On success, an HTTP 200 OK status code is returned, with
+    a JSON body representing the policies that match the query.</para>
+   <para>If the query is not formatted correctly, for example an incorrect
+    field is used in the <literal>_queryFilter</literal>, an HTTP 500 Server
+    Error is returned, as follows:
+<screen><computeroutput>{
+    "code": 500,
+    "reason": "Internal Server Error",
+    "message": "'/badField' not queryable"
+}</computeroutput></screen></para>
+  </step>
+ </procedure>
+
+</section>

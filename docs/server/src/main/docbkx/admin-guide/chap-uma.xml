@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2015 ForgeRock AS.
+  !    
+-->
+<chapter xml:id='chap-uma'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Managing UMA Authorization</title>
+ <indexterm>
+  <primary>Authorization</primary>
+  <secondary>Configuring</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>UMA</primary>
+ </indexterm>
+
+ <para>
+  This chapter introduces <link
+  xlink:href="${umaSpecUrl}"
+  xlink:show="new"
+  >User-Managed Access (UMA) 1.0</link>, and the part OpenAM plays in the
+  UMA workflow. UMA 1.0 is a profile of OAuth 2.0.</para>
+
+ <xinclude:include href='sec-uma-intro.xml' />
+
+ <section xml:id="configure-uma">
+  <title>Configuring OpenAM for UMA</title>
+  <para>This section explains how to setup OpenAM as an authorization
+   server in the User-Managed Access (UMA) workflow.</para>
+
+ <section xml:id="configure-uma-provider">
+  <title>Configuring the UMA Provider Service</title>
+  <para>To enable OpenAM to act as an authorization server in the UMA
+   workflow you must create an UMA Provider service.</para>
+<procedure xml:id="to-configure-uma-provider-service">
+ <title>To Configure the UMA Provider Service</title>
+ <step>
+  <para>Login to the OpenAM console as an OpenAM administrator, for example
+   <literal>amadmin</literal>.</para>
+ </step>
+ <step>
+ <para>On the Access Control tab, click the realm in which to enable UMA,
+  and then click Services.</para>
+</step>
+ <step>
+ <para>On the Services tab, click Add, select UMA Provider from the list of
+  services, and then click Next.</para>
+</step>
+ <step>
+  <para>Configure the Realm Attributes for this instance of the UMA 
+   provider, or accept the default values.</para>
+  <para>For information about the available attributes, see the
+   <citetitle>Reference</citetitle> section <link xlink:show="new"
+       xlink:href="reference#uma-provider-configuration"
+       xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>UMA Provider Configuration</citetitle></link>.</para>
+ </step>
+ <step>
+  <para>To complete the configuration, click Finish.</para>
+ </step>
+</procedure>
+ </section>
+
+  <section xml:id="configure-uma-storage">
+   <title>Configuring UMA Stores</title>
+
+   <para>OpenAM stores information about registered resource sets, and
+    also audit information generated when users manage access to their
+    protected resources. OpenAM provides a default store, or you can
+    configure external stores to maintain this information.
+   </para>
+   <procedure xml:id="to-configure-uma-external-rs-store">
+    <title>To Configure the UMA Resource Set Store</title>
+    <step>
+     <para>Login to the OpenAM console as an OpenAM administrator, for example
+      <literal>amadmin</literal>.</para>
+    </step>
+    <step>
+     <para>On the main OpenAM Console screen, click Configuration > Servers
+      and Sites > <replaceable>Server Name</replaceable> > UMA.</para>
+    </step>
+    <step>
+     <para>On the Edit <replaceable>Server Name</replaceable> screen, click
+      Inheritance Settings. Resource Sets Store properties are inherited from
+      defaults.</para></step>
+    <step><para>On the Server Property Inheritance Setting screen,
+     uncheck the Resource Sets Store properties that you want to modify, and
+      then click Save.</para></step>
+    <step><para>On the Edit <replaceable>Server Name</replaceable> screen, in
+     the Resource Sets Store section, click External Token Store and then
+     enter the base DN of the store in Root Suffix. For example
+     <literal>dc=uma-rs,dc=example,dc=com</literal>.</para></step>
+
+<step><para>In the External Resource Sets Store Configuration section, enter
+ the properties for the store. For information about the available
+ settings, see the <citetitle>Reference</citetitle> section
+ <link xlink:show="new" xlink:href="reference#servers-uma"
+       xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>Servers &gt; UMA</citetitle></link>.</para>
+    </step>
+    <step>
+     <para>To complete the configuration, click Save.</para>
+    </step>
+   </procedure>
+   <procedure xml:id="to-configure-uma-external-audit-store">
+    <title>To Configure UMA Audit Storage</title>
+    <step>
+     <para>Login to the OpenAM console as an OpenAM administrator, for example
+      <literal>amadmin</literal>.</para>
+    </step>
+    <step>
+     <para>On the main OpenAM Console screen, click Configuration > Servers
+      and Sites > <replaceable>Server Name</replaceable> > UMA.</para>
+    </step>
+    <step>
+     <para>On the Edit <replaceable>Server Name</replaceable> screen, click
+      Inheritance Settings. UMA Audit Store properties are inherited from
+      defaults. On the Server Property Inheritance Setting screen, uncheck
+      the UMA Audit Store properties that you want to modify, and
+      then click Save.</para>
+    </step>
+    <step><para>On the Edit <replaceable>Server Name</replaceable> screen, in
+     the UMA Audit Store section, click External Token Store and then
+     enter the base DN of the store in Root Suffix. For example
+     <literal>dc=uma-audit,dc=example,dc=com</literal>.</para></step>
+
+    <step><para>In the External UMA Audit Store Configuration section, enter the
+     properties for the store. For information about the available
+     settings, see the <citetitle>Reference</citetitle> section
+     <link xlink:show="new" xlink:href="reference#servers-uma"
+           xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Servers &gt; UMA</citetitle></link>.</para>
+    </step>
+    <step>
+     <para>To complete the configuration, click Save.</para>
+    </step>
+   </procedure>
+
+  </section>
+  <section xml:id="configure-uma-discovery">
+  <title>Configuring OpenAM For UMA Discovery</title>
+
+  <para>OpenAM exposes an endpoint for discovering
+   information about UMA Provider configuration.</para>
+
+  <para>To use the endpoint, you must first create both an OAuth 2.0
+   Provider service, and an UMA Provider service in OpenAM. For more
+   information on creating these services, see <xref
+    linkend="configure-oauth2-authz" /> and <xref
+    linkend="configure-uma-provider" />.
+  </para>
+
+  <para>A resource server or client can perform an HTTP GET on
+   <literal>/uma/<replaceable>{realm}</replaceable>/.well-known/uma-configuration</literal>
+   to retrieve a JSON object indicating the UMA Provider configuration for
+   <replaceable>realm</replaceable> if specified, or the top-level root realm
+   if not.</para>
+
+  <tip><para>Resource servers and clients need to be able to discover the
+   UMA provider for a resource owner. You should consider
+   redirecting requests to URIs at the server root, such as
+   <literal>http://www.example.com/.well-known/uma-configuration</literal>,
+   to the well-known URIs in OpenAM's space:
+   <literal>http://www.example.com/openam/uma/.well-known/uma-configuration</literal>.
+  </para></tip>
+
+  <para>The following is an example of a GET request to the UMA
+   configuration discovery endpoint for the top-level root realm:</para>
+<screen>$ <userinput>curl \
+ --request GET \
+ https://openam.example.com:8443/openam/uma/.well-known/uma-configuration</userinput>
+<computeroutput>{
+ "version": "1.0",
+ "issuer": "openam.example.com",
+ "pat_profiles_supported": [
+  "bearer"
+ ],
+ "aat_profiles_supported": [
+     "bearer"
+ ],
+ "rpt_profiles_supported": [
+     "bearer"
+ ],
+ "pat_grant_types_supported": [
+     "authorization_code"
+ ],
+ "aat_grant_types_supported": [
+     "authorization_code"
+ ],
+ "token_endpoint": "https://openam.example.com:8443/openam/oauth2/access_token",
+ "authorization_endpoint": "https://openam.example.com:8443/openam/oauth2/authorize",
+ "introspection_endpoint": "https://openam.example.com:8443/openam/oauth2/introspect",
+ "resource_set_registration_endpoint": "https://openam.example.com:8443/openam/oauth2/resource_set",
+ "permission_registration_endpoint": "https://openam.example.com:8443/openam/uma/permission_request",
+ "rpt_endpoint": "https://openam.example.com:8443/openam/uma/authz_request",
+ "dynamic_client_endpoint": "https://openam.example.com:8443/openam/oauth2/connect/register"
+}</computeroutput>
+</screen>
+
+  <para>The JSON object returned includes the following configuration
+   information:</para>
+  <variablelist>
+
+   <varlistentry>
+    <term><literal>version</literal></term>
+    <listitem>
+     <para>The supported UMA core protocol version.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>issuer</literal></term>
+    <listitem>
+     <para>The URI of the issuing authorization server.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>pat_profiles_supported</literal></term>
+    <listitem>
+     <para>The supported OAuth token types used for issuing Protection API
+      Tokens (PATs).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>aat_profiles_supported</literal></term>
+    <listitem>
+     <para>The supported OAuth token types used for issuing Authorization
+      API Tokens (AATs).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>rpt_profiles_supported</literal></term>
+    <listitem>
+     <para>The supported Requesting Party Token (RPT) profiles.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>pat_grant_types_supported</literal></term>
+    <listitem>
+     <para>The supported OAuth grant types used for issuing PATs.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>aat_grant_types_supported</literal></term>
+    <listitem>
+     <para>The supported OAuth grant types used for issuing AATs.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>token_endpoint</literal></term>
+    <listitem>
+     <para>The URI to request a PAT or AAT.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>authorization_endpoint</literal></term>
+    <listitem>
+     <para>The URI to request authorization for issuing a PAT or AAT.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>introspection_endpoint</literal></term>
+    <listitem>
+     <para>The URI to introspect an RPT.</para>
+     <para>For more information, see
+      <link xlink:show="new"
+            xlink:href="dev-guide#rest-api-oauth2-client-endpoints"
+            xlink:role="http://docbook.org/xlink/role/olink"
+       ><citetitle>OAuth 2.0 Client &amp; Resource Server Endpoints</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>resource_set_registration_endpoint</literal></term>
+    <listitem>
+     <para>The URI for a resource server to register a resource set.</para>
+     <para>For more information, see
+      <xref linkend="managing-uma-resource-sets" />.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>permission_registration_endpoint</literal></term>
+    <listitem>
+     <para>The URI for a resource server to register a requested permission.</para>
+     <para>For more information, see
+      <xref linkend="to-register-an-uma-permission-request" />.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>rpt_endpoint</literal></term>
+    <listitem>
+     <para>The URI for the client to request authorization data.</para>
+     <para>For more information, see
+      <xref linkend="uma-acquire-rpt" />.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>dynamic_client_endpoint</literal></term>
+    <listitem>
+     <para>The URI for registering a dynamic client.</para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+
+
+ </section>
+ </section>
+ <section xml:id="managing-uma-resource-sets">
+  <title>Managing UMA Resource Sets</title>
+
+  <para>
+   UMA resource servers must register resource sets with the resource owner's
+   chosen authorization server, so that those resources can be protected, and
+   are available for user-created policies.
+  </para>
+
+  <para>OpenAM provides the <literal>/oauth2/resource_set</literal> REST
+   endpoint for registering and managing resource sets. </para>
+
+  <para>The endpoint is protected - access requires a Protection API Token
+   (PAT) - an OAuth 2.0 access token with a scope of <literal>uma_protection
+   </literal>. A resource server must acquire a PAT in order to use the resource
+   set endpoint. For more information, see <xref linkend="uma-acquire-pat" />.
+  </para>
+
+  <para>After acquiring a PAT, use the <literal>/oauth2/resource_set</literal> REST
+   endpoint for the following operations:</para>
+  <itemizedlist>
+   <listitem>
+    <para><xref linkend="to-register-an-uma-resource-set" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-list-uma-resource-sets" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-read-an-uma-resource-set" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-update-an-uma-resource-set" /></para>
+   </listitem>
+   <listitem>
+    <para><xref linkend="to-delete-an-uma-resource-set" /></para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="uma-acquire-pat">
+   <title>To Acquire a Protection API Token</title>
+   <para>You must have first <link xlink:show="new"
+                                   xlink:href="admin-guide#register-oauth2-client"
+                                   xlink:role="http://docbook.org/xlink/role/olink"
+    >registered an OAuth 2.0/OpenID Connect client</link>
+    with a name such as <replaceable>UMA-Resource-Server</replaceable> and a
+    client password such as <replaceable>password</replaceable>. Ensure that
+    <literal>uma_protection</literal> is in the list of available scopes in the
+    client, and a redirection URI is configured.</para>
+   <step><para>Direct the resource owner to the authorization server to
+    obtain a PAT token. The URL should specify the client name registered
+    above, the redirect URI, and request the <literal>uma_protection</literal>
+    scope, as shown in the example below:</para>
+    <para>
+     <literal>https://openam.example.com:8443/openam/oauth2/authorize?client_id=UMA-Resource-Server&amp;redirect_uri=http://openam.example.com:8080&amp;response_type=code&amp;scope=uma_protection</literal></para>
+    <para>
+    This example uses the OAuth 2.0 code grant, however the UMA
+    resource server can use any of the OAuth 2.0 grants to obtain the
+    access token.</para>
+   </step>
+   <step><para>After logging in, the consent screen asks the resource owner
+    to allow or deny the requested scopes.</para>
+
+    <mediaobject xml:id="figure-uma-resource-server-auth-request">
+     <alt>The OAuth 2.0 consent screen presented to the resource owner.</alt>
+     <imageobject>
+      <imagedata fileref="images/uma-resource-server-auth-request.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The consent screen requires the resource owner to
+      allow or deny access.
+     </para>
+     </textobject>
+    </mediaobject>
+   </step>
+   <step><para>If the resource owner allows access, they are
+    sent to the configured redirection URL, which will have a
+    <literal>code</literal> query string parameter added, which is used to
+    request the PAT.</para></step>
+<step><para>Create a POST request to the
+ <literal>/oauth2/access_token</literal> endpoint, with the client
+ credentials registered earlier, a grant type of
+ <literal>authorization_code</literal>, a redirect URL, and the value of the
+ <literal>code</literal> query string parameter returned in the
+ previous step, as shown below:</para>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --data 'client_id=UMA-Resource-Server' \
+ --data 'client_secret=password' \
+ --data 'grant_type=authorization_code' \
+ --data 'code=c1bb2b94-038b-4ab2-beb1-a1ee14790c6b' \
+ --data 'redirect_uri=http%3A%2F%2Fopenam.example.com%3A8080' \
+ http://openam.example.com:8080/openam/oauth2/access_token
+</userinput>
+<computeroutput>{
+ "scope": "uma_protection read",
+ "expires_in": 599,
+ "token_type": "Bearer",
+ "refresh_token": "f9873041-885a-4522-836c-9fa71aaad3e4",
+ "access_token": "983e1d96-20a7-437c-8432-cfde52076714"
+}</computeroutput>
+</screen>
+<para>The value returned in <literal>access_token</literal> is the PAT bearer
+ token, used in the following procedures.</para>
+</step>
+  </procedure>
+
+  <procedure xml:id="to-register-an-uma-resource-set">
+   <title>To Register an UMA Resource Set</title>
+
+   <para>To register a resource set, the resource server must first
+    acquire a PAT token, as described in <xref linkend="uma-acquire-pat" />.</para>
+
+   <para>Once you have the PAT bearer token, you can access the
+    <literal>/oauth2/resource_set</literal> endpoint to register resources,
+    as shown in the following steps.</para>
+
+   <step>
+    <para>Create a POST request to the resource_set endpoint, including the
+     PAT bearer token in an Authorization header.</para>
+    <para>The following example uses a PAT bearer token to register a
+     photo album resource set:</para>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Authorization: Bearer 515d6551-6512-5279-98b6-c0ef3f03a723" \
+ --data \
+ '{
+     "name" : "Photo Album",
+     "icon_uri" : "http://www.example.com/icons/flower.png",
+     "scopes" : [
+         "http://photoz.example.com/dev/scopes/view",
+         "http://photoz.example.com/dev/scopes/all"
+     ],
+     "type" : "http://www.example.com/rsets/photoalbum"
+ }' \
+ https://openam.example.com:8443/openam/oauth2/resource_set/</userinput>
+<computeroutput>{
+    "_id": "43225628-4c5b-4206-b7cc-5164da81decd0",
+    "user_access_policy_uri":
+ "https://openam.example.com:8443/openam/XUI/#uma/share/43225628-4c5b-4206-b7cc-5164da81decd0/"
+}</computeroutput>
+</screen>
+    <para>The resource owner can then visit the user access policy URI in order
+     to manage access to the resources set.</para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-list-uma-resource-sets">
+   <title>To List Registered UMA Resource Sets</title>
+
+   <para>To list registered resource sets, you must first acquire a PAT token,
+    as described in <xref linkend="uma-acquire-pat" />.</para>
+
+   <para>Once you have the PAT token, you can access the
+    <literal>/oauth2/resource_set</literal> endpoint to list resource sets,
+    as shown below.</para>
+
+   <step>
+    <para>Create a GET request to the resource_set endpoint, including the
+     PAT bearer token in an Authorization header.</para>
+    <para>The following example uses a PAT bearer token to list the
+     registered resource sets:</para>
+<screen>
+$ <userinput>curl \
+ --header "Authorization: Bearer 515d6551-6512-5279-98b6-c0ef3f03a723" \
+ https://openam.example.com:8443/openam/oauth2/resource_set</userinput>
+<computeroutput>[
+    "43225628-4c5b-4206-b7cc-5164da81decd0",
+    "3a2fe6d5-67c8-4a5a-83fb-09734f1dd5b10",
+    "8ed24623-fcb5-46b8-9a64-18ee1b9b7d5d0"
+ ]</computeroutput>
+</screen>
+    <para>On success, an array of the registered resource set IDs is
+     returned. Use the ID to identify a resource set in the
+     following procedures:</para>
+     <itemizedlist>
+      <listitem><para><xref linkend="to-read-an-uma-resource-set" /></para></listitem>
+      <listitem><para><xref linkend="to-update-an-uma-resource-set" /></para></listitem>
+      <listitem><para><xref linkend="to-delete-an-uma-resource-set" /></para></listitem>
+     </itemizedlist>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-read-an-uma-resource-set">
+   <title>To Read an UMA Resource Set</title>
+
+   <para>To read a resource set, you must first acquire a PAT token,
+    as described in <xref linkend="uma-acquire-pat" />.</para>
+
+   <para>Once you have the PAT token, you can access the
+    <literal>/oauth2/resource_set</literal> endpoint to read resources,
+    as shown below.</para>
+
+   <step>
+    <para>Create a GET request to the resource_set endpoint, including the
+     PAT bearer token in an Authorization header.</para>
+    <note><para>You must provide the ID of the resource set to read, specified
+     at the end of the request, as follows:
+     <literal>https://openam.example.com:8443/openam/oauth2/resource_set/<replaceable>resource_set_ID</replaceable></literal>.</para></note>
+    <para>The following example uses a PAT bearer token and a resource set
+     ID to read a specific resource set:</para>
+<screen>
+$ <userinput>curl \
+ --header "Authorization: Bearer 515d6551-6512-5279-98b6-c0ef3f03a723" \
+ https://openam.example.com:8443/openam/oauth2/resource_set/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+<computeroutput>{
+  "scopes": [
+    "http://photoz.example.com/dev/scopes/view",
+    "http://photoz.example.com/dev/scopes/all"
+  ],
+  "_id": "43225628-4c5b-4206-b7cc-5164da81decd0",
+  "name": "Photo Album",
+  "icon_uri": "http://www.example.com/icons/flower.png",
+  "type": "http://www.example.com/rsets/photoalbum",
+  "user_access_policy_uri":
+    "https://openam.example.com:8443/openam/XUI/#uma/share/43225628-4c5b-4206-b7cc-5164da81decd0"
+}</computeroutput>
+</screen>
+    <para>On success, an HTTP 200 OK status code is returned, as well as a
+     header containing the current ETag value, for example:
+     <literal>W/"123401234"</literal>. Use this ETag value when updating a
+     resource set. See <xref linkend="to-update-an-uma-resource-set" />.</para>
+    <tip><para>Add the <literal>-i</literal> option to curl commands to
+     show the returned headers. For example: </para>
+<screen>
+$ <userinput>curl -i \
+ --header "Authorization: Bearer 515d6551-4512-4279-98b6-c0ef3f03a722" \
+https://openam.example.com:8443/openam/oauth2\
+/resource_set/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+<computeroutput>HTTP/1.1 200 OK
+ ETag: W/"123401234"
+ Date: Tue, 10 Feb 2015 11:57:35 GMT
+ Accept-Ranges: bytes
+ Server: Restlet-Framework/2.1.7
+ Vary: Accept-Charset, Accept-Encoding, Accept-Language, Accept
+ Content-Type: application/json;charset=UTF-8
+ Transfer-Encoding: chunked
+
+ {
+     "scopes": [
+         "http://photoz.example.com/dev/scopes/view",
+         "http://photoz.example.com/dev/scopes/all"
+     ],
+     "_id": "myPhotoAlbum001",
+     "name": "Photo Album",
+     "icon_uri": "http://www.example.com/icons/flower.png",
+     "type": "http://www.example.com/rsets/photoalbum",
+     "user_access_policy_uri":
+         "https://openam.example.com:8443/openam/XUI/#uma
+              /share/43225628-4c5b-4206-b7cc-5164da81decd0"
+ }</computeroutput>
+</screen>
+    </tip>
+    <para>If the resource set ID does not exist, an HTTP 404 Not Found
+     status code is returned, as follows:</para>
+<screen><computeroutput>{
+    "error": "not_found",
+    "error_description":
+        "Resource set corresponding to id: 43225628-4c5b-4206-b7cc-5164da81decd0 not found"
+}</computeroutput></screen>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-update-an-uma-resource-set">
+   <title>To Update an UMA Resource Set</title>
+
+   <para>To update a resource set, you must first acquire a PAT token,
+    as described in <xref linkend="uma-acquire-pat" />.</para>
+
+   <para>Once you have the PAT token, you can access the
+    <literal>/oauth2/resource_set</literal> endpoint to update resources,
+    as shown below.</para>
+
+   <step>
+    <para>Create a PUT request to the resource_set endpoint, including the
+     PAT bearer token in a header named <literal>Authorization</literal>, and any
+     new or changed parameters.</para>
+    <para>The only difference between creating a resource set and updating
+     one is the presence of an <literal>If-Match</literal> header when
+     updating. This should contain the value of the ETag header returned
+     when creating, updating, or reading a resource set.</para>
+    <note><para>You must provide the ID of the resource set to update, specified
+     at the end of the request, as follows:
+     <literal>https://openam.example.com:8443/openam/oauth2/resource_set/<replaceable>resource_set_ID</replaceable></literal>.</para></note>
+    <para>The following example uses a PAT bearer token, a resource set
+     ID and an If-Match header to update a specific resource set:</para>
+<screen>$ <userinput>curl \
+ --request PUT \
+ --header "Authorization: Bearer 515d6551-6512-5279-98b6-c0ef3f03a723" \
+ --header "If-Match: "123401234"" \
+ --data \
+ '{
+     "name" : "Photo Album 2.0",
+     "icon_uri" : "http://www.example.com/icons/camera.png",
+     "scopes" : [
+         "http://photoz.example.com/dev/scopes/view",
+         "http://photoz.example.com/dev/scopes/edit",
+         "http://photoz.example.com/dev/scopes/all"
+     ],
+     "type" : "http://www.example.com/rsets/photoalbum"
+ }' \
+ https://openam.example.com:8443/openam/oauth2/resource_set/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+ <computeroutput>{
+  "_id": "43225628-4c5b-4206-b7cc-5164da81decd0",
+  "user_access_policy_uri":
+  "https://openam.example.com:8443/openam/XUI/#uma/share/43225628-4c5b-4206-b7cc-5164da81decd0"
+  }</computeroutput>
+</screen>
+    <para>On success, an HTTP 200 OK status code is returned, with the
+     resource set ID, and a user access policy URI that the resource owner can
+     visit in order to manage access to the resource set.</para>
+    <para>If the resource set ID is not found, an HTTP 404 Not Found status
+     code is returned, as follows:</para>
+<screen><computeroutput>{
+    "error": "not_found",
+    "error_description":
+        "ResourceSet corresponding to id: 43225628-4c5b-4206-b7cc-5164da81decd0 not found"
+}</computeroutput></screen>
+    <para>If the <literal>If-Match</literal> header is missing, or does
+     not match the current version of the resource set, an HTTP 412
+     Precondition Failed status code is returned, as follows:</para>
+<screen><computeroutput>{
+ "error": "precondition_failed"
+}</computeroutput></screen>
+   </step>
+  </procedure>
+
+  <procedure xml:id="to-delete-an-uma-resource-set">
+   <title>To Delete an UMA Resource Set</title>
+
+   <para>To delete a resource set, you must first acquire a PAT token,
+    as described in <xref linkend="uma-acquire-pat" />.</para>
+
+   <para>Once you have the PAT token, you can access the
+    <literal>/oauth2/resource_set</literal> endpoint to delete resources,
+    as shown below.</para>
+
+   <step>
+    <para>Create a DELETE request to the resource_set endpoint, including the
+     PAT bearer token in a header named <literal>Authorization</literal>.</para>
+    <para>Add an <literal>If-Match</literal> header containing the value of the
+     ETag header returned when creating, updating, or reading a resource set.</para>
+    <note><para>You must provide the ID of the resource set to read, specified
+     at the end of the request, as follows:
+     <literal>https://openam.example.com:8443/openam/oauth2/resource_set/<replaceable>resource_set_ID</replaceable></literal>.</para></note>
+    <para>The following example uses a PAT bearer token, a resource set
+     ID and an If-Match header to delete a specific resource set:</para>
+<screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "Authorization: Bearer 515d6551-6512-5279-98b6-c0ef3f03a723" \
+ --header "If-Match: "123401234"" \
+ https://openam.example.com:8443/openam/oauth2/resource_set/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+ <computeroutput>{}</computeroutput>
+</screen>
+    <para>On success, an HTTP 204 No Content status code is returned, as well as
+     an empty response body.</para>
+    <para>If the resource set ID does not exist, an HTTP 404 Not Found
+     status code is returned, as follows:</para>
+<screen><computeroutput>{
+ "error": "not_found",
+ "error_description":
+     "Resource set corresponding to id: 43225628-4c5b-4206-b7cc-5164da81decd0 not found"
+}</computeroutput></screen>
+    <para>If the <literal>If-Match</literal> header is missing, or does
+     not match the current version of the resource set, an HTTP
+     412 Precondition Failed status code is returned, as follows:</para>
+<screen><computeroutput>{
+ "error": "precondition_failed"
+}</computeroutput></screen>
+   </step>
+  </procedure>
+ </section>
+
+ <xinclude:include href='sec-uma-policies.xml' />
+
+ <section xml:id="accessing-uma-protected-resources">
+  <title>Accessing an UMA-Protected Resource</title>
+
+  <para>To access an UMA-protected resource a client must provide the
+   resource server with a Requesting Party Token (RPT) obtained from OpenAM,
+   which is acting as the authorization server.
+  </para>
+
+  <para>In order to obtain access to an UMA-protected resource, the following
+   actions take place:</para>
+
+  <mediaobject xml:id="figure-uma-rpt-flow">
+   <alt>OpenAM in UMA RPT Token flow</alt>
+   <imageobject>
+    <imagedata fileref="images/uma-rpt-flow.png" format="PNG"/>
+   </imageobject>
+   <textobject><para>OpenAM can function as the authorization server and also
+    as the client.</para></textobject>
+  </mediaobject>
+
+  <itemizedlist>
+   <listitem>
+    <para>A requesting party, using a client application, requests access to
+     an UMA-protected resource (labelled <keycap>1</keycap> in the
+     diagram above).</para></listitem>
+   <listitem>
+    <para>The resource server registers a permission request
+     with OpenAM on behalf of the client (<keycap>2</keycap>),
+     which contains the ID of the resource set to access, and the requested scopes. A
+     permission ticket is returned (<keycap>3</keycap>),
+     which the resource server provides to the client (<keycap>4</keycap>).</para>
+    <para>For more information about registering permission requests, see
+     <xref linkend="to-register-an-uma-permission-request" />.</para>
+   </listitem>
+   <listitem>
+    <para>The client uses the permission ticket, and an Authorization API
+     Token (AAT) to acquire an RPT from OpenAM (<keycap>5</keycap>).</para>
+    <para>For more information about acquiring an RPT, see <xref
+     linkend="uma-acquire-rpt" />.</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM makes a policy decision using the requested scopes, the
+     scopes permitted in the registered resource set, and the user-created
+     policy, and if successful returns an RPT (<keycap>6</keycap>).</para>
+    </listitem>
+   <listitem>
+    <para>The client presents the RPT to the resource server (<keycap>7</keycap>) which must verify the token is valid using the
+     OpenAM introspection endpoint (<keycap>8</keycap>).</para>
+    <para>For more information about the introspection endpoint, see <link xlink:show="new"
+     xlink:href="dev-guide#rest-api-oauth2-client-endpoints"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>OAuth 2.0 Client &amp; Resource Server Endpoints</citetitle></link>.</para>
+    <para>If the RPT is confirmed to be valid, and non-expired (<keycap>9</keycap>)
+     the resource server can return the protected resource to the requesting
+     party (<keycap>10</keycap>).</para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="to-register-an-uma-permission-request">
+   <title>To Register an UMA Permission Request</title>
+
+   <para>OpenAM provides the <literal>/uma/permission_request</literal> REST
+    endpoint for a resource server to register an access request on
+    behalf of a client. </para>
+   <para>To register a permission request, the resource server must first
+    acquire a PAT token, as described in <xref linkend="uma-acquire-pat" />.
+   </para>
+
+   <para>Once you have the PAT bearer token, you can access the
+    <literal>/uma/permission_request</literal> endpoint to register a
+    permission request, as shown below.</para>
+
+   <step>
+    <para>Create a POST request to the permission_request endpoint, including the
+     PAT bearer token in a header named <literal>Authorization</literal>.</para>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Authorization: Bearer 515d6551-6512-5279-98b6-c0ef3f03a723" \
+ --data \
+ '{
+     "resource_set_id" : "43225628-4c5b-4206-b7cc-5164da81decd0",
+     "scopes" : [
+         "http://photoz.example.com/dev/scopes/view",
+         "http://photoz.example.com/dev/scopes/all"
+     ]
+ }' \
+ https://openam.example.com:8443/openam/uma/permission_request</userinput>
+ <computeroutput>{
+    "ticket": "dc630c21-7d55-45bf-958d-24d624441138"
+ }</computeroutput>
+</screen>
+    <para>On success, an HTTP 201 Created status code is returned, and a
+     <literal>ticket</literal> property in the JSON-formatted body, which can be
+     used by the client to acquire a requesting party token. For more
+     information, see <xref linkend="uma-acquire-rpt" />.</para>
+    <para>If the resource set does not allow the requested scopes, an error
+     is returned, as follows:</para>
+<screen><computeroutput>{
+    "error_description": "Requested scopes are not in allowed scopes for resource set.",
+    "error": "invalid_scope"
+}</computeroutput></screen>
+   </step>
+  </procedure>
+
+  <procedure xml:id="uma-acquire-aat">
+   <title>To Acquire an Authorization API Token</title>
+   <para>You must have first <link xlink:show="new"
+                                   xlink:href="admin-guide#register-oauth2-client"
+                                   xlink:role="http://docbook.org/xlink/role/olink"
+    >registered an OAuth 2.0/OpenID Connect client</link>
+    with a name such as <replaceable>UMA-Client</replaceable> and a
+    client password such as <replaceable>password</replaceable>. Ensure that
+    <literal>uma_authorization</literal> is in the list of available scopes in
+    the client, and a redirection URI is configured.</para>
+
+   <step><para>Direct the requesting party to the authorization server to
+    obtain an AAT token. The URL should specify the client name registered
+    above, the redirect URI, and request the <literal>uma_authorization</literal>
+    scope, as shown in the example below:</para>
+    <para>
+     <literal>https://openam.example.com:8443/openam/oauth2/authorize?client_id=UMA-Client&amp;redirect_uri=http://openam.example.com:8080&amp;response_type=code&amp;scope=uma_authorization</literal></para>
+    <para>
+     This example uses the OAuth 2.0 code grant, however the UMA
+     client can use any of the OAuth 2.0 grants to obtain the
+     access token.</para>
+   </step>
+   <step><para>After logging in, the consent screen asks the requesting party
+    to allow or deny the requested scopes.</para>
+
+    <mediaobject xml:id="figure-uma-client-auth-request">
+     <alt>The OAuth 2.0 consent screen presented to the requesting party.</alt>
+     <imageobject>
+      <imagedata fileref="images/uma-client-auth-request.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The consent screen requires the requesting party to
+      allow or deny access.
+     </para>
+     </textobject>
+    </mediaobject>
+   </step>
+   <step><para>If the requesting party allows access, they are
+    sent to the configured redirection URL, which will have a <literal>code</literal>
+    query string parameter added, which is used to request the AAT.
+   </para></step>
+   <step><para>Create a POST request to the
+    <literal>/oauth2/access_token</literal> endpoint, with the client
+    credentials registered earlier, a grant type of
+    <literal>authorization_code</literal>, a redirect URL, and the value of the
+    <literal>code</literal> query string parameter returned in the
+    previous step, as shown below:</para>
+<screen>
+ $ <userinput>curl \
+ --request POST \
+ --data 'client_id=UMA-Client' \
+ --data 'client_secret=password' \
+ --data 'grant_type=authorization_code' \
+ --data 'code=2b911969-5b8e-4d07-bf34-612917a37c9d' \
+ --data 'redirect_uri=http%3A%2F%2Fopenam.example.com%3A8080' \
+ http://openam.example.com:8080/openam/oauth2/access_token
+</userinput>
+<computeroutput>{
+ "scope": "uma_authorization print",
+ "expires_in": 599,
+ "token_type": "Bearer",
+ "refresh_token": "e77fac0e-0dc6-40c3-a600-3309451bd6ee",
+ "access_token": "d47c2278-460b-41e8-bf98-a8a1206e2c58"
+ }</computeroutput>
+</screen>
+    <para>The value returned in <literal>access_token</literal> is the AAT
+     bearer token, used in the following procedures.</para>
+   </step>
+  </procedure>
+
+ <procedure xml:id="uma-acquire-rpt">
+  <title>To Acquire a Requesting Party Token</title>
+
+  <para>OpenAM provides the <literal>/uma/authz_request</literal> REST
+   endpoint for acquiring a Requesting Party Token (RPT). </para>
+
+  <para>The endpoint is protected - access requires a Authorization API Token
+   (AAT) - an OAuth 2.0 token with a scope of <literal>uma_authorization
+   </literal>. A client must acquire an AAT in order to use the authorization
+   request endpoint. For more information, see <xref linkend="uma-acquire-aat" />.
+  </para>
+
+  <para>Once the client has an AAT bearer token, it can access the
+   <literal>/uma/authz_request</literal> endpoint to acquire an RPT,
+   as shown below.</para>
+  <step>
+   <para>Create a POST request to the authz_request endpoint, including the
+    AAT bearer token in a header named <literal>Authorization</literal>, and the
+    permission token in the JSON body of the request, as follows:</para>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Authorization: Bearer 3b08e99c-b09d-4a65-9780-ea0c9e1f0f52" \
+ --data \
+ '{
+  "ticket": "dc630c21-7d55-45bf-958d-24d624441138"
+ }' \
+ https://openam.example.com:8443/openam/uma/authz_request</userinput>
+ <computeroutput>{
+      "rpt": "162d6137-68a4-4e8e-950d-edd834589eb73"
+  }</computeroutput>
+</screen>
+   <para>On success, an HTTP 201 Created status code is returned, as well as
+    the <literal>rpt</literal> property in the JSON-formatted body.</para>
+  </step>
+ </procedure>
+</section>
+</chapter>

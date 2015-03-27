@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-rest-oauth2-oidc'
@@ -32,17 +32,17 @@
          xmlns:xlink='http://www.w3.org/1999/xlink'
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
- <title>RESTful OAuth 2.0 and OpenID Connect 1.0 Services</title>
+ <title>RESTful OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 Services</title>
 
  <indexterm><primary>REST API</primary></indexterm>
- <para>This chapter shows how to use the OpenAM RESTful interfaces for OAuth 2.0
-  and OpenID Connect 1.0.</para>
+ <para>This chapter shows how to use the OpenAM RESTful interfaces for
+  OAuth 2.0, OpenID Connect 1.0, and UMA 1.0.</para>
 
  <para>In this chapter, long URLs are wrapped to fit the printed page, as some
   of the output is formatted for easier reading.</para>
 
  <section xml:id="rest-api-oauth2">
-  <title>OAuth 2.0 Authorization</title>
+  <title>OAuth 2.0</title>
   <indexterm>
    <primary>OAuth 2.0</primary>
    <secondary>REST API</secondary>
@@ -57,8 +57,13 @@
     2.0 clients and resource servers</link>, mostly defined in RFC 6749,
     <link xlink:href="http://tools.ietf.org/html/rfc6749" xlink:show="new"
     ><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>, with
-    an additional <literal>tokeninfo</literal> endpoint useful to resource
-    servers.</para>
+    additional <literal>tokeninfo</literal> and <literal>introspect</literal>
+     endpoints useful to resource servers and clients.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-oauth2-resourceset-endpoint"
+     >reading OAuth 2.0 resource sets</link>. This is specific to OpenAM.</para>
    </listitem>
 
    <listitem>
@@ -181,6 +186,88 @@ $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
    authentication module instance to use or <literal>service</literal>
    specifies the authentication chain to use when authenticating the resource
    owner.</para>
+  </section>
+
+  <section xml:id="rest-api-oauth2-resourceset-endpoint">
+   <title>OAuth 2.0 Resource Set Endpoint</title>
+
+   <para>OpenAM provides a read-only REST endpoint for viewing a resource set
+    registered to a particular user. The endpoint is
+    <literal>/json<replaceable>{/realm}</replaceable>/users/<replaceable>user</replaceable>/oauth2/resourcesets/<replaceable>resource_set_ID</replaceable></literal>,
+    so for example
+    <literal>https://openam.example.com:8443/openam/json/myrealm/users/demo/oauth2/resourcesets/43225628-4c5b-4206-b7cc-5164da81decd0</literal>.</para>
+
+   <para>To read a resource set, either the resource set owner or an
+    administrator such as <literal>amadmin</literal> must have logged in to
+    OpenAM (the authorization server) and have been issued an SSO token.</para>
+
+   <procedure xml:id="read-user-oauth2-resource-set">
+    <title>To Read an OAuth 2.0 Resource Set</title>
+    <step>
+     <para>Create a GET request to the <literal>resourcesets</literal> endpoint,
+      including the SSO token in a header based on the configured session cookie
+      name (for example: <literal>iPlanetDirectoryPro</literal>), and with the
+      resource set ID in the URL.</para>
+     <para>The following example uses an SSO token acquired by the
+      <literal>amadmin</literal> user to view a resource set, and related
+      policy, belonging to the <literal>demo</literal> user in the
+      top-level realm:</para>
+<screen>
+$ <userinput>curl \
+--header "iPlanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
+https://openam.example.com:8443/openam/json/users/demo\
+/oauth2/resourcesets/43225628-4c5b-4206-b7cc-5164da81decd0</userinput>
+<computeroutput>{
+    "scopes": [
+         "http://photoz.example.com/dev/scopes/view",
+         "http://photoz.example.com/dev/scopes/comment"
+    ],
+    "_id": "43225628-4c5b-4206-b7cc-5164da81decd0",
+    "resourceServer": "UMA-Resource-Server",
+    "name": "My Videos",
+    "icon_uri": "http://www.example.com/icons/cinema.png",
+    "policy": {
+        "permissions": [
+            {
+                "subject": "id=alice,ou=user,dc=openam,dc=forgerock,dc=org",
+                "scopes": [
+                    "http://photoz.example.com/dev/scopes/view"
+                ]
+            },
+            {
+                "subject": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org",
+                "scopes": [
+                    "http://photoz.example.com/dev/scopes/comment",
+                    "http://photoz.example.com/dev/scopes/view"
+                ]
+            }
+        ]
+    },
+    "type": "http://www.example.com/rsets/videos"
+}</computeroutput>
+</screen>
+     <tip><para>You can specify the fields that are returned with the
+      <literal>_fields</literal> query string filter. For example
+      <literal>?_fields=scopes, resourceServer, name</literal></para></tip>
+   <para>On success, an HTTP 200 OK status code is returned, with
+    a JSON body representing the resource set. If a policy relating to the
+    resource set exists, a representation of the policy is also returned in the
+    JSON.</para>
+   <para>If the specified resource set does not exist, an HTTP 404 Not Found
+    status code is returned, as follows:
+<screen><computeroutput>{
+    "code": 404,
+    "reason": "Not Found",
+    "message": "No resource set with id, bad-id-3e28-4c19-8a2b-36fc24c899df0, found."
+}</computeroutput></screen></para>
+   <para>If the SSO token used is not that of the resource set owner or an
+    administrator, an HTTP 403 Forbidden status code is returned, as follows:
+<screen><computeroutput>{
+    "code": 403,
+    "reason": "Forbidden",
+    "message": "User, id=bob,ou=user,dc=openam,dc=forgerock,dc=org, not authorized."
+}</computeroutput></screen></para></step>
+   </procedure>
   </section>
 
   <section xml:id="rest-api-oauth2-token-admin-endpoint">
@@ -658,4 +745,5 @@ $ <userinput>curl \
   </section>
  </section>
 
+ <xinclude:include href="../shared/sec-rest-api-uma.xml" />
 </chapter>
