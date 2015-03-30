@@ -541,7 +541,7 @@
     <para>
      An <emphasis>external identity repository</emphasis> is a user store
      other than the OpenAM embedded repository. Before configuring an OpenAM data
-     store to access an external identity repository, make sure that you
+     store as an external identity repository, make sure that you
      have prepared the external identity repository for OpenAM. For more information,
      see <link xlink:show="new"
                 xlink:href="install-guide#prepare-identity-repository"
@@ -662,9 +662,21 @@
 
    <step>
     <para>
-     If your data store accesses an external identity repository,
-     index several attributes if you used the "Load schema when finished" option.
-     For more information,
+     You must index several directory attributes as a post-configuration step
+     if you configured the data store as follows:
+     <itemizedlist>
+      <listitem>
+       <para>
+        You configured the data store to access an external identity repository.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        You used the "Load schema when finished" option.
+       </para>
+      </listitem>
+     </itemizedlist>
+     For more information about indexing external identity repository attributes,
      see <link xlink:show="new"
                 xlink:href="install-guide#install-index-opendj-external-idrepo"
                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To
