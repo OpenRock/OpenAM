@@ -38,7 +38,7 @@
 
  <para>This chapter covers prerequisites for installing OpenAM software,
  including how to prepare your application server to run OpenAM, how to prepare
- directory services to store configuration data, and how to prepare an identity
+ directory servers to store configuration data, and how to prepare an identity
  repository to handle OpenAM identities.</para>
 
  <note>
@@ -272,7 +272,7 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
   <title>Preparing an External Identity Repository</title>
 
   <indexterm>
-   <primary>directory service requirements</primary>
+   <primary>directory server requirements</primary>
    <secondary>preparing</secondary>
    <tertiary>external identity repository</tertiary>
   </indexterm>
@@ -287,11 +287,11 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
    will only ever have a few users to manage and do not need to share identity
    data with other applications, you can use the embedded directory server as your identity
    repository and avoid the additional overhead of maintaining a separate
-   directory service.
+   directory server.
   </para>
 
   <para>
-   In many deployments OpenAM connects to existing LDAP directory services
+   In many deployments OpenAM connects to existing LDAP directory servers
    for user identity data. OpenAM is designed therefore to share data in an
    identity repository with other applications.
   </para>
@@ -305,6 +305,19 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
    Store Requirements</citetitle></link> in the <citetitle>Release Notes</citetitle> for
    a list of supported external identity repositories.
   </para>
+
+  <important>
+   <para>
+    Storing identity data in a relational database is an Early Access feature,
+    meaning it is not generally supported for use in production environments.
+    For more information about storing identity data in a relational database,
+    see <link xlink:show="new"
+              xlink:href="admin-guide#sec-data-stores-db"
+              xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints
+    for Configuring Database Repository (Early Access) Data Stores</citetitle></link> in
+    the <citetitle>Administration Guide</citetitle>.
+   </para>
+  </important>
 
   <procedure xml:id="install-prepare-opendj-external-idrepo">
     <title>To Prepare an External OpenDJ Identity Repository</title>
@@ -331,20 +344,25 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
 
   <step>
    <para>
-    Add an account that OpenAM can use to access user data in the external identity repository.
+    Create a user that OpenAM that will access user data from the external
+    identity repository on behalf of OpenAM.
    </para>
    <para>
-    OpenAM connects to an external directory with a user ID that you specify in the
-    OpenAM data store configuration. OpenAM can use the directory administrator
-    ID to connect, for example, <literal>cn=Directory Manager</literal>.
+    OpenAM connects to an external directory by binding to it as a user that you
+    specify in the OpenAM data store configuration. It is simple to
+    specify the directory administrator user&#x2014;for example,
+    <literal>cn=Directory Manager</literal>&#x2014;as the OpenAM user,
+    but doing so is not recommended for production deployments. Instead,
+    create an administrator account with fewer access privileges than the
+    directory administrator.
    </para>
    <para>
-    However, if you prefer that OpenAM use an administrator account with fewer
-    access privileges than the directory administrator, you must create
-    the account. This example uses the distinguished
-    name <literal>uid=openam,ou=admins,dc=example,dc=com</literal> for the
-    OpenAM administrator account and assumes that the <literal>dc=example,dc=com</literal>
-    suffix already exists in the directory.
+    This example uses
+    uses <literal>uid=openam,ou=admins,dc=example,dc=com</literal> as the
+    user that accesses user data from the external identity repository on
+    behalf of OpenAM. The example also assumes that
+    the <literal>dc=example,dc=com</literal> suffix already exists in the
+    directory.
    </para>
    <para>
     First, create an LDIF file that defines the administrator account and gives
@@ -373,6 +391,12 @@ ds-privilege-name: password-reset
     If you copy the text from the preceding example,
     make sure the line between the two DNs does not have any
     spaces in it.
+   </para>
+   <para>
+    TO DO: Mention:
+    update-schema is necessary only if the directory schema isn't already applied on the directory server.
+    subentry-write (if I'm not mistaken this is also for modifying the schema), and this privilege is only really necessary during installation time (and even then only if the changes haven't been already performed).
+    password-reset privilege makes it possible to reset other user's password (which is used by the forgotten password feature)
    </para>
    <para>
     Then run the <command>ldapmodify</command> command to create the user:
@@ -439,7 +463,11 @@ ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com</computer
   </step>
 
    <step>
-    <para>Allow OpenAM to read directory schema.</para>
+    <para>
+     Allow OpenAM to read the directory schema. OpenAM needs to read the
+     directory schema to ensure that changes made to identities stored in
+     identity repositories remain compliant with the directory schema.
+    </para>
 
     <para>For OpenDJ, no actions are required. Simply retain the default
      "User-Visible Schema Operational Attributes" global ACI.
@@ -448,20 +476,23 @@ ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com</computer
 
    <step>
     <para>
-     Give the OpenAM administrator access rights to create, modify,
-     read, search, and delete user entries in the directory.
+     Give the OpenAM administrator appropriate access rights on the directory.
+     Depending on the required level of access, this could include privileges to
+     create, modify, read, search, and delete user entries in the directory.
+     Fewer privileges might be required, for example, when read-only access
+     to the directory server is adequate.
     </para>
     <para>
-     When OpenAM connects to an external identity repository,
-     it binds as the OpenAM administrator. To allow OpenAM
-     to access user data, you must set ACIs that permit
-     the OpenAM administrator to create, read, modify, and delete
+     When OpenAM connects to an external identity repository, it binds as the
+     OpenAM administrator. To allow OpenAM to access user data, set ACIs that
+     permit the OpenAM administrator to create, read, modify, and delete
      directory entries.
     </para>
 
     <para>
-     To grant the access rights in OpenDJ, create a file with
-     the following LDIF:
+     To grant the OpenAM administrator account privileges to
+     create, modify, read, search, and delete user entries in OpenDJ,
+     create a file with the following LDIF:
     </para>
     <programlisting language="ldif">
 dn: dc=example,dc=com
@@ -480,6 +511,9 @@ aci: (version 3.0;acl "Add identity"; allow (add)(userdn = "ldap:///
 aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
    uid=openam,ou=admins,dc=example,dc=com");)
     </programlisting>
+    <para>
+     Remove ACIs from the preceding LDIF if fewer privileges are required.
+    </para>
     <para>
      Then run the <command>ldapmodify</command> command to implement the ACIs:
     </para>
@@ -511,7 +545,8 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
      <para>
       Specify your user directory in the User Data Store Settings dialog box
       when installing OpenAM core services. The configurator will load schema
-      definitions required by OpenAM into your user directory.
+      definitions required by OpenAM into your user directory
+      if you have assigned the necessary permissions.
       For more information about running the OpenAM configurator,
       see <link xlink:show="new"
                 xlink:href="install-guide#chap-install-core"
@@ -590,19 +625,21 @@ $ dsconfig \
    <para>
     If you receive an LDAP error code 65 while attempting to create a
     user, it indicates that you did not correctly prepare the
-    external identity repository.
+    external identity repository. Common reasons for error code 65 include
+    the following:
    </para>
    <itemizedlist>
     <listitem>
      <para>
-      You might have simply forgotten to check the "Load schema when finished"
+      If you configured the external data store after initial configuration,
+      you might have simply forgotten to check the "Load schema when finished"
       option. In this case, select this option and resave the data store
       configuration.
      </para>
     </listitem>
     <listitem>
      <para>
-      You might have given the OpenAM administrator inadequate rights to
+      The OpenAM administrator account might not have adequate rights to
       update the directory schema. Review the OpenDJ <filename>access</filename>
       log and locate the log records for the schema update operation for
       clues.
@@ -617,7 +654,7 @@ $ dsconfig \
   <title>Preparing an External Configuration Data Store</title>
 
   <indexterm>
-   <primary>directory service requirements</primary>
+   <primary>directory server requirements</primary>
    <secondary>preparing</secondary>
    <tertiary>external configuration data store</tertiary>
   </indexterm>
@@ -629,7 +666,7 @@ $ dsconfig \
 
   <para>
    OpenAM stores its configuration, session, and token data in an LDAP
-   directory service. OpenAM ships with an embedded OpenDJ directory server
+   directory server. OpenAM ships with an embedded OpenDJ directory server
    that you can install as part of the OpenAM configuration process.
    By default, OpenAM installs the embedded directory server alongside its
    configuration settings under the $HOME directory of the user running OpenAM
@@ -648,7 +685,7 @@ $ dsconfig \
    using the embedded directory not only for relatively static configuration
    data, but also for volatile session and token data. Your tests should subject
    OpenAM to the same load patterns you expect in production. If it looks like
-   a better choice to use an external directory service, then use one of the
+   a better choice to use an external directory server, then use one of the
    supported external configuration stores listed in the
    <link xlink:show="new"
          xlink:href="release-notes#chap-before-you-install"
@@ -668,7 +705,7 @@ $ dsconfig \
 
   <tip>
    <para>
-    If you are the directory administrator and do not yet know directory services
+    If you are the directory administrator and do not yet know directory servers
     very well, take some time to read the documentation for your directory server,
     especially the sections covering directory schema and procedures on how
     to configure access to directory data.
@@ -811,7 +848,7 @@ $ <userinput>bin/dsconfig create-backend \
       configuration store, and save the file as
       <literal>add-config-entries.ldif</literal>.
       The entries include the base DN suffix, an organizational unit entry,
-      and the OpenAM user entry needed to access the directory service.
+      and the OpenAM user entry needed to access the directory server.
      </para>
      <para>
       When OpenAM connects as <literal>uid=openam,ou=admins,dc=example,dc=com</literal>
