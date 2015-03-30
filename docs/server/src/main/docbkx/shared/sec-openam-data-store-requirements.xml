@@ -32,145 +32,91 @@
   This section summarizes supported OpenAM data stores.
  </para>
 
- <section xml:id="idrepo-data-store-requirements"
-          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
-          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-          xsi:schemaLocation='http://docbook.org/ns/docbook
-                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <para>
+  The following table summarizes OpenAM data store support, including data
+  stores for the OpenAM Core Token Service (CTS) and User Managed Access (UMA).
+ </para>
 
- <title>Identity Repository Requirements</title>
+ <table xml:id="table-data-store-requirements" pgwide="1">
 
-  <para>
-    You can use any of the following directory servers as an
-    identity repository in OpenAM <?eval ${serverDocTargetVersion}?>:
-  </para>
-  <itemizedlist>
-   <listitem>
-    <para>
-     Embedded OpenDJ 2.6.2 (included in OpenAM)
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     External OpenDJ 2.6, 2.6.2
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     IBM Tivoli Directory Server 6.3
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     Microsoft Active Directory 2008, 2008 R2, 2012, 2012 R2
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     Oracle Directory Server Enterprise Edition 11g
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     Oracle Unified Directory 11g
-    </para>
-   </listitem>
-  </itemizedlist>
- </section>
+  <title>Supported Data Stores</title>
 
- <section xml:id="config-store-requirements"
-          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
-          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-          xsi:schemaLocation='http://docbook.org/ns/docbook
-                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+  <tgroup cols="6">
 
- <title>OpenAM Configuration Store Requirements</title>
+   <colspec colnum="1" colwidth="2*"/>
+   <colspec colnum="2" colwidth="1*"/>
+   <colspec colnum="3" colwidth="1*"/>
+   <colspec colnum="4" colwidth="1*"/>
+   <colspec colnum="5" colwidth="1*"/>
+   <colspec colnum="6" colwidth="1*"/>
+   <thead>
+    <row>
+     <entry>Data Store</entry>
+     <entry>Identity Repository</entry>
+     <entry>Configuration Store</entry>
+     <entry>CTS Store</entry>
+     <entry>UMA Resource Sets Store</entry>
+     <entry>UMA Audit Store</entry>
+    </row>
+   </thead>
 
-  <para>
-    You can use any of the following directory servers as the
-    configuration store in OpenAM <?eval ${serverDocTargetVersion}?>:
-  </para>
-  <itemizedlist>
-   <listitem>
-    <para>
-     Embedded OpenDJ 2.6.2 (included in OpenAM)
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     External OpenDJ 2.6, 2.6.2
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     Oracle Directory Server Enterprise Edition 11g
-    </para>
-    <para>
-      When using ODSEE as the configuration store,
-      you must set up an external OpenDJ directory service
-      as a Core Token Service data store as well,
-      and you must configure OpenAM to use the external OpenDJ directory service
-      as the CTS data store.
-     </para>
-   </listitem>
-   <listitem>
-    <para>
-     Oracle Unified Directory 11g
-    </para>
-   </listitem>
-  </itemizedlist>
- </section>
+   <tbody>
+    <row>
+     <entry>Embedded OpenDJ 2.6.2 (included in OpenAM)</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
 
- <section xml:id="cts-store-requirements"
-          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
-          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-          xsi:schemaLocation='http://docbook.org/ns/docbook
-                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+    <row>
+     <entry>External OpenDJ 2.6, 2.6.2</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
 
- <title>Core Token Store Requirements</title>
+    <row>
+     <entry>IBM Tivoli Directory Server 6.3</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+    </row>
 
-  <para>
-    You can use any of the following directory servers as the
-    Core Token Service (CTS) token store in OpenAM <?eval ${serverDocTargetVersion}?>:
-  </para>
-  <itemizedlist>
-   <listitem>
-    <para>
-     Embedded OpenDJ 2.6.2 (included in OpenAM)
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     External OpenDJ 2.6, 2.6.2
-    </para>
-   </listitem>
-  </itemizedlist>
- </section>
+    <row>
+     <entry>Microsoft Active Directory 2008, 2008 R2, 2012, 2012 R2</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+    </row>
 
- <section xml:id="uma-store-requirements"
-          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
-          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-          xsi:schemaLocation='http://docbook.org/ns/docbook
-                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+    <row>
+     <entry>Oracle Directory Server Enterprise Edition 11g</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+    </row>
 
- <title>User Managed Access Store Requirements</title>
+    <row>
+     <entry>Oracle Unified Directory 11g</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+    </row>
+   </tbody>
+  </tgroup>
 
-  <para>
-    You can use any of the following directory servers for User Managed Access
-    (UMA) resource sets and audit stores in OpenAM <?eval ${serverDocTargetVersion}?>:
-  </para>
-  <itemizedlist>
-   <listitem>
-    <para>
-     Embedded OpenDJ 2.6.2 (included in OpenAM)
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     External OpenDJ 2.6, 2.6.2
-    </para>
-   </listitem>
-  </itemizedlist>
- </section>
+ </table>
 
 </section>

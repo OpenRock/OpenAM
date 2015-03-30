@@ -51,12 +51,17 @@
    </author>
    <author>
     <personname>
-     <firstname>Mike </firstname><surname>Jang</surname>
+     <firstname>David </firstname><surname>Goldsmith</surname>
     </personname>
    </author>
    <author>
     <personname>
-     <firstname>Vanessa </firstname><surname>Richie</surname>
+     <firstname>Gene </firstname><surname>Hirayama</surname>
+    </personname>
+   </author>
+   <author>
+    <personname>
+     <firstname>Chris </firstname><surname>Lee</surname>
     </personname>
 
     <xinclude:include href="../shared/affiliation-fr.xml"/>
