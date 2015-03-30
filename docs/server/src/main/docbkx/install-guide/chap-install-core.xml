@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-install-core'
@@ -545,6 +545,7 @@ Using CLASSPATH:
     </varlistentry>
    </variablelist>
   </step>
+
   <step>
    <para>In the Site Configuration screen, you can set up OpenAM as part of
    a site where the load is balanced across multiple OpenAM servers.</para>
@@ -652,6 +653,23 @@ Using CLASSPATH:
    $HOME corresponds to the user who runs the web container). Prevent other
    users from accessing files in the configuration directory.</para>
 
+  </step>
+
+  <step>
+   <indexterm>
+    <primary>identity repository</primary>
+    <secondary>external</secondary>
+   </indexterm>
+   <para>
+    If you specified the Other User Data Store option in the
+    User Data Store Settings screen, you must index several
+    attributes in your external identity repository.
+    See <link xlink:show="new"
+              xlink:href="install-guide#install-index-opendj-external-idrepo"
+              xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To
+    Index External Identity Repository Attributes</citetitle></link> in the
+    <citetitle>Installation Guide</citetitle> for more information.
+   </para>
   </step>
 
  </procedure>
