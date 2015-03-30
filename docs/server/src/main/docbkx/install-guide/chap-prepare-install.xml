@@ -310,7 +310,7 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
   <important>
    <para>
     Storing identity data in a relational database is an Early Access feature,
-    meaning it is not generally supported for use in production environments.
+    meaning it is not generally recommended for use in production environments.
     This section covers preparing directory servers as external identity
     repositories only. For more information about storing identity data in a
     relational database, see <link xlink:show="new"
@@ -330,60 +330,61 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
    </para>
 
    <para>
-    It is simplest to specify the directory administrator user&#x2014;for
+    Specifying the directory administrator&#x2014;for
     example, <literal>cn=Directory Manager</literal>&#x2014;as the OpenAM
-    data store administrator, but if you do so, OpenAM will have
-    directory administrator privileges when accessing the identity repository.
-    Therefore, specifying the directory administrator as the OpenAM
     data store administrator is not recommended for production
-    deployments. Instead, create a separate OpenAM administrator account
-    with fewer access privileges than the directory administrator so that you
-    can assign the appropriate level of privileges for the OpenAM data store
-    administrator.
+    deployments because if you do so, OpenAM will have directory administrator
+    privileges when accessing the identity repository. Instead, create a
+    separate OpenAM administrator account with fewer access privileges
+    than the directory administrator so that you can assign the appropriate
+    level of privileges for the OpenAM data store administrator.
    </para>
 
    <para>
     You need to consider two areas of privileges for the OpenAM
     data store administrator:
+   </para>
 
-    <itemizedlist>
+   <variablelist>
 
+    <varlistentry>
+     <term>
+      Schema Update Privileges
+     </term>
      <listitem>
-      <para>
-       Schema Update Privileges
-      </para>
       <para>
        OpenAM needs to update the directory schema when you configure a new
        identity repository and when you upgrade OpenAM software. If the OpenAM
        data store administrator has schema update privileges, OpenAM can
        update the schema dynamically during data store configuration and
        during OpenAM upgrades. If the OpenAM data store administrator does
-       not have has schema update privileges, you must update the schema
+       not have schema update privileges, you must update the schema
        manually before configuring a new identity repository and before
        upgrading OpenAM.
       </para>
      </listitem>
+    </varlistentry>
 
+    <varlistentry>
+     <term>
+      Directory Read and Write Access Privileges
+     </term>
      <listitem>
-      <para>
-       Directory Read and Write Access Privileges
-      </para>
       <para>
        If you want OpenAM to be able to create, update, and delete user entries,
        then the OpenAM data store administrator must have full read and write
-       access to the directory. If you are using an external identity
+       access to the identity data in the directory. If you are using an external identity
        repository as a read-only user directory, then the OpenAM data store
        administrator needs read privileges only.
       </para>
      </listitem>
+    </varlistentry>
 
-    </itemizedlist>
-
-   </para>
+   </variablelist>
 
    <para>
     The level of access privileges you give the OpenAM data store administrator
-    depends is specific to each OpenAM deployment. Work with your
+    is specific to each OpenAM deployment. Work with your
     directory server administrator to determine the appropriate level of
     privileges as part of the process of preparing an external identity
     repository.
@@ -409,7 +410,7 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
     </listitem>
     <listitem>
      <para>
-      If the OpenAM data store administrator does not have has schema update
+      If the OpenAM data store administrator does not have schema update
       privileges, follow the procedure in <xref linkend="prepare-idrepo-manual-schema"/>.
      </para>
     </listitem>
@@ -430,12 +431,13 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
     <para>
      When running the <command>ldapmodify</command> command,
      you might need to specify the <literal>--trustAll</literal> argument to trust
-     server certificates if you directory server uses SSL.
+     server certificates if your directory server
+     uses self-signed certificates and StartTLS or SSL.
     </para>
    </note>
 
    <section xml:id="prepare-idrepo-dynamic-schema">
-    <title>Preparing an Identity Repository With Dynamic Schema Update</title>
+    <title>Preparing an Identity Repository With Dynamic Schema Updates</title>
 
     <para>
      If the OpenAM data store administrator has schema update privileges, you can
@@ -448,8 +450,8 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
     </para>
 
     <para>
-     The following procedure contains steps that you follow when preparing
-     an identity repository with dynamic schema update. The procedure assumes
+     The following procedure shows how to prepare
+     an identity repository with dynamic schema updates. The procedure assumes
      that you have already created an OpenDJ identity repository and populated
      it with user data and therefore does not include steps to install OpenDJ,
      configure directory server backends, and implement replication. For external
@@ -460,7 +462,7 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
     </para>
 
     <procedure xml:id="prepare-idrepo-dynamic-schema-steps">
-     <title>To Prepare an External OpenDJ Identity Repository with Dynamic Schema Update</title>
+     <title>To Prepare an External OpenDJ Identity Repository with Dynamic Schema Updates</title>
 
      <indexterm>
       <primary>identity repository</primary>
@@ -485,21 +487,21 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
        <itemizedlist>
         <listitem>
          <para>
-          <literal>update-schema</literal>, which lets the account update
+          <literal>update-schema</literal>. Allows the account to update
           the directory schema.
          </para>
         </listitem>
         <listitem>
          <para>
-          <literal>subentry-write</literal>, which is also necessary for
-          making directory schema updates.
+          <literal>subentry-write</literal>. Allows the account to make
+          directory subentry updates.
          </para>
         </listitem>
         <listitem>
          <para>
-          <literal>password-reset</literal>, which lets the account reset
-          other users' passwords and is needed for the forgotten
-          password feature. Note that for deployments in which OpenAM will not
+          <literal>password-reset</literal>. Allows the account to reset
+          other users' passwords. Required for the OpenAM forgotten
+          password feature. For deployments in which OpenAM will not
           modify user entries, the OpenAM data store administrator does not
           require this privilege.
          </para>
@@ -669,7 +671,7 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
    </section>
 
    <section xml:id="prepare-idrepo-manual-schema">
-    <title>Preparing an Identity Repository With Manual Schema Update</title>
+    <title>Preparing an Identity Repository With Manual Schema Updates</title>
 
     <indexterm>
      <primary>identity repository</primary>
@@ -688,8 +690,8 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
     </para>
 
     <para>
-     The following procedure contains steps that you follow when preparing
-     an identity repository with manual schema update. The procedure assumes
+     The following procedure shows how to prepare
+     an identity repository with manual schema updates. The procedure assumes
      that you have already created an OpenDJ identity repository and populated
      it with user data and therefore does not include steps to install OpenDJ,
      configure directory server backends, and implement replication. For external
@@ -700,7 +702,7 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
     </para>
 
     <procedure xml:id="prepare-idrepo-manual-schema-steps">
-     <title>To Prepare an External OpenDJ Identity Repository With Manual Schema Update</title>
+     <title>To Prepare an External OpenDJ Identity Repository With Manual Schema Updates</title>
 
      <step>
       <para>
@@ -719,9 +721,9 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
        <itemizedlist>
         <listitem>
          <para>
-          <literal>password-reset</literal>, which lets the account reset
-          other users' passwords and is needed for the forgotten
-          password feature. Note that for deployments in which OpenAM will not
+          <literal>password-reset</literal>. Allows the account to reset
+          other users' passwords. Required for the OpenAM forgotten
+          password feature. For deployments in which OpenAM will not
           modify user entries, the OpenAM data store administrator does not
           require this privilege.
          </para>
@@ -800,7 +802,7 @@ ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com</computer
        </itemizedlist>
       </para>
       <para>
-       Then run <command>ldapmodify</command> commands to import the
+       Then run the <command>ldapmodify</command> command to import the
        user, device print, and dashboard schema extensions. For example,
        to add schema extensions for an OpenDJ directory server, run the
        following <command>ldapmodify</command> commands:
@@ -917,8 +919,8 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
    <title>Configuring OpenAM Data Stores That Access External Identity Repositories</title>
 
    <para>
-    Having prepared your external identity repository for OpenAM as described
-    in the preceding steps, you then can configure the directory as an OpenAM
+    Now that you have prepared your external identity repository, you
+    can configure the directory as an OpenAM
     data store by using one of the following methods:
     <itemizedlist>
 
@@ -928,10 +930,10 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
        dialog box when installing OpenAM core services.
       </para>
       <para>
-       If you are using dynamic schema update, the OpenAM configurator will
-       required load schema definitions into your user directory.
-       If you are using manual schema update, you will have already loaded
-       required schema definitions into your user directory.
+       If you are using dynamic schema updates, the OpenAM configurator
+       loads required schema definitions into your user directory.
+       If you are using manual schema updates, you will have already loaded
+       the required schema definitions into your user directory.
       </para>
       <para>
        For more information about running the OpenAM configurator,
@@ -947,10 +949,10 @@ MODIFY operation successful for DN dc=example,dc=com</computeroutput></screen>
        By defining a data store after you have installed OpenAM core services.
       </para>
       <para>
-       If you are using dynamic schema update and you specify the "Load schema
-       when finished" option, OpenAM will load required schema definitions
-       into your user directory. If you are using manual schema update,
-       you will have already loaded required schema definitions into your user
+       If you are using dynamic schema updates and you specify the "Load schema
+       when finished" option, OpenAM loads required schema definitions
+       into your user directory. If you are using manual schema updates,
+       you will have already loaded the required schema definitions into your user
        directory.
       </para>
       <para>
@@ -1051,8 +1053,9 @@ $ dsconfig \
    <para>
     If you receive an LDAP error code 65 while attempting to create a
     user, it indicates that you did not correctly prepare the
-    external identity repository. Common reasons for error code 65 include
-    the following:
+    external identity repository. Error code 65 is an LDAP object class violation
+    and often indicates a problem with the directory schema. Common reasons for
+    this error while attempting to create a user include the following:
    </para>
 
    <itemizedlist>
