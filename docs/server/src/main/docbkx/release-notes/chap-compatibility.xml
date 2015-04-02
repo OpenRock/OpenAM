@@ -51,21 +51,389 @@
 
  <section xml:id="deprecated">
   <title>Deprecated Functionality</title>
+
+   <para>
+    This sections covers deprecated functionality in OpenAM.
+   </para>
   
-  <para>The following functionality is deprecated in OpenAM
-  <?eval ${serverDocTargetVersion}?>, and is likely to be removed in a future
-  release.</para>
-
   <!-- Deprecated features in 13.0 -->
-  <itemizedlist>
+  <section>
 
-   <listitem>
-    <para>
-     TODO: Update for the next release
-    </para>
-   </listitem>
+   <title>Functionality Deprecated in OpenAM 13</title>
 
-  </itemizedlist>
+   <para>The following functionality is deprecated in OpenAM
+    <?eval ${serverDocTargetVersion}?>, and is likely to be removed in a future
+    release.
+   </para>
+
+   <itemizedlist>
+
+    <listitem>
+     <para>
+      TODO: Update for the next release
+     </para>
+    </listitem>
+
+   </itemizedlist>
+
+  </section>
+
+  <!-- Deprecated features in 12.0 -->
+  <section>
+
+   <title>Functionality Deprecated Since OpenAM 12</title>
+
+   <para>
+    The following functionality was deprecated in OpenAM 12,
+    and is likely to be removed in a future release.
+   </para>
+
+   <itemizedlist>
+
+    <listitem>
+     <para>
+      Classic (JATO-based) UI is deprecated for end user pages.
+      OpenAM offers the JavaScript-based XUI as a replacement.
+      Classic UI for end user pages is likely to be removed in a future release.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>Older REST services relying on the following endpoints are
+      deprecated.</para>
+
+     <simplelist type="vert" columns="2">
+      <member>/identity/authorize</member>
+      <member>/identity/isTokenValid</member>
+      <member>/ws/1/entitlement/decision</member>
+      <member>/ws/1/entitlement/decisions</member>
+      <member>/ws/1/entitlement/entitlement</member>
+      <member>/ws/1/entitlement/entitlements</member>
+     </simplelist>
+
+     <para>The following table shows how legacy and newer endpoints
+      correspond.</para>
+
+     <table pgwide="1">
+      <title>REST Endpoints</title>
+
+      <tgroup cols="2">
+       <colspec colnum="1" colwidth="1*"/>
+       <colspec colnum="2" colwidth="1*"/>
+
+       <thead>
+        <row>
+         <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                      xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
+         <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                            xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+        </row>
+       </thead>
+
+       <tbody>
+
+        <row>
+         <entry>/identity/authorize</entry>
+         <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
+        </row>
+
+        <row>
+         <entry>/identity/isTokenValid</entry>
+         <entry>/json/sessions/<replaceable>tokenId</replaceable>?_action=validate</entry>
+        </row>
+
+        <row>
+         <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
+          /ws/1/entitlement/entitlement, /ws/1/entitlement/entitlements</entry>
+         <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/applications</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/applicationtypes</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/conditiontypes</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/dashboard</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/decisionscombiners</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/policies</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/referrals</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/serverinfo</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/subjectattributes</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/json/subjecttypes</entry>
+        </row>
+
+        <row>
+         <entry>N/A</entry>
+         <entry>/xacml/policies</entry>
+        </row>
+       </tbody>
+      </tgroup>
+     </table>
+
+     <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link
+      xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
+
+     <para>Support for the older REST services is likely to be removed in a
+      future release in favor of the newer REST services.</para>
+    </listitem>
+
+    <listitem>
+     <para>With the implementation of XACML 3.0 support when importing and
+     exporting policies the following <option>ssoadm</option> commands
+      have been replaced:</para>
+
+     <table>
+     <title>Policy Import and Export with ssoadm</title>
+
+     <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                    xlink:role="http://docbook.org/xlink/role/olink">
+        Deprecated</link> Command</entry>
+       <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                          xlink:role="http://docbook.org/xlink/role/olink">
+        Evolving</link> Command</entry>
+      </row>
+     </thead>
+
+     <tbody>
+     <row>
+      <entry><literal>create-policies</literal></entry>
+      <entry><literal>create-xacml</literal></entry>
+     </row>
+      <row>
+       <entry><literal>delete-policies</literal></entry>
+       <entry><literal>delete-xacml</literal></entry>
+      </row>
+      <row>
+       <entry><literal>list-policies</literal></entry>
+       <entry><literal>list-xacml</literal></entry>
+      </row>
+      <row>
+       <entry><literal>update-policies</literal></entry>
+       <entry><literal>create-xacml</literal></entry>
+      </row>
+     </tbody>
+     </tgroup>
+     </table>
+
+     <para>For more information, see the <citetitle>OpenAM
+      Reference</citetitle> section <link xlink:show="new"
+      xlink:href="reference#ssoadm-1"
+      xlink:role="http://docbook.org/xlink/role/olink">
+      ssoadm — configure OpenAM core services</link>.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      The OAuth 2.0 plugin interface for custom scopes,
+      <link
+       xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
+       xlink:show="new"><literal>Scope</literal></link>
+      is deprecated and likely to be removed in a future release.
+     </para>
+
+     <para>
+      Custom OAuth 2.0 scopes plugins now implement the
+      <link
+       xlink:href="${javadocBase}?org/forgerock/oauth2/core/ScopeValidator.html"
+       xlink:show="new"
+       ><literal>ScopeValidator</literal></link> interface instead.
+      For an example, see the <citetitle>Developer's Guide</citetitle> chapter,
+      <link
+       xlink:href="dev-guide#chap-oauth2-scopes"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       xlink:show="new"
+       ><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      The OAuth 2.0 plugin interface for custom response types,
+      <link
+       xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/ResponseType.html"
+       xlink:show="new"><literal>ResponseType</literal></link>
+      is deprecated and likely to be removed in a future release.
+     </para>
+
+     <para>
+      Custom OAuth 2.0 response type plugins now implement the
+      <link
+       xlink:href="${javadocBase}?org/forgerock/oauth2/core/ResponseTypeHandler.html"
+       xlink:show="new"
+       ><literal>ResponseTypeHandler</literal></link> interface instead.
+     </para>
+    </listitem>
+
+   </itemizedlist>
+
+  </section>
+
+  <!-- Deprecated features in 11.0 -->
+  <section>
+
+   <title>Functionality Deprecated Since OpenAM 11</title>
+
+   <para>
+    The following functionality was deprecated in OpenAM 11,
+    and is likely to be removed in a future release.
+   </para>
+
+   <itemizedlist>
+
+    <listitem>
+     <para>Older REST services relying on the following endpoints are
+      deprecated.</para>
+
+     <simplelist type="vert" columns="2">
+      <member>/identity/attributes</member>
+      <member>/identity/authenticate</member>
+      <member>/identity/create</member>
+      <member>/identity/delete</member>
+      <member>/identity/logout</member>
+      <member>/identity/read</member>
+      <member>/identity/search</member>
+      <member>/identity/update</member>
+     </simplelist>
+
+     <para>The following table shows how legacy and newer endpoints
+      correspond.</para>
+
+     <table pgwide="1">
+      <title>REST Endpoints</title>
+
+      <tgroup cols="2">
+       <colspec colnum="1" colwidth="1*"/>
+       <colspec colnum="2" colwidth="1*"/>
+
+       <thead>
+        <row>
+         <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                      xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
+         <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                            xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+        </row>
+       </thead>
+
+       <tbody>
+        <row>
+         <entry>/identity/attributes</entry>
+         <entry>/json/users</entry>
+        </row>
+
+        <row>
+         <entry>/identity/authenticate</entry>
+         <entry>/json/authenticate</entry>
+        </row>
+
+        <row>
+         <entry>/identity/create, /identity/delete, /identity/read,
+          /identity/search, /identity/update</entry>
+         <entry>/json/agents, /json/groups, /json/realms, /json/users</entry>
+        </row>
+
+        <row>
+         <entry>/identity/logout</entry>
+         <entry>/json/sessions/?_action=logout</entry>
+        </row>
+
+       </tbody>
+      </tgroup>
+     </table>
+
+     <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link
+      xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
+
+     <para>Support for the older REST services is likely to be removed in a
+      future release in favor of the newer REST services.</para>
+    </listitem>
+
+    <listitem>
+     <para>With the implementation of the Persistent Cookie authentication module, the
+     Core Authentication module persistent cookie options are deprecated and are
+     likely to be removed in a future release.</para>
+    </listitem>
+
+   </itemizedlist>
+
+  </section>
+
+  <!-- Deprecated features in 10.0 -->
+  <section>
+
+   <title>Functionality Deprecated Since OpenAM 10</title>
+
+   <para>
+    The following functionality was deprecated in OpenAM 10,
+    and is likely to be removed in a future release.
+   </para>
+
+   <itemizedlist>
+
+    <listitem>
+     <para>With the implementation of OAuth 2.0 in this release, OAuth 1.0 has been
+     deprecated. OAuth 1.0 support was originally provided in OpenAM 9.</para>
+    </listitem>
+
+    <listitem>
+     <para>The Netscape LDAP API is to be removed from OpenAM, with OpenAM
+     using the OpenDJ LDAP SDK instead. This affects all classes in
+     <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
+    </listitem>
+
+    <listitem>
+     <para>OpenAM currently uses Sun Java System Application Framework (JATO).
+     JATO is deprecated and is likely to be replaced in a future release.</para>
+    </listitem>
+
+   </itemizedlist>
+
+  </section>
+
  </section>
 
  <section xml:id="removed">
