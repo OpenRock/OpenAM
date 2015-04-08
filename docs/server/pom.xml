@@ -113,7 +113,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <frDocPluginVersion>2.1.5</frDocPluginVersion>
+        <frDocPluginVersion>3.0.0-SNAPSHOT</frDocPluginVersion>
 
         <projectName>OpenAM</projectName>
 
@@ -231,36 +231,15 @@
                     <configuration>
                         <projectName>${projectName}</projectName>
                         <projectVersion>${serverDocTargetVersion}</projectVersion>
-                        <latestJson>http://docs.forgerock.org/latest.json</latestJson>
+                        <releaseVersion>${serverDocTargetVersion}</releaseVersion>
                         <googleAnalyticsId>${gaId}</googleAnalyticsId>
-                        <overwriteGeneratedSource>true</overwriteGeneratedSource>
                     </configuration>
                     <executions>
-                        <execution>
-                            <id>copy-common</id>
-                            <phase>pre-site</phase>
-                            <goals>
-                                <goal>boilerplate</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>filter-sources</id>
-                            <phase>pre-site</phase>
-                            <goals>
-                                <goal>filter</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>prepare-sources</id>
-                            <phase>pre-site</phase>
-                            <goals>
-                                <goal>prepare</goal>
-                            </goals>
-                        </execution>
                         <execution>
                             <id>build-doc</id>
                             <phase>pre-site</phase>
                             <goals>
+                                <goal>process</goal>
                                 <goal>build</goal>
                             </goals>
                         </execution>
@@ -268,7 +247,11 @@
                             <id>layout-doc</id>
                             <phase>site</phase>
                             <goals>
-                                <goal>layout</goal>
+                                <goal>site</goal>
+<!-- These are not needed to build the site and should probably be moved to profiles:
+                                <goal>release</goal>
+                                <goal>backstage</goal>
+-->
                             </goals>
                         </execution>
                     </executions>
@@ -325,14 +308,14 @@
                                     <artifactId>openam-doc-log-message-ref</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>log-message-ref</classifier>
-                                    <outputDirectory>${project.build.directory}/docbkx-generated</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/docbkx-sources</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-doc-ssoadm-ref</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>ssoadm-ref</classifier>
-                                    <outputDirectory>${project.build.directory}/docbkx-generated</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/docbkx-sources</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
