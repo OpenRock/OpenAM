@@ -137,7 +137,7 @@
 
  <properties>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  <frDocPluginVersion>2.1.5</frDocPluginVersion>
+  <frDocPluginVersion>3.0.0-SNAPSHOT</frDocPluginVersion>
 
   <serverDocTargetVersion>13.0.0-SNAPSHOT</serverDocTargetVersion>
   <agentsDocTargetVersion>${project.version}</agentsDocTargetVersion>
@@ -179,35 +179,15 @@
      <configuration>
       <projectName>OpenAM</projectName>
       <projectVersion>${agentsDocTargetVersion}</projectVersion>
+      <releaseVersion>${agentsDocTargetVersion}</releaseVersion>
       <googleAnalyticsId>${gaId}</googleAnalyticsId>
-      <overwriteGeneratedSource>true</overwriteGeneratedSource>
      </configuration>
      <executions>
-      <execution>
-       <id>copy-common</id>
-       <phase>pre-site</phase>
-       <goals>
-        <goal>boilerplate</goal>
-       </goals>
-      </execution>
-      <execution>
-       <id>filter-sources</id>
-       <phase>pre-site</phase>
-       <goals>
-        <goal>filter</goal>
-       </goals>
-      </execution>
-      <execution>
-       <id>prepare-sources</id>
-       <phase>pre-site</phase>
-       <goals>
-        <goal>prepare</goal>
-       </goals>
-      </execution>
       <execution>
        <id>build-doc</id>
        <phase>pre-site</phase>
        <goals>
+        <goal>process</goal>
         <goal>build</goal>
        </goals>
       </execution>
@@ -215,7 +195,11 @@
        <id>layout-doc</id>
        <phase>site</phase>
        <goals>
-        <goal>layout</goal>
+        <goal>site</goal>
+<!-- These are not needed to build the site and should probably be moved to profiles:
+        <goal>release</goal>
+        <goal>backstage</goal>
+-->
        </goals>
       </execution>
      </executions>
@@ -240,7 +224,7 @@
          <artifactId>openam-server-doc</artifactId>
          <version>${serverDocTargetVersion}</version>
          <classifier>agent-docs</classifier>
-         <outputDirectory>${project.build.directory}/docbkx-generated</outputDirectory>
+         <outputDirectory>${project.build.directory}/docbkx-sources</outputDirectory>
         </artifactItem>
        </artifactItems>
       </configuration>
