@@ -101,7 +101,7 @@
 
  <xinclude:include href='chap-rest-sts.xml' />
 
- <xinclude:include href='chap-jdk.xml' />
+ <xinclude:include href='chap-java-sdk.xml' />
  <xinclude:include href='chap-authentication.xml' />
  <xinclude:include href='chap-session.xml' />
  <xinclude:include href='chap-policy-decisions.xml' />
