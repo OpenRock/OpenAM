@@ -7,6 +7,12 @@
       <form name="security_check_form" action="j_security_check" method="POST">
          <input type="hidden" value="am.filter.j_username" name="j_username"/>
          <input type="hidden" value="am.filter.j_password" name="j_password"/>
+         <noscript>
+            <center>
+                <p>Your browser does not have JavaScript enabled, please click the button below to continue.</p>
+                <input type="submit" value="Submit" />
+            </center>
+         </noscript>
       </form>
    </body>
 </html>
