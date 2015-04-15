@@ -360,10 +360,10 @@ String encrypted = AccessController.doPrivileged(new EncodeAction(question + "\t
    <para>The last number in the previous example indicates whether the question/answer is
     enabled or disabled:</para>
    <itemizedlist>
-    <listitem>0 = default question/answer that is disabled</listitem>
-    <listitem>1 = default question/answer that is enabled</listitem>
-    <listitem>2 = personal question/answer that is disabled</listitem>
-    <listitem>3 = personal question/answer that is enabled</listitem>
+    <listitem><para>0 = default question/answer that is disabled</para></listitem>
+    <listitem><para>1 = default question/answer that is enabled</para></listitem>
+    <listitem><para>2 = personal question/answer that is disabled</para></listitem>
+    <listitem><para>3 = personal question/answer that is enabled</para></listitem>
    </itemizedlist>
 
   <para>
