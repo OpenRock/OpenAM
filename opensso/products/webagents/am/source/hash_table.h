@@ -76,7 +76,7 @@ public:
     bool hasElement(const std::string& key) const;
     ElementType insert(const std::string& key,
 		       const ElementType value,
-                       time_t maxCaching, time_t timeLeft);
+                       time_t maxCaching = 0, time_t timeLeft = 0);
     ElementType remove(const std::string& key);
     void for_each(HTFunction<ElementType> &);
 
@@ -401,8 +401,8 @@ template<class Element>
 typename HashTable<Element>::ElementType
 HashTable<Element>::insert(const std::string& key,
 			   const ElementType newValue,
-                           time_t maxCaching = 0, 
-                           time_t timeLeft = 0)
+                           time_t maxCaching, 
+                           time_t timeLeft)
 {
     HashValueType bucketNumber = computeHash(key);
     EntryType entry = buckets[bucketNumber].find(key);
