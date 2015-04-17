@@ -75,7 +75,8 @@ public:
     ElementType find_cac(const std::string& key);
     bool hasElement(const std::string& key) const;
     ElementType insert(const std::string& key,
-		       const ElementType value);
+		       const ElementType value,
+                       time_t maxCaching, time_t timeLeft);
     ElementType remove(const std::string& key);
     void for_each(HTFunction<ElementType> &);
 
@@ -399,21 +400,27 @@ HashTable<Element>::hasElement(const std::string& key) const
 template<class Element>
 typename HashTable<Element>::ElementType
 HashTable<Element>::insert(const std::string& key,
-			   const ElementType newValue)
+			   const ElementType newValue,
+                           time_t maxCaching = 0, 
+                           time_t timeLeft = 0)
 {
     HashValueType bucketNumber = computeHash(key);
     EntryType entry = buckets[bucketNumber].find(key);
     ElementType oldValue;
+    // maxCaching value is in minutes, timeLeft in seconds
+    time_t mc = maxCaching <= 0 ? entryLifeTime : maxCaching * 60;
+    time_t tc = timeLeft <= 0 ? entryLifeTime : timeLeft;
+    time_t expTime = entryLifeTime <= mc ?
+            entryLifeTime : (mc < tc ? mc : tc);
 
     // Check if entry already exists return the old value.
     if (entry) {
-	oldValue = entry->getValue();
-	entry->setValue(newValue);
-	entry->setExpirationTime(time(0) + entryLifeTime);
+        oldValue = entry->getValue();
+        entry->setValue(newValue);
+        entry->setExpirationTime(time(0) + expTime);
     } else {
-	buckets[bucketNumber].insert(EntryType(new Entry(key, newValue,
-							 time(0) +
-							 entryLifeTime)));
+        buckets[bucketNumber].insert(EntryType(new Entry(key, newValue,
+                time(0) + expTime)));
     }
 
     return oldValue;

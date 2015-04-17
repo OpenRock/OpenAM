@@ -54,7 +54,7 @@ public:
 
     SessionInfo()
 	: ssoToken(), sessionType(), id(), domain(), maxSessionTime(0),
-	  maxIdleTime(0), maxCachingTime(0), remainingSessionTime(),
+	  maxIdleTime(0), maxCachingTime(0), remainingSessionTime(0),
 	  idleTime(0), state(INVALID), properties()
     {
     }

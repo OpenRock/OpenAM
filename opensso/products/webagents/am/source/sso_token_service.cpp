@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS
  */
 
 #include <climits>
@@ -470,10 +470,11 @@ SSOTokenService::getSessionInfo(const ServiceInfo& serviceInfo,
                          "for SSO Token ID %s to cache.", ssoTokenID.c_str());
 		SSOTokenEntryRefCntPtr ssotokenEntry;
 		SSOTokenEntryRefCntPtr oldEntry;
-		ssotokenEntry = new SSOTokenEntry(sessionInfo, 
-						  cookieList,
-						  svcInfo);
-		oldEntry = mSSOTokenTable.insert(ssoTokenID, ssotokenEntry);
+                ssotokenEntry = new SSOTokenEntry(sessionInfo,
+                        cookieList,
+                        svcInfo);
+                oldEntry = mSSOTokenTable.insert(ssoTokenID, ssotokenEntry,
+                        sessionInfo.getMaxCachingTime(), sessionInfo.getRemainingSessionTime());
 		Log::log(mLogID, Log::LOG_MAX_DEBUG,
                          "SSOTokenService::getSessionInfo(): "
 			 "SSO Token %s inserted in cache.", ssoTokenID.c_str());
