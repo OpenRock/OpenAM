@@ -3231,6 +3231,20 @@ $ ssoadm set-realm-svc-attrs \
      <literal>sunAMAuthJDBCAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
+
+   <note>
+    <para>
+OpenAM provides two properties, <literal>iplanet-am-admin-console-invalid-chars</literal> and
+<literal>iplanet-am-auth-ldap-invalid-chars</literal>, that store
+LDAP-releated special characters that are not allowed in username searches.
+    </para>
+    <para>
+When using JDBC databases, consider adding the '%' wildcard character to
+the <literal>iplanet-am-admin-console-invalid-chars</literal> and
+<literal>iplanet-am-auth-ldap-invalid-chars</literal> properties. By default,
+the '%' character is not included in the properties.
+    </para>
+   </note>
   </section>
   
   <section xml:id="ldap-module-conf-hints">
