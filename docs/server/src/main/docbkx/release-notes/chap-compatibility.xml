@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-compatibility'
@@ -207,7 +207,7 @@
      </table>
 
      <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link
-      xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:href="dev-guide#sec-rest" xlink:role="http://docbook.org/xlink/role/olink"
       xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
 
      <para>Support for the older REST services is likely to be removed in a
@@ -283,7 +283,7 @@
        ><literal>ScopeValidator</literal></link> interface instead.
       For an example, see the <citetitle>Developer's Guide</citetitle> chapter,
       <link
-       xlink:href="dev-guide#chap-oauth2-scopes"
+       xlink:href="dev-guide#sec-oauth2-scopes"
        xlink:role="http://docbook.org/xlink/role/olink"
        xlink:show="new"
        ><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
@@ -385,7 +385,7 @@
      </table>
 
      <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link
-      xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:href="dev-guide#sec-rest" xlink:role="http://docbook.org/xlink/role/olink"
       xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
 
      <para>Support for the older REST services is likely to be removed in a

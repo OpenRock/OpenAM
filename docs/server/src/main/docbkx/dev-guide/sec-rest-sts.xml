@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2014-2015 ForgeRock AS
+  !      Copyright 2014-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-rest-sts'
+<section xml:id='sec-rest-sts'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -75,7 +75,7 @@
    For example, you can create a REST
    STS instance programmatically or through the Admin console
    to transform a validated OpenID Connect (OIDC) 1.0 access token,
-   whose principal is mapped to a new SAML 2.0 token, asserting claims mapped
+   whose principal is mapped to a new SAML v2.0 token, asserting claims mapped
    in the OIDC access token's scope.
   </para>
 
@@ -99,7 +99,7 @@
  </itemizedlist>
 
   <para>
-  The generated SAML 2.0 token supports assertion signing and encryption as well
+  The generated SAML v2.0 token supports assertion signing and encryption as well
   as with the Bearer, Holder of Key, or Sender Vouches Subject confirmation:
  </para>
 
@@ -147,7 +147,7 @@
   <section xml:id="rest-sts-instance-config">
    <title>Instance Configuration</title>
    <para>
-    Each REST STS instance issues SAML 2.0 assertions for a single ServiceProvider.
+    Each REST STS instance issues SAML v2.0 assertions for a single ServiceProvider.
     As a result, each REST STS instance is configured with the following elements:
    </para>
 
@@ -208,7 +208,7 @@
   <section xml:id="rest-sts-plugins">
    <title>Custom Plug-ins</title>
    <para>
-    All statements constituting a SAML 2.0 assertion can be fully customized.
+    All statements constituting a SAML v2.0 assertion can be fully customized.
     For each REST STS instance, you can write custom plug-ins for the
     <literal>Conditions</literal>, <literal>Subject</literal>,
     <literal>AuthenticationStatements</literal>,
@@ -228,7 +228,7 @@
    <para>
     Each REST STS instance must specify the <literal>AuthnContext</literal>
     in the <literal>AuthenticationStatements</literal> of the generated assertion.
-    This <literal>AuthnContext</literal> allows the generated SAML 2.0 assertion
+    This <literal>AuthnContext</literal> allows the generated SAML v2.0 assertion
     to specify the manner in which the assertion’s
     subject was authenticated. For a token transformation,
     this <literal>AuthnContext</literal> is a function of the input token type.
@@ -327,7 +327,7 @@ urn:oasis:names:tc:SAML:2.0:attrname-format:uri|photo=photo;binary
 X->Y;(don’t) invalidate interim OpenAM session
   where
     "X" refers to the input token type
-    "Y" refers to the output token type (currently limited to SAML 2.0)
+    "Y" refers to the output token type (currently limited to SAML v2.0)
     "(don't) invalidate interim OpenAM session" specifies whether the interim
      OpenAM session, created during the authentication of the presented input token
      type, should be invalidated following the creation of the output token type.
@@ -1451,4 +1451,4 @@ public class RestSTSConsumer {
   </programlisting>
  </section>
 
-</chapter>
+</section>

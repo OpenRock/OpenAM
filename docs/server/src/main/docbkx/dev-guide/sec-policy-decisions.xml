@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-policy-decisions'
+<section xml:id='sec-policy-decisions'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -36,7 +36,7 @@
   <secondary>Java API</secondary>
  </indexterm>
 
- <para>This chapter shows how to request policy decision by using OpenAM Java
+ <para>This section shows how to request policy decision by using OpenAM Java
  SDK. The chapter focuses on the sample client,
  <filename>source/samples/policy/PolicyEvaluationSample.java</filename>, which
  demonstrates making a request to OpenAM for a policy decision about access to
@@ -245,4 +245,4 @@ returning from getPolicyDecision()</computeroutput>
  OpenAM has allowed access to the resource.</para>
 
  <literallayout class="monospaced">&lt;Value&gt;allow&lt;/Value&gt;</literallayout>
-</chapter>
+</section>

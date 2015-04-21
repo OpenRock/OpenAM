@@ -20,22 +20,22 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-csdk'
+<section xml:id='sec-csdk'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>Using the OpenAM C API</title>
+ <title>Using the OpenAM C SDK</title>
  <indexterm>
   <primary>Installing</primary>
   <secondary>C SDK</secondary>
  </indexterm>
- <para>This chapter introduces OpenAM C SDK. OpenAM C SDK is available for
+ <para>This section introduces OpenAM C SDK. OpenAM C SDK is available for
  selected platforms on the OpenAM <link xlink:show="new"
  xlink:href="http://forgerock.org/openam.html">nightly builds page</link>.
  Contact <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>
@@ -165,4 +165,4 @@ $ <userinput>LD_LIBRARY_PATH=../lib \
    </screen>
   </step>
  </procedure>
-</chapter>
+</section>

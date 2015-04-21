@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-xacml'
+<section xml:id='sec-xacml'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -32,7 +32,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Requesting a XACML Policy Decision Using OpenAM Java SDK</title>
 
- <para>This chapter shows how to request a XACML policy decision with OpenAM
+ <para>This section shows how to request a XACML policy decision with OpenAM
  Java SDK, using the sample client,
  <filename>source/samples/xacml/XACMLClientSample.java</filename>.
  The sample client relies on an OpenAM server acting as a policy decision point
@@ -483,4 +483,4 @@ testProcessRequest():xacmlResponse:
 &lt;/xacml-context:Result&gt;
 &lt;/xacml-context:Response&gt;</computeroutput>
  </screen>
-</chapter>
+</section>

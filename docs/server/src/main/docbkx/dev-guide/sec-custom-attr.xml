@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-custom-attr'
+<section xml:id='sec-custom-attr'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -35,7 +35,7 @@
   <primary>User data</primary>
   <secondary>Custom profile attributes</secondary>
  </indexterm>
- <para>You can extend user profiles by adding custom attributes. This chapter
+ <para>You can extend user profiles by adding custom attributes. This section
  demonstrates how to add a custom attribute to a user profile when storing
  user profiles in the embedded LDAP directory.</para>
 
@@ -46,7 +46,7 @@
  OpenAM policy configuration stored in the configuration directory.</para>
 
  <itemizedlist>
-  <para>This chapter includes the following procedures.</para>
+  <para>This section includes the following procedures.</para>
 
   <listitem><para><xref linkend="add-attr-to-service-description" /></para></listitem>
   <listitem><para><xref linkend="add-attr-to-identity-repository" /></para></listitem>
@@ -234,4 +234,4 @@ $ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
    </mediaobject>
   </step>
  </procedure>
-</chapter>
+</section>

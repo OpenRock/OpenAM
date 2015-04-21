@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-extending'
@@ -31,7 +31,6 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Extending OpenAM</title>
-
  <para>OpenAM services solve a wide range of access and federation
  management problems out of the box. Yet, OpenAM also exposes APIs and
  SPIs that enable you extend OpenAM services when built-in functionality
@@ -39,4 +38,5 @@
 
  <para>This part of the guide covers OpenAM mechanisms for plugging in
  additional functionality not available out of the box.</para>
+ <xinclude:include href='sec-post-auth.xml' />
 </chapter>

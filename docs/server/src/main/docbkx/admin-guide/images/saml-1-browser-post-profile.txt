@@ -21,13 +21,13 @@
    
     CCPL HEADER END
    
-         Copyright 2014 ForgeRock AS
+         Copyright 2014-2015 ForgeRock AS.
 
     To generate a sequence diagram from this file, process
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
 '/
 
-title SAML 1.x Browser POST Profile
+title SAML v1.x Browser POST Profile
 autonumber
 
 participant "Browser" as Browser

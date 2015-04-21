@@ -4967,7 +4967,7 @@ ssoadm \
     For details on writing authentication module scripts, see the
     <citetitle>Developer Guide</citetitle> chapter,
     <link
-     xlink:href="dev-guide#chap-scripted-auth-module"
+     xlink:href="dev-guide#sec-scripted-auth-module"
      xlink:role="http://docbook.org/xlink/role/olink"
      xlink:show="new"
     ><citetitle>Scripting Authentication</citetitle></link>.
@@ -5638,7 +5638,7 @@ ssoadm \
 
   <para>If necessary, you can also write your own custom post authentication
   plugin as described in the <citetitle>Developer's Guide</citetitle> chapter
-  on <link xlink:href="dev-guide#chap-post-auth"
+  on <link xlink:href="dev-guide#sec-post-auth"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Creating a Post
   Authentication Plugin</citetitle></link>.</para>
  </section>
@@ -6073,7 +6073,7 @@ ssoadm \
    <para>If none of these session quota exhaustion actions fit your deployment,
    you can implement a custom session quota exhaustion action. See the
    <citetitle>Developer's Guide</citetitle> chapter on <link
-   xlink:href="dev-guide#chap-custom-quota-exhaustion-action"
+   xlink:href="dev-guide#sec-custom-quota-exhaustion-action"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing
    Session Quota Exhaustion Actions</citetitle></link> for an example.</para>
   </step>

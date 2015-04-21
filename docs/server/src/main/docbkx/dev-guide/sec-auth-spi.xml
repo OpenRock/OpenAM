@@ -23,7 +23,7 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-auth-spi'
+<section xml:id='sec-auth-spi'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -43,7 +43,7 @@
       This version uses Maven to simplify the build process for developers.
  -->
 
- <para>This chapter shows how to customize authentication with a sample custom
+ <para>This section shows how to customize authentication with a sample custom
  authentication module. For deployments with particular requirements not met by
  existing OpenAM authentication modules, determine whether you can adapt one of
  the built-in or extension modules for your needs. If not, build the
@@ -875,4 +875,4 @@ $ <userinput>tail -1 /path/to/tomcat/logs/catalina.out</userinput>
   authentication as users <literal>test1</literal> or <literal>test2</literal>
   to see what the error handling looks like to the user.</para>
  </section>
-</chapter>
+</section>

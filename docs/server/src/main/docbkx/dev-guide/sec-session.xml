@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-session'
+<section xml:id='sec-session'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -35,8 +35,8 @@
   <primary>Session tokens</primary>
   <secondary>Java API</secondary>
  </indexterm>
- <para>This chapter looks at handling session tokens with the OpenAM Java SDK.
- The class shown in this chapter is
+ <para>This section looks at handling session tokens with the OpenAM Java SDK.
+ The class shown in this section is
  <literal>com.sun.identity.samples.sso.SSOTokenSample</literal>.</para>
 
  <para>When a user authenticates successfully, OpenAM sets up a single sign-on
@@ -263,4 +263,4 @@ Property: County: SantaClara</computeroutput>
   Specification</citetitle></link> for details on the available listener
   interfaces.</para>
  </section>
-</chapter>
+</section>

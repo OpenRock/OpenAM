@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-rest-authz-policy'
+<section xml:id='sec-rest-authz-policy'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -36,8 +36,8 @@
 
  <indexterm><primary>REST API</primary></indexterm>
 
- <para>This chapter shows how to use the OpenAM RESTful interfaces for authorization
-  and policy management.
+ <para>This section shows how to use the OpenAM RESTful interfaces for
+  authorization and policy management.
  </para>
 
  <section xml:id="rest-api-authz">
@@ -5480,4 +5480,4 @@ $ <userinput>curl \
    </programlisting>
   </section>
 
-</chapter>
+</section>

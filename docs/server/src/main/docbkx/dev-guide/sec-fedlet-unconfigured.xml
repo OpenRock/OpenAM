@@ -21,7 +21,7 @@
   !      Copyright 2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id="chap-fedlet-unconfigured"
+<section xml:id="sec-fedlet-unconfigured"
          xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://docbook.org/ns/docbook
@@ -33,17 +33,18 @@
  <indexterm>
   <primary>Fedlets</primary>
   <secondary>Java</secondary>
+  <tertiary>Manual</tertiary>
  </indexterm>
 
  <para>
   An OpenAM Fedlet is a small web application
-  that makes it easy to add SAML 2.0 Service Provider (SP) capabilities
+  that makes it easy to add SAML v2.0 Service Provider (SP) capabilities
   to your Java web application.
   The OpenAM console offers a wizard for configuring a Java Fedlet
-  as a SAML 2.0 Service Provider with OpenAM as the Identity Provider (IDP).
+  as a SAML v2.0 Service Provider with OpenAM as the Identity Provider (IDP).
   If that fits your purposes, then read the chapter
   <link
-   xlink:href="dev-guide#chap-fedlet-java"
+   xlink:href="dev-guide#sec-fedlet-java"
    xlink:role="http://docbook.org/xlink/role/olink"
    xlink:show="new"
   ><citetitle>Using Fedlets in Java Web Applications</citetitle></link>
@@ -65,7 +66,7 @@
   are quite similar though not identical for Java and .NET Fedlets.
   For instructions on configuring .NET Fedlets, read the chapter
   <link
-   xlink:href="dev-guide#chap-fedlet-dotnet"
+   xlink:href="dev-guide#sec-fedlet-dotnet"
    xlink:role="http://docbook.org/xlink/role/olink"
    xlink:show="new"
   ><citetitle>Using Fedlets in .NET Applications</citetitle></link>.
@@ -79,7 +80,7 @@
   <listitem>
    <para>
     Determine the roles that the IDP(s) and Fedlet play
-    in SAML 2.0 Circles of Trust.
+    in SAML v2.0 Circles of Trust.
    </para>
   </listitem>
 
@@ -99,12 +100,12 @@
 
   <listitem>
    <para>
-    Obtain SAML 2.0 metadata configuration files from the IDP(s),
+    Obtain SAML v2.0 metadata configuration files from the IDP(s),
     and add them to the Fedlet configuration.
    </para>
 
    <para>
-    The IDP must provide at least the standard SAML 2.0 metadata.
+    The IDP must provide at least the standard SAML v2.0 metadata.
    </para>
   </listitem>
 
@@ -117,13 +118,14 @@
 
   <listitem>
    <para>
-    Share the Fedlet SAML 2.0 configuration files
-    at least for the standard SAML 2.0 metadata
+    Share the Fedlet SAML v2.0 configuration files
+    at least for the standard SAML v2.0 metadata
     with the IDP(s).
    </para>
 
    <para>
-    An IDP relies on the standard SAML 2.0 metadata to communicate with the Fedlet.
+    An IDP relies on the standard SAML v2.0 metadata to communicate with the
+    Fedlet.
    </para>
   </listitem>
 
@@ -220,7 +222,7 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     <listitem>
      <para>
       This file defines settings for the Fedlet as a web application.
-      It does not address the SAML 2.0 configuration.
+      It does not address the SAML v2.0 configuration.
      </para>
 
      <para>
@@ -235,7 +237,7 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     <term><filename>conf/fedlet.cot-template</filename></term>
     <listitem>
      <para>
-      This template defines settings for a SAML 2.0 Circle of Trust
+      This template defines settings for a SAML v2.0 Circle of Trust
       to which the Fedlet belongs.
      </para>
 
@@ -250,19 +252,19 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     <term><filename>conf/idp.xml</filename> (not provided)</term>
     <listitem>
      <para>
-      The <filename>idp.xml</filename> file is standard SAML 2.0 metadata
+      The <filename>idp.xml</filename> file is standard SAML v2.0 metadata
       that describes the IDP configuration.
      </para>
 
      <para>
-      Templates for other SAML 2.0 configuration files are provided,
+      Templates for other SAML v2.0 configuration files are provided,
       but no <filename>idp.xml</filename> template file is provided.
      </para>
 
      <para>
-      Instead you must obtain the SAML 2.0 metadata from the IDP,
+      Instead you must obtain the SAML v2.0 metadata from the IDP,
       and add it as <filename>idp.xml</filename> here,
-      alongside the other SAML 2.0 configuration files.
+      alongside the other SAML v2.0 configuration files.
       How you obtain this file from the IDP depends on the IDP implementation.
      </para>
     </listitem>
@@ -272,7 +274,7 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     <term><filename>conf/idp-extended.xml-template</filename></term>
     <listitem>
      <para>
-      This template holds extended SAML 2.0 IDP settings that OpenAM uses.
+      This template holds extended SAML v2.0 IDP settings that OpenAM uses.
      </para>
 
      <para>
@@ -286,7 +288,7 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     <term><filename>conf/sp.xml-template</filename></term>
     <listitem>
      <para>
-      This template describes standard SAML 2.0 SP settings.
+      This template describes standard SAML v2.0 SP settings.
      </para>
 
      <para>
@@ -300,7 +302,8 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     <term><filename>conf/sp-extended.xml-template</filename></term>
     <listitem>
      <para>
-      This template describes extended SAML 2.0 SP settings that the Fedlet uses.
+      This template describes extended SAML v2.0 SP settings that the Fedlet
+      uses.
      </para>
 
      <para>
@@ -322,7 +325,7 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
    The configuration for a single Java Fedlet includes
    only one <filename>Fedlet.properties</filename> file,
    regardless of how many IDP and SP configurations are involved.
-   This file does not address the SAML 2.0 configuration.
+   This file does not address the SAML v2.0 configuration.
   </para>
 
   <para>
@@ -544,14 +547,14 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
     Other sections in this guide explain
     how to configure a Fedlet for signing and encryption
     including how to work with the key stores that these settings reference,
-    and how to specify public key certificates in standard SAML 2.0 metadata.
+    and how to specify public key certificates in standard SAML v2.0 metadata.
     When working with a Java Fedlet, see the section on
     <link
      xlink:href="dev-guide#fedlet-signing-encryption"
      xlink:role="http://docbook.org/xlink/role/olink"
      xlink:show="new"
     ><citetitle>Signing &amp; Encryption For a Fedlet</citetitle></link>.
-    Although this chapter focuses on Java Fedlets,
+    Although this section focuses on Java Fedlets,
     if you are working with a .NET Fedlet also see the procedures
     <link
      xlink:href="dev-guide#import-fedlet-key-pairs-windows"
@@ -895,7 +898,7 @@ $ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</useri
 
   <para>
    As described in <xref linkend="unconfigured-fedlet-conf" />,
-   this template defines settings for a SAML 2.0 Circle of Trust.
+   this template defines settings for a SAML v2.0 Circle of Trust.
    The Fedlet belongs to at least one Circle of Trust.
   </para>
 
@@ -1093,10 +1096,10 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
 
   <para>
    As described in <xref linkend="unconfigured-fedlet-conf" />,
-   the IDP provides its standard SAML 2.0 metadata as XML,
+   the IDP provides its standard SAML v2.0 metadata as XML,
    which you save in the configuration folder as <filename>idp.xml</filename>.
    If the IDP uses OpenAM,
-   the IDP can also provide extended SAML 2.0 metadata as XML,
+   the IDP can also provide extended SAML v2.0 metadata as XML,
    which you save in the configuration folder as <filename>idp-extended.xml</filename>,
    rather than using the template for extended information.
   </para>
@@ -1115,7 +1118,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
 
    <para>
     This section covers the configuration in <filename>idp.xml</filename>.
-    The <filename>idp.xml</filename> file contains standard SAML 2.0 metadata
+    The <filename>idp.xml</filename> file contains standard SAML v2.0 metadata
     for an IDP in a Circle of Trust that includes the Fedlet as SP.
     The IDP provides you the content of this file.
    </para>
@@ -1150,7 +1153,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
 
    <para>
     This section covers the configuration in <filename>idp-extended.xml</filename>.
-    Most extended metadata are specific to the OpenAM implementation of SAML 2.0.
+    Most extended metadata are specific to the OpenAM implementation of SAML v2.0.
     If the IDP runs OpenAM, have the IDP provide the extended metadata
     exported by using the <command>ssoadm create-metadata-templ</command> command.
     This section covers only the basic settings relative to all IDPs.
@@ -1182,7 +1185,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
     though the namespace defines elements
     for the Attribute Authority and Policy Decision Point roles
     shown in the template, as well as the others
-    defined in the standard governing SAML 2.0 metadata.
+    defined in the standard governing SAML v2.0 metadata.
    </para>
 
    <para>
@@ -1235,7 +1238,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
 
   <para>
    As mentioned in <xref linkend="unconfigured-fedlet-conf" />,
-   the Fedlet SAML 2.0 configuration is defined in two XML files,
+   the Fedlet SAML v2.0 configuration is defined in two XML files,
    the standard metadata in <filename>sp.xml</filename>
    and the extended metadata in <filename>sp-extended.xml</filename>.
   </para>
@@ -1255,7 +1258,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
 
    <para>
     This section covers the configuration in <filename>sp.xml</filename>.
-    The <filename>sp.xml</filename> file contains standard SAML 2.0 metadata
+    The <filename>sp.xml</filename> file contains standard SAML v2.0 metadata
     for the Fedlet as SP.
     If you edit the standard metadata,
     make sure that you provide the new version to your IDP,
@@ -1278,7 +1281,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
    </para>
    
    <para>
-    A standard metadata file describes the SAML 2.0 roles that the Fedlet plays.
+    A standard metadata file describes the SAML v2.0 roles that the Fedlet plays.
     The default base element of the file is an <tag>EntityDescriptor</tag>,
     which is a container for role descriptor elements.
     The <tag>EntityDescriptor</tag> element can therefore
@@ -1289,7 +1292,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
     <link
      xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-schema-metadata-2.0.xsd"
      xlink:show="new" />.
-    In general, you can find standard SAML 2.0-related XML schema definitions at
+    In general, you can find standard SAML v2.0-related XML schema definitions at
     <link
      xlink:href="http://docs.oasis-open.org/security/saml/v2.0/"
      xlink:show="new" />.
@@ -1307,7 +1310,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
      xlink:href="admin-guide#fedlet-saml2-features"
      xlink:role="http://docbook.org/xlink/role/olink"
      xlink:show="new"
-    ><citetitle>Fedlet Support for SAML 2.0 Features</citetitle></link>.
+    ><citetitle>Fedlet Support for SAML v2.0 Features</citetitle></link>.
    </para>
 
    <itemizedlist>
@@ -1515,7 +1518,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
    <para>
     This section covers the configuration
     in the <filename>sp-extended.xml</filename> file.
-    The extended metadata are specific to the OpenAM implementation of SAML 2.0.
+    The extended metadata are specific to the OpenAM implementation of SAML v2.0.
    </para>
 
    <para>
@@ -1888,7 +1891,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
       <term><literal>saml2AuthModuleName</literal></term>
       <listitem>
        <para>
-        Name of an alternative SAML 2.0 authentication module
+        Name of an alternative SAML v2.0 authentication module
        </para>
       </listitem>
      </varlistentry>
@@ -2178,7 +2181,7 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
       <listitem>
        <para>
         Set this to true to pick a preferred IDP
-        based on a SAML 2.0 introduction cookie.
+        based on a SAML v2.0 introduction cookie.
        </para>
 
        <para>
@@ -2453,9 +2456,9 @@ $ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot
    <listitem>
     <para>
      When you deploy your war file,
-     also provide the Fedlet configuration as described in this chapter.
+     also provide the Fedlet configuration as described in this section.
     </para>
    </listitem>
   </itemizedlist>
  </section>
-</chapter>
+</section>

@@ -23,17 +23,18 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-rest'
+<section xml:id='sec-rest'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
- <title>RESTful Web Services</title>
+ <title>Using the REST API</title>
  <indexterm><primary>REST API</primary></indexterm>
- <para>This chapter shows how to use the OpenAM RESTful interfaces for direct
+ <para>This section shows how to use the OpenAM RESTful interfaces for direct
  integration between web client applications and OpenAM.</para>
  
  <section xml:id="about-openam-rest-api">
@@ -241,7 +242,7 @@
     <para>
      <link
       xlink:show="new"
-      xlink:href="dev-guide#chap-rest-authz-policy"
+      xlink:href="dev-guide#sec-rest-authz-policy"
       xlink:role="http://docbook.org/xlink/role/olink"
       >Authorization and Policy Management</link>
     </para>
@@ -273,21 +274,21 @@
     <para>
      <link
       xlink:show="new"
-      xlink:href="dev-guide#chap-rest-user-services"
+      xlink:href="dev-guide#sec-rest-user-services"
       xlink:role="http://docbook.org/xlink/role/olink"
       >User Self-Registration</link></para>
    </listitem>
    <listitem>
     <para><link
      xlink:show="new"
-     xlink:href="dev-guide#chap-rest-user-services"
+     xlink:href="dev-guide#sec-rest-user-services"
      xlink:role="http://docbook.org/xlink/role/olink"
      >Resetting Forgotten Passwords</link></para>
    </listitem>
    <listitem>
     <para><link
      xlink:show="new"
-     xlink:href="dev-guide#chap-rest-user-services"
+     xlink:href="dev-guide#sec-rest-user-services"
      xlink:role="http://docbook.org/xlink/role/olink"
      >Dashboard Service</link></para>
    </listitem>
@@ -296,7 +297,7 @@
     <para>
      <link
       xlink:show="new"
-      xlink:href="dev-guide#chap-rest-identity-realm-mgmt"
+      xlink:href="dev-guide#sec-rest-identity-realm-mgmt"
       xlink:role="http://docbook.org/xlink/role/olink"
       >Identity Management
       (creating, reading, updating, deleting identities)
@@ -306,7 +307,7 @@
    <listitem>
     <para><link
      xlink:show="new"
-     xlink:href="dev-guide#chap-rest-identity-realm-mgmt"
+     xlink:href="dev-guide#sec-rest-identity-realm-mgmt"
      xlink:role="http://docbook.org/xlink/role/olink"
      >Realm Management
      (creating, reading, updating, deleting realms)
@@ -315,19 +316,18 @@
    <listitem>
     <para><link
      xlink:show="new"
-     xlink:href="dev-guide#chap-rest-sts"
+     xlink:href="dev-guide#sec-rest-sts"
      xlink:role="http://docbook.org/xlink/role/olink"
      >Secure Token Service (STS)
     </link></para>
    </listitem>
   </itemizedlist>
 
-  <para>This chapter also includes a section on <link
+  <para>This section also covers <link
    linkend="rest-api-status-codes">REST Status Codes</link>.</para>
 
-  <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+  <para>In this section, long URLs are wrapped to fit the printed page, as some
   of the output is formatted for easier reading.</para>
- </section>
 
  <section xml:id="rest-api-versioning">
   <title>REST API Versioning</title>
@@ -656,7 +656,8 @@ $ <userinput>curl \
   <title>Token Encoding</title>
 
   <para>Valid tokens in OpenAM requires configuration either in percent encoding or in <emphasis>C66Encode</emphasis>
-  format. C66Encode format is encouraged. It is the default token format for OpenAM, and is used in this chapter.
+  format. C66Encode format is encouraged. It is the default token format for
+   OpenAM, and is used in this section.
   The following is an example token that has not been encoded:</para>
 
   <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE=@AAJTSQACMDE=#</literallayout>
@@ -1983,4 +1984,11 @@ $ <userinput>curl \
     </varlistentry>
    </variablelist>
   </section>
-</chapter>
+</section>
+
+ <xinclude:include href='sec-rest-authz-policy.xml' />
+ <xinclude:include href='sec-rest-oauth2-oidc.xml' />
+ <xinclude:include href='sec-rest-user-services.xml' />
+ <xinclude:include href='sec-rest-identity-realm-mgmt.xml' />
+ <xinclude:include href='sec-rest-sts.xml' />
+</section>

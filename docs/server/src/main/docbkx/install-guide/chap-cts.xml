@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2013-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-cts'
@@ -39,10 +39,10 @@
   </indexterm>
 
  <para>The Core Token Service (CTS) provides persistent and highly available
-  token storage for OpenAM session, OAuth 2.0, SAML 2.0 and UMA tokens.
+  token storage for OpenAM session, OAuth 2.0, SAML v2.0 and UMA tokens.
   CTS is set up in a generalized token storage format, which by default is
   always used for OAuth 2.0 and UMA tokens.
-  If configured, it can also be used to persist session and SAML 2.0 tokens.</para>
+  If configured, it can also be used to persist session and SAML v2.0 tokens.</para>
 
  <para>The easiest CTS configuration is to run the default configuration
   option in the installer, which uses an embedded OpenDJ directory server to store both
@@ -770,7 +770,7 @@ chmod u+x cts-setup.sh
    </indexterm>
 
     <para>Replication in this context is the process of copying updates between directory servers to help all servers
-    converge to identical copies of directory, token, and session / SAML 2.0 / OAuth 2.0 data. OpenDJ uses advanced
+    converge to identical copies of directory, token, and session / SAML v2.0 / OAuth 2.0 data. OpenDJ uses advanced
     data replication methods to ensure that directory services remain available in the event of a server crash or
     network interruption.</para>
 
@@ -798,7 +798,7 @@ $ <userinput>dsconfig \
     </screen>
 
      <para>At this point, you need to understand whether CTS data backups are important in your deployment.
-     Session, SAML 2.0, and OAuth 2.0 token data is often short-lived. In some deployments, the "worst-case"
+     Session, SAML v2.0, and OAuth 2.0 token data is often short-lived. In some deployments, the "worst-case"
      scenario is that users have to log in again.</para>
 
      <para>If CTS data backups are important in your deployment, note that OpenDJ
@@ -923,7 +923,7 @@ $ <userinput>backup \
       <para>OAuth 2.0 for token persistence</para>
      </listitem>
      <listitem>
-      <para>SAML 2.0 for token persistence</para>
+      <para>SAML v2.0 for token persistence</para>
      </listitem>
      <listitem>
       <para>UMA for token persistence</para>
@@ -1013,10 +1013,10 @@ $ <userinput>backup \
 
    <para>
     When properly configured, CTS can help your deployment avoid single points
-    of failure (SPOF). Session and SAML 2.0 tokens which are normally stored
+    of failure (SPOF). Session and SAML v2.0 tokens which are normally stored
     only in the memory of a single server are also written to the
     CTS as a secondary token store. If the OpenAM instance that owns the session
-    or SAML 2.0 token fails, a second instance of OpenAM can allow access to the
+    or SAML v2.0 token fails, a second instance of OpenAM can allow access to the
     session or token. To reduce the impact of any given failure,
     consider the following options:</para>
 
@@ -1051,7 +1051,7 @@ $ <userinput>backup \
       to move the CTS token storage to one or more dedicated systems as
       CTS generally causes much more replication traffic than less volatile
       configuration data.
-      Alternatively, if you need global replication of session, SAML 2.0, UMA
+      Alternatively, if you need global replication of session, SAML v2.0, UMA
       and OAuth 2.0 tokens, this would also justify a move to dedicated systems
       as it provides an extra level of control over how much replication is
       taking place.

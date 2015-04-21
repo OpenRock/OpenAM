@@ -23,7 +23,7 @@
   !      Copyright 2014-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-rest-sts'
+<chapter xml:id='sec-rest-sts'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'

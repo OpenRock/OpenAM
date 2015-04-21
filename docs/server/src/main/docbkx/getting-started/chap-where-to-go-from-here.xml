@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2013-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-where-to-go-from-here'
@@ -210,12 +210,12 @@
 
    <listitem>
     <para>Security Assertion Markup Language (SAML) 2.0 grew out of earlier
-    work on SAML 1.x and in the Liberty Alliance. SAML defines XML-based,
-    standard formats and profiles for federating identities. SAML 2.0 is
+    work on SAML v1.x and in the Liberty Alliance. SAML defines XML-based,
+    standard formats and profiles for federating identities. SAML v2.0 is
     supported by a wide range of applications including major software as a
-    service (SaaS) offerings. OpenAM supports SAML 2.0 and earlier standards,
+    service (SaaS) offerings. OpenAM supports SAML v2.0 and earlier standards,
     and can function as a hub in deployments where different standards are
-    used. For details on OpenAM's SAML 2.0 capabilities, see the
+    used. For details on OpenAM's SAML v2.0 capabilities, see the
     <citetitle>Administration Guide</citetitle> chapter, <link xlink:show="new"
     xlink:href="admin-guide#chap-federation"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing SAML
@@ -334,7 +334,7 @@
   have a web application running in a server for which no policy agent has been
   developed. Or you might be protecting an application where you simply cannot
   install a policy agent. In that case, OpenIG functions as a flexible reverse
-  proxy with standard SAML 2.0 capabilities. For details see the <link
+  proxy with standard SAML v2.0 capabilities. For details see the <link
   xlink:show="new" xlink:href="http://docs.forgerock.org/en/openig/"
   ><citetitle>OpenIG documentation</citetitle></link>.</para>
  </section>
@@ -361,7 +361,7 @@
     actions and query capabilities for access management functionality.</para>
 
     <para>To get started, see the <citetitle>Developer's Guide</citetitle>
-    chapter, <link xlink:show="new" xlink:href="dev-guide#chap-rest"
+    chapter, <link xlink:show="new" xlink:href="dev-guide#sec-rest"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using RESTful
     Web Services</citetitle></link>.</para>
    </listitem>
@@ -383,7 +383,7 @@
     platforms.</para>
 
     <para>To get started, see the <citetitle>Developer's Guide</citetitle>
-    chapter, <link xlink:show="new" xlink:href="dev-guide#chap-csdk"
+    chapter, <link xlink:show="new" xlink:href="dev-guide#sec-csdk"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using the
     OpenAM C API</citetitle></link>.</para>
    </listitem>

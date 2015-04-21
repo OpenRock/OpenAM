@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-monitoring'
@@ -204,7 +204,7 @@ $ <userinput>ssoadm \
    xlink:role="http://docbook.org/xlink/role/olink">OpenAM Core
    Token Service</link> (CTS) provides persistent and highly available
    token storage for a several components within OpenAM, including
-   user sessions, OAuth 2.0, SAML 2.0 and UMA tokens.
+   user sessions, OAuth 2.0, SAML v2.0 and UMA tokens.
   </para>
 
   <para>

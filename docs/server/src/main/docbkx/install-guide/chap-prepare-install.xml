@@ -1127,7 +1127,7 @@ $ dsconfig \
   <para>
    OpenAM supports the Core Token Service (CTS),
    a centralized token repository for OpenAM session tokens, OpenID Connect ID tokens, and
-   SAML 2.0 tokens, which can be stored in a locally embedded or external
+   SAML v2.0 tokens, which can be stored in a locally embedded or external
    directory store together or separately from OpenAM configuration data. For more information,
    see the chapter on <link xlink:show="new" xlink:href="install-guide#chap-cts"
                             xlink:role="http://docbook.org/xlink/role/olink">
@@ -1616,7 +1616,7 @@ $ <userinput>unzip ~/Downloads/${coreDirectoryFile}</userinput>
     <listitem>
      <para>The IDP discovery .war file, deployed as a service to service
      providers that must discover which identity provider corresponds to a
-     SAML 2.0 request</para>
+     SAML v2.0 request</para>
 
      <para>For details, see <link xlink:href="admin-guide#deploy-idp-discovery"
      xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"

@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-fedlet-java'
+<section xml:id='sec-fedlet-java'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -34,18 +34,13 @@
  <indexterm>
   <primary>Fedlets</primary>
   <secondary>Java</secondary>
+  <tertiary>Wizard</tertiary>
  </indexterm>
  <para>This chapter introduces OpenAM Fedlets, and shows how to use the Fedlet
  as part of your Java web application.</para>
 
  <section xml:id="create-install-java-fedlet">
   <title>Creating &amp; Installing a Java Fedlet</title>
-
-  <para>An OpenAM <firstterm>Fedlet</firstterm> is a small web application that
-  can do federation in your service provider application with OpenAM acting as
-  the identity provider. The Fedlet does not require an entire OpenAM
-  installation alongside your application, but instead can redirect to OpenAM
-  for single sign on, and to retrieve SAML assertions.</para>
 
   <para>The process for creating and installing a Java Fedlet is divided into several procedures.</para>
 
@@ -508,7 +503,7 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
 
    <para>To try the Fedlet XACML Query test, the Identity Provider
    must have a policy configured, must be configured with the Policy Decision
-   Point (<literal>XACML PDP</literal>) type, and must have a SAMLv2 SOAP Binding
+   Point (<literal>XACML PDP</literal>) type, and must have a SAML v2.0 SOAP Binding
    PDP handler configured.</para>
 
    <step>
@@ -619,7 +614,7 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
    </step>
 
    <step>
-    <para>Add the PDP handler for the SAMLv2 SOAP Binding.</para>
+    <para>Add the PDP handler for the SAML v2.0 SOAP Binding.</para>
 
     <substeps>
      <step>
@@ -1144,12 +1139,12 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
  <section xml:id="customize-java-fedlet">
   <title>Customizing a Java Fedlet</title>
 
-  <para>You can customize the Java Fedlet to perform many of the SAML 2.0
-  service provider operations. The Java Fedlet has the SAML 2.0 capabilities
+  <para>You can customize the Java Fedlet to perform many of the SAML v2.0
+  service provider operations. The Java Fedlet has the SAML v2.0 capabilities
   identified in the table in the <citetitle>Administration Guide</citetitle>,
   <link xlink:show="new" xlink:href="admin-guide#fedlet-saml2-features"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Fedlet Support for
-  SAML 2.0 Features</citetitle></link>.</para>
+  SAML v2.0 Features</citetitle></link>.</para>
 
   <procedure xml:id="hello-world-with-fedlet">
    <title>To Add Your Application</title>
@@ -1276,7 +1271,7 @@ $ <userinput>cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</userinput>
     Map map;
     try {
         // invoke the Fedlet processing logic. this will do all the
-        // necessary processing conforming to SAMLv2 specifications,
+        // necessary processing conforming to SAML v2.0 specifications,
         // such as XML signature validation, Audience and Recipient
         // validation etc.
         map = SPACSUtils.processResponseForFedlet(request, response);
@@ -1442,4 +1437,4 @@ $ <userinput>cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</userinput>
    <literal>Deny</literal> if the decision is to deny access.</para>
   </section>
  </section>
-</chapter>
+</section>

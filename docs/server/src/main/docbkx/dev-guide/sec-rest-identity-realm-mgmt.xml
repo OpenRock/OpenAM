@@ -23,7 +23,7 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-rest-identity-realm-mgmt'
+<section xml:id='sec-rest-identity-realm-mgmt'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -34,11 +34,11 @@
  <title>RESTful Identity and Realm Management Services</title>
 
  <indexterm><primary>REST API</primary></indexterm>
- <para>This chapter shows how to use the OpenAM RESTful interfaces for identity
+ <para>This section shows how to use the OpenAM RESTful interfaces for identity
   and realm management.
  </para>
 
- <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+ <para>In this section, long URLs are wrapped to fit the printed page, as some
   of the output is formatted for easier reading.</para>
 
  <section xml:id="rest-api-crud-identity">
@@ -1477,4 +1477,4 @@ $ <userinput>curl \
 
  </section>
 
-</chapter>
+</section>

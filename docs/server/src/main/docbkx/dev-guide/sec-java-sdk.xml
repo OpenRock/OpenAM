@@ -23,16 +23,17 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-sdk'
+<section xml:id='sec-sdk'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using the OpenAM Java SDK</title>
 
- <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
+ <para>This section introduces OpenAM Java SDK. OpenAM Java SDK is delivered
   with the full version of OpenAM,
   <filename><?eval ${coreDirectoryFile}?></filename>.</para>
 
@@ -308,79 +309,11 @@
   </itemizedlist>
  </section>
 
- <section xml:id="encoding-pwds">
-  <title>Encoding Passwords and Password Reset Questions and Answers</title>
-  <para>
-   OpenAM uses symmetric encryption algorithms to encrypt and decrypt stored
-   passwords, so that
-   they can be retrieved or modified at later date if necessary.
-   OpenAM Java SDK provides the capability to encode passwords
-   using the <literal>EncodeAction</literal>
-   class in standalone applications. For example, you can encrypt and decrypt a
-   password as follows:
-  </para>
-  <programlisting language="java">String plainText = "helloworld";
-String encrypted = AccessController.doPrivileged(new EncodeAction(plainText));
-String decrypted = AccessController.doPrivileged(new DecodeAction(encrypted));
-assert plainText.equals(decrypted);</programlisting>
-  <para>
-   To use this class,
-   you must ensure that the symmetric encryption
-   key has the same value as configured in the server instances.
-   You can
-   run <literal>ssoadm</literal> to retrieve the
-   password encryption key as follows:
-  </para>
-  <screen>
-ssoadm am.encryption.pwd
-  </screen>
-  <para>
-   Next, in your application's <literal>AMConfig.properties</literal> file, replace
-   the <literal>@ENCRYPTION_KEY@</literal> with the value of the password
-   encryption key.
-   The property ensures that OpenAM can decrypt the
-   password.
-  </para>
-  <screen>
-am.encryption.pwd=@ENCRYPTION_KEY@
-  </screen>
+ <xinclude:include href='sec-authentication.xml' />
 
-  <para>
-   OpenAM's password reset question and answer also uses symmetric key encryption
-   in its configuration.
-   You can use
-   the <literal>encodeAction</literal> class to encrypt a password reset question
-   and answer:
-  </para>
-  <programlisting>
-String encrypted = AccessController.doPrivileged(new EncodeAction(question + "\t" + \
-   answer "+" "1"));
-  </programlisting>
+ <xinclude:include href='sec-session.xml' />
 
-   <para>The last number in the previous example indicates whether the question/answer is
-    enabled or disabled:</para>
-   <itemizedlist>
-    <listitem><para>0 = default question/answer that is disabled</para></listitem>
-    <listitem><para>1 = default question/answer that is enabled</para></listitem>
-    <listitem><para>2 = personal question/answer that is disabled</para></listitem>
-    <listitem><para>3 = personal question/answer that is enabled</para></listitem>
-   </itemizedlist>
+ <xinclude:include href='sec-policy-decisions.xml' />
 
-  <para>
-   To encrypt or decrypt password reset question and answer, you must
-   retrieve the password encryption key using <literal>ssoadm am.encryption.key</literal>,
-   and then set
-   the <literal>am.encryption.key</literal> property with the value of
-   the password encryption key
-   in the <literal>AMConfig.properties</literal> file.
-  </para>
-
-  <para>
-   For additional information,
-   see <link xlink:href="${javadocBase}/index.html?com/sun/identity/security/EncodeAction.html"
-             xlink:show="new"
-             xlink:role="http://docbook.org/xlink/role/olink"
-   ><citetitle>EncodeAction</citetitle></link>.
-  </para>
- </section>
-</chapter>
+ <xinclude:include href='sec-xacml.xml' />
+</section>

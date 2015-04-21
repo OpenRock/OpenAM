@@ -23,7 +23,7 @@
   !      Copyright 2012-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-oauth2-scopes'
+<section xml:id='sec-oauth2-scopes'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
@@ -55,7 +55,7 @@
 
  <para>
   You can change this behavior by writing your own scope validator plugin.
-  This chapter shows how to write a custom OAuth 2.0 scope validator plugin
+  This section shows how to write a custom OAuth 2.0 scope validator plugin
   for use in an OAuth 2.0 provider (authorization server) configuration.
  </para>
 
@@ -412,4 +412,4 @@ $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
    authorized, but the <literal>write</literal> scope has not been authorized.
   </para>
  </section>
-</chapter>
+</section>

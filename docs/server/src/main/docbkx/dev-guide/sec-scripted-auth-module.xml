@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2014 ForgeRock AS
+  !      Copyright 2014-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-scripted-auth-module'
+<section xml:id='sec-scripted-auth-module'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -31,12 +31,7 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Scripted Authentication</title>
-
- <para>
-  This chapter demonstrates how to develop scripts
-  for a scripted authentication module.
- </para>
+ <title>Scripting Authentication Modules</title>
 
  <indexterm>
   <primary>Authentication</primary>
@@ -44,16 +39,20 @@
  </indexterm>
 
  <para>
+  This section demonstrates how to develop scripts for a scripted authentication
+  module. Scripted authentication modules are an alternative to developing
+  custom authentication modules in Java as described in
+  <link
+   xlink:href="dev-guide#sec-auth-spi"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   xlink:show="new"
+   ><citetitle>Customizing Authentication Modules</citetitle></link>.
+ </para>
+
+ <para>
   A scripted authentication module allows you to develop
   a custom authentication module by adding Groovy or JavaScript
   to the module configuration.
-  Scripted authentication modules are an alternative to developing
-  custom authentication modules in Java as described in
-  <link
-   xlink:href="dev-guide#chap-auth-spi"
-   xlink:role="http://docbook.org/xlink/role/olink"
-   xlink:show="new"
-  ><citetitle>Customizing Authentication Modules</citetitle></link>.
  </para>
 
  <section xml:id="scripted-auth-module-about">
@@ -1777,4 +1776,4 @@ Authentication allowed!
 
 
 
-</chapter>
+</section>

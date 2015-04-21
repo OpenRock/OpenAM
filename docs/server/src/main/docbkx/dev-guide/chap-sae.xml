@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-sae'
@@ -41,7 +41,7 @@
  add custom authentication modules. Furthermore OpenIG lets you integrate
  legacy systems into your access management deployment.</para>
 
- <para>In a deployment where you need OpenAM to act as a SAML 2.0 gateway to a
+ <para>In a deployment where you need OpenAM to act as a SAML v2.0 gateway to a
  legacy application that serves as an identity provider, you can use OpenAM
  Secure Attribute Exchange (SAE). On the identity provider side, SAE lets
  OpenAM retrieve the information needed to create assertions from an external
@@ -58,7 +58,7 @@
   </imageobject>
   <textobject>
    <para>External applications use SAE to communicate with OpenAM providers.
-   The providers in turn use SAML 2.0 to communicate with other
+   The providers in turn use SAML v2.0 to communicate with other
    providers.</para>
   </textobject>
  </mediaobject>
@@ -77,7 +77,7 @@
  provider OpenAM server by sending the <literal>sun.cmd=logout</literal>
  attribute to OpenAM using SAE.</para>
 
- <para>On the service provider side OpenAM communicates using SAML 2.0 with
+ <para>On the service provider side OpenAM communicates using SAML v2.0 with
  OpenAM on the identity provider side. OpenAM can use SAE to transmit
  attributes to an application through a secure HTTP POST.</para>
 
@@ -108,7 +108,7 @@
   <literal>http://sp.example.com:8080/openam</literal>. Use Common Tasks &gt;
   Test Federation Connectivity in OpenAM console to make sure Federation is
   working before you add secure attribute exchange applications that rely
-  on functioning SAML 2.0 communications between the providers.</para>
+  on functioning SAML v2.0 communications between the providers.</para>
 
   <para>Set up the sample web application as described in <link
   xlink:href="dev-guide#install-jdk-samples" xlink:show="new"

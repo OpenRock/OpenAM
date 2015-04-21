@@ -23,7 +23,7 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-post-auth'
+<section xml:id='sec-post-auth'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -44,7 +44,7 @@
  session properties, and then the policy agent injects the custom properties
  into the request header to the protected application.</para>
 
- <para>This chapter explains how to create a post authentication plugin.</para>
+ <para>This section explains how to create a post authentication plugin.</para>
 
  <!-- Taken from Steve's wiki article,
  https://wikis.forgerock.org/confluence/display/openam/Write+a+Post+Authentication+Plug-in -->
@@ -289,4 +289,4 @@ $ <userinput>ssoadm
    that your plugin added to the user session.
   </para>
  </section>
-</chapter>
+</section>

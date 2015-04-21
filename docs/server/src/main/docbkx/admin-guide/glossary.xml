@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2014 ForgeRock AS
+  !      Copyright 2012-2015 ForgeRock AS.
   !    
 -->
 <glossary xml:id='openam-glossary'
@@ -200,7 +200,7 @@
   <glossterm>Circle of trust</glossterm>
   <glossdef>
    <para>Group of providers, including at least one identity provider, who
-   have agreed to trust each other to participate in a SAML 2.0 provider
+   have agreed to trust each other to participate in a SAML v2.0 provider
    federation</para>
   </glossdef>
  </glossentry>

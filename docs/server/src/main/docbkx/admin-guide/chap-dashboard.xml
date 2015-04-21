@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2013-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-dashboard'
@@ -124,7 +124,7 @@
     <step>
      <para>Add a Dashboard Class Name that identifies how the end user
      will access the app, such as <literal>SAML2ApplicationClass</literal>
-     for a SAML 2.0 application.</para>
+     for a SAML v2.0 application.</para>
     </step>
     <step>
      <para>Add a Dashboard Name for the application.</para>

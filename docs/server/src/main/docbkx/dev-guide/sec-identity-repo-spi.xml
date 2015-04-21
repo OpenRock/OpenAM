@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-identity-repo-spi'
+<section xml:id='sec-identity-repo-spi'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -45,7 +45,8 @@
  <section xml:id="about-idrepo-plugin">
   <title>About the Identity Repository Plugin</title>
 
-  <para>This chapter describes how to create a custom identity repository plugin.
+  <para>This section describes how to create a custom identity repository
+   plugin.
   OpenAM includes built-in support for LDAP and JDBC identity repositories. For
   most deployments, you therefore do not need to create your own custom identity
   repository plugin. Only create custom identity repository plugins for
@@ -403,4 +404,4 @@ $ <userinput>ssoadm \
   
   <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=test&amp;module=DataStore</literallayout>
  </section>
-</chapter>
+</section>

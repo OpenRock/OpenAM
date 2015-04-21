@@ -23,7 +23,7 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-rest-oauth2-oidc'
+<section xml:id='sec-rest-oauth2-oidc'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -35,10 +35,10 @@
  <title>RESTful OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 Services</title>
 
  <indexterm><primary>REST API</primary></indexterm>
- <para>This chapter shows how to use the OpenAM RESTful interfaces for
+ <para>This section shows how to use the OpenAM RESTful interfaces for
   OAuth 2.0, OpenID Connect 1.0, and UMA 1.0.</para>
 
- <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+ <para>In this section, long URLs are wrapped to fit the printed page, as some
   of the output is formatted for easier reading.</para>
 
  <section xml:id="rest-api-oauth2">
@@ -746,4 +746,4 @@ $ <userinput>curl \
  </section>
 
  <xinclude:include href="../shared/sec-rest-api-uma.xml" />
-</chapter>
+</section>

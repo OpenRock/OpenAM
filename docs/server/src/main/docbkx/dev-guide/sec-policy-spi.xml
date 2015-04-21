@@ -23,7 +23,7 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-policy-spi'
+<section xml:id='sec-policy-spi'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -41,12 +41,12 @@
  session age, authentication chain or module used, authentication level, realm,
  session properties, IP address and DNS name, user profile content, resource
  environment, date, day, time of day, and time zone. Yet, some deployments
- require further distinctions for policy evaluation. This chapter explains how
+ require further distinctions for policy evaluation. This section explains how
  to customize policy evaluation for deployments with particular requirements
  not met by built-in OpenAM functionality.</para>
 
  <para>
-  This chapter shows how to build and use a custom policy plugin
+  This section shows how to build and use a custom policy plugin
   that implements a subject condition, an environment condition,
   and resource attributes.
  </para>
@@ -583,4 +583,4 @@ $ <userinput>ssoadm ...</userinput>
    </screen>
   </para>
  </section>
-</chapter>
+</section>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -30,16 +30,16 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Managing SAML 2.0 Federation</title>
+ <title>Managing SAML v2.0 Federation</title>
 
- <para>This chapter addresses how to set up and manage SAML 2.0 SSO for
+ <para>This chapter addresses how to set up and manage SAML v2.0 SSO for
  single sign on and single log out across resources belonging to
  organizations participating in a circle of trust.</para>
  
  <section xml:id="about-federation">
-  <title>About SAML 2.0 SSO &amp; Federation</title>
+  <title>About SAML v2.0 SSO &amp; Federation</title>
   <indexterm><primary>Federation</primary></indexterm>
-  <para>SAML 2.0 SSO is part of federated access management. Federation lets
+  <para>SAML v2.0 SSO is part of federated access management. Federation lets
   access management cross organizational boundaries. Federation helps
   organizations share identities and services without giving away their
   identity information, or the services they provide.</para>
@@ -48,11 +48,11 @@
   and thus depends on standards for orchestrating interaction and exchanging
   information between providers. OpenAM federation relies on standards such as
   <link xlink:href="http://saml.xml.org/saml-specifications">Security Assertion
-  Markup Language (SAML) 2.0</link>. SAML 2.0 describes the messages, how they
+  Markup Language (SAML) v2.0</link>. SAML v2.0 describes the messages, how they
   are relayed, how they are exchanged, and common use cases.</para>
   
   <itemizedlist>
-   <para>To achieve SAML 2.0 SSO, OpenAM separates <firstterm>identity
+   <para>To achieve SAML v2.0 SSO, OpenAM separates <firstterm>identity
    providers</firstterm> from <firstterm>service providers</firstterm>,
    lets you include them them in a <firstterm>circle of trust</firstterm>, and
    has you configure how the providers in the circle of trust interact.</para>
@@ -74,7 +74,7 @@
     others' services.</para>
    </listitem>
    <listitem>
-    <para>SAML 2.0 SSO maps attributes from accounts at the identity provider to
+    <para>SAML v2.0 SSO maps attributes from accounts at the identity provider to
     attributes on accounts at the service provider. The identity provider makes
     assertions to the service provider, for example to attest that a user has
     authenticated with the identity provider. The service provider then
@@ -84,18 +84,18 @@
    </listitem>
   </itemizedlist>
   
-  <para>In federation deployments where not all providers support SAML 2.0,
+  <para>In federation deployments where not all providers support SAML v2.0,
   OpenAM can act as a multi-protocol hub, translating for providers who rely
-  on other and older standards such as SAML 1.x, Liberty Alliance Project
+  on other and older standards such as SAML v1.x, Liberty Alliance Project
   frameworks, and WS-Federation (for integration with Active Directory
   Federation Services, for example).</para>
  </section>
  
  <section xml:id="set-up-federation">
-  <title>Setting Up SAML 2.0 SSO</title>
+  <title>Setting Up SAML v2.0 SSO</title>
   
   <itemizedlist>
-   <para>Before you set up SAML 2.0 SSO in OpenAM, you must:</para>
+   <para>Before you set up SAML v2.0 SSO in OpenAM, you must:</para>
    <listitem>
     <para>Know which providers participate in the circle of trust.</para>
    </listitem>
@@ -332,17 +332,17 @@ http://www.sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceabl
    a specific identity provider without requiring that you install all of
    OpenAM.</para>
 
-   <para>Fedlets support the following SAML 2.0 features.</para>
+   <para>Fedlets support the following SAML v2.0 features.</para>
 
    <table xml:id="fedlet-saml2-features">
-    <title>Fedlet Support for SAML 2.0 Features</title>
+    <title>Fedlet Support for SAML v2.0 Features</title>
     <tgroup cols="3">
      <colspec colnum="1" colwidth="4*"/>
      <colspec colnum="2" colwidth="1*"/>
      <colspec colnum="3" colwidth="1*"/>
      <thead>
       <row>
-       <entry>SAML 2.0 Feature</entry>
+       <entry>SAML v2.0 Feature</entry>
        <entry>Java Fedlet</entry>
        <entry>.NET Fedlet</entry>
       </row>
@@ -465,7 +465,7 @@ http://www.sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceabl
    the user logged in. The identity provider discover service essentially
    writes and reads cookies from the common domain. The providers configure
    their circle of trust to use the identity provider discovery service
-   as part of SAML 2.0 federation.</para>
+   as part of SAML v2.0 federation.</para>
 
    <para>Deploying the identity provider discovery service involves the
    following stages.</para>
@@ -939,7 +939,7 @@ CookieWriterServlet.doGetPost: Redirect to
       <para>The user profile attributes used here must both be allowed in user
       profiles, and also be specified for the identity repository. See the
       <citetitle>Developer's Guide</citetitle> chapter, <link xlink:show="new"
-      xlink:href="dev-guide#chap-custom-attr"
+      xlink:href="dev-guide#sec-custom-attr"
       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing
       Profile Attributes</citetitle></link>, for instructions on allowing
       additional attributes in user profiles.</para>
@@ -1158,7 +1158,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <term>IDP Adapter Class</term>
      <listitem>
       <para>Specifies a class to invoke immediately before sending a
-      SAML 2.0 response.</para>
+      SAML v2.0 response.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1624,7 +1624,7 @@ CookieWriterServlet.doGetPost: Redirect to
    <varlistentry>
     <term>SAML2 Writer Service URL</term>
     <listitem>
-     <para>SAML 2.0 service that writes identity provider entity identifiers
+     <para>SAML v2.0 service that writes identity provider entity identifiers
      to Common Domain cookies after successful authentication, used in identity
      provider discovery. Example:
      <literal>http://www.disco.example:8080/openam/saml2writer</literal>.</para>
@@ -1633,7 +1633,7 @@ CookieWriterServlet.doGetPost: Redirect to
    <varlistentry>
     <term>SAML2 Reader Service URL</term>
     <listitem>
-     <para>SAML 2.0 service that reads identity provider entity identifiers
+     <para>SAML v2.0 service that reads identity provider entity identifiers
      from Common Domain cookies, used in identity provider discovery. Example:
      <literal>http://www.disco.example:8080/openam/saml2reader</literal>.</para>
     </listitem>
@@ -1672,7 +1672,7 @@ CookieWriterServlet.doGetPost: Redirect to
   </para>
 
   <para>
-   When you set up the same SAML 2.0 Provider on multiple servers
+   When you set up the same SAML v2.0 Provider on multiple servers
    behind a load balancer, however, you must ensure the metadata
    points to the load balancer rather than the individual servers.
   </para>
@@ -1741,7 +1741,7 @@ $ <userinput>ssoadm \
 
    <listitem>
     <para>
-     Enable SAMLv2 failover in OpenAM Console.
+     Enable SAML v2.0 failover in OpenAM Console.
     </para>
 
     <para>
@@ -2111,18 +2111,18 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
  </section>
 
  <section xml:id="using-saml2-sso-slo">
-  <title>Using SAML 2.0 Single Sign-On &amp; Single Logout</title>
+  <title>Using SAML v2.0 Single Sign-On &amp; Single Logout</title>
 
   <indexterm>
    <primary>Federation</primary>
-   <secondary>SAML 2.0 Single Sign-On (SSO)</secondary>
+   <secondary>SAML v2.0 Single Sign-On (SSO)</secondary>
   </indexterm>
   <indexterm>
    <primary>Federation</primary>
-   <secondary>SAML 2.0 Single Logout (SLO)</secondary>
+   <secondary>SAML v2.0 Single Logout (SLO)</secondary>
   </indexterm>
 
-  <para>OpenAM SAML 2.0 Federation provides JSPs where you can direct
+  <para>OpenAM SAML v2.0 Federation provides JSPs where you can direct
   users to do single sign-on (SSO) and single logout (SLO) across providers
   in a circle of trust. OpenAM has two JSPs for SSO and two JSPs for
   SLO, allowing you to initiate both processes either from the identity
@@ -2718,13 +2718,13 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
    <secondary>Configuring</secondary>
   </indexterm>
 
-  <para>The SAML 2.0 Enhanced Client or Proxy (ECP) profile is intended for use
+  <para>The SAML v2.0 Enhanced Client or Proxy (ECP) profile is intended for use
   when accessing services over devices like simple phones, medical devices, and
   set-top boxes that lack the capabilities needed to use the more widely used
-  SAML 2.0 Web Browser SSO profile.</para>
+  SAML v2.0 Web Browser SSO profile.</para>
 
   <para>The ECP knows which identity provider to contact for the user, and is
-  able to use the reverse SOAP (PAOS) SAML 2.0 binding for the authentication
+  able to use the reverse SOAP (PAOS) SAML v2.0 binding for the authentication
   request and response. The PAOS binding uses HTTP and SOAP headers to pass
   information about processing SOAP requests and responses, starting with a
   PAOS HTTP header that the ECP sends in its initial request to the server.
@@ -2737,7 +2737,7 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
   server such as a WAP gateway that can support the ECP profile on behalf of
   client applications.</para>
 
-  <para>OpenAM supports the SAML 2.0 ECP profile on the server side for
+  <para>OpenAM supports the SAML v2.0 ECP profile on the server side for
   identity providers and service providers. You must build the ECP.</para>
 
   <para>By default an OpenAM identity provider uses the
@@ -2891,7 +2891,7 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
   <section xml:id="change-federation">
    <title>Changing Federation of Persistently Linked Accounts</title>
 
-   <para>OpenAM implements the SAML 2.0 Name Identifier Management profile,
+   <para>OpenAM implements the SAML v2.0 Name Identifier Management profile,
    allowing you to change a persistent identifier that has been set to federate
    accounts, and also to terminate federation for an account.</para>
 
@@ -3284,7 +3284,7 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
      out of the console, and initiate SSO logging in as the user you
      created.</para>
 
-     <para>To initiate SSO, browse to one of the OpenAM SAML 2.0 JSPs with the
+     <para>To initiate SSO, browse to one of the OpenAM SAML v2.0 JSPs with the
      appropriate query parameters. The following is an example URL for service
      provider initiated SSO.</para>
      <literallayout class="monospaced"
@@ -3408,7 +3408,7 @@ $ <userinput>ssoadm \
    <title>Authentication &amp; Linked Accounts</title>
 
    <para>
-    In a SAML 2.0 federation where accounts are durably linked,
+    In a SAML v2.0 federation where accounts are durably linked,
     authentication is required only on the identity provider side.
    </para>
 
@@ -3438,7 +3438,7 @@ $ <userinput>ssoadm \
  </section>
 
  <section xml:id="using-saml2-artifacts">
-  <title>Using SAML 2.0 Artifacts</title>
+  <title>Using SAML v2.0 Artifacts</title>
 
   <para>By default OpenAM transmits SAML messages by value. This makes it
   possible to access the SAML messages in the user agent. You can instead
@@ -3463,14 +3463,14 @@ $ <userinput>ssoadm \
  </section>
 
  <section xml:id="using-saml2-with-policy-agents">
-  <title>SAML 2.0 &amp; Policy Agents</title>
+  <title>SAML v2.0 &amp; Policy Agents</title>
 
   <para>
-   You can use policy agents in a SAML 2.0 Federation deployment.
+   You can use policy agents in a SAML v2.0 Federation deployment.
   </para>
 
   <procedure xml:id="policy-agent-with-saml2">
-   <title>To Use a Policy Agent with a SAML 2.0 Service Provider</title>
+   <title>To Use a Policy Agent with a SAML v2.0 Service Provider</title>
 
    <para>
     The following procedure applies
@@ -3501,7 +3501,7 @@ $ <userinput>ssoadm \
    <step>
     <para>
      Replace the given OpenAM Login URL and OpenAM Logout URLs
-     with SAML 2.0 URLs described in <xref linkend="using-saml2-sso-slo" />.
+     with SAML v2.0 URLs described in <xref linkend="using-saml2-sso-slo" />.
     </para>
 
     <para>

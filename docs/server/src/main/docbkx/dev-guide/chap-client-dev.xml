@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-client-dev'
@@ -44,6 +44,10 @@
  tightly, as in the case of an application using the OpenAM Java or C API
  to interact with OpenAM services.</para>
  
- <para>This part of the guide covers client interaction with OpenAM
- over supported protocols and using OpenAM APIs.</para>
+ <para>This chapter covers client interaction with OpenAM using OpenAM APIs
+ over supported protocols.</para>
+
+ <xinclude:include href='sec-rest.xml' />
+ <xinclude:include href='sec-java-sdk.xml' />
+ <xinclude:include href='sec-csdk.xml' />
 </chapter>

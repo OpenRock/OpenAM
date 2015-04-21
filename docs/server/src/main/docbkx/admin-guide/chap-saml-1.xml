@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2014 ForgeRock AS
+  !      Copyright 2014-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-saml-1'
@@ -29,30 +29,30 @@
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>Managing SAML 1.x Single Sign-On</title>
+ <title>Managing SAML v1.x Single Sign-On</title>
  <indexterm>
   <primary>Federation</primary>
-  <secondary>SAML 1.x</secondary>
+  <secondary>SAML v1.x</secondary>
  </indexterm>
  <indexterm>
-  <primary>SAML 1.x</primary>
+  <primary>SAML v1.x</primary>
  </indexterm>
 
  <para>
-  SAML 1.x describes an XML and SOAP based framework that allows
+  SAML v1.x describes an XML and SOAP based framework that allows
   online trusted partners to exchange security information.
-  In particular, SAML 1.x defines mechanisms for
+  In particular, SAML v1.x defines mechanisms for
   browser based web single sign-on (SSO) across independent organizations
   that work together to permit SSO for access to resources.
  </para>
 
  <important>
   <para>
-   Although not strictly compatible with SAML 1.x,
-   SAML 2.0 extends SAML 1.x to several additional use cases
+   Although not strictly compatible with SAML v1.x,
+   SAML v2.0 extends SAML v1.x to several additional use cases
    and also clarifies how partners share metadata with each other.
-   Unless you are integrating with an existing SAML 1.x deployment
-   consider using SAML 2.0,
+   Unless you are integrating with an existing SAML v1.x deployment
+   consider using SAML v2.0,
    or an alternative such as OAuth 2.0 or OpenID Connect 1.0, instead.
   </para>
 
@@ -60,7 +60,7 @@
    See the following chapters for more information:
    <link xlink:href="admin-guide#chap-federation" xlink:show="new"
          xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-   >Managing SAML 2.0 Federation</citetitle></link>,
+   >Managing SAML v2.0 Federation</citetitle></link>,
    <link xlink:href="admin-guide#chap-oauth2" xlink:show="new"
          xlink:role="http://docbook.org/xlink/role/olink"><citetitle
    >Managing OAuth 2.0 Authorization</citetitle></link>, and
@@ -71,10 +71,10 @@
  </important>
 
  <section xml:id="saml-1-about">
-  <title>About SAML 1.x</title>
+  <title>About SAML v1.x</title>
 
   <para>
-   SAML 1.x was defined in response to several technical problems.
+   SAML v1.x was defined in response to several technical problems.
   </para>
 
   <itemizedlist>
@@ -85,37 +85,37 @@
      For instance, browsers do not return cookies
      set by servers in the example.com domain
      to servers in the example.net domain.
-     SAML 1.x works around this limitation of HTTP cookies.
+     SAML v1.x works around this limitation of HTTP cookies.
     </para>
    </listitem>
 
    <listitem>
     <para>
-     Before SAML 1.x was defined, there were already proprietary SSO solutions,
+     Before SAML v1.x was defined, there were already proprietary SSO solutions,
      but the solutions did not interoperate well across domains.
     </para>
 
     <para>
-     SAML 1.x specifies a standard, cross-domain, interoperable SSO mechanism
+     SAML v1.x specifies a standard, cross-domain, interoperable SSO mechanism
      that works together with proprietary SSO services in a particular domain.
     </para>
    </listitem>
 
    <listitem>
     <para>
-     Before SAML 1.x was defined, there was not an easy way to communicate
+     Before SAML v1.x was defined, there was not an easy way to communicate
      security attributes across organization boundaries.
     </para>
 
     <para>
-     SAML 1.x simplifies the communication of security attributes
+     SAML v1.x simplifies the communication of security attributes
      between different organizations.
     </para>
    </listitem>
   </itemizedlist>
 
   <para>
-   In SAML 1.x, business partners can play two roles.
+   In SAML v1.x, business partners can play two roles.
    The <firstterm>asserting party</firstterm>,
    also known as the SAML authority
    and whose domain is the Source site,
@@ -127,7 +127,7 @@
   </para>
 
   <para>
-   In the Web Browser SSO Profiles for SAML 1.x, the user generally starts
+   In the Web Browser SSO Profiles for SAML v1.x, the user generally starts
    by authenticating with the asserting party
    and then selecting a relying party link to browse.
    Alternatively, the "Destination-Site-First" scenario can start
@@ -136,7 +136,7 @@
   </para>
 
   <para>
-   The SAML 1.x <firstterm>Inter-site Transfer Service</firstterm>
+   The SAML v1.x <firstterm>Inter-site Transfer Service</firstterm>
    is a service that redirects the authenticated user
    from the asserting party's site to the appropriate service
    on the relying party's site.
@@ -168,7 +168,7 @@
   </para>
 
   <figure xml:id="figure-saml-1-browser-artifact-profile">
-   <title>SAML 1.x Web SSO Browser Artifact Profile</title>
+   <title>SAML v1.x Web SSO Browser Artifact Profile</title>
 
    <mediaobject>
     <alt>Sequence diagram of the web SSO browser artifact profile</alt>
@@ -187,7 +187,7 @@
   <para>
    See section 4.1.1 of the <link xlink:show="new"
    xlink:href="https://www.oasis-open.org/committees/download.php/6837/sstc-saml-tech-overview-1.1-cd.pdf"
-   >SAML 1.1 technical overview</link> for more detail.
+   >SAML v1.1 technical overview</link> for more detail.
   </para>
 
   <para>
@@ -200,7 +200,7 @@
   </para>
 
   <figure xml:id="figure-saml-1-browser-post-profile">
-   <title>SAML 1.x Web SSO Browser POST Profile</title>
+   <title>SAML v1.x Web SSO Browser POST Profile</title>
 
    <mediaobject>
     <alt>Sequence diagram of the web SSO browser POST profile</alt>
@@ -219,7 +219,7 @@
   <para>
    See section 4.2.1 of the <link xlink:show="new"
    xlink:href="https://www.oasis-open.org/committees/download.php/6837/sstc-saml-tech-overview-1.1-cd.pdf"
-   >SAML 1.1 technical overview</link> for more detail.
+   >SAML v1.1 technical overview</link> for more detail.
   </para>
 
   <para>
@@ -237,7 +237,7 @@
   </para>
 
   <para>
-   Organizations working together to achieve SAML 1.x web SSO
+   Organizations working together to achieve SAML v1.x web SSO
    are called <firstterm>trusted partners</firstterm> in this context.
    Trusted partners agree on which services they provide,
    which web SSO profiles they implement,
@@ -480,7 +480,7 @@
 
    <para>
     Trusted partners should ask you for a Site ID.
-    OpenAM generates a SAML 1.x Site ID value at configuration time.
+    OpenAM generates a SAML v1.x Site ID value at configuration time.
     This Site ID value corresponds to the server.
     To find this in OpenAM Console, see Federation
     > SAML 1.x Configuration > Local Site Properties > Site Identifiers,
@@ -517,7 +517,7 @@ $ <userinput>java \
  </section>
 
  <section xml:id="saml-1-security">
-  <title>Preparing To Secure SAML 1.x Communications</title>
+  <title>Preparing To Secure SAML v1.x Communications</title>
 
   <para>
    SAML communications are secured using Public Key Infrastructure (PKI).
@@ -539,7 +539,7 @@ $ <userinput>java \
   </para>
 
   <procedure xml:id="saml-1-configure-keys">
-   <title>To Configure Keys For Protecting SAML 1.x Communications</title>
+   <title>To Configure Keys For Protecting SAML v1.x Communications</title>
 
    <step>
     <para>
@@ -574,17 +574,17 @@ $ <userinput>java \
  </section>
 
  <section xml:id="saml-1-configure-local-site">
-  <title>Configuring SAML 1.x For Your Site</title>
+  <title>Configuring SAML v1.x For Your Site</title>
 
   <para>
    After you have gathered configuration information
-   and prepared to secure SAML 1.x communications
-   you can configure SAML 1.x for your site.
+   and prepared to secure SAML v1.x communications
+   you can configure SAML v1.x for your site.
   </para>
 
   <tip>
    <para>
-    When you enter SAML 1.x configuration data,
+    When you enter SAML v1.x configuration data,
     OpenAM Console escapes these special characters by default:
     <literal>&amp; &lt; &gt; " ' /</literal>.
     If instead you have already escaped these characters
@@ -831,12 +831,12 @@ $ <userinput>java \
  </section>
 
  <section xml:id="saml-1-configure-trusted-partners">
-  <title>Configuring SAML 1.x Trusted Partners</title>
+  <title>Configuring SAML v1.x Trusted Partners</title>
 
   <para>
    After you have gathered configuration information
    and if necessary imported public key certificates from trusted partners
-   you can configure SAML 1.x information for the partners.
+   you can configure SAML v1.x information for the partners.
   </para>
 
   <itemizedlist>
@@ -1035,10 +1035,10 @@ $ <userinput>java \
  </section>
 
  <section xml:id="saml-1-test-web-sso">
-  <title>Testing SAML 1.x Web SSO</title>
+  <title>Testing SAML v1.x Web SSO</title>
 
   <para>
-   You can try SAML 1.x Web SSO using OpenAM
+   You can try SAML v1.x Web SSO using OpenAM
    by following the procedures in this section.
   </para>
 
@@ -1298,10 +1298,10 @@ $ <userinput>java \
   </procedure>
 
   <procedure xml:id="saml-1-try-it-out">
-   <title>To Try SAML 1.x Web SSO</title>
+   <title>To Try SAML v1.x Web SSO</title>
 
    <para>
-    Once you have successfully configured both parties, try SAML 1.x Web SSO.
+    Once you have successfully configured both parties, try SAML v1.x Web SSO.
    </para>
 
    <step>

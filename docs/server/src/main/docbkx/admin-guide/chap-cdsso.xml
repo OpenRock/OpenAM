@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-cdsso'
@@ -93,16 +93,16 @@
  </itemizedlist>
 
  <para>
-  The federation mechanism associated with SAML 2.0 can be used
+  The federation mechanism associated with SAML v2.0 can be used
   as an alternative to CDSSO for both Web and Java EE policy agents.
-  While using SAML 2.0 adds complexity, it supports attribute mapping,
+  While using SAML v2.0 adds complexity, it supports attribute mapping,
   which may be useful when the two domains are associated
   with data stores that use different attribute names.
   See the section,
   <link xlink:href="admin-guide#using-saml2-with-policy-agents"
         xlink:show="new"
         xlink:role="http://docbook.org/xlink/role/olink"
-  ><citetitle>SAML 2.0 &amp; Policy Agents</citetitle></link>, for details.
+  ><citetitle>SAML v2.0 &amp; Policy Agents</citetitle></link>, for details.
  </para>
 
  <procedure xml:id="enable-cdsso-jee-agent">

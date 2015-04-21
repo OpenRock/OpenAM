@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-fedlet-dotnet'
+<section xml:id='sec-fedlet-dotnet'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -966,4 +966,4 @@ Finished installing ASP.NET (4.0.30319).</computeroutput>
    ><citetitle>Cipher Suites in Schannel</citetitle></link>.</para>
   </step>
  </procedure>
-</chapter>
+</section>

@@ -1296,15 +1296,15 @@
         References in each JSP file in that subdirectory are associated with the Federation tab.</para>
 
         <para>Generally, the JSP files in this directory are essential if you want to add or modify federation partners
-        in your Circles of Trust (COT), SAMLv2 / ID-FF / WS-Federation entity providers, and SAML 1.x configured
+        in your Circles of Trust (COT), SAML v2.0 / ID-FF / WS-Federation entity providers, and SAML v1.x configured
             partners.</para>
 
-        <para>If you're not using the legacy elements of federation, such as Liberty ID-FF, WS-Federation, and SAML 1.x,
+        <para>If you're not using the legacy elements of federation, such as Liberty ID-FF, WS-Federation, and SAML v1.x,
             you may be able to delete related service endpoints in a more secure deployment.</para>
 
         <para>Many of the endpoints in this section are accessible from the OpenAM console, under the Federation tab.
         Some of the endpoints are accessible only after you've created an appropriate entity provider, such as
-        SAMLv2, ID-FF, or WS-Federation.</para>
+        SAML v2.0, ID-FF, or WS-Federation.</para>
 
         <variablelist>
             <varlistentry>
@@ -1332,7 +1332,7 @@
 <varlistentry>
     <term><literal>FSSAMLSelectTrustedPartnerType.jsp</literal></term>
     <listitem>
-        <para>Opened when you configure a new Trusted Partner under the SAML 1.x Configuration section.</para>
+        <para>Opened when you configure a new Trusted Partner under the SAML v1.x Configuration section.</para>
     </listitem>
 </varlistentry>
 
@@ -1347,7 +1347,7 @@
 <varlistentry>
     <term><literal>FSSAMLSetTrustedPartnerType.jsp</literal></term>
     <listitem>
-        <para>Associated with the FSSAMLSetTrustedPartnersEdit.jsp file; used when you select a configured SAML 1.x
+        <para>Associated with the FSSAMLSetTrustedPartnersEdit.jsp file; used when you select a configured SAML v1.x
             Configuration trusted partner.</para>
     </listitem>
 </varlistentry>
@@ -1391,7 +1391,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 <varlistentry>
     <term><literal>FSSAMLTrustedPartnersAdd.jsp</literal></term>
     <listitem>
-        <para>Called when you create a new "trusted partner" in the SAML 1.x Configuration area of the Federation
+        <para>Called when you create a new "trusted partner" in the SAML v1.x Configuration area of the Federation
             window.</para>
     </listitem>
 </varlistentry>
@@ -1399,7 +1399,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 <varlistentry>
     <term><literal>FSSAMLTrustedPartnersEdit.jsp</literal></term>
     <listitem>
-        <para>Called when you edit an existing "trusted partner" in the SAML 1.x Configuration area of the Federation
+        <para>Called when you edit an existing "trusted partner" in the SAML v1.x Configuration area of the Federation
             window.</para>
     </listitem>
 </varlistentry>
@@ -1497,7 +1497,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 <varlistentry>
     <term><literal>SAMLv2IDPAdvanced.jsp</literal></term>
     <listitem>
-        <para>Supports the configuration of advanced properties for a SAMLv2 IDP.</para>
+        <para>Supports the configuration of advanced properties for a SAML v2.0 IDP.</para>
     </listitem>
 </varlistentry>
 
@@ -1527,14 +1527,14 @@ to a runtime exception with messages that I think suggest that it needed to be c
 <varlistentry>
     <term><literal>SAMLv2PDP.jsp</literal></term>
     <listitem>
-        <para>Enables the configuration of a SAMLv2-based Policy Decision Point (PDP).</para>
+        <para>Enables the configuration of a SAML v2.0-based Policy Decision Point (PDP).</para>
     </listitem>
 </varlistentry>
 
 <varlistentry>
     <term><literal>SAMLv2PEP.jsp</literal></term>
     <listitem>
-        <para>Enables the configuration of a SAMLv2-based Policy Enforcement Point (PEP).</para>
+        <para>Enables the configuration of a SAML v2.0-based Policy Enforcement Point (PEP).</para>
     </listitem>
 </varlistentry>
 
@@ -2092,8 +2092,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>SCSAML2SOAPBinding.jsp</literal></term>
                 <listitem>
-                    <para>Enables a review of current SAMLv2 SOAP binding request handlers. Associated with SOAP-based
-                        communications, using SAMLv2 requests, between a client and a server.
+                    <para>Enables a review of current SAML v2.0 SOAP binding request handlers. Associated with SOAP-based
+                        communications, using SAML v2.0 requests, between a client and a server.
                         To access the relevant screen, select Configuration &gt; Global &gt; SAMLv2 SOAP Binding.</para>
                 </listitem>
             </varlistentry>
@@ -2101,7 +2101,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>SCSAML2SOAPBindingRequestHandlerListAdd.jsp</literal></term>
                 <listitem>
-                    <para>Allows you to add a new SAMLv2 SOAP binding request handler.
+                    <para>Allows you to add a new SAML v2.0 SOAP binding request handler.
                         To access the relevant screen, select Configuration &gt; Global &gt; SAMLv2 SOAP Binding.</para>
                 </listitem>
             </varlistentry>
@@ -2109,7 +2109,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>SCSAML2SOAPBindingRequestHandlerListDup.jsp</literal></term>
                 <listitem>
-                    <para>Allows you to duplicate an existing SAMLv2 SOAP binding request handler.
+                    <para>Allows you to duplicate an existing SAML v2.0 SOAP binding request handler.
                         To access the relevant screen, select Configuration &gt; Global &gt; SAMLv2 SOAP Binding.</para>
                 </listitem>
             </varlistentry>
@@ -2117,7 +2117,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>SCSAML2SOAPBindingRequestHandlerListEdit.jsp</literal></term>
                 <listitem>
-                    <para>Allows you to edit an existing SAMLv2 SOAP binding request handler.
+                    <para>Allows you to edit an existing SAML v2.0 SOAP binding request handler.
                         To access the relevant screen, select Configuration &gt; Global &gt; SAMLv2 SOAP Binding.</para>
                 </listitem>
             </varlistentry>
@@ -2547,28 +2547,28 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>CreateHostedIDP.jsp</literal></term>
                 <listitem>
-                    <para>Supports the configuration of a SAMLv2 IDP on the local instance of OpenAM.</para>
+                    <para>Supports the configuration of a SAML v2.0 IDP on the local instance of OpenAM.</para>
                 </listitem>
             </varlistentry>
 
             <varlistentry>
                 <term><literal>CreateHostedSP.jsp</literal></term>
                 <listitem>
-                    <para>Supports the configuration of a SAMLv2 SP on the local instance of OpenAM.</para>
+                    <para>Supports the configuration of a SAML v2.0 SP on the local instance of OpenAM.</para>
                 </listitem>
             </varlistentry>
 
             <varlistentry>
                 <term><literal>CreateRemoteIDP.jsp</literal></term>
                 <listitem>
-                    <para>Supports the configuration of a SAMLv2 IDP on a remote system, within a configured CoT.</para>
+                    <para>Supports the configuration of a SAML v2.0 IDP on a remote system, within a configured CoT.</para>
                 </listitem>
             </varlistentry>
 
             <varlistentry>
                 <term><literal>CreateRemoteSP.jsp</literal></term>
                 <listitem>
-                    <para>Supports the configuration of a SAMLv2 SP on a remote system, within a configured CoT.</para>
+                    <para>Supports the configuration of a SAML v2.0 SP on a remote system, within a configured CoT.</para>
                 </listitem>
             </varlistentry>
 
@@ -4148,7 +4148,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                     <para>Used by a servlet named AssertionConsumerService. Associated with the
                         FSAssertionConsumerService class. For more information, see the chapter on
                        <link xlink:href="admin-guide#chap-federation"  xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Managing SAML 2.0 Federation in the Administration Guide</citetitle></link>.
+                            <citetitle>Managing SAML v2.0 Federation in the Administration Guide</citetitle></link>.
                     </para>
                 </listitem>
             </varlistentry>
@@ -4322,7 +4322,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named OAuth2Rest. Associated with the RestTokenDispatcher class.
                         class.  For more information, see the
-                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
+                        the chapter on <link xlink:href="dev-guide#sec-rest-oauth2-oidc"
                                              xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
                 </listitem>
@@ -4343,7 +4343,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named OAuth2RestletAdapter. Associated with the RestTokenDispatcher class.
                         For more information, see the chapter on
-                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
+                        the chapter on <link xlink:href="dev-guide#sec-rest-oauth2-oidc"
                                              xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
                 </listitem>
@@ -4354,7 +4354,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named ForgeRockRest. Associated with the HttpServlet class.
                         For more information, see the chapter on
-                        <link xlink:href="dev-guide#chap-rest"
+                        <link xlink:href="dev-guide#sec-rest"
                                              xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>Using RESTful Web Services</citetitle></link>. In addition, you
                     can read more about associated REST endpoints in <link xlink:href="reference#json-rest-endpoints"
@@ -4383,7 +4383,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
    <varlistentry>
     <term>
-     <link xlink:href="dev-guide#chap-rest"
+     <link xlink:href="dev-guide#sec-rest"
                 xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>RESTful Web Services</citetitle></link>
     </term>
@@ -4397,7 +4397,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
    <varlistentry>
     <term>
-     <link xlink:href="dev-guide#chap-rest-authz-policy"
+     <link xlink:href="dev-guide#sec-rest-authz-policy"
            xlink:role="http://docbook.org/xlink/role/olink">
       <citetitle>RESTful Authorization and Policy Management Services</citetitle></link>
     </term>
@@ -4410,7 +4410,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
    <varlistentry>
     <term>
-     <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
+     <link xlink:href="dev-guide#sec-rest-oauth2-oidc"
            xlink:role="http://docbook.org/xlink/role/olink">
       <citetitle>RESTful OAuth 2.0 and OpenID Connect 1.0 Services</citetitle></link>
     </term>
@@ -4423,7 +4423,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
   <varlistentry>
    <term>
-    <link xlink:href="dev-guide#chap-rest-user-services"
+    <link xlink:href="dev-guide#sec-rest-user-services"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>RESTful User Self-Service</citetitle></link>
    </term>
@@ -4436,7 +4436,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
   <varlistentry>
    <term>
-    <link xlink:href="dev-guide#chap-rest-identity-realm-mgmt"
+    <link xlink:href="dev-guide#sec-rest-identity-realm-mgmt"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>RESTful Identity and Realm Management Services</citetitle></link>
    </term>
@@ -4449,7 +4449,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
   <varlistentry>
    <term>
-    <link xlink:href="dev-guide#chap-rest-sts"
+    <link xlink:href="dev-guide#sec-rest-sts"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>RESTful Secure Token Service</citetitle></link>
    </term>

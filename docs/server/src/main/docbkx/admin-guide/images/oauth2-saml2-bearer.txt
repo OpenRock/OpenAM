@@ -21,13 +21,13 @@
    
     CCPL HEADER END
    
-         Copyright 2013 ForgeRock AS
+         Copyright 2013-2015 ForgeRock AS.
 
     To generate a sequence diagram from this file, process
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
 '/
 
-title SAML 2.0 Bearer Assertion Authorization Grant
+title SAML v2.0 Bearer Assertion Authorization Grant
 autonumber
 
 participant "Client" as Client
@@ -35,7 +35,7 @@ participant "Issuer" as Issuer
 participant "OpenAM\nAuthorization Server" as AuthzServer
 participant "Resource Server" as ResourceServer
 
-Client->Issuer: Request SAML 2.0 assertion
+Client->Issuer: Request SAML v2.0 assertion
 
 Issuer->Client: Signed assertion
 

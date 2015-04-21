@@ -2132,7 +2132,7 @@
     <term>Dashboard Class Name</term>
     <listitem>
      <para>Identifies how to access the application, for example 
-     <literal>SAML2ApplicationClass</literal> for a SAML 2.0 application</para>
+     <literal>SAML2ApplicationClass</literal> for a SAML v2.0 application</para>
      
      <para><command>ssoadm</command> attribute:
      <literal>dashboardClassName</literal></para>
@@ -3402,7 +3402,7 @@
   </variablelist>
 
   <variablelist xml:id="saml2-service-configuration">
-   <title>SAMLv2 Service Configuration</title>
+   <title>SAML v2.0 Service Configuration</title>
 
    <para><command>ssoadm</command> service name:
    <literal>sunFAMSAML2Configuration</literal></para>
@@ -3516,7 +3516,7 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Enable SAMLv2 failover</term>
+    <term>Enable SAML v2.0 failover</term>
     <listitem>
      <para>If enabled, the OpenAM can failover requests to another
      instance.</para>
@@ -3561,7 +3561,7 @@
   </variablelist>
 
   <variablelist xml:id="saml2-soap-configuration">
-   <title>SAMLv2 SOAP Binding</title>
+   <title>SAML v2.0 SOAP Binding</title>
 
    <para><command>ssoadm</command> service name:
    <literal>sunfmSAML2SOAPBindingService</literal></para>

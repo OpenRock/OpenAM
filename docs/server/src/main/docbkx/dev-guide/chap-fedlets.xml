@@ -20,22 +20,33 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS.
+  !      Copyright 2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-samlv2'
+<chapter xml:id='chap-fedlets'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Handling Federation With SAML v2.0</title>
+ <title>Building SAML v2.0 Service Providers With Fedlets</title>
+ <indexterm>
+  <primary>Fedlets</primary>
+  <secondary>SAML v2.0</secondary>
+ </indexterm>
+ <para>This chapter introduces OpenAM Fedlets, and shows how to use the Fedlet
+ as part of your Java web or .NET application.</para>
 
- <para>This chapter covers using SAML v2.0 with OpenAM to manage access across
- federated services. This chapter also addresses Shibboleth.</para>
- 
- <!-- TODO: Include examples demonstrating use of SAML v2.0 extensions. -->
+ <para>An OpenAM <firstterm>Fedlet</firstterm> is a small web application that
+  that acts as a lightweight SAML v2.0 service provider. </para>
+ <para>Fedlets are easy to integrate into Java and .NET web applications. The
+  Fedlet does not require an entire OpenAM installation alongside your
+  application, but instead can redirect to OpenAM for single sign on, and to
+  retrieve SAML assertions.</para>
 
+ <xinclude:include href="sec-fedlet-java.xml"/>
+ <xinclude:include href="sec-fedlet-unconfigured.xml"/>
+ <xinclude:include href="sec-fedlet-dotnet.xml"/>
 </chapter>
-

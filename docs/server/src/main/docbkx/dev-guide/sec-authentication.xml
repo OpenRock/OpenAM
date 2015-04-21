@@ -20,10 +20,10 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-authentication'
+<section xml:id='sec-authentication'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -35,15 +35,15 @@
   <secondary>Java API</secondary>
  </indexterm>
 
- <para>This chapter looks at authentication with the OpenAM Java SDK and at the
+ <para>This section looks at authentication with the OpenAM Java SDK and at the
  sample client, <filename>Login.java</filename>, which demonstrates
  authenticating to OpenAM from a client application, provided a realm, user
  name, and password. This is the sample you ran to test installation of the
- command-line SDK samples. The class shown in this chapter is
+ command-line SDK samples. The class shown in this section is
  <literal>com.sun.identity.samples.authentication.Login</literal>.</para>
 
  <para>Before you continue, make sure that the packages described in the
-  <link xlink:show="new" xlink:href="dev-guide#chap-jdk"
+  <link xlink:show="new" xlink:href="dev-guide#sec-sdk"
   xlink:role="http://docbook.org/xlink/role/olink">Using the OpenAM Java SDK</link>
   chapter are installed.</para>
  
@@ -296,4 +296,80 @@ public class Login {
         System.exit(0);
     }
 }</programlisting>
-</chapter>
+
+ <section xml:id="encoding-pwds">
+  <title>Encoding Passwords and Password Reset Questions and Answers</title>
+  <para>
+   OpenAM uses symmetric encryption algorithms to encrypt and decrypt stored
+   passwords, so that
+   they can be retrieved or modified at later date if necessary.
+   The OpenAM Java SDK provides the capability to encode passwords
+   using the <literal>EncodeAction</literal>
+   class in standalone applications. For example, you can encrypt and decrypt a
+   password as follows:
+  </para>
+  <programlisting language="java">String plainText = "helloworld";
+   String encrypted = AccessController.doPrivileged(new EncodeAction(plainText));
+   String decrypted = AccessController.doPrivileged(new DecodeAction(encrypted));
+   assert plainText.equals(decrypted);</programlisting>
+  <para>
+   To use this class,
+   you must ensure that the symmetric encryption
+   key has the same value as configured in the server instances.
+   You can
+   run <literal>ssoadm</literal> to retrieve the
+   password encryption key as follows:
+  </para>
+  <screen>
+   ssoadm am.encryption.pwd
+  </screen>
+  <para>
+   Next, in your application's <literal>AMConfig.properties</literal> file, replace
+   the <literal>@ENCRYPTION_KEY@</literal> with the value of the password
+   encryption key.
+   The property ensures that OpenAM can decrypt the
+   password.
+  </para>
+  <screen>
+   am.encryption.pwd=@ENCRYPTION_KEY@
+  </screen>
+
+  <para>
+   OpenAM's password reset question and answer also uses symmetric key encryption
+   in its configuration.
+   You can use
+   the <literal>encodeAction</literal> class to encrypt a password reset question
+   and answer:
+  </para>
+  <programlisting>
+   String encrypted = AccessController.doPrivileged(new EncodeAction(question + "\t" + \
+   answer "+" "1"));
+  </programlisting>
+
+  <para>The last number in the previous example indicates whether the question/answer is
+   enabled or disabled:</para>
+  <itemizedlist>
+   <listitem><para>0 = default question/answer that is disabled</para></listitem>
+   <listitem><para>1 = default question/answer that is enabled</para></listitem>
+   <listitem><para>2 = personal question/answer that is disabled</para></listitem>
+   <listitem><para>3 = personal question/answer that is enabled</para></listitem>
+  </itemizedlist>
+
+  <para>
+   To encrypt or decrypt the password reset question and answer, you must
+   retrieve the password encryption key using <literal>ssoadm am.encryption.key</literal>,
+   and then set
+   the <literal>am.encryption.key</literal> property with the value of
+   the password encryption key
+   in the <literal>AMConfig.properties</literal> file.
+  </para>
+
+  <para>
+   For additional information,
+   see <link xlink:href="${javadocBase}/index.html?com/sun/identity/security/EncodeAction.html"
+             xlink:show="new"
+             xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>EncodeAction</citetitle></link>.
+  </para>
+ </section>
+</section>

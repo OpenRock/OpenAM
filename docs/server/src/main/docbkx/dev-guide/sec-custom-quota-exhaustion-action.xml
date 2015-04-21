@@ -23,7 +23,7 @@
   !      Copyright 2013-2015 ForgeRock AS.
   !
 -->
-<chapter xml:id='chap-custom-quota-exhaustion-action'
+<section  xml:id='sec-custom-quota-exhaustion-action'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -33,7 +33,7 @@
  <title>Customizing Session Quota Exhaustion Actions</title>
 
  <para>
-  This chapter demonstrates a custom session quota exhaustion action plugin.
+  This section demonstrates a custom session quota exhaustion action plugin.
   OpenAM calls a session quota exhaustion action plugin
   when a user tries to open more sessions than their quota allows.
  </para>
@@ -74,7 +74,7 @@
   </para>
 
   <para>
-   The example in this chapter simply removes the first session it finds
+   The example in this section simply removes the first session it finds
    as the session quota exhaustion action.
   </para>
 
@@ -320,4 +320,4 @@ $ <userinput>ssoadm \
 <computeroutput>Choice Values were removed.</computeroutput>
   </screen>
  </section>
-</chapter>
+</section>
