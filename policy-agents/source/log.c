@@ -43,10 +43,6 @@ struct am_shared_log_s {
 #endif
 };
 
-#ifndef AM_LOG_QUEUE_DEPTH
-#define AM_LOG_QUEUE_DEPTH 1024 /*must not be less than max number of simultaneus log requests*/
-#endif
-
 static struct am_shared_log_s *am_log_p = NULL;
 
 #ifdef _WIN32
@@ -95,9 +91,9 @@ struct am_log_s {
 
     size_t in;
     size_t out;
-    size_t waiting;
-    size_t queue_size;
-    char wrapped;
+    volatile size_t waiting;
+    volatile size_t queue_size;
+    volatile char wrapped;
 
 #ifndef _WIN32
     pthread_mutex_t exit;
@@ -540,129 +536,139 @@ void am_log_init_worker(int status) {
 
 void am_log(unsigned long instance_id, int level, const char *format, ...) {
     size_t off, off_out;
-    int sz, sr, i, log_lvl = AM_LOG_NONE, aud_lvl = AM_LOG_NONE;
+    int sz, sr, i, log_lvl = AM_LOG_LEVEL_NONE, aud_lvl = AM_LOG_LEVEL_NONE;
     char *data, quit = AM_FALSE;
+    struct am_log_s *log = am_log_p != NULL ?
+            (struct am_log_s *) am_log_p->am_shared : NULL;
+    char *log_d = log != NULL ?
+            ((char *) am_log_p->am_shared) + sizeof (struct am_log_s) : NULL;
     va_list args;
+
+    if (log_d == NULL) return;
+
     va_start(args, format);
     sz = vsnprintf(NULL, 0, format, args);
     va_end(args);
-    data = (char *) malloc(sz + 1);
-    if (data != NULL) {
-        memset(data, 0, sz + 1);
-        va_start(args, format);
-        sr = vsnprintf(data, sz + 1, format, args);
-        va_end(args);
-        if (sr > 0 && am_log_p != NULL) {
-            struct am_log_s *log = (struct am_log_s *) am_log_p->am_shared;
-            if (log != NULL) {
-                char *log_d = ((char *) am_log_p->am_shared) + sizeof (struct am_log_s);
-#ifdef _WIN32
-                WaitForSingleObject(am_log_lck.lock, INFINITE);
-                while (log->waiting == log->queue_size || log->wrapped == 1) {
-                    ReleaseMutex(am_log_lck.lock);
-                    WaitForSingleObject(am_log_lck.queue_overflow, INFINITE);
-                    WaitForSingleObject(am_log_lck.lock, INFINITE);
-                }
-#else
-                pthread_mutex_lock(&log->lock);
-                while (log->waiting == log->queue_size || log->wrapped == 1) {
-                    pthread_cond_wait(&log->queue_overflow, &log->lock);
-                }
-#endif
-                for (i = 0; i < AM_MAX_INSTANCES; i++) {
-                    if (log->level[i].instance_id == instance_id) {
-                        log_lvl = log->level[i].log;
-                        aud_lvl = log->level[i].audit;
-                        break;
-                    }
-                }
-                /*check if we have any logging configuration at all*/
-                if (level == AM_LOG_NONE ||
-                        (log_lvl == AM_LOG_NONE && ((level & AM_LOG_AUDIT) != AM_LOG_AUDIT)) ||
-                        (aud_lvl == AM_LOG_NONE && (level & AM_LOG_AUDIT) == AM_LOG_AUDIT)) {
-                    quit = AM_TRUE;
-                }
 
-                /*check configured logging level (LOG_ALLWAYS*/
-                if ((level & AM_LOG_AUDIT) != AM_LOG_AUDIT && (level & AM_LOG_ALWAYS) != AM_LOG_ALWAYS) {
-                    /* DEBUG > INFO > WARNING > ERROR */
-                    if (level > log_lvl) {
-                        quit = AM_TRUE;
-                    }
-                }
+    data = (char *) calloc(1, sz + 1);
+    if (data == NULL) return;
 
-                /* either this particular instance has no logging configuration or requested log 
-                 * level does not correspond to one set in instance configuration
-                 */
-                if (quit == AM_TRUE) {
-                    free(data);
-#ifdef _WIN32
-                    ReleaseMutex(am_log_lck.lock);
-#else
-                    pthread_mutex_unlock(&log->lock);
-#endif
-                    return;
-                }
+    va_start(args, format);
+    sr = vsnprintf(data, sz + 1, format, args);
+    va_end(args);
 
-                off = log->queue[log->in].offset;
-
-                if (sr / 2 > log->capacity) {
-                    fprintf(stderr, "am_log() shared log buffer is too small (%ld)", log->capacity);
-                    free(data);
-#ifdef _WIN32
-                    ReleaseMutex(am_log_lck.lock);
-#else
-                    pthread_mutex_unlock(&log->lock);
-#endif
-                    return;
-                } else if (sr + off > log->capacity) {
-                    size_t count2 = sr + off - log->capacity;
-                    size_t count1 = sr - count2;
-                    log->queue[log->in].offset_wrap = log->queue[log->in].size_wrap = 0;
-                    /* copy first part of a message to the end of ring buffer */
-                    if (count1 > 0) {
-                        memcpy(log_d + off, data, count1);
-                        log->queue[log->in].offset_wrap = off;
-                        log->queue[log->in].size_wrap = count1;
-                    }
-                    /* remaining portion of a message (if any) wraps to start of buffer */
-                    if (count2 > 0) {
-                        memcpy(log_d, data + count1, count2);
-                    }
-                    off_out = count2;
-                    log->queue[log->in].size = count2;
-                    log->wrapped = 1;
-                } else {
-
-                    memcpy(log_d + off, data, sr);
-                    log->queue[log->in].size = sr;
-                    log->queue[log->in].offset_wrap = log->queue[log->in].size_wrap = 0;
-                    off_out = off + sr;
-                }
-
-                log->queue[log->in].instance_id = instance_id;
-                log->queue[log->in].audit = (level & AM_LOG_AUDIT) == AM_LOG_AUDIT ? 1 : 0;
-
-                ++(log->waiting);
-                ++(log->in);
-                log->in %= log->queue_size;
-                log->queue[log->in].offset = off_out;
-
-#ifdef _WIN32
-                SetEvent(am_log_lck.queue_empty);
-                ReleaseMutex(am_log_lck.lock);
-#else
-                pthread_cond_signal(&log->queue_empty);
-                pthread_mutex_unlock(&log->lock);
-#endif
-            }
-        }
+    if (sr <= 0) {
         free(data);
+        return;
     }
+
+#ifdef _WIN32
+    WaitForSingleObject(am_log_lck.lock, INFINITE);
+    while (log->waiting == log->queue_size || log->wrapped == 1) {
+        ReleaseMutex(am_log_lck.lock);
+        WaitForSingleObject(am_log_lck.queue_overflow, INFINITE);
+        WaitForSingleObject(am_log_lck.lock, INFINITE);
+    }
+#else
+    pthread_mutex_lock(&log->lock);
+    while (log->waiting == log->queue_size || log->wrapped == 1) {
+        pthread_cond_wait(&log->queue_overflow, &log->lock);
+    }
+#endif
+
+    for (i = 0; i < AM_MAX_INSTANCES; i++) {
+        if (log->level[i].instance_id == instance_id) {
+            log_lvl = log->level[i].log;
+            aud_lvl = log->level[i].audit;
+            break;
+        }
+    }
+
+    /*check if we have any logging configuration at all*/
+    if (level == AM_LOG_LEVEL_NONE ||
+            (log_lvl == AM_LOG_LEVEL_NONE && ((level & AM_LOG_LEVEL_AUDIT) != AM_LOG_LEVEL_AUDIT)) ||
+            (aud_lvl == AM_LOG_LEVEL_NONE && (level & AM_LOG_LEVEL_AUDIT) == AM_LOG_LEVEL_AUDIT)) {
+        quit = AM_TRUE;
+    }
+
+    /*check configured logging level (LOG_ALLWAYS*/
+    if ((level & AM_LOG_LEVEL_AUDIT) != AM_LOG_LEVEL_AUDIT && (level & AM_LOG_LEVEL_ALWAYS) != AM_LOG_LEVEL_ALWAYS) {
+        /* DEBUG > INFO > WARNING > ERROR */
+        if (level > log_lvl) {
+            quit = AM_TRUE;
+        }
+    }
+
+    /* either this particular instance has no logging configuration or requested log 
+     * level does not correspond to one set in instance configuration
+     */
+    if (quit) {
+        free(data);
+#ifdef _WIN32
+        ReleaseMutex(am_log_lck.lock);
+#else
+        pthread_mutex_unlock(&log->lock);
+#endif
+        return;
+    }
+
+    off = log->queue[log->in].offset;
+
+    if (sr / 2 > log->capacity) {
+        fprintf(stderr, "am_log() shared log buffer is too small (%ld)", log->capacity);
+        free(data);
+#ifdef _WIN32
+        ReleaseMutex(am_log_lck.lock);
+#else
+        pthread_mutex_unlock(&log->lock);
+#endif
+        return;
+    }
+
+    if (sr + off > log->capacity) {
+        size_t count2 = sr + off - log->capacity;
+        size_t count1 = sr - count2;
+        log->queue[log->in].offset_wrap = log->queue[log->in].size_wrap = 0;
+        /* copy first part of a message to the end of ring buffer */
+        if (count1 > 0) {
+            memcpy(log_d + off, data, count1);
+            log->queue[log->in].offset_wrap = off;
+            log->queue[log->in].size_wrap = count1;
+        }
+        /* remaining portion of a message (if any) wraps to start of buffer */
+        if (count2 > 0) {
+            memcpy(log_d, data + count1, count2);
+        }
+        off_out = count2;
+        log->queue[log->in].size = count2;
+        log->wrapped = 1;
+    } else {
+        memcpy(log_d + off, data, sr);
+        log->queue[log->in].size = sr;
+        log->queue[log->in].offset_wrap = log->queue[log->in].size_wrap = 0;
+        off_out = off + sr;
+    }
+
+    log->queue[log->in].instance_id = instance_id;
+    log->queue[log->in].audit = (level & AM_LOG_LEVEL_AUDIT) != 0 ? 1 : 0;
+
+    ++(log->waiting);
+    ++(log->in);
+    log->in %= log->queue_size;
+    log->queue[log->in].offset = off_out;
+
+#ifdef _WIN32
+    SetEvent(am_log_lck.queue_empty);
+    ReleaseMutex(am_log_lck.lock);
+#else
+    pthread_cond_signal(&log->queue_empty);
+    pthread_mutex_unlock(&log->lock);
+#endif
+    free(data);
 }
 
 void am_log_shutdown() {
-    const char *thisfunc = "am_log_shutdown():";
+    static const char *thisfunc = "am_log_shutdown():";
     int i;
     int pid = getpid();
     if (am_log_p != NULL) {
@@ -672,7 +678,7 @@ void am_log_shutdown() {
         for (i = 0; i < AM_MAX_INSTANCES; i++) {
             struct log_files *f = &log->files[i];
             if (f->instance_id > 0 && f->owner == pid) {
-                am_log_always(f->instance_id, "%s exiting", thisfunc);
+                AM_LOG_ALWAYS(f->instance_id, "%s exiting", thisfunc);
             }
         }
 
@@ -823,7 +829,7 @@ void am_log_register_instance(unsigned long instance_id, const char *debug_log, 
         if (exist == 2) {
 #define AM_LOG_HEADER "\r\n\r\n\t######################################################\r\n\t# %-51s#\r\n\t# Version: %-42s#\r\n\t# %-51s#\r\n\t# Build date: %s %-27s#\r\n\t######################################################\r\n"
 
-            am_log_always(instance_id, AM_LOG_HEADER, DESCRIPTION, VERSION,
+            AM_LOG_ALWAYS(instance_id, AM_LOG_HEADER, DESCRIPTION, VERSION,
                     VERSION_VCS, __DATE__, __TIME__);
 
             am_agent_init_set_value(instance_id, AM_TRUE, AM_UNKNOWN);
@@ -872,7 +878,7 @@ void set_valid_url_index(unsigned long instance_id, int value) {
                 break;
             }
         }
-        if (set == AM_FALSE) {
+        if (!set) {
             for (i = 0; i < AM_MAX_INSTANCES; i++) {
                 /*find first empty slot*/
                 if (log->valid[i].instance_id == 0) {

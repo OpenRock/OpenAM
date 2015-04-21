@@ -20,10 +20,6 @@
 #include "version.h"
 #include "thread.h"
 
-#ifndef AM_MAX_THREADS_POOL
-#define AM_MAX_THREADS_POOL 4
-#endif
-
 #ifdef _WIN32
 static INIT_ONCE worker_pool_initialized = INIT_ONCE_STATIC_INIT;
 static TP_CALLBACK_ENVIRON worker_env;
@@ -40,7 +36,7 @@ struct am_threadpool_work {
 
 struct am_threadpool {
     int num_threads;
-    int size;
+    volatile int size;
     pthread_t *threads;
     struct am_threadpool_work *head;
     struct am_threadpool_work *tail;
@@ -58,7 +54,6 @@ static void *do_work(void *arg) {
     struct am_threadpool_work *cur;
 
     while (1) {
-        pool->size = pool->size;
         pthread_mutex_lock(&(pool->lock));
         while (pool->size == 0) {
             struct timeval now = {0, 0};
@@ -362,7 +357,10 @@ int wait_for_event(am_event_t *e, int timeout) {
                 }
             }
         }
-        if (r == 0) e->e = 0; /*resets the event state to nonsignaled after a single waiting thread has been released*/
+        if (r == 0) {
+            /*resets the event state to nonsignaled after a single waiting thread has been released*/
+            e->e = 0;
+        }
         pthread_mutex_unlock(&e->m);
 #endif
     }

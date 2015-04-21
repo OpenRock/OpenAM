@@ -26,49 +26,46 @@ void notification_worker(
         void *
 #endif
         inst, void *arg) {
-    const char *thisfunc = "notification_worker():";
+    static const char *thisfunc = "notification_worker():";
     struct notification_worker_data *r = (struct notification_worker_data *) arg;
-    struct am_namevalue *e, *t, *session_list = NULL;
+    struct am_namevalue *e, *t, *session_list;
     char *token = NULL, destroyed = 0;
     char *agentid = NULL;
 
-    if (r == NULL || r->post_data == NULL || r->post_data_sz == 0) {
-        if (r != NULL) {
-            am_log_warning(r->instance_id, "%s post data is not available", thisfunc);
-            if (r->post_data != NULL) free(r->post_data);
-            free(r);
-        }
+    if (r == NULL) return;
+    if (r->post_data == NULL || r->post_data_sz == 0) {
+        AM_LOG_WARNING(r->instance_id, "%s post data is not available", thisfunc);
+        am_free(r->post_data);
+        free(r);
         return;
     }
 
     session_list = am_parse_session_xml(r->instance_id, r->post_data, r->post_data_sz);
-    if (session_list != NULL) {
 
-        am_list_for_each(session_list, e, t) {
-            /*SessionNotification*/
-            if (strcmp(e->n, "sid") == 0) token = e->v;
-            if (strcmp(e->n, "state") == 0 && strcmp(e->v, "destroyed") == 0) destroyed = 1;
-            if (strcmp(e->n, "agentName") == 0) agentid = e->v;
-            /*PolicyChangeNotification - ResourceName*/
-            if (strcmp(e->n, "ResourceName") == 0) {
-                am_remove_cache_entry(r->instance_id, e->v);
-            }
+    AM_LIST_FOR_EACH(session_list, e, t) {
+        /*SessionNotification*/
+        if (strcmp(e->n, "sid") == 0) token = e->v;
+        if (strcmp(e->n, "state") == 0 && strcmp(e->v, "destroyed") == 0) destroyed = 1;
+        if (strcmp(e->n, "agentName") == 0) agentid = e->v;
+        /*PolicyChangeNotification - ResourceName*/
+        if (strcmp(e->n, "ResourceName") == 0) {
+            am_remove_cache_entry(r->instance_id, e->v);
         }
-
-        if (ISVALID(token) && destroyed) {
-            am_remove_cache_entry(r->instance_id, token);
-        }
-
-        if (ISVALID(agentid)) {
-            am_log_debug(r->instance_id, "%s agent configuration entry removed (%s)",
-                    thisfunc, agentid);
-            remove_agent_instance_byname(agentid);
-        }
-
-        delete_am_namevalue_list(&session_list);
     }
 
-    if (r->post_data != NULL) free(r->post_data);
+    if (ISVALID(token) && destroyed) {
+        am_remove_cache_entry(r->instance_id, token);
+    }
+
+    if (ISVALID(agentid)) {
+        AM_LOG_DEBUG(r->instance_id, "%s agent configuration entry removed (%s)",
+                thisfunc, agentid);
+        remove_agent_instance_byname(agentid);
+    }
+
+    delete_am_namevalue_list(&session_list);
+
+    am_free(r->post_data);
     free(r);
 }
 

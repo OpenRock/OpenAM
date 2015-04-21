@@ -44,14 +44,19 @@ static void am_main_destroy() {
 
 static void am_main_init_timed_lock() {
     DWORD status = WaitForSingleObject(init.id, 1000);
-    if (status == WAIT_OBJECT_0) {
-        init.error = AM_SUCCESS;
-    } else if (status == WAIT_ABANDONED) {
-        init.error = AM_EAGAIN;
-    } else if (status == WAIT_TIMEOUT) {
-        init.error = AM_ETIMEDOUT;
-    } else {
-        init.error = AM_ERROR;
+    switch (status) {
+        case WAIT_OBJECT_0:
+            init.error = AM_SUCCESS;
+            break;
+        case WAIT_ABANDONED:
+            init.error = AM_EAGAIN;
+            break;
+        case WAIT_TIMEOUT:
+            init.error = AM_ETIMEDOUT;
+            break;
+        default:
+            init.error = AM_ERROR;
+            break;
     }
 }
 

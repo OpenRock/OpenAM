@@ -35,11 +35,10 @@ typedef struct am_config_map {
     do {\
         int i;\
         for (i = 0; (el) && i < sz; i++) {\
-            am_config_map_t v = (el)[i];\
-                if (v.name != NULL) free(v.name);\
-                /*if (v.value != NULL) free(v.value); should not be freed as name-value is allocated in one chunk*/\
+            am_config_map_t *v = &((el)[i]);\
+            am_free(v->name);\
         }\
-        if ((el) != NULL) free(el);\
+        am_free(el);\
         (el) = NULL;\
     } while (0)
 
@@ -60,6 +59,7 @@ typedef struct {
     char *realm; /* agent profile info */
     char *user;
     char *pass;
+    size_t pass_sz;
     char *key;
 
     /* debug and audit logging */
@@ -72,6 +72,7 @@ typedef struct {
 
     char *cert_key_file;
     char *cert_key_pass;
+    size_t cert_key_pass_sz;
     char *cert_file;
     char *cert_ca_file;
     char *ciphers;
@@ -114,7 +115,7 @@ typedef struct {
     char *userid_param;
     char *userid_param_type;
 
-    int profile_attr_fetch; /* SET_ATTRS_NONE - 0, SET_ATTRS_AS_HEADER, SET_ATTRS_AS_COOKIE */
+    int profile_attr_fetch; /* AM_SET_ATTRS_NONE - 0, AM_SET_ATTRS_AS_HEADER, AM_SET_ATTRS_AS_COOKIE */
     int profile_attr_map_sz;
     am_config_map_t *profile_attr_map;
 
@@ -152,6 +153,9 @@ typedef struct {
     /* key: [GET,]0  value: cidr notation */
     am_config_map_t *not_enforced_ip_map;
 
+    int not_enforced_ext_map_sz;
+    am_config_map_t *not_enforced_ext_map;
+
     int pdp_enable;
     char *pdp_lb_cookie;
     int pdp_cache_valid;
@@ -188,7 +192,7 @@ typedef struct {
 
     int config_valid; /* agent configuration valid (sec) */
 
-    char *password_replay_key; /**/
+    char *password_replay_key;
 
     int policy_clock_skew;
 
@@ -202,9 +206,6 @@ typedef struct {
 
     char *url_check_regex;
 
-    /* key: pattern,0  value: url 
-     * key format: pattern,index
-     **/
     int cond_login_url_sz;
     am_config_map_t *cond_login_url;
 
@@ -348,5 +349,6 @@ typedef struct {
 #define AM_AGENTS_CONFIG_IIS_PASSWORD_HEADER "com.sun.identity.agents.config.iis.password.header"
 
 #define AM_AGENTS_CONFIG_PDP_JS_REPOST "org.forgerock.agents.pdp.javascript.repost"
+#define AM_AGENTS_CONFIG_EXT_NOT_ENFORCED_URL "org.forgerock.agents.config.notenforced.ipurl"
 
 #endif

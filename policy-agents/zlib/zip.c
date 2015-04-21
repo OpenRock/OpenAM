@@ -47,7 +47,11 @@
 /* compile with -Dlocal if your debugger can't find static symbols */
 
 #ifndef VERSIONMADEBY
-# define VERSIONMADEBY   (0x0) /* platform depedent */
+#ifdef _WIN32
+#define VERSIONMADEBY   (0x0)
+#else
+#define VERSIONMADEBY   (0x031E)
+#endif
 #endif
 
 #ifndef Z_BUFSIZE

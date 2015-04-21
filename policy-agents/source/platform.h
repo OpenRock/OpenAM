@@ -21,8 +21,11 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <ws2ipdef.h>
+#include <windns.h>
+#include <iphlpapi.h>
 #include <wincrypt.h>
 #include <process.h>
 #include <io.h>
@@ -48,6 +51,8 @@
 #define SOCKLEN_T           int
 #define pid_t               int
 typedef SSIZE_T             ssize_t;
+#define INETPTON            InetPton
+#define INETNTOP            InetNtop
 #if (_MSC_VER < 1800)
 #define va_copy(dst, src)   ((void)((dst) = (src)))
 #endif
@@ -97,11 +102,14 @@ typedef SSIZE_T             ssize_t;
 #include <mach/task.h>
 #include <sys/uio.h>
 #include <copyfile.h>
+#include <sys/event.h>
 #else
 #include <sys/sendfile.h>
 #endif
 #define sockpoll            poll
 #define SOCKLEN_T           socklen_t
+#define INETPTON            inet_pton
+#define INETNTOP            inet_ntop
 #define FILE_PATH_SEP       "/"
 #define AM_GLOBAL_PREFIX    ""
 

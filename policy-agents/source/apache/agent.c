@@ -63,33 +63,28 @@ typedef struct {
 static const char *am_set_opt(cmd_parms *c, void *cfg, const char *arg) {
     amagent_config_t *conf = (amagent_config_t *)
             ap_get_module_config(c->server->module_config, &amagent_module);
-    if (conf) {
-        const char *name = c->cmd->name;
-        if (name) {
-            if (strcmp(name, "AmAgentConf") == 0) {
-                am_config_t *ac = NULL;
-                conf->config = apr_psprintf(c->pool, "%s", arg);
-                conf->config_id = am_instance_id(conf->config);
-                /* read and parse agent bootstrap configuration */
-                ac = am_get_config_file(conf->config_id, conf->config);
-                if (ac != NULL) {
-                    conf->debug_file = ac->debug_file != NULL ? apr_pstrdup(c->pool, ac->debug_file) : NULL;
-                    conf->audit_file = ac->audit_file != NULL ? apr_pstrdup(c->pool, ac->audit_file) : NULL;
-                    conf->debug_level = ac->debug_level;
-                    conf->audit_level = ac->audit_level;
-                    conf->error = AM_SUCCESS;
-                    am_config_free(&ac);
-                } else {
-                    conf->error = AM_FILE_ERROR;
-                }
-            } else if (strcmp(name, "AmAgent") == 0) {
-                if (!strcasecmp(arg, "on")) {
-                    conf->enabled = 1;
-                } else {
-                    conf->enabled = 0;
-                }
-            }
+    const char *name = c->cmd->name;
+    if (!conf || !name) {
+        return NULL;
+    }
+    if (strcmp(name, "AmAgentConf") == 0) {
+        am_config_t *ac = NULL;
+        conf->config = apr_psprintf(c->pool, "%s", arg);
+        conf->config_id = am_instance_id(conf->config);
+        /* read and parse agent bootstrap configuration */
+        ac = am_get_config_file(conf->config_id, conf->config);
+        if (ac != NULL) {
+            conf->debug_file = ac->debug_file != NULL ? apr_pstrdup(c->pool, ac->debug_file) : NULL;
+            conf->audit_file = ac->audit_file != NULL ? apr_pstrdup(c->pool, ac->audit_file) : NULL;
+            conf->debug_level = ac->debug_level;
+            conf->audit_level = ac->audit_level;
+            conf->error = AM_SUCCESS;
+            am_config_free(&ac);
+        } else {
+            conf->error = AM_FILE_ERROR;
         }
+    } else if (strcmp(name, "AmAgent") == 0) {
+        conf->enabled = !strcasecmp(arg, "on");
     }
     return NULL;
 }
@@ -209,12 +204,12 @@ static am_status_t get_request_url(am_request_t *rq) {
 }
 
 static am_status_t set_user(am_request_t *rq, const char *user) {
-    const char *thisfunc = "set_user():";
+    static const char *thisfunc = "set_user():";
     request_rec *r = (request_rec *) (rq != NULL ? rq->ctx : NULL);
     if (r == NULL) return AM_EINVAL;
     r->user = apr_pstrdup(r->pool, user == NULL ? "" : user);
     r->ap_auth_type = apr_pstrdup(r->pool, "OpenAM");
-    am_log_debug(rq->instance_id, "%s user set to %s", thisfunc, LOGEMPTY(user));
+    AM_LOG_DEBUG(rq->instance_id, "%s %s", thisfunc, LOGEMPTY(user));
     return AM_SUCCESS;
 }
 
@@ -244,49 +239,76 @@ static am_status_t set_cookie(am_request_t *rq, const char *header) {
 }
 
 static am_status_t add_header_in_response(am_request_t *rq, const char *key, const char *value) {
-    am_status_t status = AM_ERROR;
     request_rec *r = (request_rec *) (rq != NULL ? rq->ctx : NULL);
     if (r == NULL || !ISVALID(key)) return AM_EINVAL;
     if (!ISVALID(value)) {
         /*value is empty, sdk is setting a cookie in response*/
-        status = set_cookie(rq, key);
-    } else {
-        /* Apache HTTPD keeps two separate server response header tables in the request 
-         * record — one for normal response headers and one for error headers. 
-         * The difference between them is the error headers are sent to 
-         * the client even (not only) on an error response (REDIRECT is one of them)
-         */
-        apr_table_add(r->err_headers_out, key, value);
-        status = AM_SUCCESS;
+        return set_cookie(rq, key);
     }
-    return status;
+    /* Apache HTTPD keeps two separate server response header tables in the request 
+     * record — one for normal response headers and one for error headers. 
+     * The difference between them is the error headers are sent to 
+     * the client even (not only) on an error response (REDIRECT is one of them)
+     */
+    apr_table_add(r->err_headers_out, key, value);
+    return AM_SUCCESS;
 }
 
 static am_status_t set_custom_response(am_request_t *rq, const char *text, const char *cont_type) {
     request_rec *r = (request_rec *) (rq != NULL ? rq->ctx : NULL);
-    if (r == NULL || !ISVALID(text)) return AM_EINVAL;
-    if (rq->status == AM_INTERNAL_REDIRECT) {
-        ap_internal_redirect(text, r);
-        rq->status = AM_DONE;
-    } else if (rq->status == AM_REDIRECT) {
-        apr_table_add(r->headers_out, "Location", text);
-        ap_custom_response(r, HTTP_MOVED_TEMPORARILY, text);
-    } else {
-        if (rq->status == AM_PDP_DONE) {
+    am_status_t status = AM_ERROR;
+
+    if (r == NULL || !ISVALID(text)) {
+        return AM_EINVAL;
+    }
+
+    status = rq->status;
+    switch (status) {
+        case AM_JSON_RESPONSE:
+        {
+            //TODO:
+            rq->status = AM_DONE;
+        }
+            break;
+        case AM_INTERNAL_REDIRECT:
+        {
+            ap_internal_redirect(text, r);
+            rq->status = AM_DONE;
+        }
+            break;
+        case AM_REDIRECT:
+        {
+            apr_table_add(r->headers_out, "Location", text);
+            ap_custom_response(r, HTTP_MOVED_TEMPORARILY, text);
+        }
+            break;
+        case AM_PDP_DONE:
+        {
             request_rec *sr = ap_sub_req_method_uri(am_method_num_to_str(rq->method),
                     rq->post_data_url, r, NULL);
 
             sr->headers_in = r->headers_in;
             sr->notes = r->notes;
+            sr->clength = rq->post_data_sz;
+            sr->content_type = cont_type;
 
-            am_log_debug(rq->instance_id, "set_custom_response(): issuing sub-request %s to %s",
-                    sr->method, rq->post_data_url);
+            AM_LOG_DEBUG(rq->instance_id, "set_custom_response(): issuing sub-request %s to %s (%s)",
+                    sr->method, rq->post_data_url, LOGEMPTY(cont_type));
 
             ap_run_sub_req(sr);
-            ap_destroy_sub_req(sr);
-            rq->status = AM_DONE;
 
-        } else {
+            r->status_line = apr_pstrdup(r->pool, sr->status_line);
+            r->status = sr->status;
+            r->uri = sr->uri;
+
+            ap_rflush(sr);
+
+            ap_destroy_sub_req(sr);
+            rq->status = AM_SUCCESS;
+        }
+            break;
+        default:
+        {
             size_t tl = strlen(text);
             if (ISVALID(cont_type)) {
                 ap_set_content_type(r, cont_type);
@@ -298,23 +320,25 @@ static am_status_t set_custom_response(am_request_t *rq, const char *text, const
                     rq->status == AM_DONE ? AM_SUCCESS : rq->status), text);
             ap_rflush(r);
         }
+            break;
     }
-    am_log_info(rq->instance_id, "set_custom_response(): status: %s", am_strerror(rq->status));
+    AM_LOG_INFO(rq->instance_id, "set_custom_response(): status: %s (exit: %s)",
+            am_strerror(status), am_strerror(rq->status));
     return AM_SUCCESS;
 }
 
 static char get_method_num(request_rec *r, unsigned long instance_id) {
-    const char *thisfunc = "get_method_num():";
+    static const char *thisfunc = "get_method_num():";
     char method_num = AM_REQUEST_UNKNOWN;
     const char *mthd = ap_method_name_of(r->pool, r->method_number);
-    am_log_debug(instance_id, "%s method %s (%s, %d)", thisfunc, LOGEMPTY(r->method),
+    AM_LOG_DEBUG(instance_id, "%s method %s (%s, %d)", thisfunc, LOGEMPTY(r->method),
             LOGEMPTY(mthd), r->method_number);
     if (r->method_number == M_GET && r->header_only > 0) {
         method_num = AM_REQUEST_HEAD;
     } else {
         method_num = am_method_str_to_num(mthd);
     }
-    am_log_debug(instance_id, "%s number corresponds to %s method",
+    AM_LOG_DEBUG(instance_id, "%s number corresponds to %s method",
             thisfunc, am_method_num_to_str(method_num));
     /* check if method number and method string correspond */
     if (method_num == AM_REQUEST_UNKNOWN) {
@@ -322,7 +346,7 @@ static char get_method_num(request_rec *r, unsigned long instance_id) {
         if (r->method != NULL && *(r->method) != '\0') {
             method_num = am_method_str_to_num(r->method);
             r->method_number = ap_method_number_of(r->method);
-            am_log_debug(instance_id, "%s set method number to correspond to %s method (%d)",
+            AM_LOG_DEBUG(instance_id, "%s set method number to correspond to %s method (%d)",
                     thisfunc, r->method, r->method_number);
         }
     } else if (ISVALID(r->method) && strcasecmp(r->method, am_method_num_to_str(method_num))
@@ -333,7 +357,7 @@ static char get_method_num(request_rec *r, unsigned long instance_id) {
          * used as a proxy (in front of Exchange Server for instance)
          */
         r->method = am_method_num_to_str(method_num);
-        am_log_debug(instance_id, "%s set method to %s", thisfunc, LOGEMPTY(r->method));
+        AM_LOG_DEBUG(instance_id, "%s set method to %s", thisfunc, LOGEMPTY(r->method));
     }
     return method_num;
 }
@@ -347,11 +371,11 @@ static am_status_t set_method(am_request_t *rq) {
 }
 
 static am_status_t set_request_body(am_request_t *rq) {
-    const char *thisfunc = "set_request_body():";
+    static const char *thisfunc = "set_request_body():";
     request_rec *r = (request_rec *) (rq != NULL ? rq->ctx : NULL);
     am_status_t status = AM_EINVAL;
 
-    if (r == NULL || rq == NULL) {
+    if (r == NULL) {
         return status;
     }
 
@@ -362,7 +386,7 @@ static am_status_t set_request_body(am_request_t *rq) {
         char *encoded = base64_encode(rq->post_data, &data_sz);
         if (encoded != NULL) {
             apr_table_set(r->notes, amagent_post_filter_name, encoded);
-            am_log_debug(rq->instance_id, "%s preserved %d bytes", thisfunc,
+            AM_LOG_DEBUG(rq->instance_id, "%s preserved %d bytes", thisfunc,
                     rq->post_data_sz);
             /* restore the content length so that we have a
              * match with a re-played data in the agent filter 
@@ -378,24 +402,27 @@ static am_status_t set_request_body(am_request_t *rq) {
 }
 
 static am_status_t get_request_body(am_request_t *rq) {
-    const char *thisfunc = "get_request_body():";
-    request_rec *r = (request_rec *) (rq != NULL ? rq->ctx : NULL);
-    apr_bucket_brigade *bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
+    static const char *thisfunc = "get_request_body():";
+    request_rec *r;
+    apr_bucket_brigade *bb;
     int eos_found = 0, read_bytes = 0;
     apr_status_t read_status = 0;
     am_status_t status = AM_ERROR;
-    char *out = NULL;
+    char *out = NULL, *out_tmp = NULL;
 
-    if (r == NULL || rq == NULL) {
+    if (rq == NULL || rq->ctx == NULL) {
         return AM_EINVAL;
     }
+
+    r = (request_rec *) rq->ctx;
+    bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
 
     do {
         apr_bucket *ob;
         read_status = ap_get_brigade(r->input_filters, bb, AP_MODE_READBYTES,
                 APR_BLOCK_READ, HUGE_STRING_LEN);
         if (read_status != APR_SUCCESS) {
-            if (out != NULL) free(out);
+            am_free(out);
             return AM_ERROR;
         }
 
@@ -416,11 +443,14 @@ static am_status_t get_request_body(am_request_t *rq) {
             /* read data */
             apr_bucket_read(ob, &data, &data_size, APR_BLOCK_READ);
             /* process data */
-            out = realloc(out, read_bytes + data_size + 1);
-            if (out == NULL) {
+            out_tmp = realloc(out, read_bytes + data_size + 1);
+            if (out_tmp == NULL) {
+                am_free(out);
                 status = AM_ENOMEM;
                 eos_found = 1;
                 break;
+            } else {
+                out = out_tmp;
             }
 
             memcpy(out + read_bytes, data, data_size);
@@ -440,7 +470,7 @@ static am_status_t get_request_body(am_request_t *rq) {
     rq->post_data_sz = read_bytes;
 
     if (status == AM_SUCCESS) {
-        am_log_debug(rq->instance_id, "%s read %d bytes \n%s", thisfunc,
+        AM_LOG_DEBUG(rq->instance_id, "%s read %d bytes \n%s", thisfunc,
                 read_bytes, LOGEMPTY(out));
         /* remove the content length since the body has been read */
         r->clength = 0;
@@ -450,14 +480,14 @@ static am_status_t get_request_body(am_request_t *rq) {
 }
 
 static int amagent_auth_handler(request_rec *r) {
-    const char *thisfunc = "amagent_auth_handler():";
+    static const char *thisfunc = "amagent_auth_handler():";
     int rv;
     am_request_t d;
     am_config_t *boot = NULL;
 
     amagent_config_t *c = ap_get_module_config(r->server->module_config, &amagent_module);
 
-    if (c == NULL || !c->enabled || c->error != AM_SUCCESS) {
+    if (c == NULL || !c->enabled) {
         /* amagent module is not enabled for this 
          * server/virtualhost - we are not handling this request
          **/
@@ -479,7 +509,7 @@ static int amagent_auth_handler(request_rec *r) {
     am_log_register_instance(c->config_id, c->debug_file, c->debug_level,
             c->audit_file, c->audit_level);
 
-    am_log_debug(c->config_id, "%s begin", thisfunc);
+    AM_LOG_DEBUG(c->config_id, "%s begin", thisfunc);
 
     /* fetch agent configuration instance (from cache if available) */
     rv = am_get_agent_config(c->config_id, c->config, &boot);
@@ -487,7 +517,7 @@ static int amagent_auth_handler(request_rec *r) {
         LOG_R(APLOG_ERR, r, "%s is not configured to handle the request "
                 "to %s (unable to get agent configuration instance, configuration: %s, error: %s)",
                 DESCRIPTION, r->uri, c->config, am_strerror(rv));
-        am_log_error(c->config_id, "amagent_auth_handler(): failed to get agent configuration instance, error: %s",
+        AM_LOG_ERROR(c->config_id, "amagent_auth_handler(): failed to get agent configuration instance, error: %s",
                 am_strerror(rv));
         return HTTP_FORBIDDEN;
     }
@@ -531,7 +561,7 @@ static int amagent_auth_handler(request_rec *r) {
 
     rv = am_status_value(d.status);
 
-    am_log_debug(c->config_id, "amagent_auth_handler(): exit status: %s (%d)",
+    AM_LOG_DEBUG(c->config_id, "amagent_auth_handler(): exit status: %s (%d)",
             am_strerror(d.status), d.status);
 
     am_config_free(&d.conf);
@@ -597,7 +627,7 @@ static void amagent_register_hooks(apr_pool_t *p) {
     ap_hook_post_config(amagent_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_child_init(amagent_worker_init, NULL, NULL, APR_HOOK_MIDDLE);
 
-    ap_hook_insert_filter(amagent_auth_post_insert_filter, NULL, NULL, APR_HOOK_REALLY_FIRST);
+    ap_hook_insert_filter(amagent_auth_post_insert_filter, NULL, NULL, APR_HOOK_FIRST);
     ap_register_input_filter(amagent_post_filter_name, amagent_post_filter, NULL, AP_FTYPE_RESOURCE);
 }
 

@@ -23,7 +23,7 @@ struct offset_list {
 
 #ifdef _WIN32
 
-#define am_list_insert(head,el) \
+#define AM_LIST_INSERT(head,el) \
     do { \
         if ((head) != NULL) { \
             (el)->next = (head); \
@@ -35,7 +35,7 @@ struct offset_list {
 
 #else
 
-#define am_list_insert(head,el) \
+#define AM_LIST_INSERT(head,el) \
     do { \
         __typeof__(head) t; \
         (el)->next = NULL; \
@@ -48,40 +48,40 @@ struct offset_list {
 
 #endif
 
-#define am_list_for_each(head,el,tmp) \
+#define AM_LIST_FOR_EACH(head,el,tmp) \
      for ((el) = (head); (el) && (tmp = (el)->next, 1); (el) = tmp)
 
-#define am_get_offset(base, ptr) \
+#define AM_GET_OFFSET(base, ptr) \
     ((unsigned int) ((char *) ptr - (char *) base))
 
-#define am_get_pointer(base, off) \
+#define AM_GET_POINTER(base, off) \
     ((void *) ((char *) (base) + off))
 
-#define am_is_valid_pointer(base, ptr) \
+#define AM_IS_VALID_POINTER(base, ptr) \
     ((char *) (base) < (char *) (ptr))
 
-#define am_offset_list_insert(base,el,head,typ) \
+#define AM_OFFSET_LIST_INSERT(base,el,head,typ) \
     do {\
         struct offset_list *dl = (head);\
-        unsigned int eo = am_get_offset(base, (el));\
+        unsigned int eo = AM_GET_OFFSET(base, (el));\
         if (dl->next == 0 && dl->next == dl->prev) {\
             dl->next = dl->prev = eo;\
         } else {\
-            ((typ *) am_get_pointer(base, dl->next))->lh.next = eo;\
+            ((typ *) AM_GET_POINTER(base, dl->next))->lh.next = eo;\
             (el)->lh.prev = dl->next;\
             dl->next = eo;\
         }\
     } while(0)
 
-#define am_offset_list_for_each(base,head,el,tmp,typ) \
-     for ((el) = (head); am_is_valid_pointer(base, el) && \
-        (tmp = (typ *) am_get_pointer(base, el->lh.next), 1);(el) = tmp)
+#define AM_OFFSET_LIST_FOR_EACH(base,head,el,tmp,typ) \
+     for ((el) = (head); AM_IS_VALID_POINTER(base, el) && \
+        (tmp = (typ *) AM_GET_POINTER(base, el->lh.next), 1);(el) = tmp)
 
 struct am_namevalue {
-    char *n;
     size_t ns;
-    char *v;
     size_t vs;
+    char *n;
+    char *v;
     struct am_namevalue *next;
 };
 

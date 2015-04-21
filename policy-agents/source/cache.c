@@ -19,10 +19,6 @@
 #include "utility.h"
 #include "list.h"
 
-#ifndef AM_SHARED_CACHE_SIZE
-#define AM_SHARED_CACHE_SIZE 6151
-#endif
-
 /*
  * Session and Policy response attribute cache
  * ===============================================================
@@ -56,7 +52,7 @@ struct am_cache_entry_data {
     int index;
     int scope;
     char method;
-    unsigned long long ttl;
+    uint64_t ttl;
     size_t size[3];
     struct offset_list lh;
     char value[1]; /*format: value\0value\0value\0 */
@@ -80,9 +76,7 @@ static am_shm_t *cache = NULL;
 
 int am_cache_init() {
     size_t i;
-    int status = AM_SUCCESS;
-    if (cache != NULL)
-        return status;
+    if (cache != NULL) return AM_SUCCESS;
 
     cache = am_shm_create("am_shared_cache", sizeof (struct am_cache) +
             (sizeof (struct am_cache_entry) + sizeof (struct am_cache_entry_data)) * 2048);
@@ -93,26 +87,25 @@ int am_cache_init() {
         return cache->error;
     }
 
-    if (cache->init == AM_TRUE) {
+    if (cache->init) {
         struct am_cache *cache_data = (struct am_cache *) am_shm_alloc(cache, sizeof (struct am_cache));
-        if (cache_data != NULL) {
-            am_shm_lock(cache);
-            cache_data->count = 0;
-            /* initialize head nodes */
-            for (i = 0; i < AM_SHARED_CACHE_SIZE; i++) {
-                cache_data->table[i].next = cache_data->table[i].prev = 0;
-            }
-            cache->user = cache_data;
-            /*store table offset (for other processes)*/
-            am_shm_set_user_offset(cache, am_get_offset(cache->pool, cache_data));
-            am_shm_unlock(cache);
-        } else {
+        if (cache_data == NULL) {
             cache->user = NULL;
-            status = AM_ENOMEM;
+            return AM_ENOMEM;
         }
+        am_shm_lock(cache);
+        cache_data->count = 0;
+        /* initialize head nodes */
+        for (i = 0; i < AM_SHARED_CACHE_SIZE; i++) {
+            cache_data->table[i].next = cache_data->table[i].prev = 0;
+        }
+        cache->user = cache_data;
+        /*store table offset (for other processes)*/
+        am_shm_set_user_offset(cache, AM_GET_OFFSET(cache->pool, cache_data));
+        am_shm_unlock(cache);
     }
 
-    return status;
+    return AM_SUCCESS;
 }
 
 int am_cache_shutdown() {
@@ -152,9 +145,9 @@ static struct am_cache_entry *get_cache_entry(const char *key, int *index) {
     if (cache_data != NULL) {
         key_hash = hash((void *) key);
         entry_index = index_for(AM_SHARED_CACHE_SIZE, key_hash);
-        h = (struct am_cache_entry *) am_get_pointer(cache->pool, cache_data->table[entry_index].prev);
+        h = (struct am_cache_entry *) AM_GET_POINTER(cache->pool, cache_data->table[entry_index].prev);
 
-        am_offset_list_for_each(cache->pool, h, e, t, struct am_cache_entry) {
+        AM_OFFSET_LIST_FOR_EACH(cache->pool, h, e, t, struct am_cache_entry) {
             if (strcmp(key, e->key) == 0) {
                 if (index) *index = entry_index;
                 return e;
@@ -171,23 +164,23 @@ static int delete_cache_entry(int entry_index, struct am_cache_entry *e) {
 
     if (e == NULL) return AM_EINVAL;
     /* cleanup cache entry data */
-    h = (struct am_cache_entry_data *) am_get_pointer(cache->pool, e->data.prev);
-    
-    am_offset_list_for_each(cache->pool, h, i, t, struct am_cache_entry_data) {
+    h = (struct am_cache_entry_data *) AM_GET_POINTER(cache->pool, e->data.prev);
+
+    AM_OFFSET_LIST_FOR_EACH(cache->pool, h, i, t, struct am_cache_entry_data) {
         am_shm_free(cache, i);
     }
-    
+
     /* remove a node from a doubly linked list */
     if (e->lh.prev == 0) {
         cache_data->table[entry_index].prev = e->lh.next;
     } else {
-        ((struct am_cache_entry *) am_get_pointer(cache->pool, e->lh.prev))->lh.next = e->lh.next;
+        ((struct am_cache_entry *) AM_GET_POINTER(cache->pool, e->lh.prev))->lh.next = e->lh.next;
     }
 
     if (e->lh.next == 0) {
         cache_data->table[entry_index].next = e->lh.prev;
     } else {
-        ((struct am_cache_entry *) am_get_pointer(cache->pool, e->lh.next))->lh.prev = e->lh.prev;
+        ((struct am_cache_entry *) AM_GET_POINTER(cache->pool, e->lh.next))->lh.prev = e->lh.prev;
     }
     return rv;
 }
@@ -196,7 +189,7 @@ static int delete_cache_entry(int entry_index, struct am_cache_entry *e) {
  * Find PDP cache entry (key: uuid value).
  */
 int am_get_pdp_cache_entry(am_request_t *r, const char *key, char **data, size_t *data_sz, char **content_type) {
-    const char *thisfunc = "am_get_pdp_cache_entry():";
+    static const char *thisfunc = "am_get_pdp_cache_entry():";
     int status = AM_NOT_FOUND;
     int entry_index = 0;
     struct am_cache_entry *c;
@@ -210,7 +203,7 @@ int am_get_pdp_cache_entry(am_request_t *r, const char *key, char **data, size_t
 
     c = get_cache_entry(key, &entry_index);
     if (c == NULL) {
-        am_log_warning(r->instance_id, "%s failed to locate data for a key (%s)",
+        AM_LOG_WARNING(r->instance_id, "%s failed to locate data for a key (%s)",
                 thisfunc, key);
         am_shm_unlock(cache);
         return AM_NOT_FOUND;
@@ -226,12 +219,12 @@ int am_get_pdp_cache_entry(am_request_t *r, const char *key, char **data, size_t
             localtime_r(&ts, &until);
             strftime(tsc, sizeof (tsc), AM_CACHE_TIMEFORMAT, &created);
             strftime(tsu, sizeof (tsu), AM_CACHE_TIMEFORMAT, &until);
-            am_log_warning(r->instance_id, "%s data for a key (%s) is obsolete (created: %s, valid until: %s)",
+            AM_LOG_WARNING(r->instance_id, "%s data for a key (%s) is obsolete (created: %s, valid until: %s)",
                     thisfunc, key, tsc, tsu);
 
-            h = (struct am_cache_entry_data *) am_get_pointer(cache->pool, c->data.prev);
+            h = (struct am_cache_entry_data *) AM_GET_POINTER(cache->pool, c->data.prev);
 
-            am_offset_list_for_each(cache->pool, h, e, t, struct am_cache_entry_data) {
+            AM_OFFSET_LIST_FOR_EACH(cache->pool, h, e, t, struct am_cache_entry_data) {
                 if (e->type == AM_CACHE_PDP && e->size[1] != 0) {
                     char *file = e->value + e->size[0] + 1;
                     if (ISVALID(file)) {
@@ -250,9 +243,9 @@ int am_get_pdp_cache_entry(am_request_t *r, const char *key, char **data, size_t
         }
     }
 
-    h = (struct am_cache_entry_data *) am_get_pointer(cache->pool, c->data.prev);
+    h = (struct am_cache_entry_data *) AM_GET_POINTER(cache->pool, c->data.prev);
 
-    am_offset_list_for_each(cache->pool, h, e, t, struct am_cache_entry_data) {
+    AM_OFFSET_LIST_FOR_EACH(cache->pool, h, e, t, struct am_cache_entry_data) {
         if (e->type == AM_CACHE_PDP && e->size[0] > 0 && e->size[1] > 0 && e->size[2] > 0) {
             *data = malloc(e->size[0] + e->size[1] + 2);
             if (*data != NULL) {
@@ -277,84 +270,92 @@ int am_get_pdp_cache_entry(am_request_t *r, const char *key, char **data, size_t
 /* 
  * Add PDP cache entry (key: uuid value).
  */
-int am_add_pdp_cache_entry(am_request_t *r, const char *key, const char *url,
+int am_add_pdp_cache_entry(am_request_t *request, const char *key, const char *url,
         const char *file, const char *content_type) {
-    const char *thisfunc = "am_add_pdp_cache_entry():";
+    static const char *thisfunc = "am_add_pdp_cache_entry():";
     unsigned int key_hash;
     int entry_index = 0;
-    size_t us, fs, cs;
-    struct am_cache_entry *c;
-    struct am_cache_entry_data *ca;
+    size_t url_length, file_length, content_type_length;
+    struct am_cache_entry *cache_entry;
+    struct am_cache_entry_data *cache_entry_data;
+    struct am_cache *cache_data;
 
-    struct am_cache *cache_data = cache != NULL ? (struct am_cache *) cache->user : NULL;
+    if (cache == NULL || cache->user == NULL) {
+        return AM_ENOMEM;
+    }
+    if (!ISVALID(key) || !ISVALID(url) || !ISVALID(file) || !ISVALID(content_type)) {
+        return AM_EINVAL;
+    }
+    if (strlen(key) >= AM_SHARED_CACHE_KEY_SIZE) {
+        return AM_E2BIG;
+    }
 
-    if (cache_data == NULL) return AM_ENOMEM;
-    if (!ISVALID(key) || !ISVALID(url) || !ISVALID(file) || !ISVALID(content_type)) return AM_EINVAL;
-    if (strlen(key) >= AM_SHARED_CACHE_KEY_SIZE) return AM_E2BIG;
+    cache_data = (struct am_cache *) cache->user;
 
-    us = strlen(url);
-    fs = strlen(file);
-    cs = strlen(content_type);
+    url_length = strlen(url);
+    file_length = strlen(file);
+    content_type_length = strlen(content_type);
 
     key_hash = hash((void *) key);
     entry_index = index_for(AM_SHARED_CACHE_SIZE, key_hash);
 
     am_shm_lock(cache);
 
-    c = get_cache_entry(key, NULL);
-    if (c != NULL) {
-        if (!delete_cache_entry(entry_index, c)) {
-            am_shm_free(cache, c);
+    cache_entry = get_cache_entry(key, NULL);
+    if (cache_entry != NULL) {
+        if (!delete_cache_entry(entry_index, cache_entry)) {
+            am_shm_free(cache, cache_entry);
             cache_data->count--;
-            c = NULL;
+            cache_entry = NULL;
         } else {
-            am_log_error(r->instance_id, "%s failed to remove cache entry (%s)",
+            AM_LOG_ERROR(request->instance_id, "%s failed to remove cache entry (%s)",
                     thisfunc, key);
             am_shm_unlock(cache);
             return AM_ERROR;
         }
     }
 
-    c = am_shm_alloc(cache, sizeof (struct am_cache_entry));
-    if (c == NULL) {
-        am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+    cache_entry = am_shm_alloc(cache, sizeof (struct am_cache_entry));
+    if (cache_entry == NULL) {
+        AM_LOG_ERROR(request->instance_id, "%s failed to allocate %ld bytes",
                 thisfunc, sizeof (struct am_cache_entry));
         am_shm_unlock(cache);
         return AM_ENOMEM;
     }
 
-    c->ts = time(NULL);
-    c->valid = r->conf->pdp_cache_valid;
-    c->instance_id = r->instance_id;
-    strncpy(c->key, key, sizeof (c->key) - 1);
+    cache_entry->ts = time(NULL);
+    cache_entry->valid = request->conf->pdp_cache_valid;
+    cache_entry->instance_id = request->instance_id;
+    strncpy(cache_entry->key, key, sizeof (cache_entry->key) - 1);
 
-    c->data.next = c->data.prev = 0;
-    c->lh.next = c->lh.prev = 0;
-    am_offset_list_insert(cache->pool, c, &(cache_data->table[entry_index]), struct am_cache_entry);
+    cache_entry->data.next = cache_entry->data.prev = 0;
+    cache_entry->lh.next = cache_entry->lh.prev = 0;
+    AM_OFFSET_LIST_INSERT(cache->pool, cache_entry, &(cache_data->table[entry_index]), struct am_cache_entry);
 
-    ca = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +us + fs + cs + 3);
-    if (ca == NULL) {
-        am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+    cache_entry_data = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +url_length + file_length + content_type_length + 3);
+    if (cache_entry_data == NULL) {
+        AM_LOG_ERROR(request->instance_id, "%s failed to allocate %ld bytes",
                 thisfunc, sizeof (struct am_cache_entry_data));
         am_shm_unlock(cache);
         return AM_ENOMEM;
     }
 
-    ca->type = AM_CACHE_PDP;
-    ca->method = AM_REQUEST_UNKNOWN;
-    ca->ttl = 0;
-    ca->size[0] = us;
-    ca->size[1] = fs;
-    ca->size[2] = cs;
-    memcpy(ca->value, url, ca->size[0]);
-    ca->value[ca->size[0]] = 0;
-    memcpy(ca->value + ca->size[0] + 1, file, ca->size[1]);
-    ca->value[ca->size[0] + ca->size[1] + 1] = 0;
-    memcpy(ca->value + ca->size[0] + ca->size[1] + 2, content_type, ca->size[2]);
-    ca->value[ca->size[0] + ca->size[1] + ca->size[2] + 2] = 0;
-    ca->lh.next = ca->lh.prev = 0;
+    cache_entry_data->type = AM_CACHE_PDP;
+    cache_entry_data->method = AM_REQUEST_UNKNOWN;
+    cache_entry_data->ttl = 0;
+    cache_entry_data->size[0] = url_length;
+    cache_entry_data->size[1] = file_length;
+    cache_entry_data->size[2] = content_type_length;
+    memcpy(cache_entry_data->value, url, cache_entry_data->size[0]);
+    cache_entry_data->value[cache_entry_data->size[0]] = 0;
+    memcpy(cache_entry_data->value + cache_entry_data->size[0] + 1, file, cache_entry_data->size[1]);
+    cache_entry_data->value[cache_entry_data->size[0] + cache_entry_data->size[1] + 1] = 0;
+    memcpy(cache_entry_data->value + cache_entry_data->size[0] + cache_entry_data->size[1] + 2, content_type,
+            cache_entry_data->size[2]);
+    cache_entry_data->value[cache_entry_data->size[0] + cache_entry_data->size[1] + cache_entry_data->size[2] + 2] = 0;
+    cache_entry_data->lh.next = cache_entry_data->lh.prev = 0;
 
-    am_offset_list_insert(cache->pool, ca, &(c->data), struct am_cache_entry_data);
+    AM_OFFSET_LIST_INSERT(cache->pool, cache_entry_data, &(cache_entry->data), struct am_cache_entry_data);
 
     cache_data->count += 1;
 
@@ -366,33 +367,35 @@ int am_add_pdp_cache_entry(am_request_t *r, const char *key, const char *url,
  * Delete a shared cache entry (key: any)
  */
 int am_remove_cache_entry(unsigned long instance_id, const char *key) {
-    const char *thisfunc = "am_remove_cache_entry():";
+    static const char *thisfunc = "am_remove_cache_entry():";
     int entry_index = 0;
     int rv;
-    struct am_cache_entry *c;
-    struct am_cache *cache_data = cache != NULL ? (struct am_cache *) cache->user : NULL;
+    struct am_cache_entry *cache_entry;
+    struct am_cache *cache_data;
 
-    if (cache_data == NULL) return AM_ENOMEM;
-    if (!ISVALID(key)) return AM_EINVAL;
+    if (cache == NULL || cache->user == NULL) {
+        return AM_ENOMEM;
+    }
+    if (!ISVALID(key)) {
+        return AM_EINVAL;
+    }
     am_shm_lock(cache);
 
-    c = get_cache_entry(key, &entry_index);
-    if (c == NULL) {
-        am_log_warning(instance_id, "%s cache data is not available (%s)",
-                thisfunc, key);
+    cache_data = (struct am_cache *) cache->user;
+    cache_entry = get_cache_entry(key, &entry_index);
+    if (cache_entry == NULL) {
+        AM_LOG_WARNING(instance_id, "%s cache data is not available (%s)", thisfunc, key);
         am_shm_unlock(cache);
         return AM_NOT_FOUND;
     }
 
-    rv = delete_cache_entry(entry_index, c);
+    rv = delete_cache_entry(entry_index, cache_entry);
     if (rv != 0) {
-        am_log_error(instance_id, "%s failed to remove cache entry (%s)",
-                thisfunc, key);
+        AM_LOG_ERROR(instance_id, "%s failed to remove cache entry (%s)", thisfunc, key);
     } else {
-        am_shm_free(cache, c);
+        am_shm_free(cache, cache_entry);
         cache_data->count--;
-        am_log_debug(instance_id, "%s cache entry removed (%s)",
-                thisfunc, key);
+        AM_LOG_DEBUG(instance_id, "%s cache entry removed (%s)", thisfunc, key);
     }
     am_shm_unlock(cache);
     return rv;
@@ -403,7 +406,7 @@ int am_remove_cache_entry(unsigned long instance_id, const char *key) {
  */
 int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
         struct am_policy_result **policy, struct am_namevalue **session, time_t *ets) {
-    const char *thisfunc = "am_get_session_policy_cache_entry():";
+    static const char *thisfunc = "am_get_session_policy_cache_entry():";
     int i = -1, entry_index, status = AM_NOT_FOUND;
     struct am_cache_entry *c;
     struct am_cache_entry_data *a, *t, *h;
@@ -418,15 +421,15 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
 
     c = get_cache_entry(key, &entry_index);
     if (c == NULL) {
-        am_log_warning(r->instance_id, "%s failed to locate data for a key (%s)",
+        AM_LOG_WARNING(r->instance_id, "%s failed to locate data for a key (%s)",
                 thisfunc, key);
         am_shm_unlock(cache);
         return AM_NOT_FOUND;
     }
 
-    if (r->conf->token_cache_valid > 0) {
+    if (c->valid > 0) {
         time_t ts = c->ts;
-        ts += r->conf->token_cache_valid;
+        ts += c->valid;
         if (difftime(time(NULL), ts) >= 0) {
             char tsc[32], tsu[32];
             struct tm created, until;
@@ -434,7 +437,7 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
             localtime_r(&ts, &until);
             strftime(tsc, sizeof (tsc), AM_CACHE_TIMEFORMAT, &created);
             strftime(tsu, sizeof (tsu), AM_CACHE_TIMEFORMAT, &until);
-            am_log_warning(r->instance_id, "%s data for a key (%s) is obsolete (created: %s, valid until: %s)",
+            AM_LOG_WARNING(r->instance_id, "%s data for a key (%s) is obsolete (created: %s, valid until: %s)",
                     thisfunc, key, tsc, tsu);
 
             /*if (!delete_cache_entry(entry_index, c)) {
@@ -448,21 +451,21 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
         }
     }
 
-    h = (struct am_cache_entry_data *) am_get_pointer(cache->pool, c->data.prev);
+    h = (struct am_cache_entry_data *) AM_GET_POINTER(cache->pool, c->data.prev);
 
-    am_offset_list_for_each(cache->pool, h, a, t, struct am_cache_entry_data) {
+    AM_OFFSET_LIST_FOR_EACH(cache->pool, h, a, t, struct am_cache_entry_data) {
 
         if (a->type == AM_CACHE_SESSION && a->size[0] > 0 && a->size[1] > 0) {
             struct am_namevalue *el = NULL;
             if (create_am_namevalue_node(a->value, a->size[0], a->value + a->size[0] + 1, a->size[1], &el) == 0) {
-                am_list_insert(sesion_attrs, el);
+                AM_LIST_INSERT(sesion_attrs, el);
             }
         } else if ((a->type & AM_CACHE_POLICY) == AM_CACHE_POLICY) {
 
             if (/*a->type == AM_CACHE_POLICY && a->index != -1 && a->scope != -1 &&*/ i != a->index) {
                 struct am_policy_result *el = NULL;
                 if (create_am_policy_result_node(a->value, a->size[0], &el) == 0) {
-                    am_list_insert(pol_attrs, el);
+                    AM_LIST_INSERT(pol_attrs, el);
                     el->index = i = a->index;
                     el->scope = a->scope;
                     pol_curr = el;
@@ -472,7 +475,7 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
             if (pol_curr == NULL) continue;
 
             if (a->type == AM_CACHE_POLICY && i == a->index && pol_curr != NULL) {
-                if (pol_curr->resource) free(pol_curr->resource);
+                am_free(pol_curr->resource);
                 pol_curr->resource = strndup(a->value, a->size[0]);
                 pol_curr->scope = a->scope;
             }
@@ -480,13 +483,13 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
             if ((a->type & AM_CACHE_POLICY_RESPONSE_A) == AM_CACHE_POLICY_RESPONSE_A && a->size[0] > 0 && a->size[1] > 0) {
                 struct am_namevalue *el = NULL;
                 if (create_am_namevalue_node(a->value, a->size[0], a->value + a->size[0] + 1, a->size[1], &el) == 0) {
-                    am_list_insert(pol_curr->response_attributes, el);
+                    AM_LIST_INSERT(pol_curr->response_attributes, el);
                 }
             }
             if ((a->type & AM_CACHE_POLICY_RESPONSE_D) == AM_CACHE_POLICY_RESPONSE_D && a->size[0] > 0 && a->size[1] > 0) {
                 struct am_namevalue *el = NULL;
                 if (create_am_namevalue_node(a->value, a->size[0], a->value + a->size[0] + 1, a->size[1], &el) == 0) {
-                    am_list_insert(pol_curr->response_decisions, el);
+                    AM_LIST_INSERT(pol_curr->response_decisions, el);
                 }
             }
             if ((a->type & AM_CACHE_POLICY_ACTION) == AM_CACHE_POLICY_ACTION) {
@@ -495,13 +498,13 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
                 if ((a->type & AM_CACHE_POLICY_ALLOW) == AM_CACHE_POLICY_ALLOW) act = AM_TRUE;
                 if ((a->type & AM_CACHE_POLICY_DENY) == AM_CACHE_POLICY_DENY) act = AM_FALSE;
                 if (create_am_action_decision_node(act, a->method, a->ttl, &el) == 0) {
-                    am_list_insert(pol_curr->action_decisions, el);
+                    AM_LIST_INSERT(pol_curr->action_decisions, el);
                 }
             }
             if ((a->type & AM_CACHE_POLICY_ADVICE) == AM_CACHE_POLICY_ADVICE && a->size[0] > 0 && a->size[1] > 0) {
                 struct am_namevalue *el = NULL;
                 if (create_am_namevalue_node(a->value, a->size[0], a->value + a->size[0] + 1, a->size[1], &el) == 0) {
-                    am_list_insert(pol_curr->action_decisions->advices, el);
+                    AM_LIST_INSERT(pol_curr->action_decisions->advices, el);
                 }
             }
         }
@@ -522,9 +525,9 @@ int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
  */
 int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
         struct am_policy_result *policy, struct am_namevalue *session) {
-    const char *thisfunc = "am_add_session_policy_cache_entry():";
+    static const char *thisfunc = "am_add_session_policy_cache_entry():";
     unsigned int key_hash;
-    int entry_index = 0;
+    int entry_index = 0, max_caching, time_left;
 
     struct am_cache_entry *c;
     struct am_cache *cache_data = cache != NULL ? (struct am_cache *) cache->user : NULL;
@@ -545,7 +548,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
             cache_data->count--;
             c = NULL;
         } else {
-            am_log_error(r->instance_id, "%s failed to remove cache entry (%s)",
+            AM_LOG_ERROR(r->instance_id, "%s failed to remove cache entry (%s)",
                     thisfunc, key);
             am_shm_unlock(cache);
             return AM_ERROR;
@@ -554,30 +557,35 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
 
     c = am_shm_alloc(cache, sizeof (struct am_cache_entry));
     if (c == NULL) {
-        am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+        AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                 thisfunc, sizeof (struct am_cache_entry));
         am_shm_unlock(cache);
         return AM_ENOMEM;
     }
 
+    /* maxcaching value is in minutes, timeleft in seconds */
+    max_caching = get_ttl_value(session, "maxcaching", r->conf->token_cache_valid, AM_TRUE);
+    time_left = get_ttl_value(session, "timeleft", r->conf->token_cache_valid, AM_FALSE);
+
     c->ts = time(NULL);
-    c->valid = 0; //TODO: r->conf->pdp_cache_valid;
+    c->valid = r->conf->token_cache_valid <= max_caching ?
+            r->conf->token_cache_valid : (max_caching < time_left ? max_caching : time_left);
     c->instance_id = r->instance_id;
     strncpy(c->key, key, sizeof (c->key) - 1);
 
     c->data.next = c->data.prev = 0;
     c->lh.next = c->lh.prev = 0;
 
-    am_offset_list_insert(cache->pool, c, &(cache_data->table[entry_index]), struct am_cache_entry);
+    AM_OFFSET_LIST_INSERT(cache->pool, c, &(cache_data->table[entry_index]), struct am_cache_entry);
     cache_data->count += 1;
 
     if (session != NULL) {
         struct am_namevalue *e, *t;
 
-        am_list_for_each(session, e, t) {
+        AM_LIST_FOR_EACH(session, e, t) {
             struct am_cache_entry_data *x = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +e->ns + e->vs + 2);
             if (x == NULL) {
-                am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+                AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                         thisfunc, sizeof (struct am_cache_entry_data));
                 am_shm_unlock(cache);
                 return AM_ENOMEM;
@@ -585,7 +593,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
             x->type = AM_CACHE_SESSION;
             x->method = AM_REQUEST_UNKNOWN;
             x->scope = x->index = -1; /*not used in this context*/
-            x->ttl = 0; //TODO: ?
+            x->ttl = c->ts + c->valid;
             x->size[0] = e->ns;
             x->size[1] = e->vs;
             x->size[2] = 0;
@@ -593,11 +601,9 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
             x->value[x->size[0]] = 0;
             memcpy(x->value + x->size[0] + 1, e->v, x->size[1]);
             x->value[x->size[0] + x->size[1] + 1] = 0;
-            /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
-            x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
             x->lh.next = x->lh.prev = 0;
 
-            am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
+            AM_OFFSET_LIST_INSERT(cache->pool, x, &(c->data), struct am_cache_entry_data);
         }
     }
 
@@ -609,14 +615,14 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
         struct am_action_decision *ae, *at;
         struct am_namevalue *aee, *att;
 
-        am_list_for_each(policy, e, t) {
+        AM_LIST_FOR_EACH(policy, e, t) {
 
             {
                 /*add policy entry (per resource)*/
                 size_t rs = strlen(e->resource);
                 struct am_cache_entry_data *x = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +rs + 1);
                 if (x == NULL) {
-                    am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+                    AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                             thisfunc, sizeof (struct am_cache_entry_data));
                     am_shm_unlock(cache);
                     return AM_ENOMEM;
@@ -626,26 +632,22 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->method = AM_REQUEST_UNKNOWN;
                 x->scope = e->scope;
                 x->index = e->index;
-                x->ttl = 0;
+                x->ttl = c->ts + c->valid;
                 x->size[0] = rs;
                 x->size[1] = 0;
                 x->size[2] = 0;
                 memcpy(x->value, e->resource, x->size[0]);
                 x->value[x->size[0]] = 0;
-                /*memcpy(x->value + x->size[0] + 1, rae->v, x->size[1]);
-                x->value[x->size[0] + x->size[1] + 1] = 0;
-                memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
-                x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
                 x->lh.next = x->lh.prev = 0;
 
-                am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
+                AM_OFFSET_LIST_INSERT(cache->pool, x, &(c->data), struct am_cache_entry_data);
             }
 
-            am_list_for_each(e->response_attributes, rae, rat) {
+            AM_LIST_FOR_EACH(e->response_attributes, rae, rat) {
                 /*add response attributes*/
                 struct am_cache_entry_data *x = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +rae->ns + rae->vs + 2);
                 if (x == NULL) {
-                    am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+                    AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                             thisfunc, sizeof (struct am_cache_entry_data));
                     am_shm_unlock(cache);
                     return AM_ENOMEM;
@@ -655,7 +657,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->method = AM_REQUEST_UNKNOWN;
                 x->scope = -1;
                 x->index = e->index;
-                x->ttl = 0;
+                x->ttl = c->ts + c->valid;
                 x->size[0] = rae->ns;
                 x->size[1] = rae->vs;
                 x->size[2] = 0;
@@ -663,27 +665,25 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->value[x->size[0]] = 0;
                 memcpy(x->value + x->size[0] + 1, rae->v, x->size[1]);
                 x->value[x->size[0] + x->size[1] + 1] = 0;
-                /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
-                x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
                 x->lh.next = x->lh.prev = 0;
 
-                am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
+                AM_OFFSET_LIST_INSERT(cache->pool, x, &(c->data), struct am_cache_entry_data);
             }
 
-            am_list_for_each(e->action_decisions, ae, at) {
+            AM_LIST_FOR_EACH(e->action_decisions, ae, at) {
 
                 {
                     /*add action decision*/
                     struct am_cache_entry_data *x = am_shm_alloc(cache, sizeof (struct am_cache_entry_data));
                     if (x == NULL) {
-                        am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+                        AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                                 thisfunc, sizeof (struct am_cache_entry_data));
                         am_shm_unlock(cache);
                         return AM_ENOMEM;
                     }
 
                     x->type = AM_CACHE_POLICY | AM_CACHE_POLICY_ACTION;
-                    if (ae->action == AM_TRUE) x->type |= AM_CACHE_POLICY_ALLOW;
+                    if (ae->action) x->type |= AM_CACHE_POLICY_ALLOW;
                     else x->type |= AM_CACHE_POLICY_DENY;
                     x->method = ae->method;
                     x->ttl = ae->ttl;
@@ -692,22 +692,16 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                     x->size[0] = 0;
                     x->size[1] = 0;
                     x->size[2] = 0;
-                    /*memcpy(x->value, e->resource, x->size[0]);
-                    x->value[x->size[0]] = 0;
-                    memcpy(x->value + x->size[0] + 1, rae->v, x->size[1]);
-                    x->value[x->size[0] + x->size[1] + 1] = 0;
-                    memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
-                    x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
                     x->lh.next = x->lh.prev = 0;
 
-                    am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
+                    AM_OFFSET_LIST_INSERT(cache->pool, x, &(c->data), struct am_cache_entry_data);
                 }
 
-                am_list_for_each(ae->advices, aee, att) {
+                AM_LIST_FOR_EACH(ae->advices, aee, att) {
                     /*add advices*/
                     struct am_cache_entry_data *x = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +aee->ns + aee->vs + 2);
                     if (x == NULL) {
-                        am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+                        AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                                 thisfunc, sizeof (struct am_cache_entry_data));
                         am_shm_unlock(cache);
                         return AM_ENOMEM;
@@ -717,7 +711,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                     x->method = AM_REQUEST_UNKNOWN;
                     x->scope = -1;
                     x->index = e->index;
-                    x->ttl = 0;
+                    x->ttl = c->ts + c->valid;
                     x->size[0] = aee->ns;
                     x->size[1] = aee->vs;
                     x->size[2] = 0;
@@ -725,19 +719,17 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                     x->value[x->size[0]] = 0;
                     memcpy(x->value + x->size[0] + 1, aee->v, x->size[1]);
                     x->value[x->size[0] + x->size[1] + 1] = 0;
-                    /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
-                    x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
                     x->lh.next = x->lh.prev = 0;
 
-                    am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
+                    AM_OFFSET_LIST_INSERT(cache->pool, x, &(c->data), struct am_cache_entry_data);
                 }
             }
 
-            am_list_for_each(e->response_decisions, rde, rdt) {
+            AM_LIST_FOR_EACH(e->response_decisions, rde, rdt) {
                 /*add response decisions (profile attributes)*/
                 struct am_cache_entry_data *x = am_shm_alloc(cache, sizeof (struct am_cache_entry_data) +rde->ns + rde->vs + 2);
                 if (x == NULL) {
-                    am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+                    AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                             thisfunc, sizeof (struct am_cache_entry_data));
                     am_shm_unlock(cache);
                     return AM_ENOMEM;
@@ -747,7 +739,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->method = AM_REQUEST_UNKNOWN;
                 x->scope = -1;
                 x->index = e->index;
-                x->ttl = 0;
+                x->ttl = c->ts + c->valid;
                 x->size[0] = rde->ns;
                 x->size[1] = rde->vs;
                 x->size[2] = 0;
@@ -755,11 +747,9 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
                 x->value[x->size[0]] = 0;
                 memcpy(x->value + x->size[0] + 1, rde->v, x->size[1]);
                 x->value[x->size[0] + x->size[1] + 1] = 0;
-                /*memcpy(x->value + x->size[0] + x->size[1] + 2, content_type, x->size[2]);
-                x->value[x->size[0] + x->size[1] + x->size[2] + 2] = 0;*/
                 x->lh.next = x->lh.prev = 0;
 
-                am_offset_list_insert(cache->pool, x, &(c->data), struct am_cache_entry_data);
+                AM_OFFSET_LIST_INSERT(cache->pool, x, &(c->data), struct am_cache_entry_data);
             }
         }
     }
@@ -769,7 +759,7 @@ int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
 }
 
 int am_get_policy_cache_entry(am_request_t *r, const char *key) {
-    const char *thisfunc = "am_get_policy_cache_entry():";
+    static const char *thisfunc = "am_get_policy_cache_entry():";
     int entry_index = 0;
     struct am_cache_entry *c;
     struct am_cache *cache_data = cache != NULL ? (struct am_cache *) cache->user : NULL;
@@ -780,15 +770,15 @@ int am_get_policy_cache_entry(am_request_t *r, const char *key) {
 
     c = get_cache_entry(key, &entry_index);
     if (c == NULL) {
-        am_log_warning(r->instance_id, "%s failed to locate data for a key (%s)",
+        AM_LOG_WARNING(r->instance_id, "%s failed to locate data for a key (%s)",
                 thisfunc, key);
         am_shm_unlock(cache);
         return AM_NOT_FOUND;
     }
 
-    if (r->conf->policy_cache_valid > 0) {
+    if (c->valid > 0) {
         time_t ts = c->ts;
-        ts += r->conf->policy_cache_valid;
+        ts += c->valid;
         if (difftime(time(NULL), ts) >= 0) {
             char tsc[32], tsu[32];
             struct tm created, until;
@@ -796,7 +786,7 @@ int am_get_policy_cache_entry(am_request_t *r, const char *key) {
             localtime_r(&ts, &until);
             strftime(tsc, sizeof (tsc), AM_CACHE_TIMEFORMAT, &created);
             strftime(tsu, sizeof (tsu), AM_CACHE_TIMEFORMAT, &until);
-            am_log_warning(r->instance_id, "%s data for a key (%s) is obsolete (created: %s, valid until: %s)",
+            AM_LOG_WARNING(r->instance_id, "%s data for a key (%s) is obsolete (created: %s, valid until: %s)",
                     thisfunc, key, tsc, tsu);
             if (!delete_cache_entry(entry_index, c)) {
                 am_shm_free(cache, c);
@@ -815,7 +805,7 @@ int am_get_policy_cache_entry(am_request_t *r, const char *key) {
  * Add policy cache entry (key: ResourceResult name).
  */
 int am_add_policy_cache_entry(am_request_t *r, const char *key, int valid) {
-    const char *thisfunc = "am_add_policy_cache_entry():";
+    static const char *thisfunc = "am_add_policy_cache_entry():";
     unsigned int key_hash;
     int entry_index = 0;
     struct am_cache_entry *c;
@@ -837,7 +827,7 @@ int am_add_policy_cache_entry(am_request_t *r, const char *key, int valid) {
             cache_data->count--;
             c = NULL;
         } else {
-            am_log_error(r->instance_id, "%s failed to remove cache entry (%s)",
+            AM_LOG_ERROR(r->instance_id, "%s failed to remove cache entry (%s)",
                     thisfunc, key);
             am_shm_unlock(cache);
             return 1;
@@ -846,21 +836,22 @@ int am_add_policy_cache_entry(am_request_t *r, const char *key, int valid) {
 
     c = am_shm_alloc(cache, sizeof (struct am_cache_entry));
     if (c == NULL) {
-        am_log_error(r->instance_id, "%s failed to allocate %ld bytes",
+        AM_LOG_ERROR(r->instance_id, "%s failed to allocate %ld bytes",
                 thisfunc, sizeof (struct am_cache_entry));
         am_shm_unlock(cache);
         return AM_ENOMEM;
     }
 
     c->ts = time(NULL);
-    c->valid = valid;
+    c->valid = r->conf->policy_cache_valid > 0 &&
+            r->conf->policy_cache_valid < valid ? r->conf->policy_cache_valid : valid;
     c->instance_id = r->instance_id;
     strncpy(c->key, key, sizeof (c->key) - 1);
 
     c->data.next = c->data.prev = 0;
     c->lh.next = c->lh.prev = 0;
 
-    am_offset_list_insert(cache->pool, c, &(cache_data->table[entry_index]), struct am_cache_entry);
+    AM_OFFSET_LIST_INSERT(cache->pool, c, &(cache_data->table[entry_index]), struct am_cache_entry);
     cache_data->count += 1;
 
     am_shm_unlock(cache);

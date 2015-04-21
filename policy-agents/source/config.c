@@ -18,6 +18,7 @@
 #include "am.h"
 #include "utility.h"
 #include "list.h"
+#include "net_client.h"
 
 #define MAKE_TYPE(t,s) (s << 16 | t)
 #define GET_TYPE(r)    (r & 0xFFFF)
@@ -88,6 +89,7 @@ enum {
     AM_CONF_NEF_ATTR,
     AM_CONF_NEF_MAP,
     AM_CONF_NEF_IP_MAP,
+    AM_CONF_NEF_EXT_MAP,
     AM_CONF_PDP,
     AM_CONF_PDP_LBCOOKIE,
     AM_CONF_PDP_CACHE,
@@ -151,9 +153,7 @@ struct am_instance_entry_data {
 static am_shm_t *conf = NULL;
 
 int am_configuration_init() {
-    int status = AM_SUCCESS;
-    if (conf != NULL)
-        return status;
+    if (conf != NULL) return AM_SUCCESS;
 
     conf = am_shm_create("am_shared_conf", sizeof (struct am_instance) * 2048 * AM_MAX_INSTANCES);
     if (conf == NULL) {
@@ -163,24 +163,23 @@ int am_configuration_init() {
         return conf->error;
     }
 
-    if (conf->init == 1) {
+    if (conf->init) {
         /* allocate the table itself */
         struct am_instance *instance_data = (struct am_instance *) am_shm_alloc(conf, sizeof (struct am_instance));
-        if (instance_data != NULL) {
-            am_shm_lock(conf);
-            /* initialize head node */
-            instance_data->list.next = instance_data->list.prev = 0;
-            conf->user = instance_data;
-            /*store instance_data offset (for other processes)*/
-            am_shm_set_user_offset(conf, am_get_offset(conf->pool, instance_data));
-            am_shm_unlock(conf);
-        } else {
+        if (instance_data == NULL) {
             conf->user = NULL;
-            status = AM_ENOMEM;
+            return AM_ENOMEM;
         }
+        am_shm_lock(conf);
+        /* initialize head node */
+        instance_data->list.next = instance_data->list.prev = 0;
+        conf->user = instance_data;
+        /*store instance_data offset (for other processes)*/
+        am_shm_set_user_offset(conf, AM_GET_OFFSET(conf->pool, instance_data));
+        am_shm_unlock(conf);
     }
 
-    return status;
+    return AM_SUCCESS;
 }
 
 int am_configuration_shutdown() {
@@ -193,9 +192,9 @@ static struct am_instance_entry *get_instance_entry(unsigned long instance_id) {
     struct am_instance *instance_data = conf != NULL ? (struct am_instance *) conf->user : NULL;
 
     if (instance_data != NULL) {
-        h = (struct am_instance_entry *) am_get_pointer(conf->pool, instance_data->list.prev);
+        h = (struct am_instance_entry *) AM_GET_POINTER(conf->pool, instance_data->list.prev);
 
-        am_offset_list_for_each(conf->pool, h, e, t, struct am_instance_entry) {
+        AM_OFFSET_LIST_FOR_EACH(conf->pool, h, e, t, struct am_instance_entry) {
             if (instance_id == e->instance_id) {
                 return e;
             }
@@ -212,9 +211,9 @@ static int delete_instance_entry(struct am_instance_entry *e) {
     if (e == NULL) return AM_EINVAL;
 
     /* cleanup instance entry data */
-    h = (struct am_instance_entry_data *) am_get_pointer(conf->pool, e->data.prev);
+    h = (struct am_instance_entry_data *) AM_GET_POINTER(conf->pool, e->data.prev);
 
-    am_offset_list_for_each(conf->pool, h, i, t, struct am_instance_entry_data) {
+    AM_OFFSET_LIST_FOR_EACH(conf->pool, h, i, t, struct am_instance_entry_data) {
         am_shm_free(conf, i);
     }
 
@@ -222,13 +221,13 @@ static int delete_instance_entry(struct am_instance_entry *e) {
     if (e->lh.prev == 0) {
         instance_data->list.prev = e->lh.next;
     } else {
-        ((struct am_instance_entry *) am_get_pointer(conf->pool, e->lh.prev))->lh.next = e->lh.next;
+        ((struct am_instance_entry *) AM_GET_POINTER(conf->pool, e->lh.prev))->lh.next = e->lh.next;
     }
 
     if (e->lh.next == 0) {
         instance_data->list.next = e->lh.prev;
     } else {
-        ((struct am_instance_entry *) am_get_pointer(conf->pool, e->lh.next))->lh.prev = e->lh.prev;
+        ((struct am_instance_entry *) AM_GET_POINTER(conf->pool, e->lh.next))->lh.prev = e->lh.prev;
     }
     return rv;
 }
@@ -238,11 +237,11 @@ void remove_agent_instance_byname(const char *name) {
     struct am_instance *instance_data = conf != NULL ? (struct am_instance *) conf->user : NULL;
 
     if (instance_data == NULL) return;
-    h = (struct am_instance_entry *) am_get_pointer(conf->pool, instance_data->list.prev);
+    h = (struct am_instance_entry *) AM_GET_POINTER(conf->pool, instance_data->list.prev);
 
     am_shm_lock(conf);
 
-    am_offset_list_for_each(conf->pool, h, e, t, struct am_instance_entry) {
+    AM_OFFSET_LIST_FOR_EACH(conf->pool, h, e, t, struct am_instance_entry) {
         if (strcmp(e->name, name) == 0) {
             am_remove_cache_entry(e->instance_id, e->token); /*delete cached agent session data*/
             am_agent_init_set_value(e->instance_id, AM_TRUE, AM_FALSE); /*set this instance to 'unconfigured'*/
@@ -264,7 +263,7 @@ void remove_agent_instance_byname(const char *name) {
         x->num_value = v;\
         x->size[0] = x->size[1] = 0;\
         x->lh.next = x->lh.prev = 0;\
-        am_offset_list_insert(cf->pool, x, h, struct am_instance_entry_data);\
+        AM_OFFSET_LIST_INSERT(cf->pool, x, h, struct am_instance_entry_data);\
     } while(0)
 
 #define SAVE_CHAR_VALUE(cf,h,t,v) \
@@ -279,7 +278,7 @@ void remove_agent_instance_byname(const char *name) {
         memcpy(x->value, v, x->size[0]);\
         x->value[x->size[0]] = 0;\
         x->lh.next = x->lh.prev = 0;\
-        am_offset_list_insert(cf->pool, x, h, struct am_instance_entry_data);\
+        AM_OFFSET_LIST_INSERT(cf->pool, x, h, struct am_instance_entry_data);\
     } while(0)
 
 #define SAVE_CHAR2_VALUE(cf,h,t,v,k) \
@@ -297,7 +296,7 @@ void remove_agent_instance_byname(const char *name) {
         memcpy(x->value + x->size[0] + 1, k, x->size[1]);\
         x->value[x->size[0] + x->size[1] + 1] = 0;\
         x->lh.next = x->lh.prev = 0;\
-        am_offset_list_insert(cf->pool, x, h, struct am_instance_entry_data);\
+        AM_OFFSET_LIST_INSERT(cf->pool, x, h, struct am_instance_entry_data);\
     } while(0)
 
 static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am_config_t *c, char all) {
@@ -410,9 +409,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->login_url_sz > 0 && c->login_url != NULL) {
             for (i = 0; i < c->login_url_sz; i++) {
-                am_config_map_t v = c->login_url[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_LOGIN_URL, c->login_url_sz), v.name, v.value);
+                am_config_map_t *v = &c->login_url[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_LOGIN_URL, c->login_url_sz), v->name, v->value);
                 }
             }
         }
@@ -445,9 +444,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->profile_attr_map_sz > 0 && c->profile_attr_map != NULL) {
             for (i = 0; i < c->profile_attr_map_sz; i++) {
-                am_config_map_t v = c->profile_attr_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_PROF_ATTR_MAP, c->profile_attr_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->profile_attr_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_PROF_ATTR_MAP, c->profile_attr_map_sz), v->name, v->value);
                 }
             }
         }
@@ -456,9 +455,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->session_attr_map_sz > 0 && c->session_attr_map != NULL) {
             for (i = 0; i < c->session_attr_map_sz; i++) {
-                am_config_map_t v = c->session_attr_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_SESS_ATTR_MAP, c->session_attr_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->session_attr_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_SESS_ATTR_MAP, c->session_attr_map_sz), v->name, v->value);
                 }
             }
         }
@@ -467,9 +466,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->response_attr_map_sz > 0 && c->response_attr_map != NULL) {
             for (i = 0; i < c->response_attr_map_sz; i++) {
-                am_config_map_t v = c->response_attr_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_RESP_ATTR_MAP, c->response_attr_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->response_attr_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_RESP_ATTR_MAP, c->response_attr_map_sz), v->name, v->value);
                 }
             }
         }
@@ -490,9 +489,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->fqdn_map_sz > 0 && c->fqdn_map != NULL) {
             for (i = 0; i < c->fqdn_map_sz; i++) {
-                am_config_map_t v = c->fqdn_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_FQDN_MAP, c->fqdn_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->fqdn_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_FQDN_MAP, c->fqdn_map_sz), v->name, v->value);
                 }
             }
         }
@@ -501,9 +500,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->cookie_reset_map_sz > 0 && c->cookie_reset_map != NULL) {
             for (i = 0; i < c->cookie_reset_map_sz; i++) {
-                am_config_map_t v = c->cookie_reset_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_COOKIE_RESET_MAP, c->cookie_reset_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->cookie_reset_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_COOKIE_RESET_MAP, c->cookie_reset_map_sz), v->name, v->value);
                 }
             }
         }
@@ -515,17 +514,25 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->not_enforced_map_sz > 0 && c->not_enforced_map != NULL) {
             for (i = 0; i < c->not_enforced_map_sz; i++) {
-                am_config_map_t v = c->not_enforced_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_NEF_MAP, c->not_enforced_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->not_enforced_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_NEF_MAP, c->not_enforced_map_sz), v->name, v->value);
+                }
+            }
+        }
+        if (c->not_enforced_ext_map_sz > 0 && c->not_enforced_ext_map != NULL) {
+            for (i = 0; i < c->not_enforced_ext_map_sz; i++) {
+                am_config_map_t *v = &c->not_enforced_ext_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_NEF_EXT_MAP, c->not_enforced_ext_map_sz), v->name, v->value);
                 }
             }
         }
         if (c->not_enforced_ip_map_sz > 0 && c->not_enforced_ip_map != NULL) {
             for (i = 0; i < c->not_enforced_ip_map_sz; i++) {
-                am_config_map_t v = c->not_enforced_ip_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_NEF_IP_MAP, c->not_enforced_ip_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->not_enforced_ip_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_NEF_IP_MAP, c->not_enforced_ip_map_sz), v->name, v->value);
                 }
             }
         }
@@ -555,25 +562,25 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->cdsso_login_map_sz > 0 && c->cdsso_login_map != NULL) {
             for (i = 0; i < c->cdsso_login_map_sz; i++) {
-                am_config_map_t v = c->cdsso_login_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_CDSSO_LOGIN_MAP, c->cdsso_login_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->cdsso_login_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_CDSSO_LOGIN_MAP, c->cdsso_login_map_sz), v->name, v->value);
                 }
             }
         }
         if (c->cdsso_cookie_domain_map_sz > 0 && c->cdsso_cookie_domain_map != NULL) {
             for (i = 0; i < c->cdsso_cookie_domain_map_sz; i++) {
-                am_config_map_t v = c->cdsso_cookie_domain_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_CDSSO_COOKIE_MAP, c->cdsso_cookie_domain_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->cdsso_cookie_domain_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_CDSSO_COOKIE_MAP, c->cdsso_cookie_domain_map_sz), v->name, v->value);
                 }
             }
         }
         if (c->logout_cookie_reset_map_sz > 0 && c->logout_cookie_reset_map != NULL) {
             for (i = 0; i < c->logout_cookie_reset_map_sz; i++) {
-                am_config_map_t v = c->logout_cookie_reset_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_LOGOUT_COOKIE_MAP, c->logout_cookie_reset_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->logout_cookie_reset_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_LOGOUT_COOKIE_MAP, c->logout_cookie_reset_map_sz), v->name, v->value);
                 }
             }
         }
@@ -582,17 +589,17 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->logout_map_sz > 0 && c->logout_map != NULL) {
             for (i = 0; i < c->logout_map_sz; i++) {
-                am_config_map_t v = c->logout_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_LOGOUT_MAP, c->logout_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->logout_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_LOGOUT_MAP, c->logout_map_sz), v->name, v->value);
                 }
             }
         }
         if (c->openam_logout_map_sz > 0 && c->openam_logout_map != NULL) {
             for (i = 0; i < c->openam_logout_map_sz; i++) {
-                am_config_map_t v = c->openam_logout_map[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_AMLOGOUT_MAP, c->openam_logout_map_sz), v.name, v.value);
+                am_config_map_t *v = &c->openam_logout_map[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_AMLOGOUT_MAP, c->openam_logout_map_sz), v->name, v->value);
                 }
             }
         }
@@ -649,9 +656,9 @@ static int am_create_instance_entry_data(am_shm_t *cf, struct offset_list *h, am
         }
         if (c->cond_login_url_sz > 0 && c->cond_login_url != NULL) {
             for (i = 0; i < c->cond_login_url_sz; i++) {
-                am_config_map_t v = c->cond_login_url[i];
-                if (ISVALID(v.name) && ISVALID(v.value)) {
-                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_CONDLOGIN_MAP, c->cond_login_url_sz), v.name, v.value);
+                am_config_map_t *v = &c->cond_login_url[i];
+                if (ISVALID(v->name) && ISVALID(v->value)) {
+                    SAVE_CHAR2_VALUE(cf, h, MAKE_TYPE(AM_CONF_CONDLOGIN_MAP, c->cond_login_url_sz), v->name, v->value);
                 }
             }
         }
@@ -678,9 +685,9 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
     if (c == NULL) return NULL;
     r = calloc(1, sizeof (am_config_t));
     if (r == NULL) return NULL;
-    h = (struct am_instance_entry_data *) am_get_pointer(conf->pool, c->data.prev);
+    h = (struct am_instance_entry_data *) AM_GET_POINTER(conf->pool, c->data.prev);
 
-    am_offset_list_for_each(conf->pool, h, i, t, struct am_instance_entry_data) {
+    AM_OFFSET_LIST_FOR_EACH(conf->pool, h, i, t, struct am_instance_entry_data) {
         int ty = GET_TYPE(i->type);
         int sz = GET_SIZE(i->type);
         switch (ty) {
@@ -797,7 +804,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->login_url = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->login_url != NULL && r->login_url_sz < sz) {
-                    am_config_map_t *m = &(r->login_url[r->login_url_sz++]);
+                    am_config_map_t *m = &r->login_url[r->login_url_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -835,7 +842,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->profile_attr_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->profile_attr_map != NULL && r->profile_attr_map_sz < sz) {
-                    am_config_map_t *m = &(r->profile_attr_map[r->profile_attr_map_sz++]);
+                    am_config_map_t *m = &r->profile_attr_map[r->profile_attr_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -849,7 +856,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->session_attr_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->session_attr_map != NULL && r->session_attr_map_sz < sz) {
-                    am_config_map_t *m = &(r->session_attr_map[r->session_attr_map_sz++]);
+                    am_config_map_t *m = &r->session_attr_map[r->session_attr_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -863,7 +870,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->response_attr_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->response_attr_map != NULL && r->response_attr_map_sz < sz) {
-                    am_config_map_t *m = &(r->response_attr_map[r->response_attr_map_sz++]);
+                    am_config_map_t *m = &r->response_attr_map[r->response_attr_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -889,7 +896,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->fqdn_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->fqdn_map != NULL && r->fqdn_map_sz < sz) {
-                    am_config_map_t *m = &(r->fqdn_map[r->fqdn_map_sz++]);
+                    am_config_map_t *m = &r->fqdn_map[r->fqdn_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -903,7 +910,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->cookie_reset_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->cookie_reset_map != NULL && r->cookie_reset_map_sz < sz) {
-                    am_config_map_t *m = &(r->cookie_reset_map[r->cookie_reset_map_sz++]);
+                    am_config_map_t *m = &r->cookie_reset_map[r->cookie_reset_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -920,7 +927,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->not_enforced_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->not_enforced_map != NULL && r->not_enforced_map_sz < sz) {
-                    am_config_map_t *m = &(r->not_enforced_map[r->not_enforced_map_sz++]);
+                    am_config_map_t *m = &r->not_enforced_map[r->not_enforced_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -931,7 +938,18 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->not_enforced_ip_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->not_enforced_ip_map != NULL && r->not_enforced_ip_map_sz < sz) {
-                    am_config_map_t *m = &(r->not_enforced_ip_map[r->not_enforced_ip_map_sz++]);
+                    am_config_map_t *m = &r->not_enforced_ip_map[r->not_enforced_ip_map_sz++];
+                    m->name = malloc(i->size[0] + i->size[1] + 2);
+                    memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
+                    m->value = m->name + i->size[0] + 1;
+                }
+                break;
+            case AM_CONF_NEF_EXT_MAP:
+                if (r->not_enforced_ext_map_sz == 0) {
+                    r->not_enforced_ext_map = malloc(sz * sizeof (am_config_map_t));
+                }
+                if (r->not_enforced_ext_map != NULL && r->not_enforced_ext_map_sz < sz) {
+                    am_config_map_t *m = &r->not_enforced_ext_map[r->not_enforced_ext_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -966,7 +984,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->cdsso_login_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->cdsso_login_map != NULL && r->cdsso_login_map_sz < sz) {
-                    am_config_map_t *m = &(r->cdsso_login_map[r->cdsso_login_map_sz++]);
+                    am_config_map_t *m = &r->cdsso_login_map[r->cdsso_login_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -977,7 +995,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->cdsso_cookie_domain_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->cdsso_cookie_domain_map != NULL && r->cdsso_cookie_domain_map_sz < sz) {
-                    am_config_map_t *m = &(r->cdsso_cookie_domain_map[r->cdsso_cookie_domain_map_sz++]);
+                    am_config_map_t *m = &r->cdsso_cookie_domain_map[r->cdsso_cookie_domain_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -988,7 +1006,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->logout_cookie_reset_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->logout_cookie_reset_map != NULL && r->logout_cookie_reset_map_sz < sz) {
-                    am_config_map_t *m = &(r->logout_cookie_reset_map[r->logout_cookie_reset_map_sz++]);
+                    am_config_map_t *m = &r->logout_cookie_reset_map[r->logout_cookie_reset_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -1002,7 +1020,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->logout_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->logout_map != NULL && r->logout_map_sz < sz) {
-                    am_config_map_t *m = &(r->logout_map[r->logout_map_sz++]);
+                    am_config_map_t *m = &r->logout_map[r->logout_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -1013,7 +1031,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->openam_logout_map = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->openam_logout_map != NULL && r->openam_logout_map_sz < sz) {
-                    am_config_map_t *m = &(r->openam_logout_map[r->openam_logout_map_sz++]);
+                    am_config_map_t *m = &r->openam_logout_map[r->openam_logout_map_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -1075,7 +1093,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
                     r->cond_login_url = malloc(sz * sizeof (am_config_map_t));
                 }
                 if (r->cond_login_url != NULL && r->cond_login_url_sz < sz) {
-                    am_config_map_t *m = &(r->cond_login_url[r->cond_login_url_sz++]);
+                    am_config_map_t *m = &r->cond_login_url[r->cond_login_url_sz++];
                     m->name = malloc(i->size[0] + i->size[1] + 2);
                     memcpy(m->name, i->value, i->size[0] + i->size[1] + 2);
                     m->value = m->name + i->size[0] + 1;
@@ -1102,7 +1120,7 @@ static am_config_t *am_get_stored_agent_config(struct am_instance_entry *c) {
 static int am_set_agent_config(unsigned long instance_id, const char *xml,
         size_t xsz, const char *token, const char *config_file, const char *name,
         am_config_t *bc, struct am_instance_entry **ie) {
-    const char *thisfunc = "am_set_agent_config():";
+    static const char *thisfunc = "am_set_agent_config():";
     struct am_instance_entry *c;
     int ret;
     struct am_instance *instance_data = conf != NULL ? (struct am_instance *) conf->user : NULL;
@@ -1127,7 +1145,7 @@ static int am_set_agent_config(unsigned long instance_id, const char *xml,
 
     c = am_shm_alloc(conf, sizeof (struct am_instance_entry));
     if (c == NULL) {
-        am_log_error(instance_id, "%s failed to allocate %ld bytes",
+        AM_LOG_ERROR(instance_id, "%s failed to allocate %ld bytes",
                 thisfunc, sizeof (struct am_instance_entry));
         am_shm_unlock(conf);
         return AM_ENOMEM;
@@ -1150,9 +1168,9 @@ static int am_set_agent_config(unsigned long instance_id, const char *xml,
 
     c->data.next = c->data.prev = 0;
     c->lh.next = c->lh.prev = 0;
-    am_offset_list_insert(conf->pool, c, &(instance_data->list), struct am_instance_entry);
+    AM_OFFSET_LIST_INSERT(conf->pool, c, &(instance_data->list), struct am_instance_entry);
 
-    if (bc->local == AM_TRUE) {
+    if (bc->local) {
         ret = am_create_instance_entry_data(conf, &(c->data), bc, AM_CONF_ALL);
     } else {
         if (xml == NULL || xsz == 0) {
@@ -1160,7 +1178,7 @@ static int am_set_agent_config(unsigned long instance_id, const char *xml,
         } else {
             am_config_t *cf = am_parse_config_xml(instance_id, xml, xsz, AM_TRUE);
             if (cf == NULL) {
-                am_log_error(instance_id, "%s failed to parse agent profile xml",
+                AM_LOG_ERROR(instance_id, "%s failed to parse agent profile xml",
                         thisfunc);
                 ret = AM_XML_ERROR;
             } else {
@@ -1177,23 +1195,21 @@ static int am_set_agent_config(unsigned long instance_id, const char *xml,
 }
 
 int am_get_agent_config(unsigned long instance_id, const char *config_file, am_config_t **cnf) {
-    const char *thisfunc = "am_get_agent_config():";
+    static const char *thisfunc = "am_get_agent_config():";
     struct am_instance_entry *c;
     int rv = 1, in_progress = AM_FALSE;
-
     char *profile_xml = NULL;
     size_t profile_xml_sz = 0;
-
-    unsigned int max_retry = 0;
-    unsigned int retry = 0, retry_wait = 2; //TODO: conf values
-    max_retry = retry = 3;
+    int max_retry = 3;
+    unsigned int retry = 3, retry_wait = 2; //TODO: conf values
 
     if (conf == NULL) {
-        am_log_error(instance_id, "%s unable to fetch agent configuration (shared memory error)",
+        AM_LOG_ERROR(instance_id, "%s unable to fetch agent configuration (shared memory error)",
                 thisfunc);
         return AM_ENOMEM;
     }
 
+    max_retry++;
     do {
 
         am_shm_lock(conf);
@@ -1211,12 +1227,12 @@ int am_get_agent_config(unsigned long instance_id, const char *config_file, am_c
 
             in_progress = am_agent_init_get_value(instance_id, AM_FALSE);
 
-            am_log_debug(instance_id, "%s agent configuration fetch in progress: %d",
+            AM_LOG_DEBUG(instance_id, "%s agent configuration fetch in progress: %d",
                     thisfunc, in_progress);
 
-            if (in_progress == AM_TRUE) {
+            if (in_progress) {
                 am_agent_instance_init_unlock();
-                am_log_warning(instance_id, "%s retry %d",
+                AM_LOG_WARNING(instance_id, "%s retry %d",
                         thisfunc, (retry - max_retry) + 1);
                 sleep(retry_wait);
                 continue;
@@ -1228,51 +1244,32 @@ int am_get_agent_config(unsigned long instance_id, const char *config_file, am_c
             if (ac == NULL) {
                 am_agent_init_set_value(instance_id, AM_FALSE, AM_FALSE);
                 am_agent_instance_init_unlock();
-                am_log_error(instance_id, "%s failed to load instance bootstrap %ld data",
+                AM_LOG_ERROR(instance_id, "%s failed to load instance bootstrap %ld data",
                         thisfunc, instance_id);
                 return AM_FILE_ERROR; /*fatal*/
             }
 
-            memset(&info, 0, sizeof (struct am_ssl_options));
-            if (ISVALID(ac->ciphers)) {
-                snprintf(info.name[0], sizeof (info.name[0]), "%s", ac->ciphers);
-            }
-            if (ISVALID(ac->cert_ca_file)) {
-                snprintf(info.name[1], sizeof (info.name[1]), "%s", ac->cert_ca_file);
-            }
-            if (ISVALID(ac->cert_file)) {
-                snprintf(info.name[2], sizeof (info.name[2]), "%s", ac->cert_file);
-            }
-            if (ISVALID(ac->cert_key_file)) {
-                snprintf(info.name[3], sizeof (info.name[3]), "%s", ac->cert_key_file);
-            }
-            if (ISVALID(ac->cert_key_pass)) {
-                snprintf(info.name[4], sizeof (info.name[4]), "%s", ac->cert_key_pass);
-            }
-            if (ISVALID(ac->tls_opts)) {
-                snprintf(info.name[5], sizeof (info.name[5]), "%s", ac->tls_opts);
-            }
-            info.verifypeer = ac->cert_trust == AM_TRUE ? AM_FALSE : AM_TRUE;
+            am_net_set_ssl_options(ac, &info);
 
             memset(&r, 0, sizeof (am_request_t));
             r.conf = ac;
             r.instance_id = instance_id;
             login_status = am_agent_login(instance_id, get_valid_openam_url(&r), NOTNULL(ac->notif_url),
-                    ac->user, ac->pass, ac->key, ac->realm, ac->local, &info,
+                    ac->user, ac->pass, ac->realm, ac->local, &info,
                     &agent_token, &profile_xml, &profile_xml_sz, &agent_session, NULL);
             if (login_status == AM_SUCCESS && ISVALID(agent_token) && agent_session != NULL) {
 
-                am_log_debug(instance_id, "%s agent login%s succeeded", thisfunc,
+                AM_LOG_DEBUG(instance_id, "%s agent login%s succeeded", thisfunc,
                         ISVALID(profile_xml) ? " and profile fetch" : "");
 
                 if ((store_status = am_set_agent_config(instance_id, profile_xml, profile_xml_sz,
                         agent_token, config_file, ac->user, ac, &c)) == AM_SUCCESS) {
                     am_add_session_policy_cache_entry(&r, agent_token,
                             NULL, agent_session);
-                    am_log_debug(instance_id, "%s agent configuration stored in a cache",
+                    AM_LOG_DEBUG(instance_id, "%s agent configuration stored in a cache",
                             thisfunc);
                 } else {
-                    am_log_warning(instance_id, "%s retry %d (%s)",
+                    AM_LOG_WARNING(instance_id, "%s retry %d (%s)",
                             thisfunc, (retry - max_retry) + 1, am_strerror(store_status));
 
                     //TODO async logout if failed (session_logout_worker)?
@@ -1283,19 +1280,18 @@ int am_get_agent_config(unsigned long instance_id, const char *config_file, am_c
                     should_retry = AM_TRUE;
                 }
             } else {
-                am_log_warning(instance_id, "%s retry %d (login failure)",
+                AM_LOG_WARNING(instance_id, "%s retry %d (login failure)",
                         thisfunc, (retry - max_retry) + 1);
                 should_retry = AM_TRUE;
             }
 
             am_config_free(&ac);
-            if (agent_session != NULL) delete_am_namevalue_list(&agent_session);
-            if (agent_token != NULL) free(agent_token);
-            if (profile_xml != NULL) free(profile_xml);
+            delete_am_namevalue_list(&agent_session);
+            AM_FREE(agent_token, profile_xml);
             profile_xml = agent_token = NULL;
             agent_session = NULL;
 
-            if (should_retry == AM_TRUE) {
+            if (should_retry) {
                 am_agent_init_set_value(instance_id, AM_FALSE, AM_FALSE);
                 am_agent_instance_init_unlock();
                 sleep(retry_wait);
@@ -1313,7 +1309,7 @@ int am_get_agent_config(unsigned long instance_id, const char *config_file, am_c
                 (*cnf)->token = strdup(c->token);
                 (*cnf)->config = strdup(c->config);
                 rv = AM_SUCCESS;
-                am_log_debug(instance_id, "%s agent configuration read from a cache",
+                AM_LOG_DEBUG(instance_id, "%s agent configuration read from a cache",
                         thisfunc);
                 am_shm_unlock(conf);
                 break;
@@ -1321,10 +1317,10 @@ int am_get_agent_config(unsigned long instance_id, const char *config_file, am_c
         }
 
         am_shm_unlock(conf);
-    } while (--max_retry != 0);
+    } while (--max_retry > 0);
 
     if (max_retry == 0) {
-        am_log_error(instance_id,
+        AM_LOG_ERROR(instance_id,
                 "%s failed to locate instance configuration %ld data (max %d retries exhausted)",
                 thisfunc, instance_id, retry);
         return AM_RETRY_ERROR; /*fatal*/

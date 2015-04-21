@@ -26,18 +26,16 @@
  */
 
 void delete_am_namevalue_list(struct am_namevalue **list) {
-    struct am_namevalue *t = *list;
+    struct am_namevalue *t = list != NULL ? *list : NULL;
     if (t != NULL) {
         delete_am_namevalue_list(&t->next);
-        if (t->n != NULL) free(t->n);
-        if (t->v != NULL) free(t->v);
+        AM_FREE(t->n, t->v);
         free(t);
         t = NULL;
     }
 }
 
 typedef struct {
-    int depth;
     unsigned long instance_id;
     char resource_name;
     struct am_namevalue *list;
@@ -50,63 +48,21 @@ static void start_element(void *userData, const char *name, const char **atts) {
 
     if (strcmp(name, "Session") == 0) {
         for (i = 0; atts[i]; i += 2) {
-            if (strcmp(atts[i], "sid") == 0) {
-                size_t nl = strlen(atts[i + 1]);
+            if (strcmp(atts[i], "sid") == 0 || strcmp(atts[i], "cid") == 0 ||
+                    strcmp(atts[i], "cdomain") == 0 || strcmp(atts[i], "maxtime") == 0 ||
+                    strcmp(atts[i], "maxidle") == 0 || strcmp(atts[i], "maxcaching") == 0 ||
+                    strcmp(atts[i], "timeidle") == 0 || strcmp(atts[i], "timeleft") == 0 ||
+                    strcmp(atts[i], "state") == 0) {
                 struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("sid", 3, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "cid") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("cid", 3, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "cdomain") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("cdomain", 7, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "maxtime") == 0) { /* in sec, just an interval ? */
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("maxtime", 7, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "maxidle") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("maxidle", 7, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "maxcaching") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("maxcaching", 10, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "timeidle") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("timeidle", 8, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "timeleft") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("timeleft", 8, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
-                }
-            } else if (strcmp(atts[i], "state") == 0) {
-                size_t nl = strlen(atts[i + 1]);
-                struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("state", 5, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
+                if (create_am_namevalue_node(atts[i], strlen(atts[i]),
+                        atts[i + 1], strlen(atts[i + 1]), &el) == 0) {
+                    AM_LIST_INSERT(ctx->list, el);
                 }
             }
         }
-    } else if (strcmp(name, "Property") == 0) {
+        return;
+    }
+    if (strcmp(name, "Property") == 0) {
         const char **p = atts;
 
         /*count the number of attributes*/
@@ -116,78 +72,48 @@ static void start_element(void *userData, const char *name, const char **atts) {
 
         if (((p - atts) >> 1) == 2) {
             for (i = 0; atts[i]; i += 4) {
-                if (strcmp(atts[i + 1], "HostName") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
+                if (strcmp(atts[i + 1], "HostName") == 0 || strcmp(atts[i + 1], "Host") == 0 ||
+                        strcmp(atts[i + 1], "UserToken") == 0 || strcmp(atts[i + 1], "AuthLevel") == 0 ||
+                        strcmp(atts[i + 1], "AuthType") == 0 || strcmp(atts[i + 1], "Service") == 0 ||
+                        strcmp(atts[i + 1], "sunIdentityUserPassword") == 0) {
                     struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("HostName", 8, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
-                    }
-                } else if (strcmp(atts[i + 1], "Host") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
-                    struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("Host", 4, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
-                    }
-                } else if (strcmp(atts[i + 1], "UserToken") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
-                    struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("UserToken", 9, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
-                    }
-                } else if (strcmp(atts[i + 1], "AuthLevel") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
-                    struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("AuthLevel", 9, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
-                    }
-                } else if (strcmp(atts[i + 1], "AuthType") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
-                    struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("AuthType", 8, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
-                    }
-                } else if (strcmp(atts[i + 1], "Service") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
-                    struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("Service", 7, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
-                    }
-                } else if (strcmp(atts[i + 1], "sunIdentityUserPassword") == 0) {
-                    size_t nl = strlen(atts[i + 3]);
-                    struct am_namevalue *el = NULL;
-                    if (create_am_namevalue_node("sunIdentityUserPassword", 23, atts[i + 3], nl, &el) == 0) {
-                        am_list_insert(ctx->list, el);
+                    if (create_am_namevalue_node(atts[i + 1], strlen(atts[i + 1]),
+                            atts[i + 3], strlen(atts[i + 3]), &el) == 0) {
+                        AM_LIST_INSERT(ctx->list, el);
                     }
                 }
             }
         }
-    } else if (strcmp(name, "AgentConfigChangeNotification") == 0) {
+        return;
+    }
+    if (strcmp(name, "AgentConfigChangeNotification") == 0) {
         for (i = 0; atts[i]; i += 2) {
             if (strcmp(atts[i], "agentName") == 0) {
-                size_t nl = strlen(atts[i + 1]);
                 struct am_namevalue *el = NULL;
-                if (create_am_namevalue_node("agentName", 9, atts[i + 1], nl, &el) == 0) {
-                    am_list_insert(ctx->list, el);
+                if (create_am_namevalue_node(atts[i], strlen(atts[i]),
+                        atts[i + 1], strlen(atts[i + 1]), &el) == 0) {
+                    AM_LIST_INSERT(ctx->list, el);
                 }
             }
         }
-    } else if (strcmp(name, "ResourceName") == 0) {
+        return;
+    }
+    if (strcmp(name, "ResourceName") == 0) {
         ctx->resource_name = AM_TRUE;
     }
 }
 
 static void end_element(void * userData, const char * name) {
     am_xml_parser_ctx_t *ctx = (am_xml_parser_ctx_t *) userData;
-    ctx->depth--;
     ctx->resource_name = AM_FALSE;
 }
 
 static void character_data(void *userData, const char *val, int len) {
     am_xml_parser_ctx_t *ctx = (am_xml_parser_ctx_t *) userData;
     struct am_namevalue *el = NULL;
-    if (ctx->resource_name == AM_FALSE || len <= 0) return;
+    if (!(ctx->resource_name) || len <= 0) return;
     if (create_am_namevalue_node("ResourceName", 12, val, len, &el) == 0) {
-        am_list_insert(ctx->list, el);
+        AM_LIST_INSERT(ctx->list, el);
     }
 }
 
@@ -199,16 +125,16 @@ static void entity_declaration(void *userData, const XML_Char *entityName,
 }
 
 void *am_parse_session_xml(unsigned long instance_id, const char *xml, size_t xml_sz) {
-    const char *thisfunc = "am_parse_session_xml():";
+    static const char *thisfunc = "am_parse_session_xml():";
     char *begin, *stream = NULL;
     size_t data_sz;
     struct am_namevalue *r = NULL;
 
-    am_xml_parser_ctx_t xctx = {.depth = 0, .instance_id = instance_id,
+    am_xml_parser_ctx_t xctx = {.instance_id = instance_id,
         .list = NULL, .parser = NULL, .resource_name = AM_FALSE};
 
     if (xml == NULL || xml_sz == 0) {
-        am_log_error(instance_id, "%s memory allocation error", thisfunc);
+        AM_LOG_ERROR(instance_id, "%s memory allocation error", thisfunc);
         return NULL;
     }
 
@@ -236,7 +162,7 @@ void *am_parse_session_xml(unsigned long instance_id, const char *xml, size_t xm
             const char *message = XML_ErrorString(XML_GetErrorCode(parser));
             int line = XML_GetCurrentLineNumber(parser);
             int col = XML_GetCurrentColumnNumber(parser);
-            am_log_error(instance_id, "%s xml parser error (%d:%d) %s", thisfunc,
+            AM_LOG_ERROR(instance_id, "%s xml parser error (%d:%d) %s", thisfunc,
                     line, col, message);
 
             delete_am_namevalue_list(&xctx.list);

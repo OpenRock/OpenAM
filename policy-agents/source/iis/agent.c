@@ -16,7 +16,13 @@
 
 #include "platform.h"
 #include "version.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "am.h"
+#ifdef __cplusplus
+}
+#endif
 #include <httpserv.h>
 
 #define AM_MOD_SECTION                 L"system.webServer/OpenAmModule"
@@ -436,14 +442,14 @@ static const char *get_server_variable(IHttpContext *ctx,
 
     if (!ISVALID(var)) return NULL;
 
-    am_log_debug(instance_id, "%s trying to fetch server variable %s", thisfunc, var);
+    AM_LOG_DEBUG(instance_id, "%s trying to fetch server variable %s", thisfunc, var);
 
     if (FAILED(ctx->GetServerVariable(var, &val, &size))) {
-        am_log_warning(instance_id,
+        AM_LOG_WARNING(instance_id,
                 "%s server variable %s is not available in HttpContext (error: %d)",
                 thisfunc, var, GetLastError());
     } else {
-        am_log_debug(instance_id, "%s found variable %s with value [%s]",
+        AM_LOG_DEBUG(instance_id, "%s found variable %s with value [%s]",
                 thisfunc, var, LOGEMPTY(val));
     }
     return val;
@@ -474,17 +480,17 @@ static am_status_t get_request_url(am_request_t *rq) {
 }
 
 static am_status_t set_header_in_request(am_request_t *rq, const char *key, const char *value) {
-    const char *thisfunc = "set_header_in_request():";
+    static const char *thisfunc = "set_header_in_request():";
     IHttpContext *r = (IHttpContext *) (rq != NULL ? rq->ctx : NULL);
     HRESULT hr;
     if (r == NULL || !ISVALID(key)) return AM_EINVAL;
 
-    am_log_debug(rq->instance_id, "%s %s = %s", thisfunc, LOGEMPTY(key), LOGEMPTY(value));
+    AM_LOG_DEBUG(rq->instance_id, "%s %s = %s", thisfunc, LOGEMPTY(key), LOGEMPTY(value));
 
     /* remove all instances of the header first */
     hr = r->GetRequest()->DeleteHeader(key);
     if (FAILED(hr)) {
-        am_log_warning(rq->instance_id, "%s failed to delete request header %s (%d)", thisfunc,
+        AM_LOG_WARNING(rq->instance_id, "%s failed to delete request header %s (%d)", thisfunc,
                 LOGEMPTY(key), hr_to_winerror(hr));
     }
     if (ISVALID(value)) {
@@ -499,7 +505,7 @@ static am_status_t set_header_in_request(am_request_t *rq, const char *key, cons
             value_data[value_sz] = 0;
             hr = r->GetRequest()->SetHeader(key_data, value_data, (USHORT) value_sz, TRUE);
             if (FAILED(hr)) {
-                am_log_warning(rq->instance_id, "%s failed to set request header %s value %s (%d)", thisfunc,
+                AM_LOG_WARNING(rq->instance_id, "%s failed to set request header %s value %s (%d)", thisfunc,
                         LOGEMPTY(key), LOGEMPTY(value), hr_to_winerror(hr));
                 return AM_ERROR;
             }
@@ -511,7 +517,7 @@ static am_status_t set_header_in_request(am_request_t *rq, const char *key, cons
 }
 
 static am_status_t set_cookie(am_request_t *rq, const char *header) {
-    const char *thisfunc = "set_cookie():";
+    static const char *thisfunc = "set_cookie():";
     am_status_t status = AM_ERROR;
     const char *cookie;
     size_t header_sz = 0;
@@ -529,7 +535,7 @@ static am_status_t set_cookie(am_request_t *rq, const char *header) {
         if (!FAILED(hr)) {
             status = AM_SUCCESS;
         } else {
-            am_log_warning(rq->instance_id, "%s failed to set response header Set-Cookie value %s (%d)", thisfunc,
+            AM_LOG_WARNING(rq->instance_id, "%s failed to set response header Set-Cookie value %s (%d)", thisfunc,
                     LOGEMPTY(header_data), hr_to_winerror(hr));
         }
     } else {
@@ -555,34 +561,35 @@ static am_status_t set_cookie(am_request_t *rq, const char *header) {
 }
 
 static am_status_t add_header_in_response(am_request_t *rq, const char *key, const char *value) {
-    const char *thisfunc = "add_header_in_response():";
+    static const char *thisfunc = "add_header_in_response():";
     am_status_t status = AM_ERROR;
+    size_t key_sz, value_sz;
+    char *key_data, *value_data;
     HRESULT hr;
     IHttpContext *r = (IHttpContext *) (rq != NULL ? rq->ctx : NULL);
     if (r == NULL || !ISVALID(key)) return AM_EINVAL;
     if (!ISVALID(value)) {
         /*value is empty, sdk is setting a cookie in response*/
-        status = set_cookie(rq, key);
-    } else {
-        size_t key_sz = strlen(key);
-        size_t value_sz = strlen(value);
-        char *key_data = (char *) alloc_request(r, key_sz + 1);
-        char *value_data = (char *) alloc_request(r, value_sz + 1);
-        if (key_data != NULL && value_data != NULL) {
-            memcpy(key_data, key, key_sz);
-            key_data[key_sz] = 0;
-            memcpy(value_data, value, value_sz);
-            value_data[value_sz] = 0;
-            hr = r->GetResponse()->SetHeader(key_data, value_data, (USHORT) value_sz, FALSE);
-            if (!FAILED(hr)) {
-                status = AM_SUCCESS;
-            } else {
-                am_log_warning(rq->instance_id, "%s failed to set response header %s value %s (%d)", thisfunc,
-                        LOGEMPTY(key), LOGEMPTY(value), hr_to_winerror(hr));
-            }
+        return set_cookie(rq, key);
+    }
+    key_sz = strlen(key);
+    value_sz = strlen(value);
+    key_data = (char *) alloc_request(r, key_sz + 1);
+    value_data = (char *) alloc_request(r, value_sz + 1);
+    if (key_data != NULL && value_data != NULL) {
+        memcpy(key_data, key, key_sz);
+        key_data[key_sz] = 0;
+        memcpy(value_data, value, value_sz);
+        value_data[value_sz] = 0;
+        hr = r->GetResponse()->SetHeader(key_data, value_data, (USHORT) value_sz, FALSE);
+        if (!FAILED(hr)) {
+            status = AM_SUCCESS;
         } else {
-            status = AM_ENOMEM;
+            AM_LOG_WARNING(rq->instance_id, "%s failed to set response header %s value %s (%d)", thisfunc,
+                    LOGEMPTY(key), LOGEMPTY(value), hr_to_winerror(hr));
         }
+    } else {
+        status = AM_ENOMEM;
     }
     return status;
 }
@@ -633,7 +640,7 @@ static am_status_t set_method(am_request_t *rq) {
 }
 
 static am_status_t set_request_body(am_request_t *rq) {
-    const char *thisfunc = "set_request_body():";
+    static const char *thisfunc = "set_request_body():";
     IHttpContext *r = (IHttpContext *) (rq != NULL ? rq->ctx : NULL);
     am_status_t status = AM_SUCCESS;
     HRESULT hr = S_OK;
@@ -651,22 +658,24 @@ static am_status_t set_request_body(am_request_t *rq) {
         }
     }
     if (status != AM_SUCCESS) {
-        am_log_warning(rq->instance_id, "%s status %s (%d)", thisfunc,
+        AM_LOG_WARNING(rq->instance_id, "%s status %s (%d)", thisfunc,
                 am_strerror(status), hr_to_winerror(hr));
     }
     return status;
 }
 
 static am_status_t get_request_body(am_request_t *rq) {
-    const char *thisfunc = "get_request_body():";
+    static const char *thisfunc = "get_request_body():";
     IHttpContext *ctx = (IHttpContext *) (rq != NULL ? rq->ctx : NULL);
     IHttpRequest *r = ctx != NULL ? ctx->GetRequest() : NULL;
     DWORD read_bytes = 0, rc = 1024;
     HRESULT hr;
     am_status_t status = AM_ERROR;
-    char *out = NULL;
-    void *data = alloc_request(ctx, rc);
+    char *out = NULL, *out_tmp;
+    void *data;
+
     if (r == NULL) return AM_EINVAL;
+    data = alloc_request(ctx, rc);
     if (data == NULL) return AM_ENOMEM;
 
     if (r->GetRemainingEntityBytes() > 0) {
@@ -674,12 +683,17 @@ static am_status_t get_request_body(am_request_t *rq) {
             hr = r->ReadEntityBody(data, rc, FALSE, &rc, NULL);
             if (FAILED(hr)) {
                 if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF)) {
-                    if (out != NULL) free(out);
+                    am_free(out);
                     return AM_ERROR;
                 }
             }
-            out = (char *) realloc(out, read_bytes + rc + 1);
-            if (out == NULL) return AM_ENOMEM;
+            out_tmp = (char *) realloc(out, read_bytes + rc + 1);
+            if (out_tmp == NULL) {
+                am_free(out);
+                return AM_ENOMEM;
+            } else {
+                out = out_tmp;
+            }
             memcpy(out + read_bytes, data, rc);
             read_bytes += rc;
             out[read_bytes] = 0;
@@ -690,7 +704,7 @@ static am_status_t get_request_body(am_request_t *rq) {
     }
 
     if (status == AM_SUCCESS) {
-        am_log_debug(rq->instance_id, "%s read %d bytes \n%s", thisfunc,
+        AM_LOG_DEBUG(rq->instance_id, "%s read %d bytes \n%s", thisfunc,
                 read_bytes, LOGEMPTY(out));
         r->DeleteHeader("CONTENT_LENGTH");
     }
@@ -744,8 +758,8 @@ static am_status_t des_decrypt(const char *encrypted, const char *keys, char **c
         CryptDestroyKey(hKey);
         CryptReleaseContext(hCryptProv, 0);
     }
-    if (data != NULL) free(data);
-    if (key != NULL) free(key);
+    am_free(data);
+    am_free(key);
     return status;
 }
 
@@ -775,7 +789,7 @@ class OpenAMHttpModule : public CHttpModule{
 
     REQUEST_NOTIFICATION_STATUS OnBeginRequest(IHttpContext *ctx,
     IHttpEventProvider * prov) {
-        const char *thisfunc = "OpenAMHttpModule():";
+        static const char *thisfunc = "OpenAMHttpModule():";
         REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
         IHttpRequest *req = ctx->GetRequest();
         IHttpResponse *res = ctx->GetResponse();
@@ -814,14 +828,14 @@ class OpenAMHttpModule : public CHttpModule{
             return RQ_NOTIFICATION_FINISH_REQUEST;
         }
 
-        am_log_debug(site->GetSiteId(), "%s begin", thisfunc);
+        AM_LOG_DEBUG(site->GetSiteId(), "%s begin", thisfunc);
 
         res->DisableKernelCache(9);
 
         rv = am_get_agent_config(site->GetSiteId(), conf->GetPath(ctx), &rq_conf);
         if (rq_conf == NULL || rv != AM_SUCCESS) {
             WriteEventLog("%s am_get_agent_config failed (%d)", thisfunc, site->GetSiteId());
-            am_log_error(site->GetSiteId(), "%s failed to get agent configuration instance, error: %s",
+            AM_LOG_ERROR(site->GetSiteId(), "%s failed to get agent configuration instance, error: %s",
                     thisfunc, am_strerror(rv));
             res->SetStatus(403, "Forbidden");
             return RQ_NOTIFICATION_FINISH_REQUEST;
@@ -888,7 +902,7 @@ class OpenAMHttpModule : public CHttpModule{
         am_request_free(&d);
 
         status = am_status_value(ctx, d.status);
-        am_log_debug(site->GetSiteId(), "%s exit status: %s (%d)", thisfunc, am_strerror(d.status), d.status);
+        AM_LOG_DEBUG(site->GetSiteId(), "%s exit status: %s (%d)", thisfunc, am_strerror(d.status), d.status);
         return status;
     }
 
@@ -903,12 +917,12 @@ class OpenAMHttpModule : public CHttpModule{
                 OpenAMHttpUser *httpUser = new OpenAMHttpUser(user, userPassword,
                         userPasswordCrypted, showPassword, doLogOn);
                 if (httpUser == NULL || !httpUser->GetStatus()) {
-                    am_log_error(site->GetSiteId(), "OpenAMHttpModule(): failed (invalid Windows/AD user credentials). "
+                    AM_LOG_ERROR(site->GetSiteId(), "OpenAMHttpModule(): failed (invalid Windows/AD user credentials). "
                             "Responding with HTTP403 error (%d)", httpUser->GetStatus());
                     res->SetStatus(403, "Forbidden");
                     return RQ_NOTIFICATION_FINISH_REQUEST;
                 } else {
-                    am_log_debug(site->GetSiteId(), "OpenAMHttpModule(): context user set to \"%s\"", userName);
+                    AM_LOG_DEBUG(site->GetSiteId(), "OpenAMHttpModule(): context user set to \"%s\"", userName);
                 }
                 prov->SetUser(httpUser);
             }
@@ -961,7 +975,7 @@ class OpenAMHttpModule : public CHttpModule{
 };
 
 static am_status_t set_user(am_request_t *rq, const char *user) {
-    const char *thisfunc = "set_user():";
+    static const char *thisfunc = "set_user():";
     IHttpContext *r = (IHttpContext *) (rq != NULL ? rq->ctx : NULL);
     OpenAMHttpModule *m = rq != NULL && rq->ctx_class != NULL ?
             static_cast<OpenAMHttpModule *>(rq->ctx_class) : NULL;
@@ -979,7 +993,7 @@ static am_status_t set_user(am_request_t *rq, const char *user) {
         if (des_decrypt(rq->user_password, rq->conf->password_replay_key, &user_passwd) == AM_SUCCESS) {
             m->userPassword = utf8_decode(r, user_passwd, (size_t *) & m->userPasswordSize);
         }
-        if (user_passwd != NULL) free(user_passwd);
+        am_free(user_passwd);
         m->userPasswordCrypted = utf8_decode(r, rq->user_password, (size_t *) & m->userPasswordCryptedSize);
     }
     m->doLogOn = rq->conf->logon_user_enable ? TRUE : FALSE;
@@ -988,27 +1002,43 @@ static am_status_t set_user(am_request_t *rq, const char *user) {
 }
 
 static am_status_t set_custom_response(am_request_t *rq, const char *text, const char *cont_type) {
-    const char *thisfunc = "set_custom_response():";
+    static const char *thisfunc = "set_custom_response():";
     HRESULT hr;
     IHttpContext *r = (IHttpContext *) (rq != NULL ? rq->ctx : NULL);
     OpenAMHttpModule *m = rq != NULL && rq->ctx_class != NULL ?
             static_cast<OpenAMHttpModule *>(rq->ctx_class) : NULL;
-    am_status_t is = rq->status;
-    if (r == NULL) return AM_EINVAL;
-    if (rq->status == AM_INTERNAL_REDIRECT || rq->status == AM_REDIRECT) {
-        hr = r->GetResponse()->Redirect(text, TRUE, FALSE);
-        if (FAILED(hr)) {
-            am_log_error(rq->instance_id, "set_custom_response(): failed to issue a redirect to %s (%d)",
-                    text, hr_to_winerror(hr));
-            rq->status = AM_ERROR;
-        } else {
+    am_status_t status = AM_ERROR;
+    if (r == NULL) {
+        return AM_EINVAL;
+    }
+    status = rq->status;
+    switch (status) {
+        case AM_JSON_RESPONSE:
+        {
+
+        }
+            break;
+        case AM_INTERNAL_REDIRECT:
+        case AM_REDIRECT:
+        {
+            hr = r->GetResponse()->Redirect(text, TRUE, FALSE);
+            if (FAILED(hr)) {
+                AM_LOG_ERROR(rq->instance_id, "set_custom_response(): failed to issue a redirect to %s (%d)",
+                        text, hr_to_winerror(hr));
+                rq->status = AM_ERROR;
+                break;
+            }
             rq->status = AM_DONE;
         }
-    } else {
-        if (rq->status == AM_PDP_DONE) {
+            break;
+        case AM_PDP_DONE:
+        {
             r->GetResponse()->Redirect(rq->post_data_url, TRUE, FALSE);
             rq->status = AM_DONE;
-        } else {
+        }
+            break;
+        default:
+        {
             HTTP_DATA_CHUNK dc;
             DWORD sent;
             char tls[64];
@@ -1031,9 +1061,10 @@ static am_status_t set_custom_response(am_request_t *rq, const char *text, const
             hr = r->GetResponse()->WriteEntityChunks(&dc, 1, FALSE, TRUE, &sent);
             rq->status = AM_DONE;
         }
+            break;
     }
-    am_log_info(rq->instance_id, "set_custom_response(): status: %s (exit: %s)",
-            am_strerror(is), am_strerror(rq->status));
+    AM_LOG_INFO(rq->instance_id, "set_custom_response(): status: %s (exit: %s)",
+            am_strerror(status), am_strerror(rq->status));
     return AM_SUCCESS;
 }
 

@@ -11,297 +11,373 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 - 2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define NTDDI_VERSION 0x0501
-#include <winsock2.h>
-#include <in6addr.h>
-#include <ws2tcpip.h>
-#include <process.h>
-#include <io.h>
-#define strtok_r strtok_s
-#else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <limits.h>
-#include <sys/time.h>
-#include <pthread.h>
-#include <unistd.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdarg.h>
-#include <time.h>
-
+#include "platform.h"
 #include "am.h"
+#include "utility.h"
 
-static const unsigned char inverted_bits[8] = {0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE};
-static uint8_t zero[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-static uint8_t one6[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-static uint8_t one4[16] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+#define IP6_QUADS 4 /* the number of 32 bit words */
+
+#ifndef s6_addr32
+#ifdef __sun
+#define s6_addr32   _S6_un._S6_u32
+#elif __APPLE__
+#define s6_addr32   __u6_addr.__u6_addr32
+#endif
+#endif
 
 #ifdef _WIN32
 
-static int inet_pton(int af, const char *src, void *dst) {
-    struct sockaddr_storage ss;
-    int size = sizeof (ss);
-    char src_copy[INET6_ADDRSTRLEN + 1];
-    memset(&(ss), 0, sizeof (ss));
-    strncpy(src_copy, src, INET6_ADDRSTRLEN + 1);
-    src_copy[INET6_ADDRSTRLEN] = 0;
-    if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr *) &ss, &size) == 0) {
-        switch (af) {
-            case AF_INET:
-                *(struct in_addr *) dst = ((struct sockaddr_in *) &ss)->sin_addr;
-                return 1;
-            case AF_INET6:
-                *(struct in6_addr *) dst = ((struct sockaddr_in6 *) &ss)->sin6_addr;
-                return 1;
-        }
-    }
-    return 0;
-}
+struct win_in6_addr {
 
-static const char *inet_ntop(int af, const void *src, char *dst, socklen_t size) {
-    struct sockaddr_storage ss;
-    unsigned long s = size;
-    memset(&(ss), 0, sizeof (ss));
-    ss.ss_family = af;
-    switch (af) {
-        case AF_INET:
-            ((struct sockaddr_in *) &ss)->sin_addr = *(struct in_addr *) src;
-            break;
-        case AF_INET6:
-            ((struct sockaddr_in6 *) &ss)->sin6_addr = *(struct in6_addr *) src;
-            break;
-    }
-    return (WSAAddressToStringA((struct sockaddr *) &ss, sizeof (ss), NULL, dst, &s) == 0) ? dst : NULL;
-}
+    union {
+        uint8_t u6_addr8[16];
+        uint16_t u6_addr16[8];
+        uint32_t u6_addr32[4];
+    } in6_u;
+#ifdef s6_addr
+#undef s6_addr
 #endif
 
-static int address(const char *ip, uint8_t *addr) {
-    struct in_addr a4;
-    struct in6_addr a6;
-    if (inet_pton(AF_INET6, ip, &a6) > 0) {
-        memcpy(addr, &a6.s6_addr, 16);
-        return AF_INET6;
-    } else if (inet_pton(AF_INET, ip, &a4) > 0) {
-        memcpy(addr, &a4.s_addr, 4);
-        return AF_INET;
+#ifdef s6_addr16
+#undef s6_addr16
+#endif
+
+#ifdef s6_addr32
+#undef s6_addr32
+#endif
+
+#define s6_addr     in6_u.u6_addr8
+#define s6_addr16   in6_u.u6_addr16
+#define s6_addr32   in6_u.u6_addr32
+};
+
+#define in6_addr win_in6_addr
+#endif
+
+/**
+ * Test equivalence masked bits in two ipv4 addresses in network form
+ * 
+ * @return 0 if equal
+ */
+static int cidr_match(const struct in_addr * addr, const struct in_addr * net, int bits) {
+    if (bits == 0) {
+        /* the range is all inclusive - uint32_t << 32 is undefined */
+        return 1;
     }
-    return 0;
-}
 
-static void shiftl(uint8_t *o, size_t size) {
-    unsigned int index;
-    for (index = 0; index < size; index++) {
-        uint8_t carryFlag = (o[index] & 0x80) > 0 ? 1 : 0;
-        if (index > 0) if (carryFlag == 1) o[index - 1] = (o[index - 1] | 0x01);
-        o[index] = (o[index] << 1);
-    }
-}
+    /* here and in the function below, we are comparing quads (uint32_t) represented in the network byte
+     * order. xor (^) is used to identify differences between the quads, and then << is used to remove the
+     * differences outside of the network masks number of bits.
+     */
 
-static void shiftlr(uint8_t *r, uint8_t *o, size_t size) {
-    memcpy(r, o, size);
-    shiftl(r, size);
-}
+    if ((addr->s_addr ^ net->s_addr) & htonl(0xFFFFFFFFu << (32 - bits)))
+        return 0;
 
-static void shiftr(uint8_t *o, size_t size) {
-    int index;
-    int re = (int) size - 1;
-    for (index = re; index >= 0; index--) {
-        uint8_t carryFlag = (o[index] & 0x01) > 0 ? 1 : 0;
-        if (index < re) if (carryFlag == 1) o[index + 1] = (o[index + 1] | 0x80);
-        o[index] = (o[index] >> 1);
-    }
-}
-
-static void shiftrr(uint8_t *r, uint8_t *o, size_t size) {
-    memcpy(r, o, size);
-    shiftr(r, size);
-}
-
-static void and(uint8_t *r, uint8_t *a, uint8_t *b, size_t s) {
-    size_t i;
-    for (i = 0; i < s; i++) r[i] = a[i] & b[i];
-}
-
-static void or(uint8_t *r, uint8_t *a, uint8_t *b, size_t s) {
-    size_t i;
-    for (i = 0; i < s; i++) r[i] = a[i] | b[i];
-}
-
-static void xor(uint8_t *r, uint8_t *a, uint8_t *b, size_t s) {
-    size_t i;
-    for (i = 0; i < s; i++) r[i] = a[i] ^ b[i];
-}
-
-static void not(uint8_t *a, size_t s) {
-    size_t i;
-    for (i = 0; i < s; i++) a[i] = ~(a[i]);
-}
-
-static void add(uint8_t *r, uint8_t *a, uint8_t *b, size_t s) {
-    uint8_t aa[16], bb[16], ai[16], bi[16];
-    memcpy(ai, a, s);
-    memcpy(bi, b, s);
-    do {
-        and(aa, ai, bi, s);
-        xor(bb, ai, bi, s);
-        shiftlr(ai, aa, s);
-        memcpy(bi, bb, s);
-    } while (memcmp(aa, zero, s) != 0);
-    memcpy(r, bb, s);
-}
-
-static void sub(uint8_t *r, uint8_t *a, uint8_t *b, size_t s) {
-    uint8_t t[16], ta[16];
-    memcpy(t, b, s);
-    memcpy(ta, a, s);
-    not(t, s);
-    add(t, t, (s == 4 ? one4 : one6), s);
-    add(r, ta, t, s);
-}
-
-static unsigned int prefix(uint8_t *a, int family) {
-    int s = family == AF_INET6 ? 16 : 4;
-    unsigned int i = family == AF_INET6 ? 128 : 32;
-    uint8_t j[16];
-    and(j, a, (s == 4 ? one4 : one6), s);
-    while (memcmp(j, (s == 4 ? one4 : one6), s) != 0) {
-        shiftr(a, s);
-        i -= 1;
-        and(j, a, (s == 4 ? one4 : one6), s);
-    }
-    return i;
-}
-
-static void l1(uint8_t *a, size_t s) {
-    uint8_t i[16];
-    and(i, a, (s == 4 ? one4 : one6), s);
-    while (memcmp(i, zero, s) != 0) {
-        shiftr(a, s);
-        and(i, a, (s == 4 ? one4 : one6), s);
-    }
-}
-
-static int l2(uint8_t *a, size_t s) {
-    uint8_t i[16];
-    int j = 0;
-    shiftrr(i, a, s);
-    while (memcmp(i, zero, s) != 0) {
-        shiftr(a, s);
-        j += 1;
-        shiftrr(i, a, s);
-    }
-    return j;
-}
-
-static int match_cidr(const unsigned char* address, const unsigned char* mask, unsigned int mask_bits) {
-    unsigned int divisor = mask_bits / 8;
-    unsigned int modulus = mask_bits % 8;
-    if (modulus) {
-        if ((address[divisor] & inverted_bits[modulus]) != (mask[divisor] & inverted_bits[modulus])) {
-            return 0;
-        }
-    }
-    if (memcmp(address, mask, divisor)) return 0;
     return 1;
 }
 
-static void r2c(uint8_t *ip, uint8_t *a, uint8_t *b, int f, int *r, unsigned long instance_id) {
-    int k;
-    char straddr[INET6_ADDRSTRLEN];
-    char ipaddr[INET6_ADDRSTRLEN];
-    size_t s = f == AF_INET6 ? 16 : 4;
-    uint8_t i[16], j, lxh[16], t[16], mid[16];
-    xor(lxh, a, b, s);
-    memcpy(i, lxh, s);
-    l1(i, s);
-    or(t, a, lxh, s);
-    if (memcmp(i, zero, s) == 0 && memcmp(t, b, s) == 0) {
-        sub(t, b, a, s);
-        not(t, s);
-        if (inet_ntop(f, a, straddr, sizeof (straddr)) != NULL && inet_ntop(f, ip, ipaddr, sizeof (ipaddr)) != NULL) {
-            unsigned int bits = prefix(t, f);
-            if (match_cidr(ip, a, bits) == 1) {
-                am_log_info(instance_id, "ip_range_match(): found ip %s in range %s/%d", ipaddr, straddr, bits);
-                (*r) += 1;
-            } else {
-                am_log_info(instance_id, "ip_range_match(): ip %s is not in range %s/%d", ipaddr, straddr, bits);
-            }
+/**
+ * Test masked bits in two ipv6 addresses in network form
+ * 
+ * @return 0 if equal
+ */
+static int cidr6_match(const struct in6_addr * addr, const struct in6_addr * net, int bits) {
+    const uint32_t * a = addr->s6_addr32;
+    const uint32_t * n = net->s6_addr32;
+
+    int quads = bits >> 5; /* number of whole quads masked = bits/32 */
+    int remainder = bits & 0x1F; /* number of bits masked in the subsequent quad = bits%32 */
+
+    if (quads) {
+        if (memcmp(a, n, quads * sizeof (uint32_t))) {
+            return 0;
         }
-    } else {
-        memcpy(i, lxh, s);
-        j = l2(i, s);
-        for (k = 0; k < j; k++) shiftl(i, s);
-        sub(t, i, (s == 4 ? one4 : one6), s);
-        not(t, s);
-        and(mid, t, b, s);
-        sub(t, mid, (s == 4 ? one4 : one6), s);
-        r2c(ip, a, t, f, r, instance_id);
-        r2c(ip, mid, b, f, r, instance_id);
     }
+
+    if (remainder) {
+        if ((a [quads] ^ n [quads]) & htonl(0xFFFFFFFFu << (32 - remainder))) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
-static int ip_range_match(const char *ip, const char *from, const char *to, unsigned long instance_id) {
-    uint8_t ia[16], fa[16], ta[16];
-    int f = 0;
-    int r = 0;
-    if ((f = address(ip, ia)) == address(from, fa) && f == address(to, ta) && f != 0) {
-        r2c(ia, fa, ta, f, &r, instance_id);
-    }
-    return r > 0 ? 1 : 0;
+/**
+ * Tests whether the first argument is in the (inclusive) range of v6 addresses from adr_lo to addr_hi
+ * 
+ * @return 0 if the address is in the range
+ */
+static int cmp_ip_range(const struct in_addr * addr, const struct in_addr * addr_lo,
+        const struct in_addr * addr_hi) {
+    const uint32_t a = addr->s_addr;
+    const uint32_t lo = addr_lo->s_addr;
+    const uint32_t hi = addr_hi->s_addr;
+    return ntohl(a) < ntohl(lo) ? -1 : ntohl(hi) < ntohl(a) ? 1 : 0;
 }
 
-int ip_address_match(const char *ip, const char **list, unsigned int listsize, unsigned long instance_id) {
-    unsigned char addr_raw[16];
-    unsigned char mask_raw[16];
-    int f = 0;
-    unsigned int i;
-    unsigned int bits = 0;
-    char *p = NULL, *p_buf = NULL;
-    char buf[INET6_ADDRSTRLEN];
-    char cbuf[INET6_ADDRSTRLEN];
-    for (i = 0; i < listsize; i++) {
-        memset(buf, 0, sizeof (buf));
-        memcpy(buf, list[i], sizeof (buf) - 1);
-        memset(cbuf, 0, sizeof (cbuf));
-        if (strchr(buf, '-') != NULL && strchr(buf, '/') == NULL) {
-            /* ip range, 192.168.1.1-192.168.2.3,  match*/
-            if ((p = strtok_r(buf, "-", &p_buf)) == NULL) continue;
-            memcpy(cbuf, p, sizeof (cbuf) - 1);
-            if ((p = strtok_r(NULL, "/", &p_buf)) == NULL) continue;
-            if (ip_range_match(ip, cbuf, p, instance_id) > 0) {
-                return 1;
-            }
-        } else {
-            /* cidr (192.168.1.1/24) match*/
-            if ((p = strtok_r(buf, "/", &p_buf)) == NULL) continue;
-            memcpy(cbuf, p, sizeof (cbuf) - 1);
-            if ((p = strtok_r(NULL, "/", &p_buf)) != NULL) {
-                bits = atoi(p);
-            } else {
-                bits = 129;
-            }
-            if ((f = address(ip, addr_raw)) == address(cbuf, mask_raw) && f != 0) {
-                unsigned int s = f == AF_INET6 ? 128 : 32;
-                if (bits > s) bits = s;
-                if (match_cidr(addr_raw, mask_raw, bits) == 1) {
-                    am_log_info(instance_id, "ip_address_match(): found ip address %s in address range %s", ip, list[i]);
-                    return 1;
-                } else {
-                    am_log_info(instance_id, "ip_address_match(): ip address %s is not in address range %s", ip, list[i]);
-                }
-            }
+/**
+ * Compares two uint32 arrays in network format (requiring ntohl translation)
+ * 
+ *  @return negative if a < b, positive if a > b, 0 if they are equal
+ */
+static int cmp_net(const uint32_t * a, const uint32_t * b) {
+    int i, c = 0;
+    for (i = IP6_QUADS; 0 < i--;) {
+        uint32_t ha = ntohl(a [i]), hb = ntohl(b [i]);
+        c = CMP(ha, hb);
+        if (c) {
+            break;
+        }
+    }
+    return c;
+}
+
+/**
+ * Tests whether the first argument is in the (inclusive) range of v6 addresses from adr_lo to addr_hi
+ * 
+ * @return 0 if the address is in the range, negative if below the range, positive if its above
+ */
+static int cmp_ip6_range(const struct in6_addr * addr, const struct in6_addr * addr_lo, const struct in6_addr * addr_hi) {
+    int c;
+    c = cmp_net(addr_lo->s6_addr32, addr->s6_addr32);
+    if (0 < c) {
+        return -1;
+    }
+    c = cmp_net(addr->s6_addr32, addr_hi->s6_addr32);
+    if (0 < c) {
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * Initialize and read an ipv4 presentation, returning in bpits the number of bits
+ * 
+ * @return 0 if the presentation cannot be read as an ipv4 address in CIDR notation
+ */
+static int read_ip(const char * p, struct in_addr * n, int * pbits) {
+#ifdef _WIN32
+    wchar_t *pw;
+    DWORD rva, rvn, len = 0;
+    NET_ADDRESS_INFO aia, ain;
+    size_t sz = p != NULL ? strlen(p) : 0;
+    if (sz == 0) {
+        return 0;
+    }
+    pw = malloc(sz * sizeof (wchar_t) + 2);
+    if (pw == NULL) {
+        return 0;
+    }
+    swprintf(pw, sz + 1, L"%hs", p);
+    rva = rvn = ERROR_INVALID_PARAMETER;
+
+    rva = ParseNetworkString(pw, NET_STRING_IPV4_ADDRESS, &aia, NULL, NULL);
+    if (rva != ERROR_SUCCESS) {
+        rvn = ParseNetworkString(pw, NET_STRING_IPV4_NETWORK, &ain, NULL, (BYTE *) & len);
+    }
+    free(pw);
+    if (rva != ERROR_SUCCESS && rvn != ERROR_SUCCESS) {
+        return 0;
+    }
+    if (rva == ERROR_SUCCESS) {
+        *pbits = 32;
+        memcpy(n, &aia.Ipv4Address.sin_addr, sizeof (struct in_addr));
+    }
+    if (rvn == ERROR_SUCCESS) {
+        *pbits = len;
+        memcpy(n, &ain.Ipv4Address.sin_addr, sizeof (struct in_addr));
+    }
+#else
+    memset(n, 0, sizeof (struct in_addr));
+    *pbits = inet_net_pton(AF_INET, p, n, sizeof (struct in_addr));
+#endif
+    if (*pbits == -1) {
+        return 0;
+    }
+    return 1;
+}
+
+/**
+ * Read an ipv4 presentation p, expecting all bits to be masked, i.e. not a range
+ * 
+ * @return 0 if the presentation is not ipv4, or if it is a CIDR range
+ */
+static int read_full_ip(const char * p, struct in_addr * n) {
+    int mask;
+    if (read_ip(p, n, &mask)) {
+        if (mask == sizeof (n->s_addr) * 8) {
+            return 1;
         }
     }
     return 0;
+}
+
+/**
+ * Initialize and read the ipv6 presentation, returning in pbits the number of masked (on) bits
+ * 
+ * @return 0 if the presentation form cannot be parsed as an ipv6 address in CIDR notation
+ */
+static int read_ip6(const char * p, struct in6_addr * n, int * pbits) {
+#ifdef _WIN32
+    wchar_t *pw;
+    DWORD rva, rvn, len = 0;
+    NET_ADDRESS_INFO aia, ain;
+    size_t sz = p != NULL ? strlen(p) : 0;
+    if (sz == 0) {
+        return 0;
+    }
+    pw = malloc(sz * sizeof (wchar_t) + 2);
+    if (pw == NULL) {
+        return 0;
+    }
+    swprintf(pw, sz + 1, L"%hs", p);
+    rva = rvn = ERROR_INVALID_PARAMETER;
+
+    rva = ParseNetworkString(pw, NET_STRING_IPV6_ADDRESS_NO_SCOPE, &aia, NULL, NULL);
+    if (rva != ERROR_SUCCESS) {
+        /* example: 21DA:D3::/48 */
+        rvn = ParseNetworkString(pw, NET_STRING_IPV6_NETWORK, &ain, NULL, (BYTE *) & len);
+    }
+    free(pw);
+    if (rva != ERROR_SUCCESS && rvn != ERROR_SUCCESS) {
+        return 0;
+    }
+    if (rva == ERROR_SUCCESS) {
+        *pbits = 128;
+        memcpy(n, &aia.Ipv6Address.sin6_addr, sizeof (struct in6_addr));
+    }
+    if (rvn == ERROR_SUCCESS) {
+        *pbits = len;
+        memcpy(n, &ain.Ipv6Address.sin6_addr, sizeof (struct in6_addr));
+    }
+#else
+    memset(n, 0, sizeof (struct in6_addr));
+    *pbits = inet_net_pton(AF_INET6, p, n, sizeof (struct in6_addr));
+#endif
+    if (*pbits == -1) {
+        return 0;
+    }
+    return 1;
+}
+
+/**
+ * Read the presentation form of an ipv6 address, expecting all bits to be masked (on)
+ * 
+ * @return true if all bits are masked (on).
+ */
+static int read_full_ip6(const char * ip, struct in6_addr * p) {
+    int mask;
+    if (read_ip6(ip, p, &mask)) {
+        if (mask == sizeof (p->s6_addr32) * 8) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/**
+ * Test whether an ip address falls within two inclusive boundaries, ensuring that
+ * all addresses are of the same family, v4 or v6, and are not ranges.
+ *
+ * @return 0 on success, and -1 on address parse error
+ */
+static int test_within_bounds(const char * addr_p, const char * lo_p, const char * hi_p) {
+    struct in_addr addr;
+    struct in6_addr addr6;
+    if (read_full_ip(addr_p, &addr)) {
+        struct in_addr lo, hi;
+        if (read_full_ip(lo_p, &lo) && read_full_ip(hi_p, &hi)) {
+            return cmp_ip_range(&addr, &lo, &hi) == 0;
+        }
+    } else if (read_full_ip6(addr_p, &addr6)) {
+        struct in6_addr lo6, hi6;
+        if (read_full_ip6(lo_p, &lo6) && read_full_ip6(hi_p, &hi6)) {
+            return cmp_ip6_range(&addr6, &lo6, &hi6) == 0;
+        }
+    }
+    return -1;
+}
+
+/**
+ * Parse a <LO>-<HI> ip address range, and test that an ip address is in that range
+ * 
+ * @return 0 on success
+ */
+static int test_hyphenated_range(const char * addr, const char * range) {
+    int c;
+    char *lo_p, *hi_p;
+    char *p = strchr(range, '-');
+    if (p == NULL) {
+        return AM_ENOMEM;
+    }
+    lo_p = strndup(range, p - range);
+    hi_p = strdup(p + 1);
+    if (lo_p && hi_p) {
+        c = test_within_bounds(addr, lo_p, hi_p);
+    } else {
+        c = AM_ENOMEM;
+    }
+    am_free(lo_p);
+    am_free(hi_p);
+    return c;
+}
+
+/**
+ * Test that an ip address is within a range specified by a CIDR in the same address family (v4 or v6).
+ *
+ * @return 0 on match, -1 on address parse error
+ */
+static int test_cidr_range(const char * addr, const char * range) {
+    struct in_addr addr4;
+    struct in6_addr addr6;
+    int bits;
+    if (read_full_ip(addr, &addr4)) {
+        struct in_addr cidr;
+        if (read_ip(range, &cidr, &bits)) {
+            return cidr_match(&addr4, &cidr, bits);
+        }
+    } else if (read_full_ip6(addr, &addr6)) {
+        struct in6_addr cidr;
+        if (read_ip6(range, &cidr, &bits)) {
+            return cidr6_match(&addr6, &cidr, bits);
+        }
+    }
+    return -1;
+}
+
+/**
+ * Test that an ip address is within a range in the same address family (v4 or v6).
+ *
+ * @return AM_SUCCESS on match
+ */
+int ip_address_match(const char *ip, const char **list, unsigned int listsize, unsigned long instance_id) {
+    unsigned int i;
+    if (ip == NULL || list == NULL || listsize == 0) {
+        return AM_EINVAL;
+    }
+
+    for (i = 0; i < listsize; i++) {
+        const char *hp = strchr(list[i], '-');
+        const char *fs = strchr(list[i], '/');
+
+        if (hp != NULL && fs == NULL) {
+            /* make sure we get address range here: 192.168.1.1-192.168.2.3 */
+            if (test_hyphenated_range(ip, list[i]) == AM_SUCCESS) {
+                AM_LOG_INFO(instance_id, "ip_address_match(): found ip address %s in address range %s", ip, list[i]);
+                return AM_SUCCESS;
+            }
+        }
+
+        if (hp == NULL && fs != NULL) {
+            /* and cidr spec here: 192.168.1.1/24 */
+            if (test_cidr_range(ip, list[i]) == AM_SUCCESS) {
+                AM_LOG_INFO(instance_id, "ip_address_match(): found ip address %s in address range %s", ip, list[i]);
+                return AM_SUCCESS;
+            }
+        }
+    }
+    return AM_NOT_FOUND;
 }

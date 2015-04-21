@@ -111,6 +111,9 @@ static struct ssl_func crypto_sw[] = {
 #define SSL_ERROR_WANT_WRITE 3
 #define SSL_OP_NO_SSLv2 0x01000000L
 #define SSL_OP_NO_SSLv3 0x02000000L
+#define SSL_OP_NO_TLSv1 0x04000000L
+#define SSL_OP_NO_TLSv1_2 0x08000000L
+#define SSL_OP_NO_TLSv1_1 0x10000000L
 #define SSL_FILETYPE_PEM 1
 #define SSL_VERIFY_NONE 0
 #define SSL_VERIFY_PEER 0x01
@@ -278,13 +281,13 @@ static void show_server_cert(am_net_t *n) {
     cert = SSL_get_peer_certificate(n->ssl.ssl_handle);
     if (cert != NULL) {
         line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-        am_log_debug(n->instance_id,
-                "show_server_cert(): server certificate subject: %s", line);
-        free(line);
+        AM_LOG_DEBUG(n->instance_id,
+                "show_server_cert(): server certificate subject: %s", LOGEMPTY(line));
+        am_free(line);
         line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-        am_log_debug(n->instance_id,
-                "show_server_cert(): server certificate issuer: %s", line);
-        free(line);
+        AM_LOG_DEBUG(n->instance_id,
+                "show_server_cert(): server certificate issuer: %s", LOGEMPTY(line));
+        am_free(line);
         X509_free(cert);
     }
 }
@@ -442,9 +445,7 @@ void net_close_ssl(am_net_t *n) {
     if (n->ssl.ssl_context != NULL) {
         SSL_CTX_free(n->ssl.ssl_context);
     }
-    if (n->ssl.request_data != NULL) {
-        free(n->ssl.request_data);
-    }
+    am_free(n->ssl.request_data);
     n->ssl.request_data = NULL;
     n->ssl.ssl_handle = NULL;
     n->ssl.ssl_context = NULL;
@@ -452,7 +453,7 @@ void net_close_ssl(am_net_t *n) {
 }
 
 void net_connect_ssl(am_net_t *n) {
-    const char *thisfunc = "net_connect_ssl():";
+    static const char *thisfunc = "net_connect_ssl():";
     int status = -1, err = 0;
     if (n != NULL) {
         n->ssl.on = AM_FALSE;
@@ -469,45 +470,64 @@ void net_connect_ssl(am_net_t *n) {
         n->ssl.ssl_context = SSL_CTX_new(SSLv23_client_method());
 
         SSL_CTX_ctrl(n->ssl.ssl_context, SSL_CTRL_OPTIONS, SSL_OP_NO_SSLv2, NULL);
-        SSL_CTX_ctrl(n->ssl.ssl_context, SSL_CTRL_OPTIONS, SSL_OP_NO_SSLv3, NULL);
-        if (ISVALID(n->ssl.info.name[5])) {
-            //TODO: parse tls options
+        if (ISVALID(n->ssl.info.tls_opts)) {
+            char *v, *t, *c = strdup(n->ssl.info.tls_opts);
+            if (c != NULL) {
+                for ((v = strtok_r(c, AM_SPACE_CHAR, &t)); v; (v = strtok_r(NULL, AM_SPACE_CHAR, &t))) {
+                    if (strcasecmp(v, "-SSLv3") == 0) {
+                        SSL_CTX_ctrl(n->ssl.ssl_context, SSL_CTRL_OPTIONS, SSL_OP_NO_SSLv3, NULL);
+                        continue;
+                    }
+                    if (strcasecmp(v, "-TLSv1") == 0) {
+                        SSL_CTX_ctrl(n->ssl.ssl_context, SSL_CTRL_OPTIONS, SSL_OP_NO_TLSv1, NULL);
+                        continue;
+                    }
+                    if (strcasecmp(v, "-TLSv1.1") == 0) {
+                        SSL_CTX_ctrl(n->ssl.ssl_context, SSL_CTRL_OPTIONS, SSL_OP_NO_TLSv1_1, NULL);
+                        continue;
+                    }
+                    if (strcasecmp(v, "-TLSv1.2") == 0) {
+                        SSL_CTX_ctrl(n->ssl.ssl_context, SSL_CTRL_OPTIONS, SSL_OP_NO_TLSv1_2, NULL);
+                    }
+                }
+                free(c);
+            }
         }
 
-        if (ISVALID(n->ssl.info.name[0])) {
-            if (!SSL_CTX_set_cipher_list(n->ssl.ssl_context, n->ssl.info.name[0])) {
-                am_log_warning(n->instance_id,
+        if (ISVALID(n->ssl.info.ciphers)) {
+            if (!SSL_CTX_set_cipher_list(n->ssl.ssl_context, n->ssl.info.ciphers)) {
+                AM_LOG_WARNING(n->instance_id,
                         "%s failed to set cipher list \"%s\"",
-                        thisfunc, n->ssl.info.name[0]);
+                        thisfunc, n->ssl.info.ciphers);
             }
         }
-        if (ISVALID(n->ssl.info.name[1])) {
-            if (!SSL_CTX_load_verify_locations(n->ssl.ssl_context, n->ssl.info.name[1], NULL)) {
-                am_log_warning(n->instance_id,
+        if (ISVALID(n->ssl.info.cert_ca_file)) {
+            if (!SSL_CTX_load_verify_locations(n->ssl.ssl_context, n->ssl.info.cert_ca_file, NULL)) {
+                AM_LOG_WARNING(n->instance_id,
                         "%s failed to load trusted CA certificates file \"%s\"",
-                        thisfunc, n->ssl.info.name[1]);
+                        thisfunc, n->ssl.info.cert_ca_file);
             }
         }
-        if (ISVALID(n->ssl.info.name[2])) {
-            if (!SSL_CTX_use_certificate_file(n->ssl.ssl_context, n->ssl.info.name[2], SSL_FILETYPE_PEM)) {
-                am_log_warning(n->instance_id,
+        if (ISVALID(n->ssl.info.cert_file)) {
+            if (!SSL_CTX_use_certificate_file(n->ssl.ssl_context, n->ssl.info.cert_file, SSL_FILETYPE_PEM)) {
+                AM_LOG_WARNING(n->instance_id,
                         "%s failed to load client certificate file \"%s\"",
-                        thisfunc, n->ssl.info.name[2]);
+                        thisfunc, n->ssl.info.cert_file);
             }
         }
 
-        if (ISVALID(n->ssl.info.name[3])) {
-            if (ISVALID(n->ssl.info.name[4])) {
-                SSL_CTX_set_default_passwd_cb_userdata(n->ssl.ssl_context, (void *) n->ssl.info.name[4]);
+        if (ISVALID(n->ssl.info.cert_key_file)) {
+            if (ISVALID(n->ssl.info.cert_key_pass)) {
+                SSL_CTX_set_default_passwd_cb_userdata(n->ssl.ssl_context, (void *) n->ssl.info.cert_key_pass);
                 SSL_CTX_set_default_passwd_cb(n->ssl.ssl_context, password_callback);
             }
-            if (!SSL_CTX_use_PrivateKey_file(n->ssl.ssl_context, n->ssl.info.name[3], SSL_FILETYPE_PEM)) {
-                am_log_warning(n->instance_id,
+            if (!SSL_CTX_use_PrivateKey_file(n->ssl.ssl_context, n->ssl.info.cert_key_file, SSL_FILETYPE_PEM)) {
+                AM_LOG_WARNING(n->instance_id,
                         "%s failed to load private key file \"%s\"",
-                        thisfunc, n->ssl.info.name[3]);
+                        thisfunc, n->ssl.info.cert_key_file);
             }
             if (!SSL_CTX_check_private_key(n->ssl.ssl_context)) {
-                am_log_warning(n->instance_id,
+                AM_LOG_WARNING(n->instance_id,
                         "%s private key does not match the public certificate",
                         thisfunc);
             }
@@ -594,4 +614,28 @@ int net_read_ssl(am_net_t *n, const char *buf, int sz) {
         }
     }
     return AM_SUCCESS;
+}
+
+void am_net_set_ssl_options(am_config_t *ac, struct am_ssl_options *info) {
+    if (ac == NULL || info == NULL) return;
+    memset(info, 0, sizeof (struct am_ssl_options));
+    if (ISVALID(ac->ciphers)) {
+        snprintf(info->ciphers, sizeof (info->ciphers), "%s", ac->ciphers);
+    }
+    if (ISVALID(ac->cert_ca_file)) {
+        snprintf(info->cert_ca_file, sizeof (info->cert_ca_file), "%s", ac->cert_ca_file);
+    }
+    if (ISVALID(ac->cert_file)) {
+        snprintf(info->cert_file, sizeof (info->cert_file), "%s", ac->cert_file);
+    }
+    if (ISVALID(ac->cert_key_file)) {
+        snprintf(info->cert_key_file, sizeof (info->cert_key_file), "%s", ac->cert_key_file);
+    }
+    if (ISVALID(ac->cert_key_pass)) {
+        snprintf(info->cert_key_pass, sizeof (info->cert_key_pass), "%s", ac->cert_key_pass);
+    }
+    if (ISVALID(ac->tls_opts)) {
+        snprintf(info->tls_opts, sizeof (info->tls_opts), "%s", ac->tls_opts);
+    }
+    info->verifypeer = !ac->cert_trust;
 }

@@ -18,17 +18,28 @@
 #define THREAD_H
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+typedef CRITICAL_SECTION am_mutex_t;
+typedef HANDLE am_thread_t;
+#define AM_MUTEX_LOCK           EnterCriticalSection
+#define AM_MUTEX_UNLOCK         LeaveCriticalSection
+#define AM_MUTEX_DESTROY        DeleteCriticalSection
+#define AM_THREAD_CREATE(t,f,a) do { t = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) f, a, 0, NULL); } while(0)
+#define AM_THREAD_JOIN(t)       WaitForSingleObject(t, INFINITE)
 #else
-#include <pthread.h>
+typedef pthread_mutex_t am_mutex_t;
+typedef pthread_t am_thread_t;
+#define AM_MUTEX_LOCK           pthread_mutex_lock
+#define AM_MUTEX_UNLOCK         pthread_mutex_unlock
+#define AM_MUTEX_DESTROY        pthread_mutex_destroy
+#define AM_THREAD_CREATE(t,f,a) pthread_create(&(t), NULL, f, a)
+#define AM_THREAD_JOIN(t)       pthread_join(t, NULL)
 #endif
 
 typedef struct {
 #ifdef _WIN32
     HANDLE e;
 #else
-    char e;
+    volatile char e;
     pthread_mutex_t m;
     pthread_cond_t c;
 #endif

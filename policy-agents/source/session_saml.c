@@ -25,7 +25,6 @@
  */
 
 typedef struct {
-    int depth;
     unsigned long instance_id;
     char setting_value;
     struct am_namevalue *list;
@@ -43,7 +42,6 @@ static void start_element(void *userData, const char *name, const char **atts) {
 
 static void end_element(void * userData, const char * name) {
     am_xml_parser_ctx_t *ctx = (am_xml_parser_ctx_t *) userData;
-    ctx->depth--;
     ctx->setting_value = 0;
 }
 
@@ -59,14 +57,14 @@ static void character_data(void *userData, const char *val, int len) {
         clean = url_decode(t);
         sz = strlen(clean);
         alloc = 1;
-        if (t != NULL) free(t);
+        am_free(t);
     } else {
         clean = (char *) val;
         sz = len;
     }
 
     if (create_am_namevalue_node("sid", 3, clean, sz, &el) == 0) {
-        am_list_insert(ctx->list, el);
+        AM_LIST_INSERT(ctx->list, el);
     }
     if (alloc && clean) {
         free(clean);
@@ -81,14 +79,14 @@ static void entity_declaration(void *userData, const XML_Char *entityName,
 }
 
 void *am_parse_session_saml(unsigned long instance_id, const char *xml, size_t xml_sz) {
-    const char *thisfunc = "am_parse_session_saml():";
+    static const char *thisfunc = "am_parse_session_saml():";
     struct am_namevalue *e, *t, *r = NULL;
 
-    am_xml_parser_ctx_t xctx = {.depth = 0, .instance_id = instance_id,
+    am_xml_parser_ctx_t xctx = {.instance_id = instance_id,
         .list = NULL, .parser = NULL};
 
     if (xml == NULL || xml_sz == 0) {
-        am_log_error(instance_id, "%s memory allocation error", thisfunc);
+        AM_LOG_ERROR(instance_id, "%s memory allocation error", thisfunc);
         return NULL;
     } else {
         XML_Parser parser = XML_ParserCreate("UTF-8");
@@ -101,7 +99,7 @@ void *am_parse_session_saml(unsigned long instance_id, const char *xml, size_t x
             const char *message = XML_ErrorString(XML_GetErrorCode(parser));
             int line = XML_GetCurrentLineNumber(parser);
             int col = XML_GetCurrentColumnNumber(parser);
-            am_log_error(instance_id, "%s xml parser error (%d:%d) %s", thisfunc,
+            AM_LOG_ERROR(instance_id, "%s xml parser error (%d:%d) %s", thisfunc,
                     line, col, message);
             delete_am_namevalue_list(&xctx.list);
         } else {
@@ -112,8 +110,8 @@ void *am_parse_session_saml(unsigned long instance_id, const char *xml, size_t x
 
     if (r != NULL) {
 
-        am_list_for_each(r, e, t) {
-            am_log_debug(instance_id, "%s name: '%s' value: '%s'", thisfunc,
+        AM_LIST_FOR_EACH(r, e, t) {
+            AM_LOG_DEBUG(instance_id, "%s name: '%s' value: '%s'", thisfunc,
                     e->n, e->v != NULL ? e->v : "NULL");
         }
     }

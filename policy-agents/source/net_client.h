@@ -85,6 +85,7 @@ int am_net_write(am_net_t *n, const char *data, size_t data_sz);
 
 void am_net_diconnect(am_net_t *n); /*disconnect socket (client side)*/
 int am_net_close(am_net_t *n);
+void am_net_set_ssl_options(am_config_t *ac, struct am_ssl_options *info);
 
 void am_net_init();
 void am_net_shutdown();

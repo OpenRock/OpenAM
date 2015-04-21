@@ -172,7 +172,7 @@ static void password_decrypt(int argc, char **argv) {
         if (decrypt_password(key, &password) > 0) {
             fprintf(stdout, "\nPassword value: %s\n\n", password);
         }
-        if (password != NULL) free(password);
+        am_free(password);
     }
 }
 
@@ -182,24 +182,26 @@ static void password_encrypt(int argc, char **argv) {
         char *password = strdup(argv[3]);
         if (encrypt_password(key, &password) > 0) {
             fprintf(stdout, "\nEncrypted password value: %s\n\n", password);
+        } else {
+            fprintf(stdout, "\nError encrypting password - invalid arguments.\n\n");
         }
-        if (password != NULL) free(password);
+        am_free(password);
     }
 }
 
 static void generate_key(int argc, char **argv) {
     char *encoded = NULL, key[37];
-    size_t sz = 36;
+    size_t sz = 16; /*limit the number of random characters in a key*/
     uuid(key, sizeof (key));
     encoded = base64_encode(key, &sz);
     fprintf(stdout, "\nEncryption key value: %s\n\n", encoded);
-    if (encoded != NULL) free(encoded);
+    am_free(encoded);
 }
 
 static void show_version(int argc, char **argv) {
     fprintf(stdout, "\n%s\n", DESCRIPTION);
     fprintf(stdout, " Version: %s\n", VERSION);
-    fprintf(stdout, " Revision: %s\n", VERSION_VCS);
+    fprintf(stdout, " %s\n", VERSION_VCS);
     fprintf(stdout, " Build machine: %s\n", BUILD_MACHINE);
     fprintf(stdout, " Build date: %s %s\n\n", __DATE__, __TIME__);
 }
@@ -220,7 +222,7 @@ static int am_read_instances(const char *path, struct am_conf_entry **list) {
                 strncpy(e->path, b, sizeof (e->path) - 1);
                 strncpy(e->web, c, sizeof (e->web) - 1);
                 e->next = NULL;
-                am_list_insert(*list, e);
+                AM_LIST_INSERT(*list, e);
                 ret++;
             }
         }
@@ -293,63 +295,77 @@ static int create_agent_instance(int status, const char *web_conf_path, const ch
             am_asprintf(&conf_file_path, "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf", created_name_path);
             am_asprintf(&log_path, "%s"FILE_PATH_SEP"logs"FILE_PATH_SEP"debug"FILE_PATH_SEP, created_name_path);
             am_asprintf(&audit_log_path, "%s"FILE_PATH_SEP"logs"FILE_PATH_SEP"audit"FILE_PATH_SEP, created_name_path);
-            if (log_path == NULL || audit_log_path == NULL || conf_file_path == NULL)
-                rv = AM_ENOMEM;
 
-            /*do a search-n-replace (in memory)*/
-            if (rv == AM_SUCCESS) {
+            do {
+                struct url u;
+                char *encoded, *password, key[37];
+                size_t sz = 16;
+
+                if (log_path == NULL || audit_log_path == NULL || conf_file_path == NULL) {
+                    rv = AM_ENOMEM;
+                    break;
+                }
+
+                /*do a search-n-replace (in memory)*/
                 install_log("updating %s", AM_INSTALL_OPENAMURL);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_OPENAMURL, openam_url, &agent_conf_template_sz);
-            }
-            if (rv == AM_SUCCESS) {
-                struct url u;
+                if (rv != AM_SUCCESS) break;
+
                 rv = parse_url(agent_url, &u);
-                if (rv == AM_SUCCESS) {
-                    install_log("updating %s %s", AM_INSTALL_AGENT_FQDN, u.host);
-                    rv = string_replace(&agent_conf_template, AM_INSTALL_AGENT_FQDN, u.host, &agent_conf_template_sz);
-                }
-            }
-            if (rv == AM_SUCCESS) {
+                if (rv != AM_SUCCESS) break;
+
+                install_log("updating %s %s", AM_INSTALL_AGENT_FQDN, u.host);
+                rv = string_replace(&agent_conf_template, AM_INSTALL_AGENT_FQDN, u.host, &agent_conf_template_sz);
+                if (rv != AM_SUCCESS) break;
+
                 install_log("updating %s", AM_INSTALL_REALM);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_REALM, agent_realm, &agent_conf_template_sz);
-            }
-            if (rv == AM_SUCCESS) {
+                if (rv != AM_SUCCESS) break;
+
                 install_log("updating %s", AM_INSTALL_AGENTURL);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_AGENTURL, agent_url, &agent_conf_template_sz);
-            }
-            if (rv == AM_SUCCESS) {
+                if (rv != AM_SUCCESS) break;
+
                 install_log("updating %s", AM_INSTALL_AGENTURL);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_AGENT, agent_user, &agent_conf_template_sz);
-            }
-            if (rv == AM_SUCCESS) {
-                char *encoded = NULL, key[37];
-                size_t sz = 36;
+                if (rv != AM_SUCCESS) break;
+
                 uuid(key, sizeof (key));
                 encoded = base64_encode(key, &sz);
                 install_log("updating %s", AM_INSTALL_KEY);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_KEY, encoded, &agent_conf_template_sz);
-                if (rv == AM_SUCCESS) {
-                    char *password = strdup(agent_password);
-                    if (password != NULL && encrypt_password(key, &password) > 0) {
-                        install_log("updating %s", AM_INSTALL_PASSWORD);
-                        rv = string_replace(&agent_conf_template, AM_INSTALL_PASSWORD, password, &agent_conf_template_sz);
-                    } else {
-                        rv = AM_ENOMEM;
-                    }
-                    if (password != NULL) free(password);
+                if (rv != AM_SUCCESS) {
+                    am_free(encoded);
+                    break;
                 }
-                if (encoded != NULL) free(encoded);
-            }
-            if (rv == AM_SUCCESS) {
+
+                password = strdup(agent_password);
+                if (password == NULL) {
+                    rv = AM_ENOMEM;
+                    am_free(encoded);
+                    break;
+                }
+
+                if (encrypt_password(encoded, &password) > 0) {
+                    install_log("updating %s", AM_INSTALL_PASSWORD);
+                    rv = string_replace(&agent_conf_template, AM_INSTALL_PASSWORD, password, &agent_conf_template_sz);
+                }
+                am_free(password);
+                am_free(encoded);
+                if (rv != AM_SUCCESS) break;
+
                 install_log("updating %s", AM_INSTALL_DEBUGPATH);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_DEBUGPATH, log_path, &agent_conf_template_sz);
-            }
-            if (rv == AM_SUCCESS) {
+                if (rv != AM_SUCCESS) break;
+
                 install_log("updating %s", AM_INSTALL_AUDITPATH);
                 rv = string_replace(&agent_conf_template, AM_INSTALL_AUDITPATH, audit_log_path, &agent_conf_template_sz);
-            }
+                if (rv != AM_SUCCESS) {
+                    install_log("failed to update agent configuration template file %s (%s)",
+                            config_template, am_strerror(rv));
+                    break;
+                }
 
-            if (rv == AM_SUCCESS) {
                 /*write an updated template to the agent configuration file*/
                 install_log("writing configuration to %s", conf_file_path);
                 if (write_file(conf_file_path, agent_conf_template, agent_conf_template_sz) > 0) {
@@ -358,15 +374,10 @@ static int create_agent_instance(int status, const char *web_conf_path, const ch
                     install_log("failed to write agent configuration to %s", conf_file_path);
                     rv = AM_FILE_ERROR;
                 }
-            } else {
-                install_log("failed to update agent configuration template file %s (%s)",
-                        config_template, am_strerror(rv));
-            }
 
-            if (agent_conf_template != NULL) free(agent_conf_template);
-            if (conf_file_path != NULL) free(conf_file_path);
-            if (log_path != NULL) free(log_path);
-            if (audit_log_path != NULL) free(audit_log_path);
+            } while (0);
+
+            AM_FREE(agent_conf_template, conf_file_path, log_path, audit_log_path);
         } else {
             install_log("failed to open agent configuration template file %s", config_template);
             rv = AM_ENOMEM;
@@ -386,60 +397,68 @@ static int create_agent_instance(int status, const char *web_conf_path, const ch
         }
 
         /*container specific updates*/
-
-        if (instance_type == AM_I_APACHE) {
-
-            if (rv == AM_SUCCESS && copy_file(web_conf_path, NULL) == AM_SUCCESS) {
-                /*update Apache httpd.conf (global context only)*/
-                f = fopen(web_conf_path, "a");
-                if (f != NULL) {
-                    fprintf(f, "\n\nLoadModule amagent_module %s.."FILE_PATH_SEP"lib"FILE_PATH_SEP"mod_openam."LIB_FILE_EXT"\n"
-                            "AmAgent On\n"
-                            "AmAgentConf %s"FILE_PATH_SEP"agent.conf\n\n",
-                            app_path, created_name_path);
-                    fclose(f);
-                    install_log("webserver configuration %s updated", web_conf_path);
-                }
-            } else {
-                install_log("failed to create a backup copy of %s", web_conf_path);
-                rv = AM_FILE_ERROR;
-            }
-
-        } else if (instance_type == AM_I_IIS) {
-
-            if (rv == AM_SUCCESS && status == 0) {
-                char schema_file[AM_URI_SIZE];
-                char lib_file[AM_URI_SIZE];
-                snprintf(schema_file, sizeof (schema_file),
-                        "%s.."FILE_PATH_SEP"config"FILE_PATH_SEP"mod_iis_openam_schema.xml",
-                        app_path);
-                snprintf(lib_file, sizeof (lib_file),
-                        "%s.."FILE_PATH_SEP"lib"FILE_PATH_SEP"mod_iis_openam."LIB_FILE_EXT,
-                        app_path);
-
-                /*need to add module to global configuration first*/
-                if (install_module(lib_file, schema_file) == 0) {
-                    rv = AM_ERROR;
+        switch (instance_type) {
+            case AM_I_APACHE:
+            {
+                if (rv == AM_SUCCESS && copy_file(web_conf_path, NULL) == AM_SUCCESS) {
+                    /*update Apache httpd.conf (global context only)*/
+                    f = fopen(web_conf_path, "a");
+                    if (f != NULL) {
+                        fprintf(f, "\n\nLoadModule amagent_module %s.."FILE_PATH_SEP"lib"FILE_PATH_SEP"mod_openam."LIB_FILE_EXT"\n"
+                                "AmAgent On\n"
+                                "AmAgentConf %s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf\n\n",
+                                app_path, created_name_path);
+                        fclose(f);
+                        install_log("webserver configuration %s updated", web_conf_path);
+                    }
                 } else {
-                    install_log("webserver site global configuration updated");
+                    install_log("failed to create a backup copy of %s", web_conf_path);
+                    rv = AM_FILE_ERROR;
                 }
             }
-            if (rv == AM_SUCCESS) {
-                char iis_instc_file[AM_URI_SIZE];
-                snprintf(iis_instc_file, sizeof (iis_instc_file),
-                        "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
-                        created_name_path);
+                break;
+            case AM_I_IIS:
+            {
+                if (rv == AM_SUCCESS && status == 0) {
+                    char schema_file[AM_URI_SIZE];
+                    char lib_file[AM_URI_SIZE];
+                    snprintf(schema_file, sizeof (schema_file),
+                            "%s.."FILE_PATH_SEP"config"FILE_PATH_SEP"mod_iis_openam_schema.xml",
+                            app_path);
+                    snprintf(lib_file, sizeof (lib_file),
+                            "%s.."FILE_PATH_SEP"lib"FILE_PATH_SEP"mod_iis_openam."LIB_FILE_EXT,
+                            app_path);
 
-                /*module is already loaded in global configuration*/
-                if (enable_module(web_conf_path, iis_instc_file) == 0) {
-                    rv = AM_ERROR;
-                } else {
-                    install_log("webserver site %s configuration updated", web_conf_path);
+                    /*need to add module to global configuration first*/
+                    if (install_module(lib_file, schema_file) == 0) {
+                        rv = AM_ERROR;
+                    } else {
+                        install_log("webserver site global configuration updated");
+                    }
+                }
+                if (rv == AM_SUCCESS) {
+                    char iis_instc_file[AM_URI_SIZE];
+                    snprintf(iis_instc_file, sizeof (iis_instc_file),
+                            "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
+                            created_name_path);
+
+                    /*module is already loaded in global configuration*/
+                    if (enable_module(web_conf_path, iis_instc_file) == 0) {
+                        rv = AM_ERROR;
+                    } else {
+                        install_log("webserver site %s configuration updated", web_conf_path);
+                    }
                 }
             }
-
-        } else if (instance_type == AM_I_VARNISH) {
-            //TODO
+                break;
+            case AM_I_VARNISH:
+            {
+                //TODO
+            }
+                break;
+            default:
+                install_log("unknown installation instance type %d", instance_type);
+                break;
         }
 
         /*delete agent configuration directory in case of an error*/
@@ -453,9 +472,7 @@ static int create_agent_instance(int status, const char *web_conf_path, const ch
         install_log("failed to create agent instance configuration directories");
     }
 
-    if (created_name_path != NULL) free(created_name_path);
-    if (created_name_simple != NULL) free(created_name_simple);
-
+    AM_FREE(created_name_path, created_name_simple);
     return rv;
 }
 
@@ -525,15 +542,15 @@ static void install_interactive(int argc, char **argv) {
             install_log("license accepted");
             lic_accepted = AM_TRUE;
             am_make_path(instance_path);
-            write_file(lic_path, " ", 1);
+            write_file(lic_path, AM_SPACE_CHAR, 1);
         }
-        if (input != NULL) free(input);
+        am_free(input);
     } else {
         lic_accepted = AM_TRUE;
         install_log("license was accepted earlier");
     }
 
-    if (lic_accepted != AM_TRUE) {
+    if (!lic_accepted) {
         install_log("license was not accepted");
         fprintf(stdout, "\nYou need to accept the License terms and conditions to continue.\n");
         exit(1);
@@ -542,199 +559,217 @@ static void install_interactive(int argc, char **argv) {
     fprintf(stdout, "\n%s for %s Server interactive installation.\n\n", DESCRIPTION,
             am_container_str(instance_type));
 
-restart_container:
+    for (;;) {
+        switch (instance_type) {
+            case AM_I_APACHE:
+            {
+                char *conf = NULL;
+                char err = AM_TRUE;
 
-    if (instance_type == AM_I_APACHE) {
-        char *conf = NULL;
-        char err = AM_TRUE;
+                /*Apache HTTPD specific*/
 
-        /*Apache HTTPD specific*/
+                input = prompt_and_read("\nEnter the complete path to the httpd.conf file which is used by Apache HTTPD\n"
+                        "Server to store its configuration.\n"
+                        "[ q or 'ctrl+c' to exit ]\n"
+                        "Configuration file ["APACHE_DEFAULT_CONF_FILE"]:");
+                if (ISVALID(input) && strcasecmp(input, "q") == 0) {
+                    free(input);
+                    install_log("installation exit");
+                    exit(1);
+                }
 
-        input = prompt_and_read("\nEnter the complete path to the httpd.conf file which is used by Apache HTTPD\n"
-                "Server to store its configuration.\n"
+                if (!ISVALID(input)) {
+                    am_free(input);
+                    input = strdup(APACHE_DEFAULT_CONF_FILE);
+                    if (input == NULL) {
+                        install_log("installation exit (memory allocation error)");
+                        exit(1);
+                    }
+                }
+
+                conf = load_file(input, NULL);
+                if (conf != NULL) {
+                    if (strstr(conf, "LoadModule amagent_module") != NULL && strstr(conf, "#LoadModule amagent_module") == NULL) {
+                        fprintf(stdout, "\nError: this server instance is already configured with %s module.\nPlease try again.\n\n", DESCRIPTION);
+                        install_log("server instance %s is already configured with %s",
+                                input, DESCRIPTION);
+                    } else if (strstr(conf, "LoadModule") == NULL) {
+                        fprintf(stdout, "\nError: invalid server configuration file %s.]\nPlease try again.\n\n",
+                                input);
+                        install_log("could not locate LoadModule configuration directive in %s", input);
+                    } else {
+                        strncpy(apache_conf, input, sizeof (apache_conf) - 1);
+                        install_log("server configuration file %s", apache_conf);
+                        free(input);
+                        input = NULL;
+                        err = AM_FALSE;
+                    }
+                    free(conf);
+                } else {
+                    fprintf(stdout, "\nError: unable to load the server configuration file %s.\nPlease try again.\n\n",
+                            input);
+                    install_log("unable to load server configuration file %s", input);
+                }
+
+                if (err) {
+                    am_free(input);
+                    continue;
+                }
+            }
+                break;
+            case AM_I_IIS:
+            {
+                iis_status = 0;
+                /* IIS specific */
+                list_iis_sites(argc, argv);
+
+                input = prompt_and_read("\nEnter IIS Server Site identification number.\n"
+                        "[ q or 'ctrl+c' to exit ]\n"
+                        "Site id:");
+                if (input == NULL || (ISVALID(input) && strcasecmp(input, "q") == 0)) {
+                    free(input);
+                    install_log("installation exit");
+                    exit(1);
+                }
+
+                iis_status = test_module(input);
+                if (iis_status == ADMIN_IIS_MOD_LOCAL) {
+                    fprintf(stdout, "\nError: this server site is already configured with %s module.\nPlease try again.\n\n", DESCRIPTION);
+                    install_log("IIS server site %s is already configured with %s",
+                            NOTNULL(input), DESCRIPTION);
+                    free(input);
+                    continue;
+                } else {
+                    install_log("IIS server site %s is not yet configured with %s (status: %d)",
+                            NOTNULL(input), DESCRIPTION, iis_status);
+                }
+
+                strncpy(apache_conf, input, sizeof (apache_conf) - 1);
+                free(input);
+            }
+                break;
+            case AM_I_VARNISH:
+            {
+                fprintf(stdout, "Error: %s installation type not supported yet. Exiting.\n",
+                        am_container_str(instance_type));
+                install_log("unknown installation type");
+                exit(1);
+            }
+            default:
+            {
+                fprintf(stdout, "Error: unknown installation type. Exiting.\n");
+                install_log("unknown installation type");
+                exit(1);
+            }
+        }
+        break;
+    }
+
+    for (;;) {
+        input = prompt_and_read("\nEnter the URL where the OpenAM server is running. Please include the\n"
+                "deployment URI also as shown below:\n"
+                "(http://openam.sample.com:58080/openam)\n"
                 "[ q or 'ctrl+c' to exit ]\n"
-                "Configuration file ["APACHE_DEFAULT_CONF_FILE"]:");
+                "OpenAM server URL:");
         if (ISVALID(input) && strcasecmp(input, "q") == 0) {
             free(input);
             install_log("installation exit");
             exit(1);
         }
-
-        conf = load_file(ISVALID(input) ? input : APACHE_DEFAULT_CONF_FILE, NULL);
-        if (conf != NULL) {
-            if (strstr(conf, "LoadModule amagent_module") != NULL && strstr(conf, "#LoadModule amagent_module") == NULL) {
-                fprintf(stdout, "\nError: this server instance is already configured with %s module.\nPlease try again.\n\n", DESCRIPTION);
-                install_log("server instance %s is already configured with %s",
-                        ISVALID(input) ? input : APACHE_DEFAULT_CONF_FILE, DESCRIPTION);
-            } else if (strstr(conf, "LoadModule") == NULL) {
-                fprintf(stdout, "\nError: invalid server configuration file %s.]\nPlease try again.\n\n",
-                        ISVALID(input) ? input : APACHE_DEFAULT_CONF_FILE);
-                install_log("could not locate LoadModule configuration directive in %s",
-                        ISVALID(input) ? input : APACHE_DEFAULT_CONF_FILE);
-            } else {
-                strncpy(apache_conf, input, sizeof (apache_conf) - 1);
-                install_log("server configuration file %s", apache_conf);
-                free(input);
-                err = AM_FALSE;
-            }
-            free(conf);
-        } else {
-            fprintf(stdout, "\nError: unable to load the server configuration file %s.\nPlease try again.\n\n",
-                    ISVALID(input) ? input : APACHE_DEFAULT_CONF_FILE);
-            install_log("unable to load server configuration file %s",
-                    ISVALID(input) ? input : APACHE_DEFAULT_CONF_FILE);
+        if (ISVALID(input)) {
+            strncpy(openam_url, input, sizeof (openam_url) - 1);
+            install_log("OpenAM URL %s", openam_url);
         }
+        am_free(input);
 
-        if (err) {
-            if (input != NULL) free(input);
-            goto restart_container;
-        }
-
-    } else if (instance_type == AM_I_IIS) {
-        iis_status = 0;
-
-        /* IIS specific */
-        list_iis_sites(argc, argv);
-
-        input = prompt_and_read("\nEnter IIS Server Site identification number.\n"
+        input = prompt_and_read("\nEnter the Agent URL as shown below:\n"
+                "(http://agent.sample.com:1234)\n"
                 "[ q or 'ctrl+c' to exit ]\n"
-                "Site id:");
-        if (input == NULL || (ISVALID(input) && strcasecmp(input, "q") == 0)) {
+                "Agent URL:");
+        if (ISVALID(input) && strcasecmp(input, "q") == 0) {
             free(input);
             install_log("installation exit");
             exit(1);
         }
+        if (ISVALID(input)) {
+            strncpy(agent_url, input, sizeof (agent_url) - 1);
+            install_log("Agent URL %s", agent_url);
+        }
+        am_free(input);
 
-        iis_status = test_module(input);
-        if (iis_status & (1 << 1)) {
-            fprintf(stdout, "\nError: this server site is already configured with %s module.\nPlease try again.\n\n", DESCRIPTION);
-            install_log("IIS server site %s is already configured with %s",
-                    NOTNULL(input), DESCRIPTION);
+        input = prompt_and_read("\nEnter the Agent profile name\n"
+                "[ q or 'ctrl+c' to exit ]\n"
+                "Agent Profile name:");
+        if (ISVALID(input) && strcasecmp(input, "q") == 0) {
             free(input);
-            goto restart_container;
+            install_log("installation exit");
+            exit(1);
+        }
+        if (ISVALID(input)) {
+            strncpy(agent_user, input, sizeof (agent_user) - 1);
+            install_log("Agent Profile name %s", agent_user);
+        }
+        am_free(input);
+
+        input = prompt_and_read("\nEnter the Agent realm/organization\n"
+                "[ q or 'ctrl+c' to exit ]\n"
+                "Agent realm/organization name: [/]:");
+        if (ISVALID(input) && strcasecmp(input, "q") == 0) {
+            free(input);
+            install_log("installation exit");
+            exit(1);
+        }
+        if (ISVALID(input)) {
+            strncpy(agent_realm, input, sizeof (agent_realm) - 1);
+            install_log("Agent realm/organization name %s", agent_realm);
         } else {
-            install_log("IIS server site %s is not yet configured with %s (status: %d)",
-                    NOTNULL(input), DESCRIPTION, iis_status);
+            strncpy(agent_realm, "/", sizeof (agent_realm) - 1);
+            install_log("Agent realm/organization name %s", "/");
+        }
+        am_free(input);
+
+        input = prompt_and_read("\nEnter the path to a file that contains the password to be used\n"
+                "for identifying the Agent\n"
+                "[ q or 'ctrl+c' to exit ]\n"
+                "The path to the password file:");
+        if (ISVALID(input) && strcasecmp(input, "q") == 0) {
+            free(input);
+            install_log("installation exit");
+            exit(1);
+        }
+        if (ISVALID(input)) {
+            char *password_data = load_file(input, NULL);
+            install_log("Agent password file %s", input);
+            if (password_data != NULL) {
+                trim(password_data, '\n');
+                trim(password_data, '\r');
+                install_log("agent password file %s opened successfully", input);
+                strncpy(agent_password, password_data, sizeof (agent_password) - 1);
+                free(password_data);
+            } else {
+                install_log("unable to open password file %s", LOGEMPTY(input));
+            }
         }
 
-        strncpy(apache_conf, input, sizeof (apache_conf) - 1);
-        free(input);
+        fprintf(stdout, "\nInstallation parameters:\n\n"
+                "   OpenAM URL: %s\n"
+                "   Agent URL: %s\n"
+                "   Agent Profile name: %s\n"
+                "   Agent realm/organization name: %s\n"
+                "   Agent Profile password file: %s\n\n",
+                openam_url, agent_url, agent_user, agent_realm, NOTNULL(input));
+        am_free(input);
 
-    } else if (instance_type == AM_I_VARNISH) {
-        fprintf(stdout, "Error: %s installation type not supported yet. Exiting.\n",
-                am_container_str(instance_type));
-        install_log("unknown installation type");
-        exit(1);
-    } else {
-        fprintf(stdout, "Error: unknown installation type. Exiting.\n");
-        install_log("unknown installation type");
-        exit(1);
-    }
-
-restart_remote:
-
-    input = prompt_and_read("\nEnter the URL where the OpenAM server is running. Please include the\n"
-            "deployment URI also as shown below:\n"
-            "(http://openam.sample.com:58080/openam)\n"
-            "[ q or 'ctrl+c' to exit ]\n"
-            "OpenAM server URL:");
-    if (ISVALID(input) && strcasecmp(input, "q") == 0) {
-        free(input);
-        install_log("installation exit");
-        exit(1);
-    }
-    if (ISVALID(input)) {
-        strncpy(openam_url, input, sizeof (openam_url) - 1);
-        install_log("OpenAM URL %s", openam_url);
-    }
-    if (input != NULL) free(input);
-
-    input = prompt_and_read("\nEnter the Agent URL as shown below:\n"
-            "(http://agent.sample.com:1234)\n"
-            "[ q or 'ctrl+c' to exit ]\n"
-            "Agent URL:");
-    if (ISVALID(input) && strcasecmp(input, "q") == 0) {
-        free(input);
-        install_log("installation exit");
-        exit(1);
-    }
-    if (ISVALID(input)) {
-        strncpy(agent_url, input, sizeof (agent_url) - 1);
-        install_log("Agent URL %s", agent_url);
-    }
-    if (input != NULL) free(input);
-
-    input = prompt_and_read("\nEnter the Agent profile name\n"
-            "[ q or 'ctrl+c' to exit ]\n"
-            "Agent Profile name:");
-    if (ISVALID(input) && strcasecmp(input, "q") == 0) {
-        free(input);
-        install_log("installation exit");
-        exit(1);
-    }
-    if (ISVALID(input)) {
-        strncpy(agent_user, input, sizeof (agent_user) - 1);
-        install_log("Agent Profile name %s", agent_user);
-    }
-    if (input != NULL) free(input);
-
-    input = prompt_and_read("\nEnter the Agent realm/organization\n"
-            "[ q or 'ctrl+c' to exit ]\n"
-            "Agent realm/organization name: [/]:");
-    if (ISVALID(input) && strcasecmp(input, "q") == 0) {
-        free(input);
-        install_log("installation exit");
-        exit(1);
-    }
-    if (ISVALID(input)) {
-        strncpy(agent_realm, input, sizeof (agent_realm) - 1);
-        install_log("Agent realm/organization name %s", agent_realm);
-    } else {
-        strncpy(agent_realm, "/", sizeof (agent_realm) - 1);
-        install_log("Agent realm/organization name %s", "/");
-    }
-    if (input != NULL) free(input);
-
-    input = prompt_and_read("\nEnter the path to a file that contains the password to be used\n"
-            "for identifying the Agent\n"
-            "[ q or 'ctrl+c' to exit ]\n"
-            "The path to the password file:");
-    if (ISVALID(input) && strcasecmp(input, "q") == 0) {
-        free(input);
-        install_log("installation exit");
-        exit(1);
-    }
-    if (ISVALID(input)) {
-        char *password_data = load_file(input, NULL);
-        install_log("Agent password file %s", input);
-        if (password_data != NULL) {
-            trim(password_data, '\n');
-            trim(password_data, '\r');
-            install_log("agent password file %s opened successfully", input);
-            strncpy(agent_password, password_data, sizeof (agent_password) - 1);
-            free(password_data);
-        } else {
-            install_log("unable to open password file %s", LOGEMPTY(input));
+        input = prompt_and_read("Confirm configuration (yes/no): [no]:");
+        if (!(ISVALID(input) && strcasecmp(input, "yes") == 0)) {
+            am_free(input);
+            fprintf(stdout, "\nRestarting the configuration...\n");
+            install_log("installation restarted");
+            continue;
         }
+        break;
     }
-
-    fprintf(stdout, "\nInstallation parameters:\n\n"
-            "   OpenAM URL: %s\n"
-            "   Agent URL: %s\n"
-            "   Agent Profile name: %s\n"
-            "   Agent realm/organization name: %s\n"
-            "   Agent Profile password file: %s\n\n",
-            openam_url, agent_url, agent_user, agent_realm, NOTNULL(input));
-    if (input != NULL) free(input);
-
-    input = prompt_and_read("Confirm configuration (yes/no): [no]:");
-    if (!(ISVALID(input) && strcasecmp(input, "yes") == 0)) {
-        if (input != NULL) free(input);
-        fprintf(stdout, "\nRestarting the configuration...\n");
-        install_log("installation restarted");
-        goto restart_remote;
-    }
-    if (input != NULL) free(input);
+    am_free(input);
 
     install_log("validating configuration parameters...");
     fprintf(stdout, "\nValidating...\n");
@@ -742,7 +777,7 @@ restart_remote:
     am_net_init();
 
     rv = am_agent_login(0, openam_url, NULL,
-            agent_user, agent_password, NULL, agent_realm, AM_TRUE, NULL,
+            agent_user, agent_password, agent_realm, AM_TRUE, NULL,
             &agent_token, NULL, NULL, NULL, install_log);
 
     if (rv != AM_SUCCESS) {
@@ -760,23 +795,32 @@ restart_remote:
         am_agent_logout(0, openam_url, agent_token, NULL, install_log);
     }
 
-    if (validated == AM_TRUE) {
+    if (validated) {
         fprintf(stdout, "\nCreating configuration...\n");
         /*do configure the instance and modify the server configuration*/
-        if (instance_type == AM_I_APACHE) {
-            if (create_agent_instance(0, apache_conf, openam_url, agent_realm,
-                    agent_url, agent_user, agent_password) == AM_SUCCESS) {
-                fprintf(stdout, "\nInstallation complete.\n");
-                install_log("installation complete");
+
+        switch (instance_type) {
+            case AM_I_APACHE:
+                if (create_agent_instance(0, apache_conf, openam_url, agent_realm,
+                        agent_url, agent_user, agent_password) == AM_SUCCESS) {
+                    fprintf(stdout, "\nInstallation complete.\n");
+                    install_log("installation complete");
+                }
+                break;
+            case AM_I_IIS:
+                if (create_agent_instance(iis_status, apache_conf/*site id*/, openam_url, agent_realm,
+                        agent_url, agent_user, agent_password) == AM_SUCCESS) {
+                    fprintf(stdout, "\nInstallation complete.\n");
+                    install_log("installation complete");
+                }
+                break;
+            case AM_I_VARNISH:
+            {
+                //TODO
             }
-        } else if (instance_type == AM_I_IIS) {
-            if (create_agent_instance(iis_status, apache_conf/*site id*/, openam_url, agent_realm,
-                    agent_url, agent_user, agent_password) == AM_SUCCESS) {
-                fprintf(stdout, "\nInstallation complete.\n");
-                install_log("installation complete");
-            }
-        } else if (instance_type == AM_I_VARNISH) {
-            //TODO
+                break;
+            default:
+                install_log("unknown installation instance type");
         }
     }
 
@@ -812,15 +856,15 @@ static void install_silent(int argc, char **argv) {
             install_log("license accepted");
             lic_accepted = AM_TRUE;
             am_make_path(instance_path);
-            write_file(lic_path, " ", 1);
+            write_file(lic_path, AM_SPACE_CHAR, 1);
         }
-        if (input != NULL) free(input);
+        am_free(input);
     } else {
         lic_accepted = AM_TRUE;
         install_log("license was accepted earlier");
     }
 
-    if (lic_accepted != AM_TRUE) {
+    if (!lic_accepted) {
         install_log("license was not accepted");
         fprintf(stdout, "\nYou need to accept the License terms and conditions to continue.\n");
         exit(1);
@@ -846,13 +890,8 @@ static void install_silent(int argc, char **argv) {
         install_log("validating configuration parameters...");
         fprintf(stdout, "\nValidating...\n");
 
-
-        validated = AM_TRUE;
-        rv = AM_SUCCESS;
-
-        if (1 == 0)
-            rv = am_agent_login(0, argv[3], NULL,
-                argv[6], agent_password, NULL, argv[5], AM_TRUE, NULL,
+        rv = am_agent_login(0, argv[3], NULL,
+                argv[6], agent_password, argv[5], AM_TRUE, NULL,
                 &agent_token, NULL, NULL, NULL, install_log);
         if (rv != AM_SUCCESS) {
             fprintf(stdout, "\nError validating OpenAM - Agent configuration.\n"
@@ -869,7 +908,7 @@ static void install_silent(int argc, char **argv) {
             am_agent_logout(0, argv[3], agent_token, NULL, install_log);
         }
 
-        if (validated == AM_TRUE) {
+        if (validated) {
             fprintf(stdout, "\nCreating configuration...\n");
             if (instance_type == AM_I_APACHE) {
                 if (create_agent_instance(0, argv[2], argv[3], argv[5],
@@ -888,11 +927,11 @@ static void install_silent(int argc, char **argv) {
             }
         }
 
-        if (agent_password != NULL) free(agent_password);
+        am_free(agent_password);
 
         am_net_shutdown();
     } else {
-
+        fprintf(stdout, "\nInvalid arguments. Installation exit.\n");
     }
     install_log("installation exit");
 }
@@ -909,75 +948,91 @@ static void delete_conf_entry_list(struct am_conf_entry **list) {
 static void list_instances(int argc, char **argv) {
     struct am_conf_entry *list = NULL, *e, *t;
     int rv = am_read_instances(instance_config, &list);
-    if (rv > 0) {
-        fprintf(stdout, "\n%s configuration instances:\n\n", DESCRIPTION);
-
-        am_list_for_each(list, e, t) {
-            fprintf(stdout,
-                    "   id:            %s\n"
-                    "   configuration: %s\n"
-                    "   server/site:   %s\n\n", e->name, e->path, e->web);
-        }
-        delete_conf_entry_list(&list);
-        fprintf(stdout, "\n");
-    } else {
+    if (rv <= 0) {
         fprintf(stdout, "\nNo agent configuration exists.\n");
+        delete_conf_entry_list(&list);
+        return;
     }
+
+    fprintf(stdout, "\n%s configuration instances:\n\n", DESCRIPTION);
+
+    AM_LIST_FOR_EACH(list, e, t) {
+        fprintf(stdout,
+                "   id:            %s\n"
+                "   configuration: %s\n"
+                "   server/site:   %s\n\n", e->name, e->path, e->web);
+    }
+    delete_conf_entry_list(&list);
+    fprintf(stdout, "\n");
 }
 
 static void remove_instance(int argc, char **argv) {
     struct am_conf_entry *list = NULL, *e, *t;
-    if (argc == 3) {
-        int rv = am_read_instances(instance_config, &list);
-        if (rv > 0) {
+    int rv;
+    if (argc != 3) {
+        fprintf(stdout, "\nNo agent configuration specified.\n");
+        return;
+    }
 
-            am_list_for_each(list, e, t) {
-                if (strcmp(e->name, argv[2]) == 0) {
-                    if (instance_type == AM_I_APACHE) {
-                        char *input = prompt_and_read("\nWarning! This procedure will remove all "DESCRIPTION" references from \na Web server configuration."
-                                " In case you are running "DESCRIPTION" in a\nmulti-virtualhost mode, an uninstallation must be carried out manually.\n\nContinue (yes/no): [no]:");
-                        if (!ISVALID(input) || strcasecmp(input, "yes") != 0) {
-                            if (input != NULL) free(input);
-                            break;
-                        }
-                        if (input != NULL) free(input);
+    rv = am_read_instances(instance_config, &list);
+    if (rv <= 0) {
+        delete_conf_entry_list(&list);
+        return;
+    }
 
-                        fprintf(stdout, "\nRemoving %s configuration...\n", e->name);
-                        /*remove LoadModule line*/
-                        rv = am_cleanup_instance(e->web, "LoadModule amagent_module");
-                        /*remove AmAgent On/Off line*/
-                        rv = am_cleanup_instance(e->web, "AmAgent ");
-                        /*remove AmAgentConf line*/
-                        rv = am_cleanup_instance(e->web, "AmAgentConf ");
-                        /*delete agent instance configuration directory*/
-                        am_delete_directory(e->path);
-                        /*remove agent instance configuration*/
-                        am_cleanup_instance(instance_config, e->name);
-                        fprintf(stdout, "\nRemoving %s configuration... Done.\n", e->name);
-                    } else if (instance_type == AM_I_IIS) {
-                        char iis_instc_file[AM_URI_SIZE];
-                        snprintf(iis_instc_file, sizeof (iis_instc_file),
-                                "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
-                                e->path);
-
-                        fprintf(stdout, "\nRemoving %s configuration...\n", e->name);
-                        /*remove IIS module in the site (global module configuration remains)*/
-                        disable_module(e->web, iis_instc_file);
-                        /*delete agent instance configuration directory*/
-                        am_delete_directory(e->path);
-                        /*remove agent instance configuration*/
-                        am_cleanup_instance(instance_config, e->name);
-                        fprintf(stdout, "\nRemoving %s configuration... Done.\n", e->name);
-                    } else if (instance_type == AM_I_VARNISH) {
-                        //TODO
+    AM_LIST_FOR_EACH(list, e, t) {
+        if (strcmp(e->name, argv[2]) == 0) {
+            switch (instance_type) {
+                case AM_I_APACHE:
+                {
+                    char *input = prompt_and_read("\nWarning! This procedure will remove all "DESCRIPTION" references from \na Web server configuration."
+                            " In case you are running "DESCRIPTION" in a\nmulti-virtualhost mode, an uninstallation must be carried out manually.\n\nContinue (yes/no): [no]:");
+                    if (!ISVALID(input) || strcasecmp(input, "yes") != 0) {
+                        am_free(input);
+                        break;
                     }
+                    am_free(input);
+
+                    fprintf(stdout, "\nRemoving %s configuration...\n", e->name);
+                    /*remove LoadModule line*/
+                    rv = am_cleanup_instance(e->web, "LoadModule amagent_module");
+                    /*remove AmAgent On/Off line*/
+                    rv = am_cleanup_instance(e->web, "AmAgent ");
+                    /*remove AmAgentConf line*/
+                    rv = am_cleanup_instance(e->web, "AmAgentConf ");
+                    /*delete agent instance configuration directory*/
+                    am_delete_directory(e->path);
+                    /*remove agent instance configuration*/
+                    am_cleanup_instance(instance_config, e->name);
+                    fprintf(stdout, "\nRemoving %s configuration... Done.\n", e->name);
                 }
+                    break;
+                case AM_I_IIS:
+                {
+                    char iis_instc_file[AM_URI_SIZE];
+                    snprintf(iis_instc_file, sizeof (iis_instc_file),
+                            "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
+                            e->path);
+
+                    fprintf(stdout, "\nRemoving %s configuration...\n", e->name);
+                    /*remove IIS module in the site (global module configuration remains)*/
+                    disable_module(e->web, iis_instc_file);
+                    /*delete agent instance configuration directory*/
+                    am_delete_directory(e->path);
+                    /*remove agent instance configuration*/
+                    am_cleanup_instance(instance_config, e->name);
+                    fprintf(stdout, "\nRemoving %s configuration... Done.\n", e->name);
+                }
+                    break;
+                case AM_I_VARNISH:
+                {
+                    //TODO
+                }
+                    break;
             }
         }
-        delete_conf_entry_list(&list);
-    } else {
-        fprintf(stdout, "\nNo agent configuration specified.\n");
     }
+    delete_conf_entry_list(&list);
 }
 
 static void remove_global(int argc, char **argv) {
@@ -986,15 +1041,15 @@ static void remove_global(int argc, char **argv) {
     char *input = prompt_and_read("\nWarning! This procedure will remove all "DESCRIPTION" references from \nIIS Server configuration."
             "\n\nContinue (yes/no): [no]:");
     if (!ISVALID(input) || strcasecmp(input, "yes") != 0) {
-        if (input != NULL) free(input);
+        am_free(input);
         return;
     }
-    if (input != NULL) free(input);
+    am_free(input);
 
     rv = am_read_instances(instance_config, &list);
     if (rv > 0) {
 
-        am_list_for_each(list, e, t) {
+        AM_LIST_FOR_EACH(list, e, t) {
             if (strstr(e->web, "conf") == NULL) {/*all, except Apache agent*/
                 char iis_instc_file[AM_URI_SIZE];
                 snprintf(iis_instc_file, sizeof (iis_instc_file),
@@ -1008,8 +1063,8 @@ static void remove_global(int argc, char **argv) {
                 am_cleanup_instance(instance_config, e->name);
             }
         }
-        delete_conf_entry_list(&list);
     }
+    delete_conf_entry_list(&list);
     fprintf(stdout, "\nRemoving agent module from IIS Server configuration...\n");
     remove_module();
     fprintf(stdout, "\nRemoving agent module from IIS Server configuration... Done.\n");
@@ -1017,54 +1072,61 @@ static void remove_global(int argc, char **argv) {
 
 static void enable_iis_mod(int argc, char **argv) {
     struct am_conf_entry *list = NULL, *e, *t;
-    if (argc == 3) {
-        int rv = am_read_instances(instance_config, &list);
-        if (rv > 0) {
+    int rv;
+    if (argc != 3) {
+        fprintf(stdout, "\nNo agent configuration specified.\n");
+        return;
+    }
+    rv = am_read_instances(instance_config, &list);
+    if (rv <= 0) {
+        delete_conf_entry_list(&list);
+        return;
+    }
 
-            am_list_for_each(list, e, t) {
-                if (strcmp(e->name, argv[2]) == 0) {
-                    if (instance_type == AM_I_IIS) {
-                        char iis_instc_file[AM_URI_SIZE];
-                        snprintf(iis_instc_file, sizeof (iis_instc_file),
-                                "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
-                                e->path);
-                        fprintf(stdout, "\nEnabling %s module configuration in site %s...\n", e->name, e->web);
-                        enable_module(e->web, iis_instc_file);
-                        fprintf(stdout, "\nEnabling %s module configuration in site %s... Done.\n", e->name, e->web);
-                    }
-                }
+    AM_LIST_FOR_EACH(list, e, t) {
+        if (strcmp(e->name, argv[2]) == 0) {
+            if (instance_type == AM_I_IIS) {
+                char iis_instc_file[AM_URI_SIZE];
+                snprintf(iis_instc_file, sizeof (iis_instc_file),
+                        "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
+                        e->path);
+                fprintf(stdout, "\nEnabling %s module configuration in site %s...\n", e->name, e->web);
+                enable_module(e->web, iis_instc_file);
+                fprintf(stdout, "\nEnabling %s module configuration in site %s... Done.\n", e->name, e->web);
             }
         }
-        delete_conf_entry_list(&list);
-    } else {
-        fprintf(stdout, "\nNo agent configuration specified.\n");
     }
+    delete_conf_entry_list(&list);
 }
 
 static void disable_iis_mod(int argc, char **argv) {
     struct am_conf_entry *list = NULL, *e, *t;
+    int rv;
     if (argc == 3) {
-        int rv = am_read_instances(instance_config, &list);
-        if (rv > 0) {
+        fprintf(stdout, "\nNo agent configuration specified.\n");
+        return;
+    }
 
-            am_list_for_each(list, e, t) {
-                if (strcmp(e->name, argv[2]) == 0) {
-                    if (instance_type == AM_I_IIS) {
-                        char iis_instc_file[AM_URI_SIZE];
-                        snprintf(iis_instc_file, sizeof (iis_instc_file),
-                                "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
-                                e->path);
-                        fprintf(stdout, "\nDisabling %s module configuration in site %s...\n", e->name, e->web);
-                        disable_module(e->web, iis_instc_file);
-                        fprintf(stdout, "\nDisabling %s module configuration in site %s... Done.\n", e->name, e->web);
-                    }
-                }
+    rv = am_read_instances(instance_config, &list);
+    if (rv <= 0) {
+        delete_conf_entry_list(&list);
+        return;
+    }
+
+    AM_LIST_FOR_EACH(list, e, t) {
+        if (strcmp(e->name, argv[2]) == 0) {
+            if (instance_type == AM_I_IIS) {
+                char iis_instc_file[AM_URI_SIZE];
+                snprintf(iis_instc_file, sizeof (iis_instc_file),
+                        "%s"FILE_PATH_SEP"config"FILE_PATH_SEP"agent.conf",
+                        e->path);
+                fprintf(stdout, "\nDisabling %s module configuration in site %s...\n", e->name, e->web);
+                disable_module(e->web, iis_instc_file);
+                fprintf(stdout, "\nDisabling %s module configuration in site %s... Done.\n", e->name, e->web);
             }
         }
-        delete_conf_entry_list(&list);
-    } else {
-        fprintf(stdout, "\nNo agent configuration specified.\n");
     }
+    delete_conf_entry_list(&list);
 }
 
 static void archive_files(int argc, char **argv) {
@@ -1072,79 +1134,96 @@ static void archive_files(int argc, char **argv) {
     time_t tv;
     struct tm fd;
     zipFile zf = NULL;
-    zip_fileinfo zi;
     struct am_namevalue *all = NULL, *e, *t;
-    if (argc > 3) {
-        zf = zipOpen(argv[2], APPEND_STATUS_CREATE);
-        if (zf == NULL) return;
 
-        /*read all directory/file info (recursive)*/
-        for (i = 3; i < argc; i++) {
-            read_directory(argv[i], &all);
+    if (argc < 4) return;
+
+    zf = zipOpen(argv[2], APPEND_STATUS_CREATE);
+    if (zf == NULL) return;
+
+    /*read all directory/file info (recursive)*/
+    for (i = 3; i < argc; i++) {
+        read_directory(argv[i], &all);
+    }
+
+    time(&tv);
+    localtime_r(&tv, &fd);
+
+    if (all != NULL) {
+        fprintf(stdout, "Adding to %s:\n", argv[2]);
+    }
+
+    AM_LIST_FOR_EACH(all, e, t) {
+        zip_fileinfo zi;
+        size_t off = 0;
+        uLong file_mode = 0;
+        /*fix path prefixes*/
+        if (e->n[0] == '/') {
+            off = 1;
         }
 
-        time(&tv);
-        localtime_r(&tv, &fd);
-        memset(&zi, 0, sizeof (zip_fileinfo));
+        memset(&zi, 0, sizeof (zi));
         zi.tmz_date.tm_sec = fd.tm_sec;
         zi.tmz_date.tm_min = fd.tm_min;
         zi.tmz_date.tm_hour = fd.tm_hour;
         zi.tmz_date.tm_mday = fd.tm_mday;
         zi.tmz_date.tm_mon = fd.tm_mon;
         zi.tmz_date.tm_year = fd.tm_year;
-
-        if (all != NULL) {
-            fprintf(stdout, "Adding to %s:\n", argv[2]);
-        }
-
-        am_list_for_each(all, e, t) {
-            size_t off = 0;
-            /*fix path prefixes*/
-            if (e->n[0] == '/') {
-                off = 1;
-            }
 #ifdef _WIN32
-            {
-                char fname[AM_URI_SIZE];
-                char dir[AM_URI_SIZE];
-                char drive[AM_PATH_SIZE];
-                char ext[AM_PATH_SIZE];
-                if (_splitpath_s(e->n,
-                        drive, sizeof (drive) - 1,
-                        dir, sizeof (dir) - 1,
-                        fname, sizeof (fname) - 1,
-                        ext, sizeof (ext) - 1) != 0) {
-                    continue;
-                }
-                if (dir[0] == '\\') off = 1;
-                if (dir[0] == '\\' && dir[1] == '\\') off = 2;
-                off += strlen(drive);
+        {
+            char fname[AM_URI_SIZE];
+            char dir[AM_URI_SIZE];
+            char drive[AM_PATH_SIZE];
+            char ext[AM_PATH_SIZE];
+            if (_splitpath_s(e->n,
+                    drive, sizeof (drive) - 1,
+                    dir, sizeof (dir) - 1,
+                    fname, sizeof (fname) - 1,
+                    ext, sizeof (ext) - 1) != 0) {
+                continue;
             }
+            if (dir[0] == '\\') off = 1;
+            if (dir[0] == '\\' && dir[1] == '\\') off = 2;
+            off += strlen(drive);
+        }
 #endif
-            fprintf(stdout, "  %s\n", e->n);
-            rv = zipOpenNewFileInZip(zf, e->n + off, &zi,
-                    NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_BEST_COMPRESSION);
-            if (e->ns == 1) {
-                /*a directory*/
-                rv = zipCloseFileInZip(zf);
+        fprintf(stdout, "  %s\n", e->n);
+#ifndef _WIN32
+        if (e->ns == 1) {
+            /*a directory*/
+            file_mode = (S_IFDIR | 0755) << 16L;
+        } else {
+            /*a file*/
+            if (strstr(e->n, "agentadmin") != NULL || strstr(e->n, ".so") != NULL) {
+                file_mode = 0755 << 16L; /* we need execute bit set for these two */
             } else {
-                /*a file*/
-                FILE *f = fopen(e->n, "rb");
-                if (f != NULL) {
-                    int rb;
-                    unsigned char b[1024];
-                    while (!feof(f)) {
-                        rb = (int) fread(b, 1, sizeof (b), f);
-                        rv = zipWriteInFileInZip(zf, b, rb);
-                    }
-                    fclose(f);
-                }
-                rv = zipCloseFileInZip(zf);
+                file_mode = 0644 << 16L;
             }
         }
-        zipClose(zf, NULL);
-        delete_am_namevalue_list(&all);
+        zi.external_fa = file_mode;
+#endif
+        rv = zipOpenNewFileInZip(zf, e->n + off, &zi,
+                NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_BEST_COMPRESSION);
+        if (e->ns == 1) {
+            /*a directory*/
+            rv = zipCloseFileInZip(zf);
+        } else {
+            /*a file*/
+            FILE *f = fopen(e->n, "rb");
+            if (f != NULL) {
+                int rb;
+                unsigned char b[1024];
+                while (!feof(f)) {
+                    rb = (int) fread(b, 1, sizeof (b), f);
+                    rv = zipWriteInFileInZip(zf, b, rb);
+                }
+                fclose(f);
+            }
+            rv = zipCloseFileInZip(zf);
+        }
     }
+    zipClose(zf, NULL);
+    delete_am_namevalue_list(&all);
 }
 
 int main(int argc, char **argv) {

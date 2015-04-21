@@ -42,10 +42,13 @@ static void on_agent_request_data_cb(void *udata, const char *data, size_t data_
         ld->rd[data_sz] = 0;
         ld->sz = data_sz;
     } else {
-        ld->rd = realloc(ld->rd, ld->sz + data_sz + 1);
-        if (ld->rd == NULL) {
+        char *rd_tmp = realloc(ld->rd, ld->sz + data_sz + 1);
+        if (rd_tmp == NULL) {
+            am_free(ld->rd);
             ld->error = AM_ENOMEM;
             return;
+        } else {
+            ld->rd = rd_tmp;
         }
         memcpy(ld->rd + ld->sz, data, data_sz);
         ld->sz += data_sz;
@@ -67,11 +70,11 @@ static void on_complete_cb(void *udata, int status) {
 }
 
 int am_agent_login(unsigned long instance_id, const char *openam, const char *notifyurl,
-        const char *user, const char *pass, const char *key, const char *realm, int is_local,
+        const char *user, const char *pass, const char *realm, int is_local,
         struct am_ssl_options *info,
         char **agent_token, char **pxml, size_t *pxsz, struct am_namevalue **session_list,
         void(*log)(const char *, ...)) {
-    const char *thisfunc = "am_agent_login():";
+    static const char *thisfunc = "am_agent_login():";
     char *post = NULL, *post_data = NULL;
     am_net_t n;
     size_t post_sz;
@@ -108,24 +111,12 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
 
     if (am_net_connect(&n) == 0) {
         size_t post_data_sz;
-        char *pass_param = strdup(pass);
-        char *pass_encoded = NULL;
-
-        if (ISVALID(key)) {
-            if (decrypt_password(key, &pass_param) != AM_SUCCESS) {
-                am_log_warning(instance_id, "%s failed to decrypt agent password", thisfunc);
-                if (log != NULL) {
-                    log("%s failed to decrypt agent password", thisfunc);
-                }
-            }
-        }
-        pass_encoded = url_encode(pass_param);
+        char *pass_encoded = url_encode(pass);
 
         post_data_sz = am_asprintf(&post_data,
                 "username=%s&password=%s&uri=realm%%3D%s%%26module%%3DApplication",
                 user_enc, NOTNULL(pass_encoded), realm_enc);
-        if (pass_param != NULL) free(pass_param);
-        if (pass_encoded != NULL) free(pass_encoded);
+        am_free(pass_encoded);
 
         if (post_data != NULL) {
             post_sz = am_asprintf(&post, "POST %s/identity/authenticate HTTP/1.1\r\n"
@@ -135,9 +126,9 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
                     "Connection: Keep-Alive\r\n"
                     "Content-Type: application/x-www-form-urlencoded\r\n"
                     "Content-Length: %d\r\n\r\n"
-                    "%s", n.uv.uri, n.uv.host, n.uv.port, post_data_sz, post_data);
+                    "%s", n.uv.path, n.uv.host, n.uv.port, post_data_sz, post_data);
             if (post != NULL) {
-                am_log_debug(instance_id, "%s sending %d bytes", thisfunc, post_sz);
+                AM_LOG_DEBUG(instance_id, "%s sending %d bytes", thisfunc, post_sz);
                 if (log != NULL) {
                     log("%s sending %d bytes", thisfunc, post_sz);
 #ifdef DEBUG
@@ -155,7 +146,7 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
         if (status == AM_SUCCESS)
             wait_for_event(ld.rf, 0);
 
-        am_log_debug(instance_id, "%s authenticate response status code: %d",
+        AM_LOG_DEBUG(instance_id, "%s authenticate response status code: %d",
                 thisfunc, n.http_status);
         if (log != NULL) {
             log("%s authenticate response status code: %d\n%s", thisfunc,
@@ -176,7 +167,7 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
                 free(ld.rd);
                 ld.rd = NULL;
 
-                if (is_local == AM_FALSE) {
+                if (!is_local) {
                     post_sz = am_asprintf(&identity_get, "GET %s/identity/xml/read?"
                             "name=%s&attributes_names=realm&attributes_values_realm=%s&attributes_names=objecttype"
                             "&attributes_values_objecttype=Agent&admin=%s HTTP/1.1\r\n"
@@ -184,11 +175,11 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
                             "User-Agent: "MODINFO"\r\n"
                             "Accept: text/xml\r\n"
                             "Connection: Keep-Alive\r\n\r\n",
-                            n.uv.uri,
+                            n.uv.path,
                             user_enc, realm_enc, token_enc,
                             n.uv.host, n.uv.port);
                     if (identity_get != NULL) {
-                        am_log_debug(instance_id, "%s sending request:\n%s", thisfunc, identity_get);
+                        AM_LOG_DEBUG(instance_id, "%s sending request:\n%s", thisfunc, identity_get);
                         if (log != NULL) {
                             log("%s sending request:\n%s", thisfunc, identity_get);
                         }
@@ -203,12 +194,12 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
             status = AM_ERROR;
         }
 
-        if (status == AM_SUCCESS && is_local == AM_FALSE) {
+        if (status == AM_SUCCESS && !is_local) {
             wait_for_event(ld.rf, 0);
         }
 
-        if (is_local == AM_FALSE) {
-            am_log_debug(instance_id, "%s profile response status code: %d", thisfunc,
+        if (!is_local) {
+            AM_LOG_DEBUG(instance_id, "%s profile response status code: %d", thisfunc,
                     n.http_status);
             if (log != NULL) {
                 log("%s profile response status code: %d", thisfunc,
@@ -222,7 +213,7 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
             size_t token_sz = am_asprintf(&token_in, "token:%s", NOTNULL(*agent_token));
             char *token_b64 = base64_encode(token_in, &token_sz);
 
-            if (pxml != NULL && is_local == AM_FALSE && ISVALID(ld.rd)) {
+            if (pxml != NULL && !is_local && ISVALID(ld.rd)) {
                 /*no interest in a remote profile in case of local-only configuration*/
                 *pxml = malloc(ld.sz + 1);
                 if (*pxml != NULL) {
@@ -230,9 +221,9 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
                     (*pxml)[ld.sz] = 0;
                 }
             }
-            if (pxsz != NULL && is_local == AM_FALSE) *pxsz = ld.sz;
+            if (pxsz != NULL && !is_local) *pxsz = ld.sz;
 
-            if (ld.rd != NULL) free(ld.rd);
+            am_free(ld.rd);
             ld.rd = NULL;
 
             status = AM_ERROR;
@@ -258,8 +249,7 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
                     "</RequestSet>",
                     NOTNULL(token_b64), *agent_token, NOTNULL(token_b64), notifyurl, *agent_token);
 
-            if (token_in != NULL) free(token_in);
-            if (token_b64 != NULL) free(token_b64);
+            AM_FREE(token_in, token_b64);
 
             if (session_post_data != NULL) {
                 char *session_post = NULL;
@@ -271,9 +261,9 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
                         "Connection: Close\r\n"
                         "Content-Type: text/xml; charset=UTF-8\r\n"
                         "Content-Length: %d\r\n\r\n"
-                        "%s", n.uv.uri, n.uv.host, n.uv.port, post_data_sz, session_post_data);
+                        "%s", n.uv.path, n.uv.host, n.uv.port, post_data_sz, session_post_data);
                 if (session_post != NULL) {
-                    am_log_debug(instance_id, "%s sending request:\n%s", thisfunc, session_post);
+                    AM_LOG_DEBUG(instance_id, "%s sending request:\n%s", thisfunc, session_post);
                     if (log != NULL) {
                         log("%s sending request:\n%s", thisfunc, session_post);
                     }
@@ -292,20 +282,20 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
     if (status == AM_SUCCESS) {
         wait_for_event(ld.rf, 0);
     } else {
-        am_log_debug(instance_id, "%s disconnecting", thisfunc);
+        AM_LOG_DEBUG(instance_id, "%s disconnecting", thisfunc);
         if (log != NULL) {
             log("%s disconnecting", thisfunc);
         }
         am_net_diconnect(&n);
     }
 
-    am_log_debug(instance_id, "%s sessionservice status code: %d", thisfunc, n.http_status);
+    AM_LOG_DEBUG(instance_id, "%s sessionservice status code: %d", thisfunc, n.http_status);
     if (log != NULL) {
         log("%s sessionservice status code: %d", thisfunc, n.http_status);
     }
 
     if (status == AM_SUCCESS && n.http_status == 200 && ISVALID(ld.rd)) {
-        am_log_debug(instance_id, "%s response:\n%s", thisfunc, ld.rd);
+        AM_LOG_DEBUG(instance_id, "%s response:\n%s", thisfunc, ld.rd);
         if (log != NULL) {
             log("%s response:\n%s", thisfunc, ld.rd);
         }
@@ -316,16 +306,13 @@ int am_agent_login(unsigned long instance_id, const char *openam, const char *no
     am_net_close(&n);
     close_event(ld.rf);
 
-    if (ld.rd != NULL) free(ld.rd);
-    if (user_enc != NULL) free(user_enc);
-    if (realm_enc != NULL) free(realm_enc);
-    if (token_enc != NULL) free(token_enc);
+    AM_FREE(ld.rd, user_enc, realm_enc, token_enc);
     return status;
 }
 
 int am_agent_logout(unsigned long instance_id, const char *openam,
         const char *token, struct am_ssl_options *info, void(*log)(const char *, ...)) {
-    const char *thisfunc = "am_agent_logout():";
+    static const char *thisfunc = "am_agent_logout():";
     char *get = NULL;
     am_net_t n;
     size_t get_sz;
@@ -363,10 +350,10 @@ int am_agent_logout(unsigned long instance_id, const char *openam,
                 "User-Agent: "MODINFO"\r\n"
                 "Accept: text/plain\r\n"
                 "Connection: close\r\n\r\n",
-                n.uv.uri, token_enc,
+                n.uv.path, token_enc,
                 n.uv.host, n.uv.port);
         if (get != NULL) {
-            am_log_debug(instance_id, "%s sending request:\n%s", thisfunc, get);
+            AM_LOG_DEBUG(instance_id, "%s sending request:\n%s", thisfunc, get);
             if (log != NULL) {
                 log("%s sending request:\n%s", thisfunc, get);
             }
@@ -378,14 +365,14 @@ int am_agent_logout(unsigned long instance_id, const char *openam,
     if (status == AM_SUCCESS) {
         wait_for_event(ld.rf, 0);
     } else {
-        am_log_debug(instance_id, "%s disconnecting", thisfunc);
+        AM_LOG_DEBUG(instance_id, "%s disconnecting", thisfunc);
         if (log != NULL) {
             log("%s disconnecting", thisfunc);
         }
         am_net_diconnect(&n);
     }
 
-    am_log_debug(instance_id, "%s response status code: %d", thisfunc, n.http_status);
+    AM_LOG_DEBUG(instance_id, "%s response status code: %d", thisfunc, n.http_status);
     if (log != NULL) {
         log("%s response status code: %d", thisfunc, n.http_status);
     }
@@ -393,8 +380,7 @@ int am_agent_logout(unsigned long instance_id, const char *openam,
     am_net_close(&n);
     close_event(ld.rf);
 
-    if (ld.rd != NULL) free(ld.rd);
-    if (token_enc != NULL) free(token_enc);
+    AM_FREE(ld.rd, token_enc);
     return status;
 }
 
@@ -445,7 +431,7 @@ int am_agent_naming_request(unsigned long instance_id, const char *openam, const
                     "Connection: close\r\n"
                     "Content-Type: text/xml; charset=UTF-8\r\n"
                     "Content-Length: %d\r\n\r\n"
-                    "%s", n.uv.uri, n.uv.host, n.uv.port, post_data_sz, post_data);
+                    "%s", n.uv.path, n.uv.host, n.uv.port, post_data_sz, post_data);
             if (post != NULL) {
                 status = am_net_write(&n, post, post_sz);
                 free(post);
@@ -465,7 +451,7 @@ int am_agent_naming_request(unsigned long instance_id, const char *openam, const
     am_net_close(&n);
     close_event(ld.rf);
 
-    if (ld.rd != NULL) free(ld.rd);
+    am_free(ld.rd);
     return status;
 }
 
@@ -523,8 +509,7 @@ int am_agent_session_request(unsigned long instance_id, const char *openam,
                 "</RequestSet>",
                 NOTNULL(token_b64), user_token, NOTNULL(token_b64), notif_url, user_token);
 
-        if (token_in != NULL) free(token_in);
-        if (token_b64 != NULL) free(token_b64);
+        AM_FREE(token_in, token_b64);
 
         if (post_data != NULL) {
             post_sz = am_asprintf(&post, "POST %s/sessionservice HTTP/1.1\r\n"
@@ -535,7 +520,7 @@ int am_agent_session_request(unsigned long instance_id, const char *openam,
                     "Connection: close\r\n"
                     "Content-Type: text/xml; charset=UTF-8\r\n"
                     "Content-Length: %d\r\n\r\n"
-                    "%s", n.uv.uri, n.uv.host, n.uv.port, post_data_sz, post_data);
+                    "%s", n.uv.path, n.uv.host, n.uv.port, post_data_sz, post_data);
             if (post != NULL) {
                 status = am_net_write(&n, post, post_sz);
                 free(post);
@@ -556,7 +541,7 @@ int am_agent_session_request(unsigned long instance_id, const char *openam,
     am_net_close(&n);
     close_event(ld.rf);
 
-    if (ld.rd != NULL) free(ld.rd);
+    am_free(ld.rd);
     return status;
 }
 
@@ -566,7 +551,7 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
         struct am_ssl_options *info,
         struct am_namevalue **session_list,
         struct am_policy_result **policy_list) {
-    const char *thisfunc = "am_agent_policy_request():";
+    static const char *thisfunc = "am_agent_policy_request():";
     char *post = NULL, *post_data = NULL;
     am_net_t n;
     size_t post_sz;
@@ -623,8 +608,7 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
                 "</RequestSet>",
                 NOTNULL(token_b64), user_token, NOTNULL(token_b64), notif_url, user_token);
 
-        if (token_in != NULL) free(token_in);
-        if (token_b64 != NULL) free(token_b64);
+        AM_FREE(token_in, token_b64);
 
         if (post_data != NULL) {
             post_sz = am_asprintf(&post, "POST %s/sessionservice HTTP/1.1\r\n"
@@ -635,9 +619,9 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
                     "Connection: Keep-Alive\r\n"
                     "Content-Type: text/xml; charset=UTF-8\r\n"
                     "Content-Length: %d\r\n\r\n"
-                    "%s", n.uv.uri, n.uv.host, n.uv.port, post_data_sz, post_data);
+                    "%s", n.uv.path, n.uv.host, n.uv.port, post_data_sz, post_data);
             if (post != NULL) {
-                am_log_debug(instance_id, "%s sending request:\n%s", thisfunc, post);
+                AM_LOG_DEBUG(instance_id, "%s sending request:\n%s", thisfunc, post);
                 status = am_net_write(&n, post, post_sz);
                 free(post);
                 post = NULL;
@@ -649,7 +633,7 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
         if (status == AM_SUCCESS)
             wait_for_event(ld.rf, 0);
 
-        am_log_debug(instance_id, "%s response status code: %d", thisfunc, n.http_status);
+        AM_LOG_DEBUG(instance_id, "%s response status code: %d", thisfunc, n.http_status);
 
         if (status == AM_SUCCESS && n.http_status == 200 && ISVALID(ld.rd)) {
             size_t req_url_sz = strlen(req_url);
@@ -659,7 +643,7 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
                 xml_entity_escape(req_url_escaped, req_url_sz);
             }
 
-            am_log_debug(instance_id, "%s response:\n%s", thisfunc, ld.rd);
+            AM_LOG_DEBUG(instance_id, "%s response:\n%s", thisfunc, ld.rd);
 
             if (strstr(ld.rd, "<Exception>") != NULL && strstr(ld.rd, "Invalid session ID") != NULL) {
                 session_status = AM_INVALID_SESSION;
@@ -675,6 +659,9 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
             free(ld.rd);
             ld.rd = NULL;
 
+            /* TODO:
+             * <AttributeValuePair><Attribute name=\"requestDnsName\"/><Value>%s</Value></AttributeValuePair>
+             */
             post_data_sz = am_asprintf(&post_data,
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                     "<RequestSet vers=\"1.0\" svcid=\"Policy\" reqid=\"3\">"
@@ -693,7 +680,7 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
                     token, user_token, NOTNULL(req_url_escaped), scope,
                     cip, NOTNULL(pattr));
 
-            if (req_url_escaped != NULL) free(req_url_escaped);
+            am_free(req_url_escaped);
 
             post_sz = am_asprintf(&post, "POST %s/policyservice HTTP/1.1\r\n"
                     "Host: %s:%d\r\n"
@@ -703,11 +690,11 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
                     "Content-Type: text/xml; charset=UTF-8\r\n"
                     "Content-Length: %d\r\n"
                     "Connection: close\r\n\r\n"
-                    "%s", n.uv.uri, n.uv.host, n.uv.port,
+                    "%s", n.uv.path, n.uv.host, n.uv.port,
                     post_data_sz, post_data);
 
             if (post != NULL) {
-                am_log_debug(instance_id, "%s sending request:\n%s", thisfunc, post);
+                AM_LOG_DEBUG(instance_id, "%s sending request:\n%s", thisfunc, post);
                 status = am_net_write(&n, post, post_sz);
                 free(post);
             }
@@ -719,14 +706,14 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
     if (status == AM_SUCCESS) {
         wait_for_event(ld.rf, 0);
     } else {
-        am_log_debug(instance_id, "%s disconnecting", thisfunc);
+        AM_LOG_DEBUG(instance_id, "%s disconnecting", thisfunc);
         am_net_diconnect(&n);
     }
 
-    am_log_debug(instance_id, "%s response status code: %d", thisfunc, n.http_status);
+    AM_LOG_DEBUG(instance_id, "%s response status code: %d", thisfunc, n.http_status);
 
     if (status == AM_SUCCESS && n.http_status == 200 && ISVALID(ld.rd)) {
-        am_log_debug(instance_id, "%s response:\n%s", thisfunc, ld.rd);
+        AM_LOG_DEBUG(instance_id, "%s response:\n%s", thisfunc, ld.rd);
 
         if (strstr(ld.rd, "<Exception>") != NULL && strstr(ld.rd, "SSO token is invalid") != NULL) {
             session_status = AM_INVALID_SESSION;
@@ -743,6 +730,66 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
     am_net_close(&n);
     close_event(ld.rf);
 
-    if (ld.rd != NULL) free(ld.rd);
+    am_free(ld.rd);
     return session_status != AM_SUCCESS ? session_status : status;
+}
+
+int am_url_validate(unsigned long instance_id, const char *url, struct am_ssl_options *info, int *httpcode) {
+    static const char *thisfunc = "am_url_validate():";
+    char *get = NULL;
+    am_net_t n;
+    size_t get_sz;
+    int status = AM_ERROR;
+    struct request_data ld;
+
+    if (!ISVALID(url)) return AM_EINVAL;
+
+    memset(&ld, 0, sizeof (struct request_data));
+    memset(&n, 0, sizeof (am_net_t));
+    n.log = NULL;
+    n.instance_id = instance_id;
+    n.timeout = AM_NET_CONNECT_TIMEOUT;
+    n.url = url;
+    if (info != NULL) {
+        memcpy(&n.ssl.info, info, sizeof (struct am_ssl_options));
+    }
+
+    ld.rf = create_event();
+    if (ld.rf == NULL) return AM_ENOMEM;
+
+    n.data = &ld;
+    n.on_connected = on_connected_cb;
+    n.on_close = on_close_cb;
+    n.on_data = on_agent_request_data_cb;
+    n.on_complete = on_complete_cb;
+
+    if (am_net_connect(&n) == 0) {
+        get_sz = am_asprintf(&get, "HEAD %s HTTP/1.1\r\n"
+                "Host: %s:%d\r\n"
+                "User-Agent: "MODINFO"\r\n"
+                "Accept: text/plain\r\n"
+                "Connection: close\r\n\r\n",
+                n.uv.path, n.uv.host, n.uv.port);
+        if (get != NULL) {
+            AM_LOG_DEBUG(instance_id, "%s sending request:\n%s", thisfunc, get);
+            status = am_net_write(&n, get, get_sz);
+            free(get);
+        }
+    }
+
+    if (status == AM_SUCCESS) {
+        wait_for_event(ld.rf, 0);
+    } else {
+        AM_LOG_DEBUG(instance_id, "%s disconnecting", thisfunc);
+        am_net_diconnect(&n);
+    }
+
+    AM_LOG_DEBUG(instance_id, "%s response status code: %d", thisfunc, n.http_status);
+    if (httpcode) *httpcode = n.http_status;
+
+    am_net_close(&n);
+    close_event(ld.rf);
+
+    am_free(ld.rd);
+    return status;
 }

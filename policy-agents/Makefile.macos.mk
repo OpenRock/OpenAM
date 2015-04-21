@@ -46,10 +46,10 @@ apache: $(OUT_OBJS) $(APACHE_OUT_OBJS)
 	    $(LDFLAGS) $(OUT_OBJS) $(APACHE_OUT_OBJS) -o build/mod_openam.so
 
 iis: 
-	@$(ECHO) "[*** IIS target is not supported on this platform ***]"
+	$(error IIS target is not supported on this platform)
 
 varnish: 
-	@$(ECHO) "[*** Varnish target is not supported on this platform ***]"
+	$(error Varnish target is not supported on this platform)
 	
 agentadmin: $(OUT_OBJS) $(ADMIN_OUT_OBJS)
 	@$(ECHO) "[*** Creating "$@" binary ***]"

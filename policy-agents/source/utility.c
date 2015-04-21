@@ -34,54 +34,58 @@ const char *am_strerror(int err) {
 }
 #undef AM_STRERROR_GEN
 
-#define REQUEST_METHOD_GET                      "GET"
-#define REQUEST_METHOD_POST                     "POST"
-#define REQUEST_METHOD_HEAD                     "HEAD"
-#define REQUEST_METHOD_PUT                      "PUT"
-#define REQUEST_METHOD_DELETE                   "DELETE"
-#define REQUEST_METHOD_TRACE                    "TRACE"
-#define REQUEST_METHOD_OPTIONS                  "OPTIONS"
-#define REQUEST_METHOD_CONNECT                  "CONNECT"
-#define REQUEST_METHOD_COPY                     "COPY"
-#define REQUEST_METHOD_INVALID                  "INVALID"
-#define REQUEST_METHOD_LOCK                     "LOCK"
-#define REQUEST_METHOD_UNLOCK                   "UNLOCK"
-#define REQUEST_METHOD_MKCOL                    "MKCOL"
-#define REQUEST_METHOD_MOVE                     "MOVE"
-#define REQUEST_METHOD_PATCH                    "PATCH"
-#define REQUEST_METHOD_PROPFIND                 "PROPFIND"
-#define REQUEST_METHOD_PROPPATCH                "PROPPATCH"
-#define REQUEST_METHOD_VERSION_CONTROL          "VERSION_CONTROL"
-#define REQUEST_METHOD_CHECKOUT                 "CHECKOUT"
-#define REQUEST_METHOD_UNCHECKOUT               "UNCHECKOUT"
-#define REQUEST_METHOD_CHECKIN                  "CHECKIN"
-#define REQUEST_METHOD_UPDATE                   "UPDATE"
-#define REQUEST_METHOD_LABEL                    "LABEL"
-#define REQUEST_METHOD_REPORT                   "REPORT"
-#define REQUEST_METHOD_MKWORKSPACE              "MKWORKSPACE"
-#define REQUEST_METHOD_MKACTIVITY               "MKACTIVITY"
-#define REQUEST_METHOD_BASELINE_CONTROL         "BASELINE_CONTROL"
-#define REQUEST_METHOD_MERGE                    "MERGE"
-#define REQUEST_METHOD_CONFIG                   "CONFIG"
-#define REQUEST_METHOD_ENABLE_APP               "ENABLE-APP"
-#define REQUEST_METHOD_DISABLE_APP              "DISABLE-APP"
-#define REQUEST_METHOD_STOP_APP                 "STOP-APP"
-#define REQUEST_METHOD_STOP_APP_RSP             "STOP-APP-RSP"
-#define REQUEST_METHOD_REMOVE_APP               "REMOVE-APP"
-#define REQUEST_METHOD_STATUS                   "STATUS"
-#define REQUEST_METHOD_STATUS_RSP               "STATUS-RSP"
-#define REQUEST_METHOD_INFO                     "INFO"
-#define REQUEST_METHOD_INFO_RSP                 "INFO-RSP"
-#define REQUEST_METHOD_DUMP                     "DUMP"
-#define REQUEST_METHOD_DUMP_RSP                 "DUMP-RSP"
-#define REQUEST_METHOD_PING                     "PING"
-#define REQUEST_METHOD_PING_RSP                 "PING-RSP"
-#define REQUEST_METHOD_UNKNOWN                  "UNKNOWN"
+const char *request_method_str[] = {
+    "UNKNOWN",
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "TRACE",
+    "OPTIONS",
+    "CONNECT",
+    "COPY",
+    "INVALID",
+    "LOCK",
+    "UNLOCK",
+    "MKCOL",
+    "MOVE",
+    "PATCH",
+    "PROPFIND",
+    "PROPPATCH",
+    "VERSION_CONTROL",
+    "CHECKOUT",
+    "UNCHECKOUT",
+    "CHECKIN",
+    "UPDATE",
+    "LABEL",
+    "REPORT",
+    "MKWORKSPACE",
+    "MKACTIVITY",
+    "BASELINE_CONTROL",
+    "MERGE",
+    "CONFIG",
+    "ENABLE-APP",
+    "DISABLE-APP",
+    "STOP-APP",
+    "STOP-APP-RSP",
+    "REMOVE-APP",
+    "STATUS",
+    "STATUS-RSP",
+    "INFO",
+    "INFO-RSP",
+    "DUMP",
+    "DUMP-RSP",
+    "PING",
+    "PING-RSP"
+};
 
-#define URI_HTTP "%5[HTPShtps]"
-#define URI_HOST "%255[-_.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]"
+#define AM_XSTR(s) AM_STR(s)
+#define AM_STR(s) #s
+
+#define URI_HTTP "%"AM_XSTR(AM_PROTO_SIZE)"[HTPShtps]"
+#define URI_HOST "%"AM_XSTR(AM_HOST_SIZE)"[-_.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]"
 #define URI_PORT "%6d"
-#define URI_PATH "%4095[-_.!~*'();/?:@&=+$,%#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]"
+#define URI_PATH "%"AM_XSTR(AM_URI_SIZE)"[-_.!~*'();/?:@&=+$,%#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]"
 #define HD1 URI_HTTP "://" URI_HOST ":" URI_PORT "/" URI_PATH
 #define HD2 URI_HTTP "://" URI_HOST "/" URI_PATH
 #define HD3 URI_HTTP "://" URI_HOST ":" URI_PORT
@@ -95,25 +99,7 @@ enum {
 
 #define AM_TIMER_USEC_PER_SEC 1000000
 
-#define RC5_EXPANDED_KEYSIZE_LONG 64 
-#define RC5_EXPANDED_KEYSIZE (RC5_EXPANDED_KEYSIZE_LONG * sizeof(uint32_t))
-#define P32_MAGIC       0xB7E15163UL   
-#define Q32_MAGIC       0x9E3779B9UL   
-#define ROTL(x,s)       (((x) << (s)) | ((x) >> (32 - (s))))   
-#define ROTR(x,s)       (((x) >> (s)) | ((x) << (32 - (s))))   
-#define MASK32(x)       ((x) & 0xFFFFFFFFUL)
-#define DECRYPT_ROUND(A,B,key) \
-    B = int32_sub(B, *--key);\
-    B = ROTR( MASK32(B), A & 0x1F) ^ A;\
-    A = int32_sub(A, *--key);\
-    A = ROTR( MASK32(A), B & 0x1F) ^ B  
-#define ENCRYPT_ROUND(A,B,key)\
-    A = MASK32(ROTL(A ^ B, B & 0x1F) + *key++);\
-    B = MASK32(ROTL(B ^ A, A & 0x1F) + *key++)   
-
 #ifdef _WIN32 
-
-#define DT_DIR 1
 
 struct dirent {
     long d_ino;
@@ -134,11 +120,6 @@ typedef struct {
 
 #endif
 
-typedef struct {
-    uint32_t S[RC5_EXPANDED_KEYSIZE_LONG];
-    int r;
-} am_rc5_key_t;
-
 static am_timer_t am_timer_s = {0, 0, 0, 0};
 
 static const char *hex_chars = "0123456789ABCDEF";
@@ -146,11 +127,20 @@ static const char *hex_chars = "0123456789ABCDEF";
 static const unsigned char base64_table[64] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static int am_tolower(int c) {
-    if (c >= 'A' && c <= 'Z') {
-        c ^= 0x20;
+void am_free(void *ptr) {
+    if (ptr != NULL) {
+        free(ptr);
     }
-    return c;
+}
+
+void am_secure_zero_memory(void *v, size_t sz) {
+#ifdef _WIN32
+    SecureZeroMemory(v, sz);
+#else
+    size_t n = sz;
+    volatile unsigned char *p = v;
+    while (n--) *p++ = 0;
+#endif
 }
 
 size_t page_size(size_t size) {
@@ -182,18 +172,17 @@ int match(unsigned long instance_id, const char *subject, const char *pattern) {
     int offsets[3];
     if (subject == NULL || pattern == NULL) return 0;
     x = pcre_compile(pattern, 0, &error, &erroroffset, NULL);
-    if (x != NULL) {
-        rc = pcre_exec(x, NULL, subject, (int) strlen(subject),
-                0, 0, offsets, 3);
-        if (rc < 0) {
-            am_log_debug(instance_id, "match(): '%s' does not match '%s'",
-                    subject, pattern);
-        }
-        pcre_free(x);
-    } else {
+    if (x == NULL) {
         if (error != NULL)
-            am_log_debug(instance_id, "match(): error: %s", error);
+            AM_LOG_DEBUG(instance_id, "match(): error: %s", error);
+        return 1;
     }
+    rc = pcre_exec(x, NULL, subject, (int) strlen(subject), 0, 0, offsets, 3);
+    if (rc < 0) {
+        AM_LOG_DEBUG(instance_id, "match(): '%s' does not match '%s'",
+                subject, pattern);
+    }
+    pcre_free(x);
     return rc < 0 ? 1 : 0;
 }
 
@@ -205,19 +194,22 @@ char *match_group(pcre *x, int cg, const char *subject, size_t *len) {
     char *ret = NULL;
     int *ovector = malloc(max_cg * sizeof (int)); /* (max_capturing_groups+1)*3 */
     if (x == NULL || subject == NULL || ovector == NULL) {
-        if (ovector != NULL) free(ovector);
+        am_free(ovector);
         return NULL;
     }
     while (offset < slen && (rc = pcre_exec(x, 0, subject, (int) slen, offset, 0, ovector, max_cg)) >= 0) {
         for (i = 1/*skip the first pair: "identify the portion of the subject string matched by the entire pattern" */;
                 i < rc; ++i) {
-            char *rslt;
+            char *rslt, *ret_tmp;
             if ((l = pcre_get_substring(subject, ovector, rc, i, (const char **) &rslt)) > 0) {
-                ret = realloc(ret, ret_len + l + 1);
-                if (ret == NULL) {
+                ret_tmp = realloc(ret, ret_len + l + 1);
+                if (ret_tmp == NULL) {
+                    am_free(ret);
                     pcre_free_substring(rslt);
                     free(ovector);
                     return NULL;
+                } else {
+                    ret = ret_tmp;
                 }
                 /*return value is stored as:
                  * key\0value\0...
@@ -238,9 +230,9 @@ char *match_group(pcre *x, int cg, const char *subject, size_t *len) {
 
 static void uri_normalize(struct url *url, char *path) {
     char *s, *o, *p = path != NULL ? strdup(path) : NULL;
-    int i, m = 0, ls = 0;
-    char **l = NULL, **lo = NULL;
-    char u[AM_URI_SIZE];
+    int i, m = 0, list_sz = 0;
+    char **segment_list = NULL, **segment_list_norm = NULL, **tmp;
+    char u[AM_URI_SIZE + 1];
 
     if (p == NULL) {
         if (url != NULL)
@@ -252,57 +244,63 @@ static void uri_normalize(struct url *url, char *path) {
     /* split path into segments */
     while ((s = am_strsep(&p, "/")) != NULL) {
         if (strcmp(s, ".") == 0) continue; /* remove (ignore) single dot segments */
-        l = (char **) realloc(l, sizeof (char *) * (++ls));
-        l[ls - 1] = s;
+        tmp = (char **) realloc(segment_list, sizeof (char *) * (++list_sz));
+        if (tmp == NULL) {
+            AM_FREE(o, segment_list);
+            url->error = AM_ENOMEM;
+            return;
+        }
+        segment_list = tmp;
+        segment_list[list_sz - 1] = s;
     }
-    if (ls == 0) {
+    if (list_sz == 0) {
         /* nothing to do here */
-        free(o);
+        AM_FREE(o, segment_list);
         if (url != NULL) url->error = AM_SUCCESS;
         return;
     }
 
     /* create a list for normalized segment storage */
-    lo = (char **) calloc(ls, sizeof (char *));
-    if (lo == NULL) {
-        free(o);
+    segment_list_norm = (char **) calloc(list_sz, sizeof (char *));
+    if (segment_list_norm == NULL) {
+        AM_FREE(o, segment_list);
         if (url != NULL) url->error = AM_ENOMEM;
         return;
     }
 
-    for (i = 0; i < ls; i++) {
-        if (strcmp(l[i], "..") == 0) {
+    for (i = 0; i < list_sz; i++) {
+        if (strcmp(segment_list[i], "..") == 0) {
             /* remove double dot segments */
             if (m-- <= 1) {
                 m = 1;
                 continue;
             }
-            lo[m] = NULL;
+            segment_list_norm[m] = NULL;
         } else {
-            lo[m++] = l[i];
+            segment_list_norm[m++] = segment_list[i];
         }
     }
 
     memset(&u[0], 0, sizeof (u));
     /* join normalized segments */
-    for (i = 0; i < ls; i++) {
-        if (lo[i] == NULL) break;
+    for (i = 0; i < list_sz; i++) {
+        if (segment_list_norm[i] == NULL) break;
         if (i == 0) {
-            strncpy(u, lo[i], sizeof (u) - 1);
-            if ((i + 1) < ls && lo[i + 1] != NULL) {
+            strncpy(u, segment_list_norm[i], sizeof (u) - 1);
+            if ((i + 1) < list_sz && segment_list_norm[i + 1] != NULL) {
                 strncat(u, "/", sizeof (u) - 1);
             }
         } else {
-            strncat(u, lo[i], sizeof (u) - 1);
-            if ((i + 1) < ls && lo[i + 1] != NULL) {
+            strncat(u, segment_list_norm[i], sizeof (u) - 1);
+            if ((i + 1) < list_sz && segment_list_norm[i + 1] != NULL) {
                 strncat(u, "/", sizeof (u) - 1);
             }
         }
     }
     memcpy(path, u, sizeof (u));
 
-    free(lo);
-    free(l);
+    free(segment_list_norm);
+    free(segment_list);
     free(o);
     if (url != NULL) url->error = AM_SUCCESS;
 }
@@ -310,14 +308,14 @@ static void uri_normalize(struct url *url, char *path) {
 int parse_url(const char *u, struct url *url) {
     int i = 0, port = 0;
     char last = 0;
-    char *d, *p, uri[AM_URI_SIZE];
+    char *d, *p, uri[AM_URI_SIZE + 1];
 
     if (url == NULL || u == NULL) {
         if (url != NULL) url->error = AM_EINVAL;
         return 1;
     }
 
-    if (strlen(u) > (5 + 255 + 6 + AM_URI_SIZE/*max size of all sscanf format limits*/)) {
+    if (strlen(u) > (AM_PROTO_SIZE + AM_HOST_SIZE + 6 + AM_URI_SIZE/*max size of all sscanf format limits*/)) {
         url->error = AM_E2BIG;
         return 1;
     }
@@ -326,13 +324,13 @@ int parse_url(const char *u, struct url *url) {
     memset(&uri[0], 0, sizeof (uri));
     memset(&url->proto[0], 0, sizeof (url->proto));
     memset(&url->host[0], 0, sizeof (url->host));
-    memset(&url->uri[0], 0, sizeof (url->uri));
+    memset(&url->path[0], 0, sizeof (url->path));
     memset(&url->query[0], 0, sizeof (url->query));
 
     while (u) {
-        if (sscanf(u, HD1, url->proto, url->host, &port, url->uri) == 4) {
+        if (sscanf(u, HD1, url->proto, url->host, &port, url->path) == 4) {
             break;
-        } else if (sscanf(u, HD2, url->proto, url->host, url->uri) == 3) {
+        } else if (sscanf(u, HD2, url->proto, url->host, url->path) == 3) {
             break;
         } else if (sscanf(u, HD3, url->proto, url->host, &port) == 3) {
             break;
@@ -354,25 +352,25 @@ int parse_url(const char *u, struct url *url) {
     } else if (strcasecmp(url->proto, "http") == 0 && url->port == 0) {
         url->port = 80;
     }
-    if (!ISVALID(url->uri)) {
-        strcpy(url->uri, "/");
-    } else if (url->uri[0] != '/') {
-        size_t ul = strlen(url->uri);
-        if (ul < sizeof (url->uri)) {
-            memmove(url->uri + 1, url->uri, ul);
+    if (!ISVALID(url->path)) {
+        strcpy(url->path, "/");
+    } else if (url->path[0] != '/') {
+        size_t ul = strlen(url->path);
+        if (ul < sizeof (url->path)) {
+            memmove(url->path + 1, url->path, ul);
         }
-        url->uri[0] = '/';
+        url->path[0] = '/';
     }
 
     /* split out a query string, if any (not modifying it later) */
-    p = strchr(url->uri, '?');
+    p = strchr(url->path, '?');
     if (p != NULL) {
         strncpy(url->query, p, sizeof (url->query) - 1);
         *p = 0;
     }
 
-    /* decode uri */
-    d = url_decode(url->uri);
+    /* decode path */
+    d = url_decode(url->path);
     if (d == NULL) {
         url->error = AM_ENOMEM;
         return 1;
@@ -389,10 +387,10 @@ int parse_url(const char *u, struct url *url) {
     }
     free(d);
 
-    /* normalize uri path segments, RFC-2396, section-5.2 */
+    /* normalize path segments, RFC-2396, section-5.2 */
     uri_normalize(url, uri);
 
-    strncpy(url->uri, uri, sizeof (url->uri) - 1);
+    strncpy(url->path, uri, sizeof (url->path) - 1);
     return 0;
 }
 
@@ -435,8 +433,8 @@ char *url_decode(const char *str) {
                 char c2 = str[s++];
                 char c3 = str[s++];
                 if (isxdigit(c2) && isxdigit(c3)) {
-                    c2 = am_tolower(c2);
-                    c3 = am_tolower(c3);
+                    c2 = tolower(c2);
+                    c3 = tolower(c3);
                     if (c2 <= '9') {
                         c2 = c2 - '0';
                     } else {
@@ -485,12 +483,12 @@ int am_vasprintf(char **buffer, const char *fmt, va_list arg) {
 
 int am_asprintf(char **buffer, const char *fmt, ...) {
     int size;
-    char *tmp = NULL;
+    char *tmp;
     va_list ap;
     va_start(ap, fmt);
     tmp = *buffer;
     size = am_vasprintf(buffer, fmt, ap);
-    free(tmp);
+    am_free(tmp);
     va_end(ap);
     return size;
 }
@@ -661,13 +659,13 @@ int compare_property(const char *line, const char *property) {
 }
 
 int get_line(char **line, size_t *size, FILE *file) {
-    int c;
+    int c, l = 0;
     unsigned int i = 0;
 
 #define DEFAULT_LINE_LEN 256
-    if (*line == NULL || *size == 0) {
+    if (*line == NULL) {
         *line = malloc(DEFAULT_LINE_LEN);
-        if (!(*line)) {
+        if (*line == NULL) {
             return -1;
         }
         *size = DEFAULT_LINE_LEN;
@@ -676,22 +674,29 @@ int get_line(char **line, size_t *size, FILE *file) {
     while (1) {
         c = getc(file);
         if (c < 0) {
-            return -1; /* EOF */
+            if (l == 0) {
+                return -1; /* EOF */
+            } else {
+                /* make sure we are not missing the last line (one w/o newlines) */
+                break;
+            }
         }
 
         (*line)[i++] = (char) c;
         /* time to expand the buffer? */
         if (i >= *size) {
-            char *new = realloc(*line, (*size) * 2);
-            if (!new) {
+            size_t newsize = (*size) << 1;
+            char *new = realloc(*line, newsize);
+            if (new == NULL) {
                 return -1;
             }
             *line = new;
-            (*size) *= 2;
+            (*size) = newsize;
         }
         if (c == '\n' || c == '\r') {
             break;
         }
+        l = 1;
     };
 
     (*line)[i] = 0;
@@ -699,233 +704,22 @@ int get_line(char **line, size_t *size, FILE *file) {
 }
 
 const char *am_method_num_to_str(char method) {
-    const char *mn;
-    switch (method) {
-        case AM_REQUEST_GET:
-            mn = REQUEST_METHOD_GET;
-            break;
-        case AM_REQUEST_POST:
-            mn = REQUEST_METHOD_POST;
-            break;
-        case AM_REQUEST_HEAD:
-            mn = REQUEST_METHOD_HEAD;
-            break;
-        case AM_REQUEST_PUT:
-            mn = REQUEST_METHOD_PUT;
-            break;
-        case AM_REQUEST_DELETE:
-            mn = REQUEST_METHOD_DELETE;
-            break;
-        case AM_REQUEST_TRACE:
-            mn = REQUEST_METHOD_TRACE;
-            break;
-        case AM_REQUEST_OPTIONS:
-            mn = REQUEST_METHOD_OPTIONS;
-            break;
-        case AM_REQUEST_CONNECT:
-            mn = REQUEST_METHOD_CONNECT;
-            break;
-        case AM_REQUEST_COPY:
-            mn = REQUEST_METHOD_COPY;
-            break;
-        case AM_REQUEST_INVALID:
-            mn = REQUEST_METHOD_INVALID;
-            break;
-        case AM_REQUEST_LOCK:
-            mn = REQUEST_METHOD_LOCK;
-            break;
-        case AM_REQUEST_UNLOCK:
-            mn = REQUEST_METHOD_UNLOCK;
-            break;
-        case AM_REQUEST_MKCOL:
-            mn = REQUEST_METHOD_MKCOL;
-            break;
-        case AM_REQUEST_MOVE:
-            mn = REQUEST_METHOD_MOVE;
-            break;
-        case AM_REQUEST_PATCH:
-            mn = REQUEST_METHOD_PATCH;
-            break;
-        case AM_REQUEST_PROPFIND:
-            mn = REQUEST_METHOD_PROPFIND;
-            break;
-        case AM_REQUEST_PROPPATCH:
-            mn = REQUEST_METHOD_PROPPATCH;
-            break;
-        case AM_REQUEST_VERSION_CONTROL:
-            mn = REQUEST_METHOD_VERSION_CONTROL;
-            break;
-        case AM_REQUEST_CHECKOUT:
-            mn = REQUEST_METHOD_CHECKOUT;
-            break;
-        case AM_REQUEST_UNCHECKOUT:
-            mn = REQUEST_METHOD_UNCHECKOUT;
-            break;
-        case AM_REQUEST_CHECKIN:
-            mn = REQUEST_METHOD_CHECKIN;
-            break;
-        case AM_REQUEST_UPDATE:
-            mn = REQUEST_METHOD_UPDATE;
-            break;
-        case AM_REQUEST_LABEL:
-            mn = REQUEST_METHOD_LABEL;
-            break;
-        case AM_REQUEST_REPORT:
-            mn = REQUEST_METHOD_REPORT;
-            break;
-        case AM_REQUEST_MKWORKSPACE:
-            mn = REQUEST_METHOD_MKWORKSPACE;
-            break;
-        case AM_REQUEST_MKACTIVITY:
-            mn = REQUEST_METHOD_MKACTIVITY;
-            break;
-        case AM_REQUEST_BASELINE_CONTROL:
-            mn = REQUEST_METHOD_BASELINE_CONTROL;
-            break;
-        case AM_REQUEST_MERGE:
-            mn = REQUEST_METHOD_MERGE;
-            break;
-        case AM_REQUEST_CONFIG:
-            mn = REQUEST_METHOD_CONFIG;
-            break;
-        case AM_REQUEST_ENABLE_APP:
-            mn = REQUEST_METHOD_ENABLE_APP;
-            break;
-        case AM_REQUEST_DISABLE_APP:
-            mn = REQUEST_METHOD_DISABLE_APP;
-            break;
-        case AM_REQUEST_STOP_APP:
-            mn = REQUEST_METHOD_STOP_APP;
-            break;
-        case AM_REQUEST_STOP_APP_RSP:
-            mn = REQUEST_METHOD_STOP_APP_RSP;
-            break;
-        case AM_REQUEST_REMOVE_APP:
-            mn = REQUEST_METHOD_REMOVE_APP;
-            break;
-        case AM_REQUEST_STATUS:
-            mn = REQUEST_METHOD_STATUS;
-            break;
-        case AM_REQUEST_STATUS_RSP:
-            mn = REQUEST_METHOD_STATUS_RSP;
-            break;
-        case AM_REQUEST_INFO:
-            mn = REQUEST_METHOD_INFO;
-            break;
-        case AM_REQUEST_INFO_RSP:
-            mn = REQUEST_METHOD_INFO_RSP;
-            break;
-        case AM_REQUEST_DUMP:
-            mn = REQUEST_METHOD_DUMP;
-            break;
-        case AM_REQUEST_DUMP_RSP:
-            mn = REQUEST_METHOD_DUMP_RSP;
-            break;
-        case AM_REQUEST_PING:
-            mn = REQUEST_METHOD_PING;
-            break;
-        case AM_REQUEST_PING_RSP:
-            mn = REQUEST_METHOD_PING_RSP;
-            break;
-        case AM_REQUEST_UNKNOWN:
-        default:
-            mn = REQUEST_METHOD_UNKNOWN;
-            break;
+    if (method < ARRAY_SIZE(request_method_str)) {
+        return request_method_str[(unsigned char) method];
     }
-    return mn;
+    return request_method_str[0];
 }
 
 char am_method_str_to_num(const char *method_str) {
-    char method = AM_REQUEST_UNKNOWN;
+    unsigned char i;
     if (method_str != NULL) {
-        if (!strcasecmp(method_str, REQUEST_METHOD_GET))
-            method = AM_REQUEST_GET;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_POST))
-            method = AM_REQUEST_POST;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_HEAD))
-            method = AM_REQUEST_HEAD;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_PUT))
-            method = AM_REQUEST_PUT;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_DELETE))
-            method = AM_REQUEST_DELETE;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_TRACE))
-            method = AM_REQUEST_TRACE;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_OPTIONS))
-            method = AM_REQUEST_OPTIONS;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_CONNECT))
-            method = AM_REQUEST_CONNECT;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_COPY))
-            method = AM_REQUEST_COPY;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_INVALID))
-            method = AM_REQUEST_INVALID;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_LOCK))
-            method = AM_REQUEST_LOCK;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_UNLOCK))
-            method = AM_REQUEST_UNLOCK;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_MKCOL))
-            method = AM_REQUEST_MKCOL;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_MOVE))
-            method = AM_REQUEST_MOVE;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_PATCH))
-            method = AM_REQUEST_PATCH;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_PROPFIND))
-            method = AM_REQUEST_PROPFIND;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_PROPPATCH))
-            method = AM_REQUEST_PROPPATCH;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_VERSION_CONTROL))
-            method = AM_REQUEST_VERSION_CONTROL;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_CHECKOUT))
-            method = AM_REQUEST_CHECKOUT;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_UNCHECKOUT))
-            method = AM_REQUEST_UNCHECKOUT;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_CHECKIN))
-            method = AM_REQUEST_CHECKIN;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_UPDATE))
-            method = AM_REQUEST_UPDATE;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_LABEL))
-            method = AM_REQUEST_LABEL;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_REPORT))
-            method = AM_REQUEST_REPORT;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_MKWORKSPACE))
-            method = AM_REQUEST_MKWORKSPACE;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_MKACTIVITY))
-            method = AM_REQUEST_MKACTIVITY;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_BASELINE_CONTROL))
-            method = AM_REQUEST_BASELINE_CONTROL;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_MERGE))
-            method = AM_REQUEST_MERGE;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_CONFIG))
-            method = AM_REQUEST_CONFIG;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_ENABLE_APP))
-            method = AM_REQUEST_ENABLE_APP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_DISABLE_APP))
-            method = AM_REQUEST_DISABLE_APP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_STOP_APP))
-            method = AM_REQUEST_STOP_APP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_STOP_APP_RSP))
-            method = AM_REQUEST_STOP_APP_RSP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_REMOVE_APP))
-            method = AM_REQUEST_REMOVE_APP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_STATUS))
-            method = AM_REQUEST_STATUS;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_STATUS_RSP))
-            method = AM_REQUEST_STATUS_RSP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_INFO))
-            method = AM_REQUEST_INFO;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_INFO_RSP))
-            method = AM_REQUEST_INFO_RSP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_DUMP))
-            method = AM_REQUEST_DUMP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_DUMP_RSP))
-            method = AM_REQUEST_DUMP_RSP;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_PING))
-            method = AM_REQUEST_PING;
-        else if (!strcasecmp(method_str, REQUEST_METHOD_PING_RSP))
-            method = AM_REQUEST_PING_RSP;
-        else
-            method = AM_REQUEST_UNKNOWN;
+        for (i = 0; i < ARRAY_SIZE(request_method_str); i++) {
+            if (!strcasecmp(method_str, request_method_str[i])) {
+                return i;
+            }
+        }
     }
-    return method;
+    return AM_REQUEST_UNKNOWN;
 }
 
 am_status_t get_cookie_value(am_request_t *rq, const char *separator, const char *cookie_name,
@@ -933,46 +727,47 @@ am_status_t get_cookie_value(am_request_t *rq, const char *separator, const char
     size_t value_len = 0, ec = 0;
     am_status_t found = AM_NOT_FOUND;
     char *a, *b, *header_val = NULL, *c = NULL;
-    if (!ISVALID(cookie_name)) {
-        return AM_EINVAL;
-    } else if (!ISVALID(cookie_header_val)) {
-        return AM_NOT_FOUND;
-    } else *value = NULL;
+
+    if (!ISVALID(cookie_name)) return AM_EINVAL;
+    if (!ISVALID(cookie_header_val)) return AM_NOT_FOUND;
+
+    *value = NULL;
     header_val = strdup(cookie_header_val);
-    if (header_val) {
-        am_log_debug(rq->instance_id, "get_cookie_value(%s): parsing cookie header: %s", separator, cookie_header_val);
-        for ((a = strtok_r(header_val, separator, &b)); a; (a = strtok_r(NULL, separator, &b))) {
-            if (strcmp(separator, "=") == 0 || strcmp(separator, "~") == 0) {
-                /* trim any leading/trailing whitespace */
-                trim(a, 0);
-                if (found != AM_SUCCESS && strcmp(a, cookie_name) == 0) found = AM_SUCCESS;
-                else if (found == AM_SUCCESS && a[0] != '\0') {
-                    value_len = strlen(a);
-                    if ((*value = strdup(a)) == NULL) {
-                        found = AM_NOT_FOUND;
-                    } else {
-                        (*value)[value_len] = '\0';
-                        /* trim any leading/trailing double-quotes */
-                        trim(*value, '"');
-                    }
-                }
-            } else {
-                if (strstr(a, cookie_name) == NULL) continue;
-                for (ec = 0, c = a; *c != '\0'; ++c) {
-                    if (*c == '=') ++ec;
-                }
-                if (ec > 1) {
-                    c = strchr(a, '=');
-                    *c = '~';
-                    if ((found = get_cookie_value(rq, "~", cookie_name, a, value)) == AM_SUCCESS) break;
+    if (header_val == NULL) return AM_ENOMEM;
+
+    AM_LOG_DEBUG(rq->instance_id, "get_cookie_value(%s): parsing cookie header: %s",
+            separator, cookie_header_val);
+
+    for ((a = strtok_r(header_val, separator, &b)); a; (a = strtok_r(NULL, separator, &b))) {
+        if (strcmp(separator, "=") == 0 || strcmp(separator, "~") == 0) {
+            /* trim any leading/trailing whitespace */
+            trim(a, 0);
+            if (found != AM_SUCCESS && strcmp(a, cookie_name) == 0) found = AM_SUCCESS;
+            else if (found == AM_SUCCESS && a[0] != '\0') {
+                value_len = strlen(a);
+                if ((*value = strdup(a)) == NULL) {
+                    found = AM_NOT_FOUND;
                 } else {
-                    if ((found = get_cookie_value(rq, "=", cookie_name, a, value)) == AM_SUCCESS) break;
+                    (*value)[value_len] = '\0';
+                    /* trim any leading/trailing double-quotes */
+                    trim(*value, '"');
                 }
             }
+        } else {
+            if (strstr(a, cookie_name) == NULL) continue;
+            for (ec = 0, c = a; *c != '\0'; ++c) {
+                if (*c == '=') ++ec;
+            }
+            if (ec > 1) {
+                c = strchr(a, '=');
+                *c = '~';
+                if ((found = get_cookie_value(rq, "~", cookie_name, a, value)) == AM_SUCCESS) break;
+            } else {
+                if ((found = get_cookie_value(rq, "=", cookie_name, a, value)) == AM_SUCCESS) break;
+            }
         }
-        free(header_val);
-    } else
-        return AM_ENOMEM;
+    }
+    free(header_val);
     return found;
 }
 
@@ -982,42 +777,44 @@ am_status_t get_token_from_url(am_request_t *rq) {
     char *query = NULL;
     int ql = 0;
     char *o = tmp;
+    size_t cn_sz;
 
     if (tmp == NULL) return AM_ENOMEM;
+    if (!ISVALID(rq->conf->cookie_name)) return AM_EINVAL;
+    cn_sz = strlen(rq->conf->cookie_name);
 
     while ((token = am_strsep(&tmp, "&")) != NULL) {
-        if (!ISVALID(rq->token) && strncmp(token,
-                rq->conf->cookie_name, strlen(rq->conf->cookie_name)) == 0) {
+        if (!ISVALID(rq->token) &&
+                strncmp(token, rq->conf->cookie_name, cn_sz) == 0) {
             /* session token as a query parameter (cookie-less mode) */
             char *v = strstr(token, "=");
             if (v != NULL && *(v + 1) != '\n') {
                 rq->token = strdup(v + 1);
             }
-        } else if (!ISVALID(rq->token) && strncmp(token, "LARES=", 6) == 0) {
+        } else if (!ISVALID(rq->token) &&
+                rq->conf->cdsso_enable && strncmp(token, "LARES=", 6) == 0) {
             /* session token (LARES/SAML encoded) as a query parameter */
             size_t clear_sz = strlen(token) - 6;
             char *clear = clear_sz > 0 ? base64_decode(token + 6, &clear_sz) : NULL;
             if (clear != NULL) {
-                struct am_namevalue *e, *t, *session_list = NULL;
+                struct am_namevalue *e, *t, *session_list;
                 session_list = am_parse_session_saml(rq->instance_id, clear, clear_sz);
-                if (session_list != NULL) {
 
-                    am_list_for_each(session_list, e, t) {
-                        if (strcmp(e->n, "sid") == 0 && ISVALID(e->v)) {
-                            rq->token = strdup(e->v);
-                            break;
-                        }
+                AM_LIST_FOR_EACH(session_list, e, t) {
+                    if (strcmp(e->n, "sid") == 0 && ISVALID(e->v)) {
+                        rq->token = strdup(e->v);
+                        break;
                     }
-                    delete_am_namevalue_list(&session_list);
                 }
+                delete_am_namevalue_list(&session_list);
                 free(clear);
             }
         } else {
             /* reconstruct query parameters w/o a session token(s) */
             if (query == NULL) {
-                ql += am_asprintf(&query, "?%s&", token);
+                ql = am_asprintf(&query, "?%s&", token);
             } else {
-                ql += am_asprintf(&query, "%s%s&", query, token);
+                ql = am_asprintf(&query, "%s%s&", query, token);
             }
         }
     }
@@ -1030,9 +827,7 @@ am_status_t get_token_from_url(am_request_t *rq) {
         memset(rq->url.query, 0, sizeof (rq->url.query));
         /* TODO: should a question mark be left there even when token is the only parameter? */
     }
-    if (query != NULL) free(query);
-    if (o != NULL) free(o);
-
+    AM_FREE(query, o);
     return ISVALID(rq->token) ? AM_SUCCESS : AM_NOT_FOUND;
 }
 
@@ -1210,8 +1005,7 @@ char *stristr(char *str1, char *str2) {
             ret = str1 + (t - a);
         }
     }
-    if (a) free(a);
-    if (b) free(b);
+    AM_FREE(a, b);
     return ret;
 }
 
@@ -1312,14 +1106,10 @@ char *base64_encode(const void *in, size_t *sz) {
 }
 
 void delete_am_cookie_list(struct am_cookie **list) {
-    struct am_cookie *t = *list;
+    struct am_cookie *t = list != NULL ? *list : NULL;
     if (t != NULL) {
         delete_am_cookie_list(&t->next);
-        if (t->name != NULL) free(t->name);
-        if (t->value != NULL) free(t->value);
-        if (t->domain != NULL) free(t->domain);
-        if (t->max_age != NULL) free(t->max_age);
-        if (t->path != NULL) free(t->path);
+        AM_FREE(t->name, t->value, t->domain, t->max_age, t->path);
         free(t);
         t = NULL;
     }
@@ -1335,6 +1125,7 @@ int char_count(const char *string, int c, int *last) {
 
 int concat(char **str, size_t *str_sz, const char *s2, size_t s2sz) {
     size_t len = 0;
+    char *str_tmp;
     if (str == NULL || s2 == NULL) {
         return AM_EINVAL;
     }
@@ -1342,9 +1133,12 @@ int concat(char **str, size_t *str_sz, const char *s2, size_t s2sz) {
         len = str_sz == NULL ? strlen(*str) : *str_sz;
     }
     len += s2sz;
-    *str = realloc(*str, len + 1);
-    if (*str == NULL) {
+    str_tmp = realloc(*str, len + 1);
+    if (str_tmp == NULL) {
+        am_free(*str);
         return AM_ENOMEM;
+    } else {
+        *str = str_tmp;
     }
     (*str)[len - s2sz] = 0;
     strncat(*str, s2, s2sz);
@@ -1514,7 +1308,7 @@ const char *get_valid_openam_url(am_request_t *r) {
     if (r->conf->naming_url_sz > 0) {
         val = valid_idx >= r->conf->naming_url_sz ?
                 r->conf->naming_url[0] : r->conf->naming_url[valid_idx];
-        am_log_debug(r->instance_id,
+        AM_LOG_DEBUG(r->instance_id,
                 "get_valid_openam_url(): active OpenAM service url: %s (%d)",
                 val, valid_idx);
     }
@@ -1534,7 +1328,7 @@ void xml_entity_escape(char *temp_str, size_t str_len) {
             if (temp_str[i] == ec[nref]) {
                 if ((nshifts = (int) strlen(est[nref]) - 1) > 0) {
                     memmove(temp_str + i + nshifts, temp_str + i, str_len - i + nshifts);
-                    for (j = i, k = 0; j <= i + nshifts, k <= nshifts; j++, k++) {
+                    for (j = i, k = 0; k <= nshifts; j++, k++) {
                         temp_str[j] = est[nref][k];
                     }
                     str_len += nshifts;
@@ -1550,7 +1344,7 @@ static void am_timer(uint64_t *t) {
     QueryPerformanceCounter((LARGE_INTEGER *) t);
 #else
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, NULL); //TODO: gethrtime
     *t = ((uint64_t) tv.tv_sec * AM_TIMER_USEC_PER_SEC) + tv.tv_usec;
 #endif
 }
@@ -1608,259 +1402,147 @@ double am_timer_elapsed(am_timer_t *t) {
 }
 
 void am_timer_report(unsigned long instance_id, am_timer_t *t, const char *op) {
-    am_log_debug(instance_id, "am_timer(): %s took %.0f seconds",
+    AM_LOG_DEBUG(instance_id, "am_timer(): %s took %.0f seconds",
             NOTNULL(op), am_timer_elapsed(t));
 }
 
-static uint32_t int32_sub(uint32_t A, uint32_t B) {
-    if (A >= B) return A - B;
-    B = 0xffffffff - B + 1;
-    return A + B;
-}
-
-static void rc5_key_init(am_rc5_key_t *k, unsigned char *key, size_t size) {
-    uint32_t L[RC5_EXPANDED_KEYSIZE_LONG], A = 0, B = 0;
-    unsigned char temp[RC5_EXPANDED_KEYSIZE], *tp = temp;
-    int i, j, c = ((int) size + 3) / 4, t = 2 * (k->r + 1);
-    int iterations = (c > t) ? 3 * c : 3 * t;
-    char be = is_big_endian();
-
-    /* copy the user key into the L array */
-    memset(temp, 0, RC5_EXPANDED_KEYSIZE);
-    memcpy(temp, key, size);
-    for (i = 0; i < RC5_EXPANDED_KEYSIZE_LONG; i++) {
-        if (be) {
-            L[i] = (((uint32_t) tp[0] << 24) | ((uint32_t) tp[1] << 16) |
-                    ((uint32_t) tp[2] << 8) | ((uint32_t) tp[3]));
-        } else {
-            L[i] = (((uint32_t) tp[0]) | ((uint32_t) tp[1] << 8) |
-                    ((uint32_t) tp[2] << 16) | ((uint32_t) tp[3] << 24));
-        }
-        tp += 4;
+static char *rc4(const char *input, size_t input_sz, const char *key, size_t key_sz) {
+    int x, y, i, j = 0;
+    int box[256];
+    char *r = malloc(input_sz + 1);
+    if (r == NULL) return NULL;
+    for (i = 0; i < 256; i++) {
+        box[i] = i;
     }
-
-    /* initialize the key array with the LCRNG */
-    k->S[0] = P32_MAGIC;
-    for (i = 1; i < RC5_EXPANDED_KEYSIZE_LONG; i++)
-        k->S[i] = k->S[i - 1] + Q32_MAGIC; /* overflow ignored */
-
-    /* mix the user key into the key array */
-    i = j = 0;
-    while (iterations--) {
-        A = k->S[i] = ROTL(MASK32(k->S[i] + A + B), 3);
-        B = L[j] = ROTL(MASK32(L[j] + A + B), (A + B) & 0x1F);
-        i = (i + 1) % t;
-        j = (j + 1) % c;
+    for (i = 0; i < 256; i++) {
+        j = (key[i % key_sz] + box[i] + j) % 256;
+        x = box[i];
+        box[i] = box[j];
+        box[j] = x;
     }
-
-    /* clean up */
-    memset(L, 0, RC5_EXPANDED_KEYSIZE_LONG * sizeof (uint32_t));
-    memset(temp, 0, RC5_EXPANDED_KEYSIZE);
+    for (i = 0; i < input_sz; i++) {
+        y = (i + 1) % 256;
+        j = (box[y] + j) % 256;
+        x = box[y];
+        box[y] = box[j];
+        box[j] = x;
+        r[i] = (char) (input[i] ^ box[(box[y] + box[j]) % 256]);
+    }
+    r[input_sz] = 0;
+    return r;
 }
 
 int decrypt_password(const char *key, char **password) {
     char *key_clear, *pass_clear;
     size_t key_sz, pass_sz;
-    unsigned char *dp, *bp;
-    uint32_t *kp, A, B;
-    am_rc5_key_t rk;
-    int i, j, blocks;
-    char be = is_big_endian();
 
-    if (!ISVALID(key)) return AM_SUCCESS;
-    if (key == NULL || password == NULL || !ISVALID(*password)) return AM_EINVAL;
+    if (key == NULL || password == NULL || !ISVALID(*password)) {
+        return AM_EINVAL;
+    }
 
     key_sz = strlen(key);
     pass_sz = strlen(*password);
-    key_clear = base64_decode(key, &key_sz);
-    pass_clear = base64_decode(*password, &pass_sz);
-    free(*password);
-    *password = NULL;
-    if (key_clear == NULL || pass_clear == NULL) return AM_ENOMEM;
-
-    rk.r = 12;
-    rc5_key_init(&rk, (unsigned char *) key_clear, MIN(key_sz, RC5_EXPANDED_KEYSIZE));
-    free(key_clear);
-    blocks = (int) pass_sz / 8;
-
-    bp = (unsigned char *) pass_clear;
-    for (j = 0; j < blocks; j++) {
-
-        dp = bp;
-        kp = rk.S;
-
-        /* copy the data buffer to the local variables */
-        if (be) {
-            A = (((uint32_t) dp[0] << 24) | ((uint32_t) dp[1] << 16) |
-                    ((uint32_t) dp[2] << 8) | ((uint32_t) dp[3]));
-        } else {
-            A = (((uint32_t) dp[0]) | ((uint32_t) dp[1] << 8) |
-                    ((uint32_t) dp[2] << 16) | ((uint32_t) dp[3] << 24));
-        }
-        dp += 4;
-        if (be) {
-            B = (((uint32_t) dp[0] << 24) | ((uint32_t) dp[1] << 16) |
-                    ((uint32_t) dp[2] << 8) | ((uint32_t) dp[3]));
-        } else {
-            B = (((uint32_t) dp[0]) | ((uint32_t) dp[1] << 8) |
-                    ((uint32_t) dp[2] << 16) | ((uint32_t) dp[3] << 24));
-        }
-        dp += 4;
-
-        /* point to the end of the keying material (no.rounds + the initial  
-           addition, two longwords each time) */
-        kp += 2 * (rk.r + 1);
-
-        /* perform the 12 rounds of decryption */
-        for (i = 0; i < rk.r; i++) {
-            DECRYPT_ROUND(A, B, kp);
-        }
-        B = int32_sub(B, *--kp);
-        A = int32_sub(A, *--kp);
-
-        /* copy the local variables back to the data buffer */
-        dp = bp;
-        if (be) {
-            dp[ 0 ] = ((A) >> 24) & 0xFF;
-            dp[ 1 ] = ((A) >> 16) & 0xFF;
-            dp[ 2 ] = ((A) >> 8) & 0xFF;
-            dp[ 3 ] = (A) & 0xFF;
-        } else {
-            dp[ 0 ] = (A) & 0xFF;
-            dp[ 1 ] = ((A) >> 8) & 0xFF;
-            dp[ 2 ] = ((A) >> 16) & 0xFF;
-            dp[ 3 ] = ((A) >> 24) & 0xFF;
-        }
-        dp += 4;
-        if (be) {
-            dp[ 0 ] = ((B) >> 24) & 0xFF;
-            dp[ 1 ] = ((B) >> 16) & 0xFF;
-            dp[ 2 ] = ((B) >> 8) & 0xFF;
-            dp[ 3 ] = (B) & 0xFF;
-        } else {
-            dp[ 0 ] = (B) & 0xFF;
-            dp[ 1 ] = ((B) >> 8) & 0xFF;
-            dp[ 2 ] = ((B) >> 16) & 0xFF;
-            dp[ 3 ] = ((B) >> 24) & 0xFF;
-        }
-        dp += 4;
-        bp += 8;
+    if (pass_sz < 2) {
+        return AM_EINVAL;
     }
 
-    *password = pass_clear;
-    return (int) (pass_sz - pass_clear[pass_sz - 1]);
+    key_clear = base64_decode(key, &key_sz);
+    if (key_clear == NULL) {
+        return AM_ENOMEM;
+    }
+
+    pass_clear = base64_decode(*password, &pass_sz);
+    if (pass_clear == NULL) {
+        free(key_clear);
+        return AM_ENOMEM;
+    }
+    free(*password);
+
+    *password = rc4(pass_clear, pass_sz, key_clear, key_sz);
+    if (*password == NULL) {
+        free(key_clear);
+        free(pass_clear);
+        return AM_ENOMEM;
+    }
+    free(key_clear);
+    free(pass_clear);
+    return (int) pass_sz;
 }
 
 int encrypt_password(const char *key, char **password) {
-    char *key_clear, *b64p;
+    char *key_clear;
+    char *pass_enc, *pass_enc_b64;
     size_t key_sz, pass_sz;
-    unsigned char *dp, *bp;
-    uint32_t *kp, A, B;
-    int i, j, blocks, pad;
-    am_rc5_key_t rk;
-    char be = is_big_endian();
 
-    if (!ISVALID(key)) return AM_SUCCESS;
-    if (key == NULL || password == NULL || !ISVALID(*password)) return AM_EINVAL;
+    if (key == NULL || password == NULL || !ISVALID(*password)) {
+        return AM_EINVAL;
+    }
 
     key_sz = strlen(key);
     pass_sz = strlen(*password);
+    if (pass_sz < 2) {
+        return AM_EINVAL;
+    }
+
     key_clear = base64_decode(key, &key_sz);
-    if (key_clear == NULL) return AM_ENOMEM;
-
-    rk.r = 12;
-    rc5_key_init(&rk, (unsigned char *) key_clear, MIN(key_sz, RC5_EXPANDED_KEYSIZE));
-    free(key_clear);
-
-    /* pad the data buffer */
-    pad = 8 - (pass_sz % 8);
-    *password = realloc(*password, pass_sz + pad);
-    if (*password == NULL) return AM_ENOMEM;
-    for (j = 0; j < pad; j++) {
-        (*password)[pass_sz + j] = 0; /* padding */
-    }
-    pass_sz += pad;
-    (*password)[pass_sz - 1] = pad; /* store pad at the end for decrypt use */
-    blocks = (int) pass_sz / 8;
-
-    bp = (unsigned char *) *password;
-    for (j = 0; j < blocks; j++) {
-
-        dp = bp;
-        kp = rk.S;
-
-        /* copy the data buffer to the local variables */
-        if (be) {
-            A = (((uint32_t) dp[0] << 24) | ((uint32_t) dp[1] << 16) |
-                    ((uint32_t) dp[2] << 8) | ((uint32_t) dp[3]));
-        } else {
-            A = (((uint32_t) dp[0]) | ((uint32_t) dp[1] << 8) |
-                    ((uint32_t) dp[2] << 16) | ((uint32_t) dp[3] << 24));
-        }
-        dp += 4;
-        if (be) {
-            B = (((uint32_t) dp[0] << 24) | ((uint32_t) dp[1] << 16) |
-                    ((uint32_t) dp[2] << 8) | ((uint32_t) dp[3]));
-        } else {
-            B = (((uint32_t) dp[0]) | ((uint32_t) dp[1] << 8) |
-                    ((uint32_t) dp[2] << 16) | ((uint32_t) dp[3] << 24));
-        }
-        dp += 4;
-
-        A = MASK32(A + *kp++);
-        B = MASK32(B + *kp++);
-
-        /* perform the 12 rounds of encryption */
-        for (i = 0; i < rk.r; i++) {
-            ENCRYPT_ROUND(A, B, kp);
-        }
-
-        /* copy the local variables back to the data buffer */
-        dp = bp;
-        if (be) {
-            dp[ 0 ] = ((A) >> 24) & 0xFF;
-            dp[ 1 ] = ((A) >> 16) & 0xFF;
-            dp[ 2 ] = ((A) >> 8) & 0xFF;
-            dp[ 3 ] = (A) & 0xFF;
-        } else {
-            dp[ 0 ] = (A) & 0xFF;
-            dp[ 1 ] = ((A) >> 8) & 0xFF;
-            dp[ 2 ] = ((A) >> 16) & 0xFF;
-            dp[ 3 ] = ((A) >> 24) & 0xFF;
-        }
-        dp += 4;
-        if (be) {
-            dp[ 0 ] = ((B) >> 24) & 0xFF;
-            dp[ 1 ] = ((B) >> 16) & 0xFF;
-            dp[ 2 ] = ((B) >> 8) & 0xFF;
-            dp[ 3 ] = (B) & 0xFF;
-        } else {
-            dp[ 0 ] = (B) & 0xFF;
-            dp[ 1 ] = ((B) >> 8) & 0xFF;
-            dp[ 2 ] = ((B) >> 16) & 0xFF;
-            dp[ 3 ] = ((B) >> 24) & 0xFF;
-        }
-        dp += 4;
-        bp += 8;
+    if (key_clear == NULL) {
+        return AM_ENOMEM;
     }
 
-    b64p = base64_encode(*password, &pass_sz);
-    if (b64p == NULL) return AM_ENOMEM;
+    pass_enc = rc4(*password, pass_sz, key_clear, key_sz);
+    if (pass_enc == NULL) {
+        free(key_clear);
+        return AM_ENOMEM;
+    }
+
+    pass_enc_b64 = base64_encode(pass_enc, &pass_sz);
+    if (pass_enc_b64 == NULL) {
+        free(key_clear);
+        free(pass_enc);
+        return AM_ENOMEM;
+    }
+    free(pass_enc);
     free(*password);
-    *password = b64p;
+    *password = pass_enc_b64;
     return (int) pass_sz;
+}
+
+void decrypt_agent_passwords(am_config_t *r) {
+    char *pass;
+    size_t pass_sz;
+
+    if (r == NULL || !ISVALID(r->key)) return;
+    if (ISVALID(r->pass)) {
+        pass = strdup(r->pass);
+        if (pass != NULL && (pass_sz = decrypt_password(r->key, &pass)) > 0) {
+            free(r->pass);
+            r->pass = pass;
+            r->pass_sz = pass_sz;
+            return;
+        }
+        AM_LOG_WARNING(r->instance_id, "failed to decrypt agent password");
+        am_free(pass);
+    }
+
+    if (ISVALID(r->cert_key_pass)) {
+        pass = strdup(r->cert_key_pass);
+        if (pass != NULL && (pass_sz = decrypt_password(r->key, &pass)) > 0) {
+            free(r->cert_key_pass);
+            r->cert_key_pass = pass;
+            r->cert_key_pass_sz = pass_sz;
+            return;
+        }
+        AM_LOG_WARNING(r->instance_id, "failed to decrypt certificate key password");
+        am_free(pass);
+    }
 }
 
 void am_request_free(am_request_t *r) {
     if (r != NULL) {
-        if (r->normalized_url) free(r->normalized_url);
-        if (r->overridden_url) free(r->overridden_url);
-        if (r->token) free(r->token);
-        if (r->client_ip) free(r->client_ip);
-        if (r->client_host) free(r->client_host);
-        if (r->post_data) free(r->post_data);
-        if (r->pattr) delete_am_policy_result_list(&r->pattr);
-        if (r->sattr) delete_am_namevalue_list(&r->sattr);
+        AM_FREE(r->normalized_url, r->overridden_url, r->token,
+                r->client_ip, r->client_host, r->post_data);
+        delete_am_policy_result_list(&r->pattr);
+        delete_am_namevalue_list(&r->sattr);
     }
 }
 
@@ -2049,9 +1731,7 @@ static DIR *opendir(const char *dir) {
 static int closedir(DIR *dp) {
     if (dp != NULL) {
         _findclose(dp->handle);
-        if (dp->dir) {
-            free(dp->dir);
-        }
+        am_free(dp->dir);
         free(dp);
     }
     return 0;
@@ -2125,6 +1805,7 @@ static int am_scandir(const char *dirname, struct dirent ***ret_namelist,
     DIR *dir;
     struct dirent *ent, *ent2, *dirbuf;
     struct dirent **namelist = NULL;
+    struct dirent **namelist_tmp;
     if ((dir = opendir(dirname)) == NULL) {
         return AM_EINVAL;
     }
@@ -2144,8 +1825,13 @@ static int am_scandir(const char *dirname, struct dirent ***ret_namelist,
             return -1;
         if (used >= allocated) {
             allocated *= 2;
-            namelist = realloc(namelist, allocated * sizeof (struct dirent *));
-            if (namelist == NULL) return AM_ENOMEM;
+            namelist_tmp = realloc(namelist, allocated * sizeof (struct dirent *));
+            if (namelist_tmp == NULL) {
+                am_free(namelist);
+                return AM_ENOMEM;
+            } else {
+                namelist = namelist_tmp;
+            }
         }
         memcpy(ent2, ent, len);
         namelist[used++] = ent2;
@@ -2189,7 +1875,7 @@ int am_create_agent_dir(const char *sep, const char *path,
         if (p0 == NULL) return AM_ENOMEM;
         r = am_make_path(p0);
         free(p0);
-        if (instlist != NULL) free(instlist);
+        am_free(instlist);
         return r;
 
     } else {
@@ -2235,35 +1921,36 @@ int string_replace(char **original, const char *pattern, const char *replace, si
             replace != NULL && sz != NULL) {
         size_t rlen = strlen(replace);
         size_t plen = strlen(pattern);
-        char *op = *original;
+        size_t retlen;
+        char *newop, *ret, *op = *original;
         /*count the number of patterns*/
         for (optr = op; (ploc = strstr(optr, pattern)); optr = ploc + plen) pcnt++;
-        if (pcnt > 0) {
-            size_t retlen = (*sz) + pcnt * (rlen + plen); /*worst case*/
-            char *newop = (char *) realloc(op, retlen + 1);
-            retlen = *sz;
-            if (newop != NULL) {
-                char *ret = newop;
-                /* go through each of thw patterns, make a space (by moving) 
-                 * for a replacement string, copy replacement in, 
-                 * repeat until all patterns are found
-                 **/
-                for (optr = ret; (ploc = strstr(optr, pattern)); optr = ploc + plen) {
-                    size_t move_sz = retlen - (ploc + plen - ret);
-                    memmove((void *) (ploc + rlen), ploc + plen, move_sz);
-                    memcpy((void *) ploc, replace, rlen);
-                    retlen = (ploc - ret) + rlen + move_sz;
-                }
-                newop[retlen] = 0;
-                *original = newop;
-                *sz = retlen;
-                rv = AM_SUCCESS;
-            } else {
-                rv = AM_ENOMEM;
-            }
-        } else {
-            rv = AM_NOT_FOUND;
+        if (pcnt == 0)
+            return AM_NOT_FOUND;
+
+        retlen = (*sz) + pcnt * (rlen + plen); /*worst case*/
+        newop = (char *) realloc(op, retlen + 1);
+        if (newop == NULL) {
+            am_free(op);
+            return AM_ENOMEM;
         }
+
+        retlen = *sz;
+        ret = newop;
+        /* go through each of thw patterns, make a space (by moving) 
+         * for a replacement string, copy replacement in, 
+         * repeat until all patterns are found
+         **/
+        for (optr = ret; (ploc = strstr(optr, pattern)); optr = ploc + plen) {
+            size_t move_sz = retlen - (ploc + plen - ret);
+            memmove((void *) (ploc + rlen), ploc + plen, move_sz);
+            memcpy((void *) ploc, replace, rlen);
+            retlen = (ploc - ret) + rlen + move_sz;
+        }
+        newop[retlen] = 0;
+        *original = newop;
+        *sz = retlen;
+        rv = AM_SUCCESS;
     }
     return rv;
 }
@@ -2322,35 +2009,29 @@ int copy_file(const char *from, const char *to) {
 
 void read_directory(const char *path, struct am_namevalue **list) {
     DIR *d;
+    char npath[AM_URI_SIZE];
+    struct stat s;
     if ((d = opendir(path)) != NULL) {
         while (1) {
-            struct dirent *e;
-            const char *d_name;
-            e = readdir(d);
-            if (!e) break;
-            d_name = e->d_name;
-            if (strcmp(d_name, "..") != 0 &&
-                    strcmp(d_name, ".") != 0) {
-                struct am_namevalue *el = calloc(1, sizeof (struct am_namevalue));
-                if (el != NULL) {
-                    el->ns = (e->d_type & DT_DIR) ? 1 : 0; /*record its a directory or not*/
-                    am_asprintf(&el->n,
-                            el->ns == 1 ? "%s/%s/" : "%s/%s",
-                            path, d_name);
+            struct dirent *e = readdir(d);
+            if (e == NULL) break;
 
-                    el->v = NULL;
-                    el->next = NULL;
-                    am_list_insert(*list, el);
-                } else break;
+            snprintf(npath, sizeof (npath), "%s/%s", path, e->d_name);
+            if (stat(npath, &s) == -1) break;
+
+            if (strcmp(e->d_name, "..") != 0 && strcmp(e->d_name, ".") != 0) {
+                struct am_namevalue *el = calloc(1, sizeof (struct am_namevalue));
+                if (el == NULL) break;
+                el->ns = S_ISDIR(s.st_mode);
+                am_asprintf(&el->n, el->ns ? "%s/%s/" : "%s/%s", path, e->d_name);
+                el->v = NULL;
+                el->next = NULL;
+                AM_LIST_INSERT(*list, el);
             }
-            if (e->d_type & DT_DIR) {
-                if (strcmp(d_name, "..") != 0 &&
-                        strcmp(d_name, ".") != 0) {
-                    char npath[AM_URI_SIZE];
-                    snprintf(npath, AM_URI_SIZE,
-                            "%s/%s", path, d_name);
-                    read_directory(npath, list);
-                }
+
+            if (S_ISDIR(s.st_mode) && strcmp(e->d_name, "..") != 0 &&
+                    strcmp(e->d_name, ".") != 0) {
+                read_directory(npath, list);
             }
         }
         closedir(d);
@@ -2363,8 +2044,23 @@ void read_directory(const char *path, struct am_namevalue **list) {
                 el->n = strdup(path);
                 el->v = NULL;
                 el->next = NULL;
-                am_list_insert(*list, el);
+                AM_LIST_INSERT(*list, el);
             }
         }
     }
+}
+
+int get_ttl_value(struct am_namevalue *session, const char *name, int def, int value_in_minutes) {
+    struct am_namevalue *e, *t;
+
+    AM_LIST_FOR_EACH(session, e, t) {
+        if (strcmp(e->n, name) == 0) {
+            int rv = strtol(e->v, NULL, AM_BASE_TEN);
+            if (rv < 0 || errno == ERANGE) {
+                break;
+            }
+            return value_in_minutes ? rv * 60 : rv;
+        }
+    }
+    return def < 0 ? -(def) : def;
 }

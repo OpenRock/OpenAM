@@ -17,7 +17,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-#define AM__UNKNOWN                 (-27)
+#define AM__UNKNOWN                 (-28)
+#define AM__JSON_RESPONSE           (-27)
 #define AM__ENOSSL                  (-26)
 #define AM__NOTIFICATION_DONE       (-25)
 #define AM__INVALID_AGENT_SESSION   (-24)
@@ -54,6 +55,7 @@
 
 #define AM_ERRNO_MAP(AE) \
   AE(EINVAL, "invalid argument") \
+  AE(JSON_RESPONSE, "json response") \
   AE(ENOSSL, "no ssl/library support") \
   AE(INTERNAL_REDIRECT, "internal redirect") \
   AE(EOPNOTSUPP, "operation not supported") \
@@ -94,7 +96,11 @@ typedef enum {
 #undef AE
 } am_status_t;
 
-/* Get the error (code) description */
+/**
+ * Get description for the error/status code
+ * 
+ * @return description
+ */
 const char *am_strerror(int status);
 
 #endif

@@ -20,6 +20,8 @@
 #define COBJMACROS
 
 #include "platform.h"
+#include "am.h"
+#include "utility.h"
 #include <objbase.h>
 #include <oleauto.h>
 #include <ahadmin.h>
@@ -180,8 +182,7 @@ void list_iis_sites(int argc, char **argv) {
                     }
                     fprintf(stdout, "id: %s\tname: \"%s\"\n", id, name);
                 }
-                if (name != NULL) free(name);
-                if (id != NULL) free(id);
+                AM_FREE(name, id);
                 name = NULL;
                 id = NULL;
             }
@@ -254,7 +255,6 @@ static BOOL get_property(IAppHostElement* element, BSTR name, VARIANT* value) {
 
 static BOOL get_from_collection_idx(IAppHostElementCollection* collection,
         BSTR property_key, BSTR property_value, short* index) {
-    IAppHostProperty* property = NULL;
     IAppHostElement* element = NULL;
     USHORT i;
     HRESULT hresult = S_OK;
@@ -294,7 +294,6 @@ static BOOL get_from_collection_idx(IAppHostElementCollection* collection,
         }
     } while (FALSE);
 
-    if (property != NULL) IAppHostProperty_Release(property);
     if (element != NULL) IAppHostElement_Release(element);
 
     return SUCCEEDED(hresult);
@@ -843,8 +842,7 @@ static char *get_site_name(const char *sid) {
                         i = num;
                     }
                 }
-                if (name != NULL) free(name);
-                if (id != NULL) free(id);
+                AM_FREE(name, id);
                 name = NULL;
                 id = NULL;
             }
@@ -870,61 +868,65 @@ int enable_module(const char *siteid, const char *modconf) {
     int rv = 0;
     wchar_t *config_path_w = NULL;
     wchar_t *modconf_w = NULL;
-    if (siteid != NULL) {
-        char *config_path = get_site_name(siteid);
-        if (config_path != NULL) {
-            config_path_w = utf8_decode(config_path, NULL);
-            free(config_path);
+    char *config_path;
+
+    if (siteid == NULL || modconf == NULL) {
+        fprintf(stderr, "Invalid arguments.\n");
+        return rv;
+    }
+
+    config_path = get_site_name(siteid);
+    if (config_path != NULL) {
+        config_path_w = utf8_decode(config_path, NULL);
+        free(config_path);
+    }
+
+    modconf_w = utf8_decode(modconf, NULL);
+
+    do {
+        if (config_path_w == NULL || modconf_w == NULL) {
+            fprintf(stderr, "Failed to allocate memory.\n");
+            break;
         }
 
-        modconf_w = utf8_decode(modconf, NULL);
+        hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to initialize COM.\n");
+            break;
+        }
+        hresult = CoCreateInstance(&CLSID_AppHostWritableAdminManager, NULL,
+                CLSCTX_INPROC_SERVER, &IID_IAppHostWritableAdminManager, (LPVOID*) & admin_manager);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to create AppHostWritableAdminManager.\n");
+            break;
+        }
+        hresult = IAppHostWritableAdminManager_put_CommitPath(admin_manager, config_path_w);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to put commit path.\n");
+            break;
+        }
 
-        do {
-            if (config_path_w == NULL || modconf_w == NULL) {
-                fprintf(stderr, "Failed to allocate memory.\n");
-                break;
-            }
-
-            hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to initialize COM.\n");
-                break;
-            }
-            hresult = CoCreateInstance(&CLSID_AppHostWritableAdminManager, NULL,
-                    CLSCTX_INPROC_SERVER, &IID_IAppHostWritableAdminManager, (LPVOID*) & admin_manager);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to create AppHostWritableAdminManager.\n");
-                break;
-            }
-            hresult = IAppHostWritableAdminManager_put_CommitPath(admin_manager, config_path_w);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to put commit path.\n");
-                break;
-            }
-
-            if (!add_to_modules(admin_manager, config_path_w)) {
-                fprintf(stderr, "Failed to add entry to modules.\n");
-                break;
+        if (!add_to_modules(admin_manager, config_path_w)) {
+            fprintf(stderr, "Failed to add entry to modules.\n");
+            break;
+        } else {
+            if (!update_module_site_config(admin_manager, config_path_w, modconf_w, TRUE)) {
+                fprintf(stderr, "Failed to add module configuration entry.\n");
             } else {
-                if (!update_module_site_config(admin_manager, config_path_w, modconf_w, TRUE)) {
-                    fprintf(stderr, "Failed to add module configuration entry.\n");
-                } else {
-                    rv = 1;
-                }
+                rv = 1;
             }
+        }
 
-            hresult = IAppHostWritableAdminManager_CommitChanges(admin_manager);
-            if (FAILED(hresult)) {
-                break;
-            }
-        } while (FALSE);
+        hresult = IAppHostWritableAdminManager_CommitChanges(admin_manager);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to save module configuration changes.\n");
+        }
+    } while (FALSE);
 
-        if (modconf_w != NULL) free(modconf_w);
-        if (config_path_w != NULL) free(config_path_w);
+    AM_FREE(modconf_w, config_path_w);
 
-        if (admin_manager != NULL) IAppHostWritableAdminManager_Release(admin_manager);
-        CoUninitialize();
-    }
+    if (admin_manager != NULL) IAppHostWritableAdminManager_Release(admin_manager);
+    CoUninitialize();
     return rv;
 }
 
@@ -934,125 +936,134 @@ int disable_module(const char *siteid, const char *modconf) {
     int rv = 0;
     wchar_t *config_path_w = NULL;
     wchar_t *modconf_w = NULL;
-    if (siteid != NULL) {
-        char *config_path = get_site_name(siteid);
-        if (config_path != NULL) {
-            config_path_w = utf8_decode(config_path, NULL);
-            free(config_path);
+    char *config_path;
+
+    if (siteid == NULL || modconf == NULL) {
+        fprintf(stderr, "Invalid arguments.\n");
+        return rv;
+    }
+
+    config_path = get_site_name(siteid);
+    if (config_path != NULL) {
+        config_path_w = utf8_decode(config_path, NULL);
+        free(config_path);
+    }
+
+    modconf_w = utf8_decode(modconf, NULL);
+
+    do {
+        if (config_path_w == NULL || modconf_w == NULL) {
+            fprintf(stderr, "Failed to allocate memory.\n");
+            break;
         }
 
-        modconf_w = utf8_decode(modconf, NULL);
+        hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to initialize COM.\n");
+            break;
+        }
+        hresult = CoCreateInstance(&CLSID_AppHostWritableAdminManager, NULL,
+                CLSCTX_INPROC_SERVER, &IID_IAppHostWritableAdminManager, (LPVOID*) & admin_manager);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to create AppHostWritableAdminManager.\n");
+            break;
+        }
+        hresult = IAppHostWritableAdminManager_put_CommitPath(admin_manager, config_path_w);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to put commit path.\n");
+            break;
+        }
 
-        do {
-            if (config_path_w == NULL) {
-                fprintf(stderr, "Failed to allocate memory.\n");
-                break;
-            }
-
-            hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to initialize COM.\n");
-                break;
-            }
-            hresult = CoCreateInstance(&CLSID_AppHostWritableAdminManager, NULL,
-                    CLSCTX_INPROC_SERVER, &IID_IAppHostWritableAdminManager, (LPVOID*) & admin_manager);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to create AppHostWritableAdminManager.\n");
-                break;
-            }
-            hresult = IAppHostWritableAdminManager_put_CommitPath(admin_manager, config_path_w);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to put commit path.\n");
-                break;
-            }
-
-            if (!remove_from_modules(admin_manager, config_path_w, AM_IIS_MODULES, FALSE)) {
-                fprintf(stderr, "Failed to remove entry from modules.\n");
-                break;
+        if (!remove_from_modules(admin_manager, config_path_w, AM_IIS_MODULES, FALSE)) {
+            fprintf(stderr, "Failed to remove entry from modules.\n");
+            break;
+        } else {
+            if (!update_module_site_config(admin_manager, config_path_w, modconf_w, FALSE)) {
+                fprintf(stderr, "Failed to add module configuration entry.\n");
             } else {
-                if (!update_module_site_config(admin_manager, config_path_w, modconf_w, FALSE)) {
-                    fprintf(stderr, "Failed to add module configuration entry.\n");
-                } else {
-                    rv = 1;
-                }
+                rv = 1;
             }
+        }
 
-            hresult = IAppHostWritableAdminManager_CommitChanges(admin_manager);
-            if (FAILED(hresult)) {
-                break;
-            }
-        } while (FALSE);
+        hresult = IAppHostWritableAdminManager_CommitChanges(admin_manager);
+        if (FAILED(hresult)) {
+            break;
+        }
+    } while (FALSE);
 
-        if (modconf_w != NULL) free(modconf_w);
-        if (config_path_w != NULL) free(config_path_w);
+    AM_FREE(modconf_w, config_path_w);
 
-        if (admin_manager != NULL) IAppHostWritableAdminManager_Release(admin_manager);
-        CoUninitialize();
-    }
+    if (admin_manager != NULL) IAppHostWritableAdminManager_Release(admin_manager);
+    CoUninitialize();
     return rv;
 }
 
 int test_module(const char *siteid) {
     BOOL local = FALSE;
     BOOL global = FALSE;
-    int rv = -1;
+    int rv = ADMIN_IIS_MOD_ERROR;
     IAppHostWritableAdminManager *admin_manager = NULL;
     HRESULT hresult = S_OK;
     wchar_t *config_path_w = NULL;
-    if (siteid != NULL) {
-        char *config_path = get_site_name(siteid);
-        if (config_path != NULL) {
-            config_path_w = utf8_decode(config_path, NULL);
-            free(config_path);
+    char *config_path;
+
+    if (siteid == NULL) {
+        fprintf(stderr, "Invalid arguments.\n");
+        return rv;
+    }
+
+    config_path = get_site_name(siteid);
+    if (config_path != NULL) {
+        config_path_w = utf8_decode(config_path, NULL);
+        free(config_path);
+    }
+
+    do {
+        if (config_path_w == NULL) {
+            fprintf(stderr, "Failed to allocate memory.\n");
+            break;
         }
 
-        do {
-            if (config_path_w == NULL) {
-                fprintf(stderr, "Failed to allocate memory.\n");
-                break;
-            }
+        hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to initialize COM.\n");
+            break;
+        }
+        hresult = CoCreateInstance(&CLSID_AppHostWritableAdminManager, NULL,
+                CLSCTX_INPROC_SERVER, &IID_IAppHostWritableAdminManager, (LPVOID*) & admin_manager);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to create AppHostWritableAdminManager.\n");
+            break;
+        }
+        hresult = IAppHostWritableAdminManager_put_CommitPath(admin_manager, config_path_w);
+        if (FAILED(hresult)) {
+            fprintf(stderr, "Failed to put commit path.\n");
+            break;
+        }
 
-            hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to initialize COM.\n");
-                break;
-            }
-            hresult = CoCreateInstance(&CLSID_AppHostWritableAdminManager, NULL,
-                    CLSCTX_INPROC_SERVER, &IID_IAppHostWritableAdminManager, (LPVOID*) & admin_manager);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to create AppHostWritableAdminManager.\n");
-                break;
-            }
-            hresult = IAppHostWritableAdminManager_put_CommitPath(admin_manager, config_path_w);
-            if (FAILED(hresult)) {
-                fprintf(stderr, "Failed to put commit path.\n");
-                break;
-            }
+        global = remove_from_modules(admin_manager, config_path_w, AM_IIS_GLOBAL, TRUE);
+        local = remove_from_modules(admin_manager, config_path_w, AM_IIS_MODULES, TRUE);
 
-            global = remove_from_modules(admin_manager, config_path_w, AM_IIS_GLOBAL, TRUE);
-            local = remove_from_modules(admin_manager, config_path_w, AM_IIS_MODULES, TRUE);
-
-            if (global == FALSE && local == FALSE) {
-                rv = 0;
-            } else {
-                if (global == TRUE) {
-                    rv = 1 << 0;
-                }
-                if (local == TRUE) {
-                    rv = 1 << 1;
-                }
+        if (global == FALSE && local == FALSE) {
+            rv = ADMIN_IIS_MOD_NONE;
+        } else {
+            if (global == TRUE) {
+                rv = ADMIN_IIS_MOD_GLOBAL;
             }
-
-            hresult = IAppHostWritableAdminManager_CommitChanges(admin_manager);
-            if (FAILED(hresult)) {
-                break;
+            if (local == TRUE) {
+                rv = ADMIN_IIS_MOD_LOCAL;
             }
-        } while (FALSE);
+        }
 
-        if (config_path_w != NULL) free(config_path_w);
-        if (admin_manager != NULL) IAppHostWritableAdminManager_Release(admin_manager);
-        CoUninitialize();
-    }
+        hresult = IAppHostWritableAdminManager_CommitChanges(admin_manager);
+        if (FAILED(hresult)) {
+            break;
+        }
+    } while (FALSE);
+
+    am_free(config_path_w);
+    if (admin_manager != NULL) IAppHostWritableAdminManager_Release(admin_manager);
+    CoUninitialize();
     return rv;
 }
 

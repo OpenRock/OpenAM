@@ -30,6 +30,9 @@ ifneq ("$(PROGRAMFILES)$(ProgramFiles)","")
  SED := cmd /c sed.exe
  ECHO := cmd /c echo
  MKDIR := cmd /c mkdir
+ CP := cmd /c copy /Y
+ CD := cd
+ EXEC := 
  REVISION := $(shell svn info . | findstr "Revision:")
  BUILD_MACHINE := $(shell hostname)
  IDENT_DATE := $(shell powershell get-date -format "{dd.MM.yyyy}")
@@ -46,6 +49,9 @@ else
  SED := sed
  ECHO := echo
  MKDIR := mkdir -p
+ CP := cp
+ CD := cd
+ EXEC := ./
  REVISION := $(shell svn info . | grep Revision:)
  BUILD_MACHINE := $(shell hostname)
  IDENT_DATE := $(shell date +'%d.%m.%y')
@@ -54,6 +60,12 @@ else
  COMPILEFLAG=-
  COMPILEOPTS=-c -o $@
  OBJ=o
+endif
+
+ifdef 64
+ OS_BITS := _64bit
+else
+ OS_BITS :=
 endif
 
 PS=$(strip $(PATHSEP))
@@ -103,7 +115,7 @@ $(OBJDIR)/%.$(OBJ): %.c
 
 .DEFAULT_GOAL := all
 
-all: build version apache iis agentadmin
+all: apachezip
 	
 build:
 	$(MKDIR) $(OBJDIR)$(PS)expat
@@ -119,7 +131,43 @@ version:
 	$(SED) -e "s$(SUB)_REVISION_$(SUB)$(REVISION)$(SUB)g" \
 	    -e "s$(SUB)_IDENT_DATE_$(SUB)$(IDENT_DATE)$(SUB)g" \
 	    -e "s$(SUB)_BUILD_MACHINE_$(SUB)$(BUILD_MACHINE)$(SUB)g" \
-	    -e "s$(SUB)_VERSION_$(SUB)$(VERSION)$(SUB)g" < source/version.template > source/version.h
+	    -e "s$(SUB)_VERSION_$(SUB)$(VERSION)$(SUB)g" < source$(PS)version.template > source$(PS)version.h
 clean:
 	-$(RMDIR) $(OBJDIR)
+	-$(RMDIR) log
 	-$(RMALL) source$(PS)version.h
+	
+apachezip: clean build version apache agentadmin
+	@$(ECHO) "[***** Building Apache agent archive *****]"
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)bin
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)lib
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)legal
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)instances
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)log
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)config
+	-$(CP) $(OBJDIR)$(PS)agentadmin* $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)bin$(PS)
+	-$(CP) $(OBJDIR)$(PS)mod_openam.so $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)lib$(PS)
+	-$(CP) $(OBJDIR)$(PS)mod_openam.dll $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)lib$(PS)
+	-$(CP) $(OBJDIR)$(PS)mod_openam.pdb $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)lib$(PS)
+	-$(CP) config$(PS)* $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)config$(PS)
+	-$(CP) legal$(PS)* $(OBJDIR)$(PS)web_agents$(PS)apache24_agent$(PS)legal$(PS)
+	$(CD) $(OBJDIR) && $(EXEC)agentadmin --a Apache_v24_$(OS_ARCH)$(OS_BITS)_$(VERSION).zip web_agents
+
+iiszip: clean build version iis agentadmin
+	@$(ECHO) "[***** Building IIS agent archive *****]"
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)bin
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)lib
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)legal
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)instances
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)log
+	-$(MKDIR) $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)config
+	-$(CP) $(OBJDIR)$(PS)agentadmin* $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)bin$(PS)
+	-$(CP) $(OBJDIR)$(PS)mod_iis_openam.dll $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)lib$(PS)
+	-$(CP) $(OBJDIR)$(PS)mod_iis_openam.pdb $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)lib$(PS)
+	-$(CP) config$(PS)* $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)config$(PS)
+	-$(CP) legal$(PS)* $(OBJDIR)$(PS)web_agents$(PS)iis_agent$(PS)legal$(PS)
+	$(CD) $(OBJDIR) && $(EXEC)agentadmin --a IIS_$(OS_ARCH)$(OS_BITS)_$(VERSION).zip web_agents

@@ -36,7 +36,7 @@ else
  CFLAGS += -m32 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 endif
 
-LDFLAGS += -Wl,-rpath,'$$ORIGIN/../lib' -Wl,-rpath,'$$ORIGIN' -lpthread -lrt -ldl
+LDFLAGS += -Wl,-rpath,'$$ORIGIN/../lib' -Wl,-rpath,'$$ORIGIN' -lpthread -lresolv -lrt -ldl
 
 libopenam: $(OUT_OBJS)
 	@$(ECHO) "[*** Creating "$@" shared library ***]"
@@ -48,10 +48,10 @@ apache: $(OUT_OBJS) $(APACHE_OUT_OBJS)
 	    $(OUT_OBJS) -Wl,--version-script=source/apache/agent.map $(APACHE_OUT_OBJS) -o build/mod_openam.so
 
 iis: 
-	@$(ECHO) "[*** IIS target is not supported on this platform ***]"
+	$(error IIS target is not supported on this platform)
 
 varnish: 
-	@$(ECHO) "[*** Varnish target is not supported on this platform ***]"
+	$(error Varnish target is not supported on this platform)
 	
 agentadmin: $(OUT_OBJS) $(ADMIN_OUT_OBJS)
 	@$(ECHO) "[*** Creating "$@" binary ***]"

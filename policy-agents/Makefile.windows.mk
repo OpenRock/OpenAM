@@ -29,7 +29,7 @@ LDFLAGS += /SUBSYSTEM:CONSOLE /NOLOGO /INCREMENTAL:NO /errorReport:none /MANIFES
 	/OPT:REF /OPT:ICF /LTCG /DYNAMICBASE /NXCOMPAT /DEBUG \
 	/MACHINE:X64
 	
-LIBS = kernel32.lib user32.lib ws2_32.lib crypt32.lib advapi32.lib shlwapi.lib shell32.lib
+LIBS = kernel32.lib user32.lib ws2_32.lib crypt32.lib advapi32.lib shlwapi.lib shell32.lib iphlpapi.lib
 
 $(IIS_OUT_OBJS): COMPILEOPTS += /TP
 
@@ -55,7 +55,7 @@ iis: $(OUT_OBJS) $(IIS_OUT_OBJS)
 	    $(LIBS) /EXPORT:RegisterModule oleaut32.lib
 
 varnish: 
-	@$(ECHO) "[*** Varnish target is not supported on this platform ***]"
+	$(error Varnish target is not supported on this platform)
 	
 agentadmin: $(OUT_OBJS) $(ADMIN_OUT_OBJS)
 	@$(ECHO) "[*** Creating "$@" binary ***]"

@@ -19,8 +19,44 @@
 
 #include "pcre.h"
 
-#define AM_CACHE_TIMEFORMAT "%Y-%m-%d %H:%M:%S"
-#define ARRAY_SIZE(array) sizeof(array) / sizeof(array[0])
+#define AM_CACHE_TIMEFORMAT     "%Y-%m-%d %H:%M:%S"
+#define ARRAY_SIZE(array)       sizeof(array) / sizeof(array[0])
+#define AM_BASE_TEN             10
+#define AM_SPACE_CHAR           " "
+#define AM_COMMA_CHAR           ","
+#define AM_PIPE_CHAR            "|"
+
+#define AM_NULL_CHECK(...) \
+  do { \
+    void *p[] = { __VA_ARGS__ }; \
+    int i; \
+    for (i = 0; i < sizeof(p)/sizeof(*p); i++) { \
+      if (p[i] == NULL) { \
+        return NULL; \
+      } \
+    } \
+  } while(0)
+
+#define AM_FREE(...) \
+  do { \
+    void *p[] = { __VA_ARGS__ }; \
+    int i; \
+    for (i = 0; i < sizeof(p)/sizeof(*p); i++) { \
+      am_free(p[i]); \
+    } \
+  } while(0)
+
+enum {
+    CONF_NUMBER = 0, CONF_STRING, CONF_NUMBER_LIST, CONF_STRING_LIST,
+    CONF_STRING_MAP, CONF_DEBUG_LEVEL, CONF_ATTR_MODE, CONF_AUDIT_LEVEL
+};
+
+enum {
+    ADMIN_IIS_MOD_ERROR = 0,
+    ADMIN_IIS_MOD_NONE,
+    ADMIN_IIS_MOD_GLOBAL,
+    ADMIN_IIS_MOD_LOCAL
+};
 
 enum {
     AM_EXACT_MATCH = 0,
@@ -29,15 +65,9 @@ enum {
 };
 
 enum {
-    SCOPE_SELF = 0,
-    SCOPE_SUBTREE,
-    SCOPE_RESPONSE_ATTRIBUTE_ONLY
-};
-
-enum {
-    SET_ATTRS_NONE = 0,
-    SET_ATTRS_AS_HEADER,
-    SET_ATTRS_AS_COOKIE
+    AM_SET_ATTRS_NONE = 0,
+    AM_SET_ATTRS_AS_HEADER,
+    AM_SET_ATTRS_AS_COOKIE
 };
 
 /* shared memory area handle */
@@ -57,9 +87,6 @@ typedef struct {
     char name[3][AM_PATH_SIZE];
 } am_shm_t;
 
-void am_shm_set_user_offset(am_shm_t *r, size_t s);
-void display_info(am_shm_t *am);
-
 struct am_cookie {
     char *name;
     char *value;
@@ -71,14 +98,12 @@ struct am_cookie {
     struct am_cookie *next;
 };
 
-void delete_am_cookie_list(struct am_cookie **list);
-
 struct am_action_decision {
-    char method;
-    char action;
-    unsigned long long ttl;
+    uint64_t ttl;
     struct am_namevalue *advices;
     struct am_action_decision *next;
+    char method;
+    char action;
 };
 
 struct am_policy_result {
@@ -90,8 +115,6 @@ struct am_policy_result {
     struct am_action_decision *action_decisions;
     struct am_policy_result *next;
 };
-
-void delete_am_policy_result_list(struct am_policy_result **list);
 
 struct notification_worker_data {
     unsigned long instance_id;
@@ -113,12 +136,17 @@ typedef struct {
     int state;
 } am_timer_t;
 
+void delete_am_cookie_list(struct am_cookie **list);
+void delete_am_policy_result_list(struct am_policy_result **list);
+
 void am_timer_start(am_timer_t *t);
 void am_timer_stop(am_timer_t *t);
 void am_timer_pause(am_timer_t *t);
 void am_timer_resume(am_timer_t *t);
 double am_timer_elapsed(am_timer_t *t);
 void am_timer_report(unsigned long instance_id, am_timer_t *t, const char *op);
+
+const char *get_valid_openam_url(am_request_t *r);
 
 int ip_address_match(const char *ip, const char **list, unsigned int listsize, unsigned long instance_id);
 
@@ -140,12 +168,13 @@ void am_shm_shutdown(am_shm_t *);
 void *am_shm_alloc(am_shm_t *am, size_t usize);
 void am_shm_free(am_shm_t *am, void *ptr);
 void *am_shm_realloc(am_shm_t *am, void *ptr, size_t size);
-char *am_shm_strdup(am_shm_t *am, const char *str);
+void am_shm_set_user_offset(am_shm_t *r, size_t s);
 
 int am_create_agent_dir(const char *sep, const char *path, char **created_name, char **created_name_simple);
 
 int decrypt_password(const char *key, char **password);
 int encrypt_password(const char *key, char **password);
+void decrypt_agent_passwords(am_config_t *r);
 
 char is_big_endian();
 size_t page_size(size_t size);
@@ -157,6 +186,8 @@ void trim(char *a, char w);
 
 int am_asprintf(char **buffer, const char *fmt, ...);
 int am_vasprintf(char **buffer, const char *fmt, va_list arg);
+
+void am_secure_zero_memory(void *v, size_t sz);
 
 void read_directory(const char *path, struct am_namevalue **list);
 
@@ -197,9 +228,11 @@ int am_delete_directory(const char *path);
 int get_valid_url_index(unsigned long instance_id);
 void set_valid_url_index(unsigned long instance_id, int value);
 
+int get_ttl_value(struct am_namevalue *session, const char *name, int def, int value_in_minutes);
+
 int create_am_namevalue_node(const char *n, size_t ns, const char *v, size_t vs, struct am_namevalue **node);
 int create_am_policy_result_node(const char *va, size_t vs, struct am_policy_result **node);
-int create_am_action_decision_node(char a, char m, unsigned long long ttl,
+int create_am_action_decision_node(char a, char m, uint64_t ttl,
         struct am_action_decision **node);
 
 int am_agent_logout(unsigned long instance_id, const char *openam,
@@ -213,6 +246,18 @@ int am_agent_policy_request(unsigned long instance_id, const char *openam,
         struct am_ssl_options *info,
         struct am_namevalue **session_list,
         struct am_policy_result **policy_list);
+
+int am_url_validate(unsigned long instance_id, const char *url, struct am_ssl_options *info, int *httpcode);
+
+void *am_parse_session_xml(unsigned long instance_id, const char *xml, size_t xml_sz);
+void *am_parse_session_saml(unsigned long instance_id, const char *xml, size_t xml_sz);
+void *am_parse_policy_xml(unsigned long instance_id, const char *xml, size_t xml_sz, int scope);
+
+int am_agent_login(unsigned long instance_id, const char *openam, const char *notifyurl,
+        const char *user, const char *pass, const char *realm, int is_local,
+        struct am_ssl_options *info,
+        char **agent_token, char **pxml, size_t *pxsz, struct am_namevalue **session_list,
+        void(*log)(const char *, ...));
 
 int am_scope_to_num(const char *scope);
 const char *am_scope_to_str(int scope);
@@ -232,5 +277,21 @@ int am_agent_instance_init_init();
 void am_agent_instance_init_lock();
 void am_agent_instance_init_unlock();
 void am_agent_instance_init_release(char unlink);
+
+void am_agent_init_set_value(unsigned long instance_id, char lock, int val);
+
+am_config_t *am_parse_config_xml(unsigned long instance_id, const char *xml, size_t xml_sz, char log_enable);
+
+int am_get_pdp_cache_entry(am_request_t *r, const char *key, char **data, size_t *data_sz, char **content_type);
+int am_add_pdp_cache_entry(am_request_t *r, const char *key, const char *url, const char *file, const char *content_type);
+int am_add_session_policy_cache_entry(am_request_t *r, const char *key,
+        struct am_policy_result *policy, struct am_namevalue *session);
+int am_get_session_policy_cache_entry(am_request_t *r, const char *key,
+        struct am_policy_result **policy, struct am_namevalue **session, time_t *ts);
+
+int am_get_cache_entry(unsigned long instance_id, int valid, const char *key);
+int am_add_cache_entry(unsigned long instance_id, const char *key);
+
+int am_remove_cache_entry(unsigned long instance_id, const char *key);
 
 #endif

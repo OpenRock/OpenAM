@@ -22,7 +22,7 @@
 typedef long am_usec_t;
 
 #ifdef _WIN32
-#define am_log_always(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_ALWAYS(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tze[6];\
@@ -43,10 +43,10 @@ typedef long am_usec_t;
     mod_fmt = (char *) malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
     strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-    am_log(i, (AM_LOG_INFO|AM_LOG_ALWAYS), mod_fmt, header, __VA_ARGS__);\
+    am_log(i, (AM_LOG_LEVEL_INFO|AM_LOG_LEVEL_ALWAYS), mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #else
-#define am_log_always(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_ALWAYS(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tz[8];\
@@ -63,12 +63,12 @@ typedef long am_usec_t;
     mod_fmt = malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
         strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-        am_log(i, (AM_LOG_INFO|AM_LOG_ALWAYS), mod_fmt, header, __VA_ARGS__);\
+        am_log(i, (AM_LOG_LEVEL_INFO|AM_LOG_LEVEL_ALWAYS), mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #endif
 
 #ifdef _WIN32
-#define am_log_info(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_INFO(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tze[6];\
@@ -89,10 +89,10 @@ typedef long am_usec_t;
     mod_fmt = (char *) malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
     strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-    am_log(i, AM_LOG_INFO, mod_fmt, header, __VA_ARGS__);\
+    am_log(i, AM_LOG_LEVEL_INFO, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #else
-#define am_log_info(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_INFO(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tz[8];\
@@ -109,12 +109,12 @@ typedef long am_usec_t;
     mod_fmt = malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
         strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-        am_log(i, AM_LOG_INFO, mod_fmt, header, __VA_ARGS__);\
+        am_log(i, AM_LOG_LEVEL_INFO, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #endif
 
 #ifdef _WIN32
-#define am_log_warning(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_WARNING(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tze[6];\
@@ -135,10 +135,10 @@ typedef long am_usec_t;
     mod_fmt = (char *) malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
     strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-    am_log(i, AM_LOG_WARNING, mod_fmt, header, __VA_ARGS__);\
+    am_log(i, AM_LOG_LEVEL_WARNING, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #else
-#define am_log_warning(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_WARNING(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tz[8];\
@@ -155,12 +155,12 @@ typedef long am_usec_t;
     mod_fmt = malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
         strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-        am_log(i, AM_LOG_WARNING, mod_fmt, header, __VA_ARGS__);\
+        am_log(i, AM_LOG_LEVEL_WARNING, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #endif
 
 #ifdef _WIN32
-#define am_log_error(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_ERROR(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tze[6];\
@@ -181,10 +181,10 @@ typedef long am_usec_t;
     mod_fmt = (char *) malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
     strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-    am_log(i, AM_LOG_ERROR, mod_fmt, header, __VA_ARGS__);\
+    am_log(i, AM_LOG_LEVEL_ERROR, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #else
-#define am_log_error(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_ERROR(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tz[8];\
@@ -201,12 +201,12 @@ typedef long am_usec_t;
     mod_fmt = malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
         strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-        am_log(i, AM_LOG_ERROR, mod_fmt, header, __VA_ARGS__);\
+        am_log(i, AM_LOG_LEVEL_ERROR, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #endif
 
 #ifdef _WIN32
-#define am_log_debug(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_DEBUG(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tze[6];\
@@ -227,10 +227,10 @@ typedef long am_usec_t;
     mod_fmt = (char *) malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
     strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-    am_log(i, AM_LOG_DEBUG, mod_fmt, header, __VA_ARGS__);\
+    am_log(i, AM_LOG_LEVEL_DEBUG, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #else
-#define am_log_debug(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_DEBUG(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tz[8];\
@@ -247,12 +247,12 @@ typedef long am_usec_t;
     mod_fmt = malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
         strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-        am_log(i, AM_LOG_DEBUG, mod_fmt, header, __VA_ARGS__);\
+        am_log(i, AM_LOG_LEVEL_DEBUG, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #endif
 
 #ifdef _WIN32
-#define am_log_audit(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_AUDIT(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tze[6];\
@@ -273,10 +273,10 @@ typedef long am_usec_t;
     mod_fmt = (char *) malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
     strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-    am_log(i, AM_LOG_AUDIT, mod_fmt, header, __VA_ARGS__);\
+    am_log(i, AM_LOG_LEVEL_AUDIT, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #else
-#define am_log_audit(i,f,...) do { if (i > 0 && f != NULL) {\
+#define AM_LOG_AUDIT(i,f,...) do { if (i > 0 && f != NULL) {\
     char *mod_fmt, header[256];\
     char time_string[25];\
     char tz[8];\
@@ -293,7 +293,7 @@ typedef long am_usec_t;
     mod_fmt = malloc(fmt_sz + 3);\
     if (mod_fmt != NULL) {\
         strcpy(mod_fmt,"%s");strcat(mod_fmt,f);\
-        am_log(i, AM_LOG_AUDIT, mod_fmt, header, __VA_ARGS__);\
+        am_log(i, AM_LOG_LEVEL_AUDIT, mod_fmt, header, ##__VA_ARGS__);\
     free(mod_fmt);}}}while (0)
 #endif
 
