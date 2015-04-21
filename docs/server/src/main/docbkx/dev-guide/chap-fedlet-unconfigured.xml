@@ -1,0 +1,2461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2015 ForgeRock AS.
+  !    
+-->
+<chapter xml:id="chap-fedlet-unconfigured"
+         xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+ <title>Configuring Java Fedlets By Hand</title>
+
+ <indexterm>
+  <primary>Fedlets</primary>
+  <secondary>Java</secondary>
+ </indexterm>
+
+ <para>
+  An OpenAM Fedlet is a small web application
+  that makes it easy to add SAML 2.0 Service Provider (SP) capabilities
+  to your Java web application.
+  The OpenAM console offers a wizard for configuring a Java Fedlet
+  as a SAML 2.0 Service Provider with OpenAM as the Identity Provider (IDP).
+  If that fits your purposes, then read the chapter
+  <link
+   xlink:href="dev-guide#chap-fedlet-java"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   xlink:show="new"
+  ><citetitle>Using Fedlets in Java Web Applications</citetitle></link>
+  instead.
+ </para>
+
+ <para>
+  The full distribution file, <filename>${coreDirectoryFile}</filename>,
+  also includes an Java Fedlet, <filename>${fedletZipFile}</filename>,
+  that you can configure by hand.
+  This chapter covers how to configure a Java Fedlet using that distribution,
+  by manually editing the Circle of Trust, Java properties,
+  and IDP and SP XML configuration templates.
+ </para>
+
+ <para>
+  The Circle of Trust and XML configuration templates
+  that describe the IDP, SP, and their trust relationship
+  are quite similar though not identical for Java and .NET Fedlets.
+  For instructions on configuring .NET Fedlets, read the chapter
+  <link
+   xlink:href="dev-guide#chap-fedlet-dotnet"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   xlink:show="new"
+  ><citetitle>Using Fedlets in .NET Applications</citetitle></link>.
+ </para>
+
+ <itemizedlist>
+  <para>
+   Seen from a high level, what you must do is this:
+  </para>
+
+  <listitem>
+   <para>
+    Determine the roles that the IDP(s) and Fedlet play
+    in SAML 2.0 Circles of Trust.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Unpack the unconfigured Fedlet from the full OpenAM distribution
+    to access the Fedlet war and template configuration files.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Begin preparing the Fedlet configuration,
+    including setting up a configuration directory and key store if needed.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Obtain SAML 2.0 metadata configuration files from the IDP(s),
+    and add them to the Fedlet configuration.
+   </para>
+
+   <para>
+    The IDP must provide at least the standard SAML 2.0 metadata.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Finish preparing the Fedlet configuration
+    by editing the remaining Fedlet template configuration files.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Share the Fedlet SAML 2.0 configuration files
+    at least for the standard SAML 2.0 metadata
+    with the IDP(s).
+   </para>
+
+   <para>
+    An IDP relies on the standard SAML 2.0 metadata to communicate with the Fedlet.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Deploy and test the Fedlet with each IDP.
+   </para>
+  </listitem>
+ </itemizedlist>
+
+ <section xml:id="unconfigured-fedlet-conf">
+  <title>Java Fedlet Layout</title>
+
+  <para>
+   Unpack the Java Fedlet distribution into a working directory.
+  </para>
+
+  <screen>
+$ <userinput>mkdir fedlet &amp;&amp; cd fedlet</userinput>
+$ <userinput>unzip ../${fedletZipFile}</userinput>
+  </screen>
+
+  <variablelist>
+   <para>
+    When you unpack the <filename>${fedletZipFile}</filename> file,
+    you find the following files.
+   </para>
+
+   <varlistentry>
+    <term><filename>${fedletWarFile}</filename></term>
+    <listitem>
+     <para>
+      This file contains a Java Fedlet web application
+      that serves as an example, and that you can embed in your applications.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>README</filename></term>
+    <listitem>
+     <para>
+      This file succinctly describes how to configure some Fedlet features.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>conf/</filename></term>
+    <listitem>
+     <para>
+      This folder contains the Fedlet configuration templates
+      that you edit as appropriate for your deployment.
+     </para>
+
+     <para>
+      When editing the templates, place copies of the files
+      in the Fedlet home directory on the system where you deploy the Fedlet.
+      By default the Fedlet home directory is
+      <filename><replaceable>user.home</replaceable>/<replaceable>uri</replaceable></filename>,
+      where <replaceable>user.home</replaceable> is the value
+      of the Java system property <literal>user.home</literal>
+      for the user running the web container where you deploy the Fedlet,
+      and <replaceable>uri</replaceable> is the path of the URI
+      where you deploy the Fedlet, such as <literal>/fedlet</literal>.
+     </para>
+
+     <para>
+      For example, if <replaceable>user.home</replaceable>
+      is <filename>/home/user</filename>,
+      that user could have a <filename>/home/user/fedlet</filename> folder
+      for Fedlet configuration files.
+     </para>
+
+     <screen>
+$ <userinput>mkdir ~/fedlet</userinput>
+     </screen>
+
+     <para>
+      To change the location, set the system property
+      <literal>com.sun.identity.fedlet.home</literal>
+      when starting the container where the Fedlet runs.
+     </para>
+
+     <screen>
+$ <userinput>java -Dcom.sun.identity.fedlet.home=/path/to/fedlet/conf ...</userinput>
+     </screen>
+    </listitem>
+   </varlistentry>
+
+
+   <varlistentry>
+    <term><filename>conf/FederationConfig.properties</filename></term>
+    <listitem>
+     <para>
+      This file defines settings for the Fedlet as a web application.
+      It does not address the SAML 2.0 configuration.
+     </para>
+
+     <para>
+      For more about this file,
+      see <xref linkend="unconfigured-fedlet-properties" />.
+     </para>
+    </listitem>
+   </varlistentry>
+
+
+   <varlistentry>
+    <term><filename>conf/fedlet.cot-template</filename></term>
+    <listitem>
+     <para>
+      This template defines settings for a SAML 2.0 Circle of Trust
+      to which the Fedlet belongs.
+     </para>
+
+     <para>
+      For more about this file,
+      see <xref linkend="unconfigured-fedlet-cot" />.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>conf/idp.xml</filename> (not provided)</term>
+    <listitem>
+     <para>
+      The <filename>idp.xml</filename> file is standard SAML 2.0 metadata
+      that describes the IDP configuration.
+     </para>
+
+     <para>
+      Templates for other SAML 2.0 configuration files are provided,
+      but no <filename>idp.xml</filename> template file is provided.
+     </para>
+
+     <para>
+      Instead you must obtain the SAML 2.0 metadata from the IDP,
+      and add it as <filename>idp.xml</filename> here,
+      alongside the other SAML 2.0 configuration files.
+      How you obtain this file from the IDP depends on the IDP implementation.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>conf/idp-extended.xml-template</filename></term>
+    <listitem>
+     <para>
+      This template holds extended SAML 2.0 IDP settings that OpenAM uses.
+     </para>
+
+     <para>
+      For more about this file,
+      see <xref linkend="unconfigured-fedlet-idp" />.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>conf/sp.xml-template</filename></term>
+    <listitem>
+     <para>
+      This template describes standard SAML 2.0 SP settings.
+     </para>
+
+     <para>
+      For more about this file,
+      see <xref linkend="unconfigured-fedlet-sp" />.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>conf/sp-extended.xml-template</filename></term>
+    <listitem>
+     <para>
+      This template describes extended SAML 2.0 SP settings that the Fedlet uses.
+     </para>
+
+     <para>
+      For more about this file,
+      see <xref linkend="unconfigured-fedlet-sp" />.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="unconfigured-fedlet-properties">
+  <title>Configuring Java Fedlet Properties</title>
+
+  <para>
+   The Java Fedlet to configure by hand includes
+   a <filename>Fedlet.properties</filename> file
+   that defines settings for the Fedlet as a web application.
+   The configuration for a single Java Fedlet includes
+   only one <filename>Fedlet.properties</filename> file,
+   regardless of how many IDP and SP configurations are involved.
+   This file does not address the SAML 2.0 configuration.
+  </para>
+
+  <para>
+   When configured this file contains sensitive properties
+   such as the value of <literal>am.encryption.pwd</literal>.
+   Make sure it is readable only by the user running the Fedlet application.
+  </para>
+
+  <itemizedlist>
+   <para>
+    This section categorizes the settings as follows:
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-properties-deploy-url" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-properties-logs" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-properties-keys" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-properties-alt-impl" />
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <variablelist xml:id="unconfigured-fedlet-properties-deploy-url">
+   <title>Deployment URL Settings</title>
+
+   <para>
+    The following settings define the Fedlet deployment URL.
+   </para>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.server.protocol</literal></term>
+    <listitem>
+     <para>
+      Set this to the protocol portion of the URL, such as HTTP or HTTPS.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.server.host</literal></term>
+    <listitem>
+     <para>
+      Set this to the host portion of the URL, such as
+      <literal>sp.example.com</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.server.port</literal></term>
+    <listitem>
+     <para>
+      Set this to the port portion of the URL, such as 80, 443, 8080, or 8443.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.services.deploymentDescriptor</literal></term>
+    <listitem>
+     <para>
+      Set this to path portion of the URL, starting with a <literal>/</literal>,
+      such as <literal>/fedlet</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="unconfigured-fedlet-properties-logs">
+   <title>Log and Statistics Settings</title>
+
+   <para>
+    The following settings define the Fedlet configuration
+    for logging and monitoring statistics.
+   </para>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.logstatus</literal></term>
+    <listitem>
+     <para>
+      This sets whether the Fedlet actively writes debug log files.
+     </para>
+
+     <para>
+      Default: <literal>ACTIVE</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.debug.level</literal></term>
+    <listitem>
+     <para>
+      This sets the debug log level.
+     </para>
+
+     <para>
+      The following settings are available, in order of increasing verbosity:
+     </para>
+
+     <simplelist>
+      <member><literal>off</literal></member>
+      <member><literal>error</literal></member>
+      <member><literal>warning</literal></member>
+      <member><literal>message</literal></member>
+     </simplelist>
+
+     <para>
+      Default: <literal>message</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.debug.directory</literal></term>
+    <listitem>
+     <para>
+      This sets the location of the debug log folder.
+     </para>
+
+     <para>
+      Trailing spaces in the file names are significant.
+      Even on Windows systems, use slashes to separate directories.
+     </para>
+
+     <para>
+      Examples: <filename>/home/user/fedlet/debug</filename>,
+      <filename>C:/fedlet/debug</filename>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.stats.interval</literal></term>
+    <listitem>
+     <para>
+      This sets the interval at which statistics are written, in seconds.
+     </para>
+
+     <para>
+      The shortest interval supported is 5 seconds.
+      Settings less than 5 (seconds) are taken as 5 seconds.
+     </para>
+
+     <para>
+      Default: 60
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.stats.state</literal></term>
+    <listitem>
+     <para>
+      This sets how the Fedlet writes monitoring statistics.
+     </para>
+
+     <para>
+      The following settings are available:
+     </para>
+
+     <simplelist>
+      <member><literal>off</literal></member>
+      <member><literal>console</literal> (write to the container logs)</member>
+      <member><literal>file</literal> (write to Fedlet stats logs)</member>
+     </simplelist>
+
+     <para>
+      Default: <literal>file</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.stats.directory</literal></term>
+    <listitem>
+     <para>
+      This sets the location of the stats file folder.
+     </para>
+
+     <para>
+      Trailing spaces in the file names are significant.
+      Even on Windows systems, use slashes to separate directories.
+     </para>
+
+     <para>
+      Examples: <filename>/home/user/fedlet/stats</filename>,
+      <filename>C:/fedlet/stats</filename>
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="unconfigured-fedlet-properties-keys">
+   <title>Public and Private Key Settings</title>
+
+   <para>
+    The following settings define settings for access to
+    certificates and private keys used in signing and encryption.
+   </para>
+
+   <para>
+    Other sections in this guide explain
+    how to configure a Fedlet for signing and encryption
+    including how to work with the key stores that these settings reference,
+    and how to specify public key certificates in standard SAML 2.0 metadata.
+    When working with a Java Fedlet, see the section on
+    <link
+     xlink:href="dev-guide#fedlet-signing-encryption"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Signing &amp; Encryption For a Fedlet</citetitle></link>.
+    Although this chapter focuses on Java Fedlets,
+    if you are working with a .NET Fedlet also see the procedures
+    <link
+     xlink:href="dev-guide#import-fedlet-key-pairs-windows"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>To Import Test Key Pairs on Windows</citetitle></link> and
+    <link
+     xlink:href="dev-guide#try-dotnet-fedlet-attribute-query"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>To Try the .NET Fedlet Attribute Query</citetitle></link>.
+   </para>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.keystore</literal></term>
+    <listitem>
+     <para>
+      This sets the path to the key store file
+      that holds public key certificates of IDPs and key pairs for the Fedlet.
+     </para>
+
+     <para>
+      For hints on generating a key store file with a key pair,
+      read the first steps of
+      the <citetitle>Administration Guide</citetitle> procedure,
+      <link
+       xlink:href="admin-guide#change-signing-key"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       xlink:show="new"
+      ><citetitle>To Change the Signing Key for Federation</citetitle></link>.
+     </para>
+
+     <para>
+      Example: <filename>@FEDLET_HOME@/keystore.jks</filename>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.storepass</literal></term>
+    <listitem>
+     <para>
+      This sets the path to the file that contains
+      the key store password encoded by using the symmetric key
+      set as the value of <literal>am.encryption.pwd</literal>.
+     </para>
+
+     <itemizedlist>
+      <para>
+       When creating the file, encode the clear text password
+       by using your own test copy (not a production version) of OpenAM.
+      </para>
+
+      <listitem>
+       <para>
+        Log in to the OpenAM Console as administrator <literal>amadmin</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Under Configuration > Servers and Sites > Security > Encryption,
+        set the Password Encryption Key to your symmetric key,
+        and save your work.
+       </para>
+
+       <para>
+        Do not do this in a production system
+        where the existing symmetric key is already in use!
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Switch to the <filename>encode.jsp</filename> page,
+        such as <literal>http://openam.example.com:8080/openam/encode.jsp</literal>,
+        enter the clear text password to encode with your symmetric key,
+        and click Encode.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Copy the encoded password to your file.
+       </para>
+      </listitem>
+     </itemizedlist>
+
+     <para>
+      Example: <filename>@FEDLET_HOME@/.storepass</filename>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.keypass</literal></term>
+    <listitem>
+     <para>
+      This sets the path to the file that contains
+      the private key password encoded by using the symmetric key
+      set as the value of <literal>am.encryption.pwd</literal>.
+     </para>
+
+     <para>
+      To encode the clear text password, follow the same steps
+      for the password used when setting
+      <literal>com.sun.identity.saml.xmlsig.storepass</literal>.
+     </para>
+
+     <para>
+      Example: <filename>@FEDLET_HOME@/.keypass</filename>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.certalias</literal></term>
+    <listitem>
+     <para>
+      This sets the alias of the Fedlet's public key certificate.
+     </para>
+
+     <para>
+      Example: <literal>fedlet-cert</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.storetype</literal></term>
+    <listitem>
+     <para>
+      The sets the type of key store.
+     </para>
+
+     <para>
+      Default: <literal>JKS</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>am.encryption.pwd</literal></term>
+    <listitem>
+     <para>
+      This sets the symmetric key that used to encrypt and decrypt passwords.
+     </para>
+
+     <para>
+      Example: <literal>uu4dHvBkJJpIjPQWM74pxH3brZJ5gJje</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="unconfigured-fedlet-properties-alt-impl">
+   <title>Alternative Implementation Settings</title>
+
+   <para>
+    The Java Fedlet properties file includes settings
+    that let you plug in alternative implementations of Fedlet capabilities.
+    You can safely use the default settings, as specified in the following list.
+    The list uses the same order for the keys you find in the file.
+   </para>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.configuration.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.configuration.impl.FedletConfigurationImpl</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.datastore.class.default</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.datastore.impl.FedletDataStoreProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.log.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.log.impl.FedletLogger</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.session.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.session.impl.FedletSessionProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.monitoring.agent.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.monitoring.impl.FedletAgentProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.monitoring.saml1.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.monitoring.impl.FedletMonSAML1SvcProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.monitoring.saml2.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.monitoring.impl.FedletMonSAML2SvcProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.plugin.monitoring.idff.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.plugin.monitoring.impl.FedletMonIDFFSvcProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.keyprovider.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.saml.xmlsig.JKSKeyProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.signatureprovider.class</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.saml.xmlsig.AMSignatureProvider</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.common.serverMode</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>false</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.webcontainer</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>WEB_CONTAINER</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.saml.xmlsig.passwordDecoder</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.fedlet.FedletEncodeDecode</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.comm.server.pllrequest.maxContentLength</literal></term>
+    <listitem>
+     <para>
+      Default: 16384
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.security.SecureRandomFactoryImpl</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.iplanet.am.util.SecureRandomFactoryImpl</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.security.SSLSocketFactoryImpl</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.sun.identity.shared.ldap.factory.JSSESocketFactory</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.security.encryptor</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>com.iplanet.services.util.JCEEncryption</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.jss.donotInstallAtHighestPriority</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>true</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.configpath</literal></term>
+    <listitem>
+     <para>
+      Default: <literal>@BASE_DIR@</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="unconfigured-fedlet-cot">
+  <title>Configuring Circles of Trust</title>
+
+  <para>
+   As described in <xref linkend="unconfigured-fedlet-conf" />,
+   this template defines settings for a SAML 2.0 Circle of Trust.
+   The Fedlet belongs to at least one Circle of Trust.
+  </para>
+
+  <itemizedlist>
+   <para>
+    This section includes the following procedures:
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-cot-single" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-cot-multiple" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="unconfigured-fedlet-cot-discovery" />
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="unconfigured-fedlet-cot-single">
+   <title>To Configure a Circle of Trust With a Single IDP</title>
+
+   <para>
+    When the Fedlet is involved in only a single Circle of Trust
+    with one IDP and the Fedlet as an SP,
+    the only settings to change are
+    <literal>cot-name</literal> and <literal>sun-fm-trusted-providers</literal>.
+   </para>
+
+   <step>
+    <para>
+     Save a copy of the template
+     as <filename>fedlet.cot</filename> in the configuration folder,
+     as in the following example.
+    </para>
+
+    <screen>
+$ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet.cot</userinput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     Set <literal>cot-name</literal> to the name of the Circle of Trust.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set <literal>sun-fm-trusted-providers</literal> to a comma-separated list
+     of the entity names for the IDP and SP.
+    </para>
+
+    <para>
+     For example, if the IDP is OpenAM with entity ID
+     <literal>https://openam.example.com:8443/openam</literal>
+     and the SP is the Fedlet with entity ID
+     <literal>https://sp.example.net:8443/fedlet</literal>,
+     then set the property as follows.
+    </para>
+
+    <programlisting language="ini">
+sun-fm-trusted-providers=https://openam.example.com:8443/openam,\
+ https://sp.example.net:8443/fedlet
+    </programlisting>
+     </step>
+  </procedure>
+
+  <procedure xml:id="unconfigured-fedlet-cot-multiple">
+   <title>To Configure Multiple Circles of Trust</title>
+
+   <para>
+    This procedure concerns deployments where the Fedlet participates as SP
+    in multiple Circles of Trust, each involving their own IDP.
+   </para>
+
+   <step>
+    <para>
+     For each Circle of Trust,
+     save a copy of the template in the configuration folder.
+    </para>
+
+    <para>
+     The following example involves two Circles of Trust.
+    </para>
+
+    <screen>
+$ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet.cot</userinput>
+$ <userinput>cp ~/Downloads/fedlet/conf/fedlet.cot-template ~/fedlet/fedlet2.cot</userinput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     Set up IDP XML files for each IDP as described
+     in <xref linkend="unconfigured-fedlet-idp" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     For each Circle of Trust, set up the cot file
+     as described in <xref linkend="unconfigured-fedlet-cot-single" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the extended SP XML file
+     described in <xref linkend="unconfigured-fedlet-idp" />,
+     set the Attribute element with name <literal>cotlist</literal>
+     to include values for all Circles of Trust.
+     The values are taken from the <literal>cot-name</literal> settings
+     in the cot files.
+    </para>
+
+    <para>
+     The following example works with two Circles of Trust,
+     <literal>cot</literal> and <literal>cot2</literal>.
+    </para>
+
+    <programlisting language="xml"><![CDATA[
+<Attribute name="cotlist">
+    <Value>cot</Value>
+    <Value>cot2</Value>
+</Attribute>
+]]></programlisting>
+
+    <para>
+     The same Attribute element is also available in extended IDP XML files
+     for cases where an IDP belongs to multiple Circles of Trust.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="unconfigured-fedlet-cot-discovery">
+   <title>To Configure a Circle of Trust With Multiple IDPs</title>
+
+   <para>
+    When the Circle of Trust involves multiple IDPs,
+    use the Fedlet in combination with the OpenAM IDP Discovery service.
+   </para>
+
+   <note>
+    <para>
+     For this to work, the IDPs must be configured to use IDP discovery,
+     and users must have preferred IDPs.
+    </para>
+   </note>
+
+   <step>
+    <para>
+     Set up the OpenAM IDP Discovery service.
+    </para>
+
+    <para>
+     For details see the <citetitle>Administration Guide</citetitle> section,
+     <link
+      xlink:href="admin-guide#deploy-idp-discovery"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+     ><citetitle>Deploying the Identity Provider Discovery Service</citetitle></link>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Configure the Circle of Trust as described in
+     <xref linkend="unconfigured-fedlet-cot-single" />,
+     but specifying multiple IDPs,
+     including the IDP that provides the IDP Discovery service.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set the <literal>sun-fm-saml2-readerservice-url</literal>
+     and the <literal>sun-fm-saml2-writerservice-url</literal>
+     properties as defined for the IDP Discovery service.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="unconfigured-fedlet-idp">
+  <title>Configuring the Identity Providers</title>
+
+  <para>
+   As described in <xref linkend="unconfigured-fedlet-conf" />,
+   the IDP provides its standard SAML 2.0 metadata as XML,
+   which you save in the configuration folder as <filename>idp.xml</filename>.
+   If the IDP uses OpenAM,
+   the IDP can also provide extended SAML 2.0 metadata as XML,
+   which you save in the configuration folder as <filename>idp-extended.xml</filename>,
+   rather than using the template for extended information.
+  </para>
+
+  <para>
+   If you have multiple identity providers, then number the configuration files,
+   as in <filename>idp.xml</filename>, <filename>idp2.xml</filename>,
+   <filename>idp3.xml</filename>,
+   and also <filename>idp-extended.xml</filename>,
+   <filename>idp2-extended.xml</filename>,
+   <filename>idp3-extended.xml</filename> and so on.
+  </para>
+
+  <section xml:id="unconfigured-fedlet-idp-standard">
+   <title>Identity Provider Standard XML</title>
+
+   <para>
+    This section covers the configuration in <filename>idp.xml</filename>.
+    The <filename>idp.xml</filename> file contains standard SAML 2.0 metadata
+    for an IDP in a Circle of Trust that includes the Fedlet as SP.
+    The IDP provides you the content of this file.
+   </para>
+
+   <para>
+    If the IDP uses OpenAM then the administrator can export the metadata
+    by using either the <command>ssoadm create-metadata-templ</command> command
+    or the <literal>/saml2/jsp/exportmetadata.jsp</literal> endpoint
+    under the OpenAM deployment URL.
+   </para>
+
+   <para>
+    If the IDP uses an implementation different from OpenAM,
+    see the documentation for details on obtaining the standard metadata.
+    The standard, product-independent metadata are covered in
+    <link
+     xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf"
+     xlink:show="new"
+    ><citetitle>Metadata for the OASIS
+     Security Assertion Markup Language (SAML) V2.0</citetitle></link>.
+    The standard XML namespace describing the XML document has identifier
+    <literal>urn:oasis:names:tc:SAML:2.0:metadata</literal>.
+    An XML schema description for this namespace is found online at
+    <link
+     xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-schema-metadata-2.0.xsd"
+     xlink:show="new" />.
+   </para>
+  </section>
+
+  <section xml:id="unconfigured-fedlet-idp-extended">
+   <title>Identity Provider Extended XML</title>
+
+   <para>
+    This section covers the configuration in <filename>idp-extended.xml</filename>.
+    Most extended metadata are specific to the OpenAM implementation of SAML 2.0.
+    If the IDP runs OpenAM, have the IDP provide the extended metadata
+    exported by using the <command>ssoadm create-metadata-templ</command> command.
+    This section covers only the basic settings relative to all IDPs.
+   </para>
+
+   <para>
+    The extended metadata file describes an <tag>EntityConfig</tag> element,
+    defined by the namespace with the identifier
+    <literal>urn:sun:fm:SAML:2.0:entityconfig</literal>.
+    The XML schema definition is described in
+    <filename>entity-config-schema.xsd</filename>,
+    available online as part of the OpenAM source code,
+    though not included in the OpenAM war file.
+   </para>
+
+   <para>
+    The unconfigured Fedlet includes a template file,
+    <filename>conf/idp-extended.xml-template</filename>.
+    This extended metadata template for the IDP requires that you edit
+    at least the <literal>IDP_ENTITY_ID</literal>
+    and <literal>fedletcot</literal> values
+    to reflect the IDP entity ID used in the standard metadata
+    and the Circle of Trust name defined in <filename>fedlet.cot</filename>,
+    respectively.
+    The <literal>hosted</literal> attribute on the <tag>EntityConfig</tag> element
+    must remain set to <literal>hosted="0"</literal>,
+    meaning that the IDP is remote.
+    The IDP is likely to play at least the role of SSO Identity Provider,
+    though the namespace defines elements
+    for the Attribute Authority and Policy Decision Point roles
+    shown in the template, as well as the others
+    defined in the standard governing SAML 2.0 metadata.
+   </para>
+
+   <para>
+    The extended metadata file is essentially a series of
+    XML maps of key-value pairs specifying IDP configuration for each role.
+    All role-level elements can take a <literal>metaAlias</literal> attribute
+    that the Fedlet uses when communicating with the IDP.
+    Each child element of a role element defines an <tag>Attribute</tag>
+    whose <literal>name</literal> is the key.
+    Each <tag>Attribute</tag> element can contain multiple <tag>Value</tag> elements.
+    The <tag>Value</tag> elements' contents comprise the values for the key.
+    All values are strings, sometimes with a format that is meaningful to OpenAM.
+    The basic example in the IDP template shows the minimal configuration
+    for the SSO IDP role.
+   </para>
+
+   <para>
+    In the following example, the <literal>description</literal> is empty
+    and the name of the Circle of Trust is <literal>fedletcot</literal>.
+   </para>
+
+   <programlisting language="xml"><![CDATA[
+<IDPSSOConfig>
+<Attribute name="description">
+    <Value/>
+</Attribute>
+<Attribute name="cotlist">
+    <Value>fedletcot</Value>
+</Attribute>
+]]></programlisting>
+
+   <para>
+    When functioning as IDP, OpenAM can take many other <tag>Attribute</tag> values.
+    These are implementation dependent.
+    You can obtain the extended metadata from OpenAM
+    either as part of the pre-packaged Java Fedlet that you create
+    by using the OpenAM console wizard as described in
+    <link
+     xlink:href="dev-guide#create-a-java-fedlet"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>To Create a Fedlet</citetitle></link>,
+    or by using the <command>ssoadm create-metadata-templ</command> subcommand.
+   </para>
+  </section>
+ </section>
+
+ <section xml:id="unconfigured-fedlet-sp">
+  <title>Configuring the Service Providers</title>
+
+  <para>
+   As mentioned in <xref linkend="unconfigured-fedlet-conf" />,
+   the Fedlet SAML 2.0 configuration is defined in two XML files,
+   the standard metadata in <filename>sp.xml</filename>
+   and the extended metadata in <filename>sp-extended.xml</filename>.
+  </para>
+
+  <para>
+   If the Fedlet has multiple service provider personalities,
+   then number the configuration files,
+   as in <filename>sp.xml</filename>, <filename>sp2.xml</filename>,
+   <filename>sp3.xml</filename>,
+   and also <filename>sp-extended.xml</filename>,
+   <filename>sp2-extended.xml</filename>,
+   <filename>sp3-extended.xml</filename> and so on.
+  </para>
+
+  <section xml:id="unconfigured-fedlet-sp-standard">
+   <title>Service Provider Standard XML</title>
+
+   <para>
+    This section covers the configuration in <filename>sp.xml</filename>.
+    The <filename>sp.xml</filename> file contains standard SAML 2.0 metadata
+    for the Fedlet as SP.
+    If you edit the standard metadata,
+    make sure that you provide the new version to your IDP,
+    as the IDP software relies on the metadata to get the Fedlet's configuration.
+   </para>
+
+   <para>
+    The standard metadata are covered in
+    <link
+     xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf"
+     xlink:show="new"
+    ><citetitle>Metadata for the OASIS
+     Security Assertion Markup Language (SAML) V2.0</citetitle></link>.
+    The standard XML namespace describing the XML document has identifier
+    <literal>urn:oasis:names:tc:SAML:2.0:metadata</literal>.
+    An XML schema description for this namespace is found online at
+    <link
+     xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-schema-metadata-2.0.xsd"
+     xlink:show="new" />.
+   </para>
+   
+   <para>
+    A standard metadata file describes the SAML 2.0 roles that the Fedlet plays.
+    The default base element of the file is an <tag>EntityDescriptor</tag>,
+    which is a container for role descriptor elements.
+    The <tag>EntityDescriptor</tag> element can therefore
+    contain multiple role descriptor elements.
+    The namespace for the standard metadata document is
+    <literal>urn:oasis:names:tc:SAML:2.0:metadata</literal>.
+    You can get the corresponding XML schema description online at
+    <link
+     xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-schema-metadata-2.0.xsd"
+     xlink:show="new" />.
+    In general, you can find standard SAML 2.0-related XML schema definitions at
+    <link
+     xlink:href="http://docs.oasis-open.org/security/saml/v2.0/"
+     xlink:show="new" />.
+   </para>
+
+   <para>
+    Fedlets do not support all arbitrary SP configurations.
+    As lightweight Service Provider components,
+    Fedlets are built to play the SP role in web single sign-on and single logout,
+    to perform attribute queries and XACML policy decision requests,
+    and to work with multiple IDPs
+    including Circles of Trust with an IDP discovery service.
+    For a list of what Fedlets support, see the table
+    <link
+     xlink:href="admin-guide#fedlet-saml2-features"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Fedlet Support for SAML 2.0 Features</citetitle></link>.
+   </para>
+
+   <itemizedlist>
+    <para>
+     When preparing a standard SP metadata file, follow these suggestions.
+    </para>
+
+    <listitem>
+     <para>
+      Start either with an existing example or with the template,
+      <filename>conf/sp.xml-template</filename>.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      When using the template, replace the following placeholders.
+     </para>
+
+     <variablelist>
+      <varlistentry>
+       <term><literal>FEDLET_ENTITY_ID</literal></term>
+       <listitem>
+        <para>
+         The Fedlet entity ID used when communicating with the IDP.
+        </para>
+
+        <para>
+         OpenAM often uses the deployment URL as the entity ID,
+         though that is a convention rather than a requirement.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term><literal>FEDLET_PROTOCOL</literal></term>
+       <listitem>
+        <para>
+         The Fedlet deployment protocol
+         (<literal>http</literal>, <literal>https</literal>)
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term><literal>FEDLET_HOST</literal></term>
+       <listitem>
+        <para>
+         The Fedlet deployment host name
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term><literal>FEDLET_PORT</literal></term>
+       <listitem>
+        <para>
+         The Fedlet deployment port number
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term><literal>FEDLET_DEPLOY_URI</literal></term>
+       <listitem>
+        <para>
+         The Fedlet application deployment path
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+
+    <listitem>
+     <para>
+      Add and edit role elements as children
+      depending on the roles the Fedlet plays
+      as described in the following sections.
+     </para>
+    </listitem>
+   </itemizedlist>
+
+   <section xml:id="unconfigured-fedlet-sp-standard-sso">
+    <title>Single Sign-On and Logout: SPSSODescriptor Element</title>
+
+    <para>
+     Add an <tag>SPSSODescriptor</tag> element to play the SP role
+     in web single sign-on and logout.
+     An <tag>SPSSODescriptor</tag> element has attributes specifying
+     whether requests and assertion responses should be digitally signed.
+    </para>
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       The <literal>AuthnRequestsSigned</literal> attribute indicates
+       whether the Fedlet signs authentication requests.
+      </para>
+
+      <para>
+       If you set the <literal>AuthnRequestsSigned</literal> attribute to true,
+       then you must also configure the <tag>SPSSODescriptor</tag> element
+       to allow the Fedlet to sign requests.
+       For details see the section on
+       <link
+        xlink:href="dev-guide#fedlet-signing-encryption"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Signing &amp; Encryption For a Fedlet</citetitle></link>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       The <literal>WantAssertionsSigned</literal> attribute indicates
+       whether the Fedlet requests signed assertion responses from the IDP.
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+     An <tag>SPSSODescriptor</tag> element's children indicate
+     what name ID formats the Fedlet supports,
+     and where the IDP can call the following services on the Fedlet.
+    </para>
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       The <tag>AssertionConsumerService</tag> elements specify endpoints
+       that support the SAML Authentication Request protocols.
+      </para>
+
+      <para>
+       You must specify at least one of these.
+       The template specifies two, with the endpoint supporting
+       the HTTP POST binding as the default.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       The optional <tag>SingleLogoutService</tag> elements specify endpoints
+       that support the SAML Single Logout protocols.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </section>
+
+   <section xml:id="unconfigured-fedlet-sp-standard-attr-query">
+    <title>Attribute Queries: RoleDescriptor Element</title>
+
+    <para>
+     Add a <tag>RoleDescriptor</tag> element with
+     <literal>type="query:AttributeQueryDescriptorType"</literal>
+     to perform attribute queries.
+    </para>
+
+    <para>
+     Attribute queries require the IDP to act as Attribute Authority
+     and call for signing and encryption to be configured for the Fedlet.
+     For details see the example in the procedure
+     <link
+      xlink:href="dev-guide#try-fedlet-attribute-query"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+     ><citetitle>To Try the Fedlet Attribute Query</citetitle></link>,
+     and in the procedure for the .NET Fedlet,
+     which more fully describes how to edit the configuration files,
+     <link
+      xlink:href="dev-guide#try-dotnet-fedlet-attribute-query"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+     ><citetitle>To Try the .NET Fedlet Attribute Query</citetitle></link>,
+     For example, you can set the attribute mapping on the Fedlet
+     by editing the extended metadata attribute <literal>attributeMap</literal>
+     in the <tag>SPSSOConfig</tag> element
+     as described in <xref linkend="unconfigured-fedlet-sp-extended-spssoconfig" />.
+    </para>
+   </section>
+
+   <section xml:id="unconfigured-fedlet-sp-standard-xacml">
+    <title>XACML Requests: XACMLAuthzDecisionQueryDescriptor Element</title>
+
+    <para>
+     Add an <tag>XACMLAuthzDecisionQueryDescriptor</tag> element
+     to perform XACML policy decision queries.
+    </para>
+
+    <para>
+     Attribute queries require the IDP to act as XACML PDP.
+     For details see the example in the procedure
+     <link
+      xlink:href="dev-guide#try-fedlet-xacml-query"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+     ><citetitle>To Try the Fedlet XACML Query</citetitle></link>.
+    </para>
+   </section>
+  </section>
+
+  <section xml:id="unconfigured-fedlet-sp-extended">
+   <title>Service Provider Extended XML</title>
+
+   <para>
+    This section covers the configuration
+    in the <filename>sp-extended.xml</filename> file.
+    The extended metadata are specific to the OpenAM implementation of SAML 2.0.
+   </para>
+
+   <para>
+    The extended metadata file describes an <tag>EntityConfig</tag> element,
+    defined by the namespace with the identifier
+    <literal>urn:sun:fm:SAML:2.0:entityconfig</literal>.
+    The XML schema definition is described in
+    <filename>entity-config-schema.xsd</filename>,
+    available online as part of the OpenAM source code,
+    though not included with the unconfigured Fedlet.
+   </para>
+
+   <para>
+    The unconfigured Fedlet does include a template file,
+    <filename>conf/sp-extended.xml-template</filename>.
+    This extended metadata template for the IDP requires that you edit
+    at least the <literal>FEDLET_ENTITY_ID</literal> placeholder value,
+    the <literal>appLogoutUrl</literal> attribute value
+    in the <tag>SPSSOConfig</tag> element,
+    and the <literal>fedletcot</literal> values.
+    The <literal>FEDLET_ENTITY_ID</literal> value must reflect the SP entity ID
+    used in the standard metadata.
+    For the single logout profile,
+    the <literal>appLogoutUrl</literal> attribute value must match
+    the Fedlet URL based on the values used in the
+    <filename>FederationConfig.properties</filename> file.
+    The <literal>fedletcot</literal> values must correspond to
+    the Circle of Trust name defined in <filename>fedlet.cot</filename>.
+   </para>
+
+   <para>
+    The <literal>hosted</literal> attribute on the <tag>EntityConfig</tag> element
+    must remain set to <literal>hosted="1"</literal>,
+    meaning that the SP is hosted (local to the Fedlet).
+    If you provide a copy of the file to your IDP running OpenAM, however,
+    then set <literal>hosted="0"</literal> for the IDP,
+    as the Fedlet is remote to the IDP.
+   </para>
+
+   <para>
+    The extended metadata file is essentially a series of
+    XML maps of key-value pairs specifying IDP configuration for each role.
+    All role-level elements can take a <literal>metaAlias</literal> attribute
+    that the Fedlet uses when communicating with the IDP.
+    Each child element of a role element defines an <tag>Attribute</tag>
+    whose <literal>name</literal> is the key.
+    Each <tag>Attribute</tag> element can contain multiple <tag>Value</tag> elements.
+    The <tag>Value</tag> elements' contents comprise the values for the key.
+    All values are strings, sometimes with a format that is meaningful to the Fedlet.
+    The basic example in the SP template shows the configuration options,
+    documented in the following lists.
+   </para>
+
+   <section xml:id="unconfigured-fedlet-sp-extended-spssoconfig">
+    <title>Service Provider Extended XML: SPSSOConfig Settings</title>
+
+    <para>
+     This section covers elements for the SP SSO role,
+     arranged in the order they appear in the template.
+    </para>
+
+    <variablelist>
+     <varlistentry>
+      <term><literal>description</literal></term>
+      <listitem>
+       <para>
+        Human-readable description of the Fedlet in the SP SSO role
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>signingCertAlias</literal></term>
+      <listitem>
+       <para>
+        Alias of the public key certificate for the key pair
+        used when signing messages to the IDP
+       </para>
+
+       <para>
+        The key pair is found in the Fedlet's key store,
+        and the certificate is included in the standard metadata.
+        See <xref linkend="unconfigured-fedlet-properties-keys" /> for details
+        on how to specify access to the key store,
+        and <xref linkend="unconfigured-fedlet-sp-standard" /> for details
+        on how to set up standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>encryptionCertAlias</literal></term>
+      <listitem>
+       <para>
+        Alias of the public key certificate for the key pair
+        used when encrypting messages to the IDP
+       </para>
+
+       <para>
+        The key pair is found in the Fedlet's key store,
+        and the certificate is included in the standard metadata.
+        See <xref linkend="unconfigured-fedlet-properties-keys" /> for details
+        on how to specify access to the key store,
+        and <xref linkend="unconfigured-fedlet-sp-standard" /> for details
+        on how to set up standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>basicAuthOn</literal></term>
+      <listitem>
+       <para>
+        Set this to true to use HTTP Basic authorization with the IDP.
+       </para>
+
+       <para>
+        Default: false
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>basicAuthUser</literal></term>
+      <listitem>
+       <para>
+        When using HTTP Basic authorization with the IDP,
+        this value is the user name.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>basicAuthPassword</literal></term>
+      <listitem>
+       <para>
+        When using HTTP Basic authorization with the IDP,
+        this value is the password.
+       </para>
+
+       <para>
+        Encrypt the password using the <filename>encode.jsp</filename> page
+        of your test copy of OpenAM that you might also have used
+        to encode key store passwords as described in
+        <xref linkend="unconfigured-fedlet-properties-keys" />.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>autofedEnabled</literal></term>
+      <listitem>
+       <para>
+        Set this to true to enable automatic federation with OpenAM
+        based on the value of a profile attribute that is common to user profiles
+        both in OpenAM and in the Fedlet's context.
+       </para>
+
+       <para>
+        Default: false
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>autofedAttribute</literal></term>
+      <listitem>
+       <para>
+        When automatic federation is enabled, set this
+        to the name of the user profile attribute used for automatic federation.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>transientUser</literal></term>
+      <listitem>
+       <para>
+        Use this effective identity for users with transient identifiers.
+       </para>
+
+       <para>
+        Default: anonymous
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term>spAdapter</term>
+      <listitem>
+       <para>
+        Class name for a plugin service provider adapter
+       </para>
+
+       <para>
+        This class must extend
+        <literal>com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter</literal>.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>spAdapterEnv</literal></term>
+      <listitem>
+       <para>
+        When using a plugin service provider adapter, this attribute's values
+        optionally take a map of settings
+        <literal><replaceable>key</replaceable>=<replaceable>value</replaceable></literal>
+        used to initialize the plugin.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>fedletAdapter</literal></term>
+      <listitem>
+       <para>
+        Class name for an alternate fedlet adapter
+       </para>
+
+       <para>
+        Default: <literal>com.sun.identity.saml2.plugins.DefaultFedletAdapter</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>fedletAdapterEnv</literal></term>
+      <listitem>
+       <para>
+        When using an alternate fedlet adapter, this attribute's values
+        optionally take a map of settings
+        <literal><replaceable>key</replaceable>=<replaceable>value</replaceable></literal>
+        used to initialize the plugin.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>spAccountMapper</literal></term>
+      <listitem>
+       <para>
+        Class name for an implementation mapping SAML protocol objects
+        to local user profiles
+       </para>
+
+       <para>
+        Default:
+        <literal>com.sun.identity.saml2.plugins.DefaultLibrarySPAccountMapper</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>spAttributeMapper</literal></term>
+      <listitem>
+       <para>
+        Class name for an implementation mapping SAML assertion attributes
+        to local user profile attributes
+       </para>
+
+       <para>
+        Default:
+        <literal>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>spAuthncontextMapper</literal></term>
+      <listitem>
+       <para>
+        Class name for an implementation determining
+        the authentication context to set in an authentication request,
+        and mapping the authentication context to an authentication level
+       </para>
+
+       <para>
+        Default:
+        <literal>com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>spAuthncontextClassrefMapping</literal></term>
+      <listitem>
+       <para>
+        String defining how the SAML authentication context classes
+        map to authentication levels and indicate the default context class
+       </para>
+
+       <para>
+        Format: <literal><replaceable
+        >authnContextClass</replaceable>|<replaceable>authLevel</replaceable>[|default]</literal>
+       </para>
+
+       <para>
+        Default:
+        <literal>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport|0|default</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>spAuthncontextComparisonType</literal></term>
+      <listitem>
+       <para>
+        How to evaluate authentication context class identifiers.
+       </para>
+
+       <variablelist>
+        <varlistentry>
+         <term><literal>exact</literal></term>
+         <listitem>
+          <para>
+           Assertion context must exactly match a context in the list
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term><literal>minimum</literal></term>
+         <listitem>
+          <para>
+           Assertion context must be at least as strong as a context in the list
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term><literal>maximum</literal></term>
+         <listitem>
+          <para>
+           Assertion context must be no stronger than a context in the list
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term><literal>better</literal></term>
+         <listitem>
+          <para>
+           Assertion context must be stronger than all contexts in the list
+          </para>
+         </listitem>
+        </varlistentry>
+       </variablelist>
+
+       <para>
+        Default: <literal>exact</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>attributeMap</literal></term>
+      <listitem>
+       <para>
+        Map of SAML assertion attributes to local user profile attributes
+       </para>
+
+       <para>
+        Default: <literal>*=*</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>saml2AuthModuleName</literal></term>
+      <listitem>
+       <para>
+        Name of an alternative SAML 2.0 authentication module
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>localAuthURL</literal></term>
+      <listitem>
+       <para>
+        URL to a login page on the Fedlet side
+       </para>
+
+       <para>
+        Use this to override the Assertion Consumer Service URL from the standard metadata
+        when consuming assertions.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>intermediateUrl</literal></term>
+      <listitem>
+       <para>
+        URL to an intermediate page returned
+        before the user accesses the final protected resource
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>defaultRelayState</literal></term>
+      <listitem>
+       <para>
+        If no RelayState is specified in a SAML request,
+        redirect to this URL after successful single sign-on.
+       </para>
+
+       <para>
+        URL-encode the <literal>defaultRelayState</literal> value.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>appLogoutUrl</literal></term>
+      <listitem>
+       <para>
+        One or more Fedlet URLs that initiate single logout
+       </para>
+
+       <para>
+        Replace the placeholders in the default with the values for your Fedlet.
+       </para>
+
+       <para>
+        Default:
+        <literal>FEDLET_PROTOCOL://FEDLET_HOST:FEDLET_PORT/FEDLET_DEPLOY_URI/logout</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>assertionTimeSkew</literal></term>
+      <listitem>
+       <para>
+        Tolerate clock skew between the Fedlet and the IDP
+        of at most this number of seconds
+       </para>
+
+       <para>
+        Default: 300
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantAttributeEncrypted</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP encrypt attributes in the response
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantAssertionEncrypted</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP encrypt the SAML assertion in the response
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantNameIDEncrypted</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP encrypt the name ID in the response
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantPOSTResponseSigned</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP sign the response when using HTTP POST
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantArtifactResponseSigned</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP sign the response when using HTTP Artifact
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantLogoutRequestSigned</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP sign single logout requests
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantLogoutResponseSigned</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP sign single logout responses
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantMNIRequestSigned</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP manage name ID requests
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantMNIResponseSigned</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP manage name ID responses
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>cotlist</literal></term>
+      <listitem>
+       <para>
+        Set this to the Circle of Trust name used in
+        <xref linkend="unconfigured-fedlet-cot" />.
+       </para>
+
+       <para>
+        Default: <literal>fedletcot</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>saeAppSecretList</literal></term>
+      <listitem>
+       <para>
+        When using Secure Attribute Exchange with OpenAM
+        this represents the Application Security Configuration settings.
+       </para>
+
+       <para>
+        Values take the format
+        <literal>url=<replaceable>FedletURL</replaceable>|type=<replaceable
+         >symmetric</replaceable>|secret=<replaceable
+         >EncodedSharedSecret</replaceable>[|encryptionalgorithm=<replaceable
+         >EncAlg</replaceable>|encryptionkeystrength=<replaceable
+         >EncStrength</replaceable>]</literal>
+        or
+        <literal>url=<replaceable>FedletURL</replaceable>|type=<replaceable
+         >asymmetric</replaceable>|privatekeyalias=<replaceable
+         >FedletSigningCertAlias</replaceable>[|encryptionalgorithm=<replaceable
+         >EncAlg</replaceable>|encryptionkeystrength=<replaceable
+         >EncStrength</replaceable>|pubkeyalias=<replaceable>FedletPublicKeyAlias</replaceable>]</literal>
+       </para>
+
+       <para>
+        You can omit the <literal>privatekeyalias</literal> setting
+        if the signing certifcate is specified in the standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>saeSPUrl</literal></term>
+      <listitem>
+       <para>
+        When using Secure Attribute Exchange (SAE) with OpenAM
+        this is the Fedlet URL that handles SAE requests.
+        If this is omitted, then SAE is not enabled.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>saeSPLogoutUrl</literal></term>
+      <listitem>
+       <para>
+        When using Secure Attribute Exchange with OpenAM
+        this is the Fedlet URL that handles SAE global logout requests.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>ECPRequestIDPListFinderImpl</literal></term>
+      <listitem>
+       <para>
+        When using the Enhanced Client and Proxy profile
+        this is the class name for the implementation that returns
+        a list of preferred IDPs trusted by the ECP.
+       </para>
+
+       <para>
+        Default: <literal>com.sun.identity.saml2.plugins.ECPIDPFinder</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>ECPRequestIDPList</literal></term>
+      <listitem>
+       <para>
+        When using the Enhanced Client and Proxy profile
+        this is the list of IDPs for the ECP to contact.
+       </para>
+
+       <para>
+        When not specified the list finder implementation is used.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>enableIDPProxy</literal></term>
+      <listitem>
+       <para>
+        Set this to true to enable IDP proxy functionality.
+       </para>
+
+       <para>
+        Default: false
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>idpProxyList</literal></term>
+      <listitem>
+       <para>
+        A list of preferred IDPs that the Fedlet can proxy to
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>idpProxyCount</literal></term>
+      <listitem>
+       <para>
+        Number of IDP proxies that the Fedlet can have
+       </para>
+
+       <para>
+        Default: 0
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>useIntroductionForIDPProxy</literal></term>
+      <listitem>
+       <para>
+        Set this to true to pick a preferred IDP
+        based on a SAML 2.0 introduction cookie.
+       </para>
+
+       <para>
+        Default: false
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </section>
+
+   <section xml:id="unconfigured-fedlet-sp-extended-attributequeryconfig">
+    <title>Service Provider Extended XML: AttributeQueryConfig Settings</title>
+
+    <para>
+     This section covers elements for the Attribute Requester role,
+     arranged in the order they appear in the template.
+    </para>
+
+    <variablelist>
+     <varlistentry>
+      <term><literal>signingCertAlias</literal></term>
+      <listitem>
+       <para>
+        Alias of the public key certificate for the key pair
+        used when signing messages to the IDP
+       </para>
+
+       <para>
+        The key pair is found in the Fedlet's key store,
+        and the certificate is included in the standard metadata.
+        See <xref linkend="unconfigured-fedlet-properties-keys" /> for details
+        on how to specify access to the key store,
+        and <xref linkend="unconfigured-fedlet-sp-standard" /> for details
+        on how to set up standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>encryptionCertAlias</literal></term>
+      <listitem>
+       <para>
+        Alias of the public key certificate for the key pair
+        used when encrypting messages to the IDP
+       </para>
+
+       <para>
+        The key pair is found in the Fedlet's key store,
+        and the certificate is included in the standard metadata.
+        See <xref linkend="unconfigured-fedlet-properties-keys" /> for details
+        on how to specify access to the key store,
+        and <xref linkend="unconfigured-fedlet-sp-standard" /> for details
+        on how to set up standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantNameIDEncrypted</literal></term>
+      <listitem>
+       <para>
+        Set to true to request that the IDP encrypt the name ID
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>cotlist</literal></term>
+      <listitem>
+       <para>
+        Set this to the Circle of Trust name used in
+        <xref linkend="unconfigured-fedlet-cot" />.
+       </para>
+
+       <para>
+        Default: <literal>fedletcot</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </section>
+
+   <section xml:id="unconfigured-fedlet-sp-extended-xacmlauthzdecisionqueryconfig">
+    <title>Service Provider Extended XML: XACMLAuthzDecisionQueryConfig Settings</title>
+
+    <para>
+     This section covers elements for the XACML decision requester role,
+     enabling the Fedlet to act as a Policy Enforcement Point,
+     arranged in the order they appear in the template.
+    </para>
+
+    <variablelist>
+     <varlistentry>
+      <term><literal>signingCertAlias</literal></term>
+      <listitem>
+       <para>
+        Alias of the public key certificate for the key pair
+        used when signing messages to the IDP
+       </para>
+
+       <para>
+        The key pair is found in the Fedlet's key store,
+        and the certificate is included in the standard metadata.
+        See <xref linkend="unconfigured-fedlet-properties-keys" /> for details
+        on how to specify access to the key store,
+        and <xref linkend="unconfigured-fedlet-sp-standard" /> for details
+        on how to set up standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>encryptionCertAlias</literal></term>
+      <listitem>
+       <para>
+        Alias of the public key certificate for the key pair
+        used when encrypting messages to the IDP
+       </para>
+
+       <para>
+        The key pair is found in the Fedlet's key store,
+        and the certificate is included in the standard metadata.
+        See <xref linkend="unconfigured-fedlet-properties-keys" /> for details
+        on how to specify access to the key store,
+        and <xref linkend="unconfigured-fedlet-sp-standard" /> for details
+        on how to set up standard metadata.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>basicAuthOn</literal></term>
+      <listitem>
+       <para>
+        Set to true to use HTTP Basic authorization when contacting
+        the Policy Decision Provider
+       </para>
+
+       <para>
+        Default: false
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>basicAuthUser</literal></term>
+      <listitem>
+       <para>
+        When using Basic authorization to contact the Policy Decision Provider,
+        use this value as the user name
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>basicAuthPassword</literal></term>
+      <listitem>
+       <para>
+        When using Basic authorization to contact the Policy Decision Provider,
+        use this value as the password
+       </para>
+
+       <para>
+        Encrypt the password using the <filename>encode.jsp</filename> page
+        of your test copy of OpenAM that you might also have used
+        to encode key store passwords as described in
+        <xref linkend="unconfigured-fedlet-properties-keys" />.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantXACMLAuthzDecisionResponseSigned</literal></term>
+      <listitem>
+       <para>
+        Set this to true to request that the Policy Decision Provider
+        sign the XACML response
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>wantAssertionEncrypted</literal></term>
+      <listitem>
+       <para>
+        Set this to true to request that the Policy Decision Provider
+        encrypt the SAML assertion response
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>cotlist</literal></term>
+      <listitem>
+       <para>
+        Set this to the Circle of Trust name used in
+        <xref linkend="unconfigured-fedlet-cot" />.
+       </para>
+
+       <para>
+        Default: <literal>fedletcot</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </section>
+  </section>
+ </section>
+
+ <section xml:id="unconfigured-fedlet-embedding">
+  <title>Embedding the Java Fedlet in a Web Application</title>
+
+  <para>
+   The Fedlet war file, <filename>${fedletWarFile}</filename>,
+   serves both as an example and also to provide the code needed
+   to embed the Fedlet in your web application.
+  </para>
+
+  <itemizedlist>
+   <para>
+    The basic steps for using the Fedlet in your application are as follows.
+   </para>
+
+   <listitem>
+    <para>
+     Unpack the Fedlet war file to a working directory,
+     remove any files you do not want to keep such as
+     <filename>index.jsp</filename> or <filename>fedletEncode.jsp</filename>,
+     and overlay the Fedlet files with those of your web application.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     To integrate single sign-on into your application,
+     modify the functionality in <filename>fedletSampleApp.jsp</filename>
+     or add it to your application's logic.
+    </para>
+
+    <para>
+     If you add it to your application's logic,
+     then you must also edit your application's deployment descriptor file,
+     <filename>web.xml</filename>, to set the assertion consumer URI,
+     which by default is <literal>/fedletapplication</literal>
+     in the basic SP XML for the Fedlet.
+     Add <literal>servlet</literal> and <literal>servlet-mapping</literal>
+     elements as shown in the following example.
+    </para>
+
+    <programlisting language="xml"><![CDATA[
+<servlet>
+    <servlet-name>yourapplication</servlet-name>
+    <jsp-file>/your-application.jsp</jsp-file>
+</servlet>
+<servlet-mapping>
+    <servlet-name>yourapplication</servlet-name>
+    <url-pattern>/fedletapplication</url-pattern>
+</servlet-mapping>
+]]></programlisting>
+   </listitem>
+
+   <listitem>
+    <para>
+     Build a war file from your web application with embedded Fedlet files.
+    </para>
+
+    <para>
+     This is the version of the application to deploy.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     When you deploy your war file,
+     also provide the Fedlet configuration as described in this chapter.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </section>
+</chapter>

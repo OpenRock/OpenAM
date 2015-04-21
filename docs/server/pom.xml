@@ -137,6 +137,7 @@
         <distauthWarFile>OpenAM-DistAuth-${serverDocTargetVersion}.war</distauthWarFile>
         <diagnosticsZipFile>SSODiagnosticTools-${serverDocTargetVersion}.zip</diagnosticsZipFile>
         <fedletZipFile>Fedlet-${serverDocTargetVersion}.zip</fedletZipFile>
+        <fedletWarFile>Fedlet-${serverDocTargetVersion}.war</fedletWarFile>
         <sharedLibrary>openam-shared-${serverDocTargetVersion}.jar</sharedLibrary>
         <federationLibrary>openam-federation-library-${serverDocTargetVersion}.jar</federationLibrary>
         <forgerockUtilLibrary>forgerock-util-${commons.forgerock-util.version}.jar</forgerockUtilLibrary>

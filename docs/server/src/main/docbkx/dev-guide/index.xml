@@ -108,6 +108,7 @@
  <xinclude:include href='chap-xacml.xml' />
  <xinclude:include href='chap-fedlet-java.xml' />
  <xinclude:include href='chap-fedlet-dotnet.xml' />
+ <xinclude:include href="chap-fedlet-unconfigured.xml" />
  <!-- TODO: Show some basic uses of the SAML 2.0 and WS-Federation APIs
  <xinclude:include href='chap-samlv2.xml' />
  <xinclude:include href='chap-ws-federation.xml' />
