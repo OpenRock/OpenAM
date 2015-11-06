@@ -33,7 +33,7 @@
                 <div class="panel panel-info">
                     <div class="panel-heading am-panel-heading-hover" data-toggle="collapse" aria-expanded="false"
                          data-target="#oauth2Scope{{@index}}" aria-controls="oauth2Scope{{@index}}">
-                        {{this.name}}
+                        {{{this.name}}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
 
@@ -43,7 +43,7 @@
                                 <small>{{this.values}}</small><br/>
                             {{else}}
                                 {{#each this.values}}
-                                    <small><strong>{{@key}}:</strong> {{this}}</small><br/>
+                                    <small><strong>{{@key}}:</strong> {{{this}}}</small><br/>
                                 {{/each}}
                             {{/if}}
                         </div>
