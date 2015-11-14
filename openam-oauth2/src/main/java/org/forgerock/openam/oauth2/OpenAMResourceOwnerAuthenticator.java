@@ -75,7 +75,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
     /**
      * {@inheritDoc}
      */
-    public ResourceOwner authenticate(OAuth2Request request) throws NotFoundException {
+    public ResourceOwner authenticate(OAuth2Request request, boolean useSession) throws NotFoundException {
         SSOToken token = null;
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -83,7 +83,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         } catch (Exception e){
             logger.warning("No SSO Token in request", e);
         }
-        if (token == null) {
+        if (token == null || !useSession) {
             final String username = request.getParameter(USERNAME);
             final char[] password = request.getParameter(PASSWORD) == null ? null :
                     request.<String>getParameter(PASSWORD).toCharArray();
@@ -98,7 +98,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
 
                 long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
 
-                return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
+                return new OpenAMResourceOwner(id.getName(), id, authTime);
             } catch (SSOException e) {
                 logger.error("Unable to create ResourceOwner", e);
             } catch (ParseException e) {
@@ -178,6 +178,6 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         final AMIdentity id = IdUtils.getIdentity(
                 AccessController.doPrivileged(AdminTokenAction.getInstance()),
                 token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-        return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id);
+        return new OpenAMResourceOwner(id.getName(), id);
     }
 }

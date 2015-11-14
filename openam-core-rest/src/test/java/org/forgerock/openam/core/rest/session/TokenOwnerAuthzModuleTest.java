@@ -16,8 +16,8 @@
 package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
-import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.testng.AssertJUnit.*;
 
@@ -26,7 +26,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
@@ -42,9 +41,9 @@ import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-public class TokenOwnerOrSuperUserAuthzModuleTest {
+public class TokenOwnerAuthzModuleTest {
 
-    private TokenOwnerOrSuperUserAuthzModule testModule;
+    private TokenOwnerAuthzModule testModule;
     SessionService mockService;
     SSOTokenManager mockTokenManager;
     Context mockContext;
@@ -68,24 +67,7 @@ public class TokenOwnerOrSuperUserAuthzModuleTest {
         mockContext = mock(Context.class);
         given(mockContext.asContext(SSOTokenContext.class)).willReturn(tc);
 
-        testModule = new TokenOwnerOrSuperUserAuthzModule(mockConfig, mock(Debug.class), "tokenId",
-                mockTokenManager, "deleteProperty");
-    }
-
-    @Test
-    public void shouldSuperInvalidAction() throws SSOException, ExecutionException, InterruptedException {
-
-        //given
-        given(mockService.isSuperUser("universal_id")).willReturn(false);
-        ActionRequest request = Requests.newActionRequest("resource", "invalid");
-
-        //when
-        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
-
-        //then
-        assertThat(result).succeeded();
-        assertFalse(result.get().isAuthorized());
-        assertEquals(result.get().getReason(), "User is not an administrator.");
+        testModule = new TokenOwnerAuthzModule("tokenId", mockTokenManager, "deleteProperty");
     }
 
     @Test
@@ -122,26 +104,7 @@ public class TokenOwnerOrSuperUserAuthzModuleTest {
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
 
         //then
-        assertThat(result).succeeded();
-        assertFalse(result.get().isAuthorized());
-    }
-
-    @Test
-    public void shouldPassDifferentOwnerQueryParamAdminToken() throws SSOException,
-            ExecutionException, InterruptedException, BadRequestException {
-
-        //given
-        ActionRequest request = Requests.newActionRequest("resource", "deleteProperty");
-        request.setAdditionalParameter("tokenId", "token");
-        given(mockService.isSuperUser(eq("universal_id"))).willReturn(true);
-        setupUsers("john");
-
-        //when
-        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
-
-        //then
-        assertThat(result).succeeded();
-        assertTrue(result.get().isAuthorized());
+        assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
     }
 
     @Test

@@ -26,6 +26,9 @@ public class PacketProcessedEvent extends RadiusEvent {
 
     private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
+    /**
+     * Constructor.
+     */
     public PacketProcessedEvent() {
         LOG.message("Constructing PacketProcessedEvent.PacketProcessedEvent()");
     }

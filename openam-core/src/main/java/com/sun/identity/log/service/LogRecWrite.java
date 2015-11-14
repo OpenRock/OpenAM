@@ -58,6 +58,8 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.utils.StringUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -234,8 +236,9 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)
-                .authentication(clientId)
-                .http("UNKNOWN", path, queryParameters, Collections.<String, List<String>>emptyMap())
+                .userId(clientId)
+                .httpRequest(hasSecureScheme(resourceUrl), "UNKNOWN", path, queryParameters,
+                        Collections.<String, List<String>>emptyMap())
                 .request("HTTP", "UNKNOWN")
                 .client(clientIp)
                 .trackingId(contextId)
@@ -244,7 +247,21 @@ public class LogRecWrite implements LogOperation, ParseOutput {
 
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);
     }
-    
+
+    private boolean hasSecureScheme(String resourceUrl) {
+        URI resourceURI;
+        try {
+            resourceURI = new URI(resourceUrl);
+            String scheme = resourceURI.getScheme();
+            if (StringUtils.isNotEmpty(scheme) && "https".equals(scheme.toLowerCase())) {
+                return true;
+            }
+        } catch (URISyntaxException e) {
+            //Fall through...
+        }
+        return false;
+    }
+
     /**
      * The method that implements the ParseOutput interface. This is called
      * by the SAX parser.

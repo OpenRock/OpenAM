@@ -15,8 +15,9 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.audit.events.AuditEventBuilder.AUTHENTICATION;
-import static org.forgerock.audit.events.AuditEventBuilder.ID;
+import org.forgerock.audit.events.AuditEventBuilder;
+
+import org.forgerock.openam.audit.context.AuditRequestContext;
 
 /**
  * Collection of constants related to auditing.
@@ -49,9 +50,9 @@ public final class AuditConstants {
         AM_SESSION_PROPERTY_CHANGED("AM-SESSION-PROPERTY_CHANGED"),
         /** Event for auth process module completion. */
         AM_LOGIN_MODULE_COMPLETED("AM-LOGIN-MODULE-COMPLETED"),
-        /** Event for auth process module chain completion. */
-        AM_LOGIN_CHAIN_COMPLETED("AM-LOGIN-CHAIN-COMPLETED"),
-        /** Event for logout. */
+        /** Event for auth login process completion. */
+        AM_LOGIN_COMPLETED("AM-LOGIN-COMPLETED"),
+        /** Event for auth process logout. */
         AM_LOGOUT("AM-LOGOUT"),
         /** Event for a change in configuration. */
         AM_CONFIG_CHANGE("AM-CONFIG-CHANGE");
@@ -177,12 +178,16 @@ public final class AuditConstants {
         IP_ADDRESS("ipAddress"),
         /** Key for the auth level. */
         AUTH_LEVEL("authLevel"),
-        /** Key for the module name. */
-        MODULE_NAME("moduleName"),
+        /** Key for the auth index. */
+        AUTH_INDEX("authIndex"),
+        /** Key for the login module control flag. */
+        AUTH_CONTROL_FLAG("authControlFlag"),
         /** Key for the module class. */
         MODULE_CLASS("moduleClass"),
-        /** Key for the extra textual information about event. */
-        EVENT_DATA("eventData");
+        /** Key for the reason of a failure event. */
+        FAILURE_REASON("failureReason"),
+        /** Key for the device ID. */
+        DEVICE_ID("deviceId");
 
         private final String name;
 
@@ -194,6 +199,44 @@ public final class AuditConstants {
         public String toString() {
             return name;
         }
+    }
+
+    /**
+     * Predefined values for the entries in the authentication audit "entries/info/failureReason" field.
+     */
+    public enum AuthenticationFailureReason {
+        /** Incorrect/invalid credentials presented. */
+        LOGIN_FAILED,
+        /** Invalid credentials entered. */
+        INVALID_PASSWORD,
+        /** Named Configuration (Auth Chain) does not exist. */
+        NO_CONFIG,
+        /** No user profile found for this user. */
+        NO_USER_PROFILE,
+        /** This user is not active. */
+        USER_INACTIVE,
+        /** Max number of failure attempts exceeded. User is Locked out. */
+        LOCKED_OUT,
+        /** User account has expired. */
+        ACCOUNT_EXPIRED,
+        /** Login timed out. */
+        LOGIN_TIMEOUT,
+        /** Authentication module is denied. */
+        MODULE_DENIED,
+        /** Limit for maximum number of allowed session has been reached. */
+        MAX_SESSION_REACHED,
+        /** Org/Realm does not exists. */
+        INVALID_REALM,
+        /** Org/Realm is not active. */
+        REALM_INACTIVE,
+        /** Role based auth. User does not belong to this role. */
+        USER_NOT_FOUND,
+        /** Authentication type is denied. */
+        AUTH_TYPE_DENIED,
+        /** Cannot create a session. */
+        SESSION_CREATE_ERROR,
+        /** Level based Auth. Invalid Auth Level. */
+        INVALID_LEVEL
     }
 
     /**
@@ -229,7 +272,7 @@ public final class AuditConstants {
     /**
      * Names of fields on an audit events.
      */
-    public static final String USER_ID = AUTHENTICATION + "." + ID;
+    public static final String USER_ID = AuditEventBuilder.USER_ID;
 
     /**
      * Names of the realm field on an audit event.
@@ -253,6 +296,11 @@ public final class AuditConstants {
      * The field name to use when adding a "reason" string to the /response/detail object of an access event.
      */
     public static final String ACCESS_RESPONSE_DETAIL_REASON = "reason";
+
+    /**
+     *  Key for the login module control flag that can be added {@link AuditRequestContext}.
+     */
+    public static final String LOGIN_MODULE_CONTROL_FLAG = "loginModuleControlFlag";
 
     private AuditConstants() {
         // Prevent instantiation

@@ -28,6 +28,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
@@ -68,9 +69,11 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionPropertyList;
+import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -97,8 +100,18 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String LOGOUT_ACTION_ID = "logout";
     public static final String VALIDATE_ACTION_ID = "validate";
     public static final String IS_ACTIVE_ACTION_ID = "isActive";
-    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime";
-    public static final String GET_IDLE_ACTION_ID = "getIdle";
+
+    /**
+     * @deprecated use getTimeLeft instead.
+     */
+    @Deprecated
+    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining
+
+    public static final String GET_TIME_LEFT_ACTION_ID = "getTimeLeft"; //time remaining
+    public static final String GET_IDLE_ACTION_ID = "getIdle"; //current idle time
+    public static final String GET_MAX_IDLE_ACTION_ID = "getMaxIdle"; //max idle time
+    public static final String GET_MAX_SESSION_TIME_ID = "getMaxSessionTime"; //max session time
+
     public static final String GET_PROPERTY_ACTION_ID = "getProperty";
     public static final String SET_PROPERTY_ACTION_ID = "setProperty";
     public static final String DELETE_PROPERTY_ACTION_ID = "deleteProperty";
@@ -116,7 +129,7 @@ public class SessionResource implements CollectionResourceProvider {
     private final SSOTokenManager ssoTokenManager;
     private final AuthUtilsWrapper authUtilsWrapper;
     private final Map<String, ActionHandler> actionHandlers;
-    private final SessionPropertyList sessionPropertyWhitelist;
+    private final SessionPropertyWhitelist sessionPropertyWhitelist;
 
     /**
      * Dependency Injection constructor allowing the SessionResource dependency to be provided.
@@ -129,7 +142,7 @@ public class SessionResource implements CollectionResourceProvider {
     public SessionResource(final SessionQueryManager sessionQueryManager,
                            final SSOTokenManager ssoTokenManager,
                            final AuthUtilsWrapper authUtilsWrapper,
-                           final SessionPropertyList sessionPropertyWhitelist) {
+                           final SessionPropertyWhitelist sessionPropertyWhitelist) {
         this.queryManager = sessionQueryManager;
         this.ssoTokenManager = ssoTokenManager;
         this.authUtilsWrapper = authUtilsWrapper;
@@ -139,7 +152,10 @@ public class SessionResource implements CollectionResourceProvider {
         actionHandlers.put(LOGOUT_ACTION_ID, new LogoutActionHandler());
         actionHandlers.put(IS_ACTIVE_ACTION_ID, new IsActiveActionHandler());
         actionHandlers.put(GET_IDLE_ACTION_ID, new GetIdleTimeActionHandler());
-        actionHandlers.put(GET_MAX_TIME_ACTION_ID, new GetMaxTimeActionHandler());
+        actionHandlers.put(GET_MAX_IDLE_ACTION_ID, new GetMaxIdleTimeActionHandler());
+        actionHandlers.put(GET_MAX_SESSION_TIME_ID, new GetMaxSessionTimeActionHandler());
+        actionHandlers.put(GET_MAX_TIME_ACTION_ID, new GetTimeLeftActionHandler());
+        actionHandlers.put(GET_TIME_LEFT_ACTION_ID, new GetTimeLeftActionHandler());
         actionHandlers.put(GET_PROPERTY_ACTION_ID, new GetPropertyActionHandler());
         actionHandlers.put(SET_PROPERTY_ACTION_ID, new SetPropertyActionHandler());
         actionHandlers.put(DELETE_PROPERTY_ACTION_ID, new DeletePropertyActionHandler());
@@ -691,9 +707,9 @@ public class SessionResource implements CollectionResourceProvider {
     }
 
     /**
-     * Handler for 'getMaxTime' action
+     * Handler for 'getMaxTime' action - from CREST 12.0.0 onwards this means 'get remaining session time'.
      */
-    private class GetMaxTimeActionHandler implements ActionHandler {
+    private class GetTimeLeftActionHandler implements ActionHandler {
 
         private static final String MAX_TIME = "maxtime";
 
@@ -706,8 +722,10 @@ public class SessionResource implements CollectionResourceProvider {
         /**
          * Using the token id specified by the invoker, find the token and if valid, return its remaining life in
          * seconds.
+         *
          * @param tokenId The SSO Token Id.
-         * @return jsonic representation of the number of seconds of remaining life, or a representation of -1 if invalid
+         * @return jsonic representation of the number of seconds of remaining life, or a representation of -1 if
+         * invalid.
          */
         private JsonValue getMaxTime(String tokenId) {
 
@@ -718,6 +736,73 @@ public class SessionResource implements CollectionResourceProvider {
             } catch (SSOException ignored) {
             }
             return json(object(field(MAX_TIME, maxTime)));
+        }
+    }
+
+    /**
+     * Handler for 'getMaxSessionTime' action - from CREST 12.0.0 onwards this means 'get maximum possible
+     * length of session'
+     */
+    private class GetMaxSessionTimeActionHandler implements ActionHandler {
+
+        private static final String MAX_SESSION_TIME = "maxsessiontime";
+
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
+                                                                 ActionRequest request) {
+            return newResultPromise(newActionResponse(getMaxSessionTime(tokenId)));
+        }
+
+        /**
+         * Using the token id specified by the invoker, find the token and if valid, return the max idle time in
+         * seconds.
+         *
+         * @param tokenId The SSO Token Id.
+         * @return jsonic representation of the number of seconds a session may exist, or a representation of -1 if
+         * token is invalid.
+         */
+        private JsonValue getMaxSessionTime(String tokenId) {
+
+            long maxSessionTime = -1;
+            try {
+                SSOToken theToken = getToken(tokenId);
+                maxSessionTime = theToken.getMaxSessionTime();
+            } catch (SSOException ignored) {
+            }
+            return json(object(field(MAX_SESSION_TIME, maxSessionTime)));
+        }
+    }
+
+    /**
+     * Handler for 'getMaxIdle' action
+     */
+    private class GetMaxIdleTimeActionHandler implements ActionHandler {
+
+        private static final String MAX_IDLE_TIME = "maxidletime";
+
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
+                                                                 ActionRequest request) {
+            return newResultPromise(newActionResponse(getMaxIdleTime(tokenId)));
+        }
+
+        /**
+         * Using the token id specified by the invoker, find the token and if valid, return the max idle time in
+         * seconds.
+         *
+         * @param tokenId The SSO Token Id.
+         * @return jsonic representation of the number of seconds a session may be idle, or a representation of -1
+         * if token is invalid.
+         */
+        private JsonValue getMaxIdleTime(String tokenId) {
+
+            long maxIdleTime = -1;
+            try {
+                SSOToken theToken = getToken(tokenId);
+                maxIdleTime = theToken.getMaxIdleTime();
+            } catch (SSOException ignored) {
+            }
+            return json(object(field(MAX_IDLE_TIME, maxIdleTime)));
         }
     }
 
@@ -737,8 +822,10 @@ public class SessionResource implements CollectionResourceProvider {
         /**
          * Using the token id specified by the invoker, find the token and if valid, return the remaining idle time in
          * seconds.
+         *
          * @param tokenId The SSO Token Id.
-         * @return jsonic representation of the number of seconds of idle time, or a representation of -1 if token invalid
+         * @return jsonic representation of the number of seconds of idle time, or a representation of -1 if token
+         * invalid.
          */
         private JsonValue getIdleTime(String tokenId) {
 
@@ -766,32 +853,36 @@ public class SessionResource implements CollectionResourceProvider {
 
             final JsonValue result = json(object());
             try {
-                final SSOToken token = getToken(tokenId);
-                final String realm = getRealm(token);
+                final SSOToken caller = getCallerToken(context);
+                final String realm = getCallerRealm(context);
+                final SSOToken target = getToken(tokenId);
 
                 if (request.getContent() == null || request.getContent().get(KEYWORD_PROPERTIES).isNull()) {
-                    for (String property : sessionPropertyWhitelist.getAllListedProperties(token, realm)) {
-                        final String value = token.getProperty(property);
+                    for (String property : sessionPropertyWhitelist.getAllListedProperties(caller, realm)) {
+                        final String value = target.getProperty(property);
                         result.add(property, value == null ? "" : value);
                     }
                 } else {
                     for (String requestedResult : request.getContent().get(KEYWORD_PROPERTIES).asSet(String.class)) {
-                        if (sessionPropertyWhitelist.isPropertyListed(token, realm,
+                        if (sessionPropertyWhitelist.isPropertyListed(caller, realm,
                                 Collections.singleton(requestedResult))) {
-                            final String value = token.getProperty(requestedResult);
+                            final String value = target.getProperty(requestedResult);
                             result.add(requestedResult, value == null ? "" : value);
                         } else {
-                            LOGGER.warning("User {} requested property {} to get which was not whitelisted or "
-                                    + "was protected.", token.getPrincipal(), requestedResult);
+                            LOGGER.warning("User {} requested property {} on {} to get which was not whitelisted or "
+                                    + "was protected.", caller.getPrincipal(), requestedResult, target.getPrincipal());
                             return new ForbiddenException().asPromise();
                         }
                     }
 
                 }
 
-            } catch (SSOException | IdRepoException e) {
+            } catch (SSOException e) {
                 LOGGER.message("Unable to read session property due to unreadable SSOToken", e);
+            } catch (DelegationException e) {
+                LOGGER.message("Unable to read session property due to delegation match internal error", e);
             }
+
             return newResultPromise(newActionResponse(result));
         }
     }
@@ -807,8 +898,9 @@ public class SessionResource implements CollectionResourceProvider {
         public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
                 final ActionRequest request) {
             try {
-                final SSOToken token = getToken(tokenId);
-                final String realm = getRealm(token);
+                final SSOToken caller = getCallerToken(context);
+                final String realm = getCallerRealm(context);
+                final SSOToken target = getToken(tokenId);
 
                 if (request.getContent() == null || request.getContent().isNull() ||
                         request.getContent().asMap(String.class).size() == 0) {
@@ -817,17 +909,19 @@ public class SessionResource implements CollectionResourceProvider {
 
                 final Map<String, String> entrySet = request.getContent().asMap(String.class);
 
-                if (sessionPropertyWhitelist.isPropertyListed(token, realm, entrySet.keySet())) {
+                if (sessionPropertyWhitelist.isPropertyListed(caller, realm, entrySet.keySet())) {
                     for (Map.Entry<String, String> entry : request.getContent().asMap(String.class).entrySet()) {
-                        token.setProperty(entry.getKey(), entry.getValue());
+                        target.setProperty(entry.getKey(), entry.getValue());
                     }
                 } else {
-                    LOGGER.warning("User {} requested property/ies {} to set which was not whitelisted.",
-                            token.getPrincipal(), entrySet.toString());
+                    LOGGER.warning("User {} requested property/ies {} to set on {} which was not whitelisted.",
+                            caller.getPrincipal(), target.getPrincipal(), entrySet.toString());
                     return new ForbiddenException().asPromise();
                 }
-            } catch (SSOException | IdRepoException e) {
+            } catch (SSOException e) {
                 LOGGER.message("Unable to set session property due to unreadable SSOToken", e);
+            } catch (DelegationException e) {
+                LOGGER.message("Unable to read session property due to delegation match internal error", e);
             }
 
             return newResultPromise(newActionResponse(json(object(field(KEYWORD_SUCCESS, true)))));
@@ -845,30 +939,33 @@ public class SessionResource implements CollectionResourceProvider {
         public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
                 final ActionRequest request) {
             try {
-                final SSOToken token = getToken(tokenId);
-                final String realm = getRealm(token);
+                final SSOToken caller = getCallerToken(context);
+                final String realm = getCallerRealm(context);
+                final SSOToken target = getToken(tokenId);
 
                 JsonValue content = request.getContent().get(KEYWORD_PROPERTIES);
 
                 if (content == null || content.isNull()) {
-                    return newExceptionPromise(ResourceException.newResourceException(400)); //no properties = bad request
+                    return new BadRequestException().asPromise(); //no properties = bad request
                 }
 
                 final Set<String> propSet = request.getContent().get(KEYWORD_PROPERTIES).asSet(String.class);
 
-                if (sessionPropertyWhitelist.isPropertyListed(token, realm, propSet)) {
+                if (sessionPropertyWhitelist.isPropertyListed(caller, realm, propSet)) {
                     for (String entry : propSet) {
                         //there is no "delete" function - we can't store null in the property map so blank it
-                        token.setProperty(entry, "");
+                        target.setProperty(entry, "");
                     }
                 } else {
-                    LOGGER.message("User {} requested property/ies {} to delete which was not whitelisted.",
-                            token.getPrincipal(), propSet.toString());
+                    LOGGER.message("User {} requested property/ies {} on {} to delete which was not whitelisted.",
+                            caller.getPrincipal(), propSet.toString(), target.getPrincipal());
                     return new ForbiddenException().asPromise();
                 }
 
-            } catch (SSOException | IdRepoException e) {
+            } catch (SSOException e) {
                 LOGGER.message("Unable to delete session property due to unreadable SSOToken", e);
+            } catch (DelegationException e) {
+                LOGGER.message("Unable to read session property due to delegation match internal error", e);
             }
 
             return newResultPromise(newActionResponse(json(object(field(KEYWORD_SUCCESS, true)))));
@@ -886,11 +983,11 @@ public class SessionResource implements CollectionResourceProvider {
         public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
                                                                  final ActionRequest request) {
             try {
-                final SSOToken token = getToken(tokenId);
-                final String realm = getRealm(token);
+                final SSOToken caller = getCallerToken(context);
+                final String realm = getCallerRealm(context);
                 return newResultPromise(newActionResponse(json(object(field(KEYWORD_PROPERTIES,
-                        sessionPropertyWhitelist.getAllListedProperties(token, realm))))));
-            } catch (SSOException | IdRepoException e) {
+                        sessionPropertyWhitelist.getAllListedProperties(caller, realm))))));
+            } catch (SSOException e) {
                 LOGGER.message("Unable to read all whitelisted session properties.", e);
             }
 
@@ -898,8 +995,11 @@ public class SessionResource implements CollectionResourceProvider {
         }
     }
 
-    private String getRealm(SSOToken token) throws IdRepoException, SSOException {
-        final AMIdentity identity = getIdentity(token);
-        return convertDNToRealm(identity.getRealm());
+    private String getCallerRealm(Context context) {
+        return context.asContext(RealmContext.class).getResolvedRealm();
+    }
+
+    private SSOToken getCallerToken(Context context) throws SSOException {
+        return context.asContext(SSOTokenContext.class).getCallerSSOToken();
     }
 }

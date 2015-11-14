@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.core.rest;
 
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.rest.Routers.ssoToken;
+import static org.forgerock.openam.rest.Routers.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -34,8 +34,8 @@ import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
 import org.forgerock.openam.core.rest.server.ServerVersionResource;
+import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
 import org.forgerock.openam.core.rest.session.SessionResource;
-import org.forgerock.openam.core.rest.session.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
@@ -109,8 +109,8 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))
                 .auditAs(SESSION)
-                .authorizeWith(SessionResourceAuthzModule.class)
-                .forVersion(1, 1)
+                .authorizeWith(AnyOfAuthzModule.class)
+                .forVersion(1, 2)
                 .toCollection(SessionResource.class);
 
         rootRouter.route("tokens")

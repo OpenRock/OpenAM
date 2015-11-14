@@ -28,6 +28,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -52,9 +53,11 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
@@ -63,6 +66,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +85,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     private final String objectType;
     private final IdentityServicesImpl identityServices;
     private final IdentityResourceV2 identityResourceV2;
+    private final RestSecurityProvider restSecurityProvider;
 
     private static Debug logger = Debug.getInstance("frRest");
 
@@ -93,19 +98,11 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                               IdentityServicesImpl identityServices,
                               CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
                               BaseURLProviderFactory baseURLProviderFactory) {
-        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
-                                                                                        baseURLProviderFactory);
-    }
-
-    // Constructor used for testing...
-    IdentityResourceV3(String objectType, ServiceConfigManager serviceConfigManager, ServiceConfig serviceConfig,
-                       MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                       RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-
         this.identityResourceV2 = new IdentityResourceV2(objectType, mailServerLoader, identityServices, coreWrapper,
                 restSecurityProvider, baseURLProviderFactory);
         this.objectType = objectType;
         this.identityServices = identityServices;
+        this.restSecurityProvider = restSecurityProvider;
     }
 
     /**
@@ -133,6 +130,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
             final CreateRequest request) {
+
         return identityResourceV2.createInstance(context, request);
     }
 

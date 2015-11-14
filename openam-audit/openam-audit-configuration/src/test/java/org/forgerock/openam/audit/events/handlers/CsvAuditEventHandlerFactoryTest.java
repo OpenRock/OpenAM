@@ -22,8 +22,7 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.EventTopicsMetaData;
 import org.forgerock.audit.events.EventTopicsMetaDataBuilder;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
+import org.forgerock.audit.handlers.csv.CsvAuditEventHandler;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 import org.testng.annotations.BeforeMethod;
@@ -58,6 +57,7 @@ public class CsvAuditEventHandlerFactoryTest {
     private void shouldCreateCsvEventHandler() throws AuditException {
         // Given
         Map<String, Set<String>> configAttributes = new HashMap<>();
+        configAttributes.put("enabled", singleton("true"));
         configAttributes.put("topics", singleton("access"));
         configAttributes.put("location", singleton(logDirName));
         AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
@@ -69,15 +69,19 @@ public class CsvAuditEventHandlerFactoryTest {
         AuditEventHandler handler = factory.create(configuration);
 
         // Then
-        assertThat(handler).isInstanceOf(CSVAuditEventHandler.class);
-        assertThat(handler.getConfigurationClass()).isEqualTo(CSVAuditEventHandlerConfiguration.class);
+        assertThat(handler).isInstanceOf(CsvAuditEventHandler.class);
+        assertThat(handler.getName()).isEqualTo("CSV Handler");
+        assertThat(handler.getHandledTopics()).containsExactly("access");
+        assertThat(handler.isEnabled()).isTrue();
     }
 
     @Test
-    private void shouldNotCreateCsvEventHandlerWhenDisabled() throws AuditException {
+    private void shouldCreateCsvEventHandlerWhenDisabled() throws AuditException {
         // Given
         Map<String, Set<String>> configAttributes = new HashMap<>();
         configAttributes.put("enabled", singleton("false"));
+        configAttributes.put("topics", singleton("access"));
+        configAttributes.put("location", singleton(logDirName));
         AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
                 .withName("CSV Handler")
                 .withAttributes(configAttributes)
@@ -87,6 +91,9 @@ public class CsvAuditEventHandlerFactoryTest {
         AuditEventHandler handler = factory.create(configuration);
 
         // Then
-        assertThat(handler).isNull();
+        assertThat(handler).isInstanceOf(CsvAuditEventHandler.class);
+        assertThat(handler.getName()).isEqualTo("CSV Handler");
+        assertThat(handler.getHandledTopics()).containsExactly("access");
+        assertThat(handler.isEnabled()).isFalse();
     }
 }

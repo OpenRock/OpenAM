@@ -20,11 +20,9 @@ define("config/process/AMConfig", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, UMADelegate, ThemeManager, URIUtils) {
+], function ($, _, Constants, EventManager, Router, ThemeManager, URIUtils) {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -152,46 +150,81 @@ define("config/process/AMConfig", [
         dependencies: [
             "underscore",
             "org/forgerock/commons/ui/common/main/Configuration",
-            "org/forgerock/commons/ui/common/components/Navigation"
+            "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
-        processDescription: function (event, _, Configuration, Navigation) {
+        processDescription: function (event, _, Configuration, NavigationHelper) {
             ThemeManager.getTheme(true);
-
             if (_.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
-                SMSGlobalDelegate.realms.all().done(function (data) {
-                    Navigation.addLink({
-                        "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                            [encodeURIComponent("/")]),
-                        "name": $.t("console.common.topLevelRealm"),
-                        "cssClass": "dropdown-sub"
-                    }, "admin", "realms");
+                NavigationHelper.setAdminNav();
+            }
+        }
+    },
+    {
+        startEvent: Constants.EVENT_UNAUTHORIZED,
+        description: "",
+        override: true,
+        dependencies: [
+            "org/forgerock/commons/ui/common/main/Router",
+            "org/forgerock/commons/ui/common/main/Configuration",
+            "org/forgerock/commons/ui/common/main/SessionManager"
+        ],
+        processDescription: function (event, Router, Configuration, SessionManager) {
+            var loggedIn = Configuration.loggedUser,
+                setGoToUrlProperty = function () {
+                    var hash = Router.getCurrentHash();
+                    if (!Configuration.gotoURL && !hash.match(Router.configuration.routes.login.url)) {
+                        Configuration.setProperty("gotoURL", "#" + hash);
+                    }
+                },
+                forbiddenPage = function () {
+                    delete Configuration.globalData.authorizationFailurePending;
+                    return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                        route: {
+                            view: "org/forgerock/openam/ui/common/views/error/ForbiddenView",
+                            url: /.*/
+                        },
+                        fromRouter: true
+                    });
+                },
+                forbiddenError = function () {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
+                },
+                logout = function () {
+                    setGoToUrlProperty();
 
-                    _.forEach(data.result, function (realm) {
-                        if (realm.active === true && realm.path !== "/") {
-                            Navigation.addLink({
-                                "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                                    [encodeURIComponent(realm.path)]),
-                                "name": realm.name,
-                                "cssClass": "dropdown-sub"
-                            }, "admin", "realms");
-                        }
+                    return SessionManager.logout().then(function () {
+                        EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
+                            anonymousMode: true
+                        });
+                        return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: Router.configuration.routes.login
+                        });
                     });
 
-                    Navigation.addLink({
-                        "url": "#realms",
-                        "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
-                        "cssClass": "dropdown-sub"
-                    }, "admin", "realms");
+                },
+                loginDialog = function () {
+                    return EventManager.sendEvent(Constants.EVENT_SHOW_LOGIN_DIALOG);
+                };
 
-                    Navigation.reload();
-                });
+            // Multiple rest calls that all return authz failures will cause this event to be called multiple times
+            if (Configuration.globalData.authorizationFailurePending !== undefined) {
+                return;
+            }
+            Configuration.globalData.authorizationFailurePending = true;
+
+
+            if (!loggedIn) {
+                // 401 no session
+                return logout();
+            } else if (_.get(event, "error.status") === 401) {
+                // 401 session timeout
+                return loginDialog();
+            } else if (event.fromRouter) {
+                // 403 route change
+                return forbiddenPage();
             } else {
-                UMADelegate.getUmaConfig().then(function (umaConfiguration) {
-                    if (umaConfiguration.enabled) {
-                        delete Navigation.configuration.links.user.urls.uma.cssClass;
-                        Navigation.reload();
-                    }
-                });
+                // 403 rest call
+                return forbiddenError();
             }
         }
     }];
