@@ -17,6 +17,7 @@ package org.forgerock.openam.audit.configuration;
 
 import com.google.inject.AbstractModule;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.audit.context.TransactionIdConfiguration;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Audit Configuration classes.
@@ -27,6 +28,7 @@ public class AuditConfigurationGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(AuditServiceConfigurationProvider.class).to(AuditServiceConfigurationProviderImpl.class);
+        bind(TransactionIdConfiguration.class).to(TransactionIdConfigurationImpl.class);
     }
 
 }

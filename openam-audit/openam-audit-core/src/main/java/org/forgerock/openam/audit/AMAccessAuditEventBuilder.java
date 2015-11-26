@@ -147,10 +147,12 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     }
 
     private AMAccessAuditEventBuilder addDetail(JsonValue detail, String field) {
-        if (jsonValue.contains(field)) {
-            jsonValue.get(field).put(DETAIL, detail);
-        } else {
-            jsonValue.put(field, json(object(field(DETAIL, detail))));
+        if (detail != null) {
+            if (jsonValue.contains(field)) {
+                jsonValue.get(field).put(DETAIL, detail.getObject());
+            } else {
+                jsonValue.put(field, object(field(DETAIL, detail.getObject())));
+            }
         }
         return this;
     }

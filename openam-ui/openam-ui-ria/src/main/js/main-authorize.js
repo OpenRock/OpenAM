@@ -27,6 +27,7 @@ require.config({
     map: {
         "*" : {
             "ThemeManager" : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
             "underscore"   : "lodash"
         }
@@ -65,9 +66,10 @@ require([
     "text!templates/common/FooterTemplate.html",
     "text!templates/common/LoginHeaderTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "ThemeManager"
+    "ThemeManager",
+    "Router"
 ], function ($, _, HandleBars, Configuration, Constants, AuthorizeTemplate,
-            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager) {
+            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager, Router) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -77,7 +79,9 @@ require([
         baseTemplate,
         footerTemplate,
         loginHeaderTemplate,
-        data = window.pageData;
+        data = window.pageData,
+        KEY_CODE_ENTER = 13,
+        KEY_CODE_SPACE = 32;
 
     i18nManager.init({
         paramLang: {
@@ -88,6 +92,9 @@ require([
     });
 
     Configuration.globalData = { realm : data.realm };
+    Router.currentRoute = {
+        navGroup: "user"
+    };
 
     ThemeManager.getTheme().always(function (theme) {
         data.theme = theme;
@@ -99,8 +106,12 @@ require([
         $("#wrapper").html(baseTemplate(data));
         $("#footer").html(footerTemplate(data));
         $("#loginBaseLogo").html(loginHeaderTemplate(data));
-        $("#content").html(formTemplate(data)).find(".panel-heading")
-        .click(function () {
+        $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
+            // keyup is required so that the collasped panel can be opened with the keyboard alone,
+            // and without relying on a mouse click event.
+            if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {
+                return;
+            }
             $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
         });
 

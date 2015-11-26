@@ -15,7 +15,8 @@
  */
 package org.forgerock.openam.core.rest;
 
-import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.*;
+import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asAttributeArray;
+import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -32,9 +33,11 @@ import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.selfservice.core.SelfServiceContext;
@@ -59,7 +62,7 @@ public final class IdentityRestUtils {
     public static final String FIELD_MAIL = "mail";
     public static final String REALM = "realm";
 
-    public static final String USER_KBA_ATTRIBUTE = "kbaInformation";
+    public static final String USER_KBA_ATTRIBUTE = "kbaInfo";
 
     public static final String USERNAME = "username";
 
@@ -206,21 +209,7 @@ public final class IdentityRestUtils {
 
             try {
                 for (String s : jVal.keys()) {
-                    JsonValue childValue = jVal.get(s);
-                    if (childValue.isString()) {
-                        identityAttrList.put(s, Collections.singleton(childValue.asString()));
-                    } else if (childValue.isList()) {
-                        List<String> list = new ArrayList<>();
-                        for (Object item : childValue.asList()) {
-                            if (item instanceof Map) {
-                                JsonValue json = new JsonValue(item);
-                                list.add(json.toString());
-                            } else {
-                                list.add(item.toString());
-                            }
-                        }
-                        identityAttrList.put(s, new HashSet<>(list));
-                    }
+                    identityAttrList.put(s, identityAttributeJsonToSet(jVal.get(s)));
                 }
             } catch (Exception e) {
                 debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot Traverse JsonValue. ", e);
@@ -234,4 +223,67 @@ public final class IdentityRestUtils {
         }
         return identity;
     }
+
+    /**
+     * Transforms json representing an identity attribute into a representative set of strings.
+     * <p/>
+     * If the json is a single value, that value is serialized into a string and returned as a single entry set.
+     * Otherwise if it is a list of values, each value is serialized into a string and returned as a collective set.
+     *
+     * @param identityAttributeJson
+     *         identity attribute json to be transformed
+     *
+     * @return identity attribute value represented as a set of strings
+     */
+    static Set<String> identityAttributeJsonToSet(JsonValue identityAttributeJson) {
+
+        if (identityAttributeJson.isString()) {
+            return Collections.singleton(identityAttributeJson.asString());
+        }
+
+        if (identityAttributeJson.isList()) {
+            Set<String> attributeValues = new HashSet<>();
+
+            for (JsonValue value : identityAttributeJson) {
+                if (value.isString()) {
+                    attributeValues.add(value.asString());
+                } else {
+                    attributeValues.add(value.toString());
+                }
+            }
+
+            return attributeValues;
+        }
+
+        return Collections.singleton(identityAttributeJson.toString());
+    }
+
+    /**
+     * Uses an amAdmin SSOtoken to create an AMIdentity from the UID provided and checks
+     * whether the AMIdentity in context is active/inactive
+     *
+     * @param uid the universal identifier of the user
+     * @return true is the user is active, false otherwise
+     * @throws NotFoundException invalid SSOToken, invalid UID
+     */
+    public static boolean isUserActive(String uid) throws NotFoundException {
+        try {
+            AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.isUserActive() : UID={} isActive={}", uid, userIdentity.isActive());
+            }
+            return userIdentity.isActive();
+        } catch (IdRepoException idre) {
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.isUserActive() : Invalid UID={}", uid , idre);
+            }
+            throw new NotFoundException("Invalid UID, could not retrieved " + uid, idre);
+        } catch (SSOException ssoe) {
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.isUserActive() : Invalid SSOToken", ssoe);
+            }
+            throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage(), ssoe);
+        }
+    }
+
 }

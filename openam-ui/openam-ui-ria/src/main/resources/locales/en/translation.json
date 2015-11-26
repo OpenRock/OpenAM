@@ -120,6 +120,9 @@
                         "requests" : "Requests"
                     },
                     "console": "Console"
+                },
+                "username" : {
+                    "label" : "Signed in as"
                 }
             }
         }
@@ -134,9 +137,9 @@
                 "noAccountQuestion" : "Don't have an account?",
                 "registerAccount" : "Register your account",
                 "problemLoggingQuestion" : "Having trouble logging in?",
-                "resetPassword" : "Reset your password",
                 "socialAuthentication" : "Or login with:",
-                "resetPassword" : "Reset your Password"
+                "resetPassword" : "Forgot Password?",
+                "forgotUsername" : "Forgot Username?"
             },
             "404" : {
                 "pageNotFound" : "Page not found",
@@ -317,6 +320,7 @@
             "deleteSelected" : "Delete Selected",
             "startTypingToSearch": "Start typing to search",
             "passwordPlaceholder": "••••••••••••",
+            "redirecting": "Redirecting...",
             "validation" : {
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
                 "VALID_NAME_FORMAT": "Contains invalid characters",
@@ -380,14 +384,23 @@
                 "tryAgain": "Try Registering Again",
                 "return": "Return to Login Page"
             },
+            "forgotUsername" : {
+                "title" : "Retrieve Your Username",
+                "checkEmail" : "An email containing your username has been sent to your account.",
+                "failed": "Unable to retrieve your username",
+                "found": "Username found:",
+                "tryAgain": "Try Finding Your Username Again",
+                "return": "Return to Login Page"
+            },
             "kba" : {
                 "answerQuestions": "Answer security questions below to reset your password.",
-                "description": "The Security Question selected and corresponding answer provided by you will be used to help identify you in the event that you forget your password.",
+                "description": "Select security question(s) below. These questions will help us verify your identity if you forget your password.",
                 "provideAnother": "Add another question",
                 "selectQuestion": "Select a security question",
                 "provideYourOwn": "Provide your own",
                 "customQuestion": "Custom Security Question",
-                "answer": "Security Answer"
+                "answer": "Security Answer",
+                "securityQuestions": "Security Questions"
             },
             "emailVerification" : {
                 "description" : "Enter the email address associated with your account to reset your password. We will send you an email that will allow you to reset your password.",
@@ -400,10 +413,12 @@
             "user" : "User",
             "login" : "Log in",
             "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
-            "profile" : "Profile",
+            "selfService" : "Self-service",
+            "administration": "Administration",
             "basicInfo" : "Basic Info",
             "myProfile" : "My Profile",
             "userProfile" : "User profile",
+            "profile": "Profile",
             "username" : "Username",
             "emailAddress" : "Email address",
             "givenName" : "First Name",
@@ -521,7 +536,7 @@
             "unavailable": "Unable to login to OpenAM"
         },
         "deviceManagement": {
-            "header": "Device Management",
+            "header": "Authentication Devices",
             "noneFound": "You have not registered any devices",
             "menu": {
                 "recoveryCodes": "Recovery Codes",
@@ -1097,7 +1112,7 @@
                     }
                 },
                 "list": {
-                    "grid": ["Name"],
+                    "grid": ["Name", "Status"],
                     "addNew": "Add a New Policy",
                     "description": "Create, edit or delete authorization policies that apply to this policy set.",
                     "noPolicies": "You haven't added any policies to this set yet."

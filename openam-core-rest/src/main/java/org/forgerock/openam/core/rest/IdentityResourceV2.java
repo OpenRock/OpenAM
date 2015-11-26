@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.core.rest;
 
-import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asAttributeArray;
 import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -34,10 +33,8 @@ import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -69,6 +67,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -113,7 +112,6 @@ import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.AsyncFunction;
-import org.forgerock.util.Pair;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
@@ -168,8 +166,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * Creates a backend
      */
     public IdentityResourceV2(String userType, MailServerLoader mailServerLoader, IdentityServicesImpl identityServices,
-            CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-        this(userType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider, baseURLProviderFactory);
+            CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+        this(userType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
+                baseURLProviderFactory, uiRolePredicates);
     }
 
     /**
@@ -192,14 +192,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory,
+            Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.restSecurityProvider = restSecurityProvider;
         this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, uiRolePredicates);
         this.identityServices = identityServices;
         this.baseURLProviderFactory = baseURLProviderFactory;
     }
@@ -681,36 +682,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             return validateGoto(context, request);
         } else { // for now this is the only case coming in, so fail if otherwise
             return RestUtils.generateUnsupportedOperation();
-        }
-    }
-
-    /**
-     * Uses an amAdmin SSOtoken to create an AMIdentity from the UID provided and checks
-     * whether the AMIdentity in context is active/inactive
-     * @param uid the universal identifier of the user
-     * @return true is the user is active;false otherwise
-     * @throws NotFoundException invalid SSOToken, invalid UID
-     */
-    /*
-     * package private scope to allow invocation from IdentityResourceV3
-     */
-    boolean isUserActive(String uid) throws NotFoundException {
-        try {
-            AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
-            if (debug.messageEnabled()) {
-                debug.message("IdentityResource.isUserActive() : UID={} isActive={}", uid, userIdentity.isActive());
-            }
-            return userIdentity.isActive();
-        } catch (IdRepoException idre) {
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.isUserActive() : Invalid UID={}", uid , idre);
-            }
-            throw new NotFoundException("Invalid UID, could not retrieved " + uid, idre);
-        } catch (SSOException ssoe){
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.isUserActive() : Invalid SSOToken", ssoe);
-            }
-            throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage(), ssoe);
         }
     }
 
@@ -1442,7 +1413,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={} ", resourceId, re);
             return re.asPromise();
         } catch (final Exception e) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATEresourceId={}", resourceId, e);
+            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={}", resourceId, e);
             return new NotFoundException(e.getMessage(), e).asPromise();
         }
     }

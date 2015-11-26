@@ -82,7 +82,10 @@ define("config/AppConfiguration", [
                     "partials/login/_HiddenValue.html",
                     "partials/login/_Password.html",
                     "partials/login/_Redirect.html",
+                    "partials/login/_RememberLogin.html",
                     "partials/login/_ScriptTextOutput.html",
+                    "partials/login/_SelfService.html",
+                    "partials/login/_SocialAuthn.html",
                     "partials/login/_TextInput.html",
                     "partials/login/_TextOutput.html"
                 ]
@@ -110,24 +113,30 @@ define("config/AppConfiguration", [
         }, {
             moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
             configuration: {
-                userBar: [
-                    {
-                        "id": "profileLink",
-                        "href": "#profile/details",
-                        "i18nKey": "common.user.profile"
-                    }, {
-                        "id": "changePasswordLink",
-                        "href": "#profile/password",
-                        "i18nKey": "common.user.changePassword"
-                    }, {
-                        "id": "logoutLink",
-                        "href": "#logout/",
-                        "i18nKey": "common.form.logout"
-                    }
-                ],
+                username: {
+                    "label" : "config.AppConfiguration.Navigation.username.label"
+                },
+                userBar: [{
+                    "href": "#profile/details",
+                    "i18nKey": "common.user.selfService",
+                    "navGroup": "admin",
+                    "visibleToRoles": ["ui-self-service-user"]
+                }, {
+                    "href": "#profile/details",
+                    "i18nKey": "common.user.profile",
+                    "navGroup": "user",
+                    "visibleToRoles": ["ui-self-service-user"]
+                }, {
+                    "href": "#realms",
+                    "i18nKey": "common.user.administration",
+                    "navGroup": "user",
+                    "visibleToRoles": ["ui-realm-admin"]
+                }, {
+                    "href": "#logout/",
+                    "i18nKey": "common.form.logout"
+                }],
                 links: {
                     "admin": {
-                        "role": "ui-admin",
                         "urls": {
                             "realms": {
                                 "url": "#realms",
@@ -144,22 +153,26 @@ define("config/AppConfiguration", [
                                     "icon": "fa fa-plus"
                                 }, {
                                     divider: true
-                                }]
+                                }],
+                                "visibleToRoles": ["ui-realm-admin"]
                             },
                             "federation": {
                                 "url": "#federation",
                                 "name": "config.AppConfiguration.Navigation.links.federation",
-                                "icon": "fa fa-building-o"
+                                "icon": "fa fa-building-o",
+                                "visibleToRoles": ["ui-global-admin"]
                             },
                             "configuration": {
                                 "url": "#configuration",
                                 "name": "config.AppConfiguration.Navigation.links.configuration",
-                                "icon": "fa fa-cog"
+                                "icon": "fa fa-cog",
+                                "visibleToRoles": ["ui-global-admin"]
                             },
                             "sessions": {
                                 "url": "#sessions",
                                 "name": "config.AppConfiguration.Navigation.links.sessions",
-                                "icon": "fa fa-users"
+                                "icon": "fa fa-users",
+                                "visibleToRoles": ["ui-global-admin"]
                             }
                         }
                     },
@@ -168,13 +181,13 @@ define("config/AppConfiguration", [
                             "dashboard": {
                                 "url": "#dashboard/",
                                 "name": "config.AppConfiguration.Navigation.links.dashboard",
-                                "icon": "fa fa-dashboard"
+                                "icon": "fa fa-dashboard",
+                                "visibleToRoles": ["ui-self-service-user"]
                             },
                             "uma": {
                                 "icon": "fa fa-user",
                                 "name": "config.AppConfiguration.Navigation.links.uma",
                                 "dropdown" : true,
-                                "cssClass": "hidden",
                                 "urls": {
                                     "listResource": {
                                         "url": "#uma/resources/",
@@ -188,7 +201,8 @@ define("config/AppConfiguration", [
                                         "url": "#uma/requests/",
                                         "name": "config.AppConfiguration.Navigation.links.umaLinks.requests"
                                     }
-                                }
+                                },
+                                "visibleToRoles": ["ui-uma-user"]
                             }
                         }
                     }

@@ -20,9 +20,8 @@ define("config/process/AMConfig", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, EventManager, Router, ThemeManager, URIUtils) {
+], function ($, _, Constants, EventManager, Router, URIUtils) {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -53,7 +52,6 @@ define("config/process/AMConfig", [
                         route: router.configuration.routes.loggedOut
                     });
                 }
-                ThemeManager.getTheme(true);
             }, function () {
                 conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
@@ -128,10 +126,20 @@ define("config/process/AMConfig", [
         startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
         description: "",
         dependencies: [
+            "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/main/Router"
         ],
-        processDescription: function (event, Router) {
-            Router.routeTo(Router.configuration.routes.profile, { trigger: true });
+        processDescription: function (event, Configuration, Router) {
+            if (!Configuration.loggedUser) {
+                Router.routeTo(Router.configuration.routes.login, { trigger: true });
+            } else if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
+                Router.routeTo(Router.configuration.routes.realms, {
+                    args: [],
+                    trigger: true
+                });
+            } else {
+                Router.routeTo(Router.configuration.routes.profile, { trigger: true });
+            }
         }
     }, {
         startEvent: Constants.EVENT_THEME_CHANGED,
@@ -153,9 +161,8 @@ define("config/process/AMConfig", [
             "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
         processDescription: function (event, _, Configuration, NavigationHelper) {
-            ThemeManager.getTheme(true);
-            if (_.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
-                NavigationHelper.setAdminNav();
+            if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
+                NavigationHelper.populateRealmsDropdown();
             }
         }
     },

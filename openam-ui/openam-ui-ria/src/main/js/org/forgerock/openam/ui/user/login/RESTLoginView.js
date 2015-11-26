@@ -40,12 +40,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
     function populateTemplate () {
         var self = this,
-            firstAuthStage = Configuration.globalData.auth.currentStage === 1;
+            showSelfService = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
 
-        // self-service links should be shown only on the first stage
-        this.data.showForgotPassword = firstAuthStage && Configuration.globalData.forgotPassword === "true";
-        this.data.showRegister = firstAuthStage && Configuration.globalData.selfRegistration === "true";
-        this.data.showRememberLogin = firstAuthStage;
+        // self-service links should be shown only on the first stage of the username/password stages
+        this.data.showForgotPassword = showSelfService && Configuration.globalData.forgotPassword === "true";
+        this.data.showForgotUserName = showSelfService && Configuration.globalData.forgotUsername === "true";
+        this.data.showSelfRegistration = showSelfService && Configuration.globalData.selfRegistration === "true";
+        this.data.showRememberLogin = showSelfService;
 
         if (Configuration.backgroundLogin) {
             this.prefillLoginData();
@@ -156,7 +157,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
         render: function (args) {
             var urlParams = {}, // Deserialized querystring params
-                promise = $.Deferred(),
                 auth = Configuration.globalData.auth;
 
             if (args && args.length) {
@@ -187,7 +187,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 if (reqs.hasOwnProperty("tokenId")) {
                     // Set a variable for the realm passed into the browser so there can be a
                     // check to make sure it is the same as the current user's realm
-                    auth.passedInRealm = auth.subRealm;
+                    auth.passedInRealm = RealmHelper.getRealm();
                     // If we have a token, let's see who we are logged in as....
                     SessionManager.getLoggedUser(function (user) {
 
@@ -228,7 +228,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                 } else { // We aren't logged in yet, so render a form...
                     this.renderForm(reqs, urlParams);
-                    promise.resolve();
+                    if (CookieHelper.getCookie("invalidRealm")) {
+                        CookieHelper.deleteCookie("invalidRealm");
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    }
                 }
             }, this), _.bind(function (error) {
                 // If we can't render a login form, then the user must not be able to login
@@ -242,13 +245,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     }
                 });
             }, this));
-
-            promise.done(function () {
-                if (CookieHelper.getCookie("invalidRealm")) {
-                    CookieHelper.deleteCookie("invalidRealm");
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
-                }
-            });
         },
 
         renderForm: function (reqs, urlParams) {
@@ -258,6 +254,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 usernamePasswordStages = ["DataStore1", "AD1", "JDBC1", "LDAP1", "Membership1", "RADIUS1"],
                 template,
                 self = this;
+
+            this.userNamePasswordStage = _.contains(usernamePasswordStages, reqs.stage);
 
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
@@ -276,7 +274,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     if (redirectCallback.redirectMethod === "POST") {
 
                         _.each(redirectCallback.redirectData, function (v, k) {
-                            redirectForm.append("<input type='hidden' name='" + k + "' value='" + v + "' />");
+                            redirectForm.append(
+                                "<input type='hidden' name='" + k + "' value='" + v + "' aria-hidden='true' />");
                         });
 
                         redirectForm.appendTo("body").submit();
@@ -326,15 +325,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                template = usernamePasswordStages.indexOf(reqs.stage) !== -1
-                    ? "templates/openam/authn/UsernamePasswordStage.html"
-                    : "templates/openam/authn/" + reqs.stage + ".html";
-
-                UIUtils.compileTemplate(template, _.extend(Configuration.globalData, this.data))
+                template = "templates/openam/authn/" + reqs.stage + ".html";
+                UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
-                        self.template = typeof compiledTemplate === "string"
-                            ? template : self.genericTemplate;
+                        self.template = typeof compiledTemplate === "string" ? template : self.genericTemplate;
 
                         populateTemplate.call(self);
                         self.parentRender(function () {
@@ -448,16 +443,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             case "ChoiceCallback":
                 options = _.find(this.output, { name: "choices" });
 
-                // FIXME: If more than two then maybe a vertical radio list.
                 if (options && options.value !== undefined) {
                     result += renderPartial("Choice", {
                         values: _.map(options.value, function (option, key) {
-                            var checked = (self.input.value === key) ? "checked" : "", // Default option
-                                active = checked ? "active" : "";
-
                             return {
-                                active: active,
-                                checked: checked,
+                                active: self.input.value === key,
                                 key: key,
                                 value: option
                             };

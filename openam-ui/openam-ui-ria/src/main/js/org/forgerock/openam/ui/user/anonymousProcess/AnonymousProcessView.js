@@ -14,11 +14,10 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-
 define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessDelegate",
+    "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/RealmHelper"
@@ -59,7 +58,7 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             realmPath = realmPath.substring(0, 1) === "/" ? realmPath : "/" + realmPath;
 
             if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate("json/" + endpoint, params.token);
+                this.setDelegate("json/selfservice/" + endpoint, params.token);
             }
 
             if (params.token) {

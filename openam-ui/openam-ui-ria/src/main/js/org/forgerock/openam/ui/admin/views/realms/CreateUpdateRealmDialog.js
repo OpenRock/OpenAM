@@ -40,6 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
          *          self.render();
          *      }
          * });
+         * @param {Map} options A Map containing the options for the create/update realm dialog.
          */
         show: function (options) {
             var self = this,
@@ -78,9 +79,12 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                     });
                 }
 
-                data.schema.properties.parentPath["enum"] = options.allRealmPaths;
-                data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
-                if (data.values.name === "/") {
+                if (newRealm) {
+                    // Only create dropdowns if the field is editable
+                    data.schema.properties.parentPath["enum"] = options.allRealmPaths;
+                    data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
+                } else {
+                    // Once created, it should not be possible to edit a realm's name or who it's parent is.
                     data.schema.properties.name.readonly = true;
                     data.schema.properties.parentPath.readonly = true;
                 }

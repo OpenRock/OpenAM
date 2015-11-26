@@ -16,6 +16,9 @@
 package org.forgerock.openam.selfservice;
 
 import static org.forgerock.json.resource.Resources.newInternalConnectionFactory;
+import static org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig.ForgottenPasswordBuilder;
+import static org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig.ForgottenUsernameBuilder;
+import static org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig.UserRegistrationBuilder;
 
 import com.google.inject.Injector;
 import com.google.inject.PrivateModule;
@@ -27,21 +30,21 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.HttpClientHandler;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
-import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
-import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
-import org.forgerock.openam.selfservice.config.ConsoleConfigHandlerImpl;
-import org.forgerock.openam.selfservice.config.ForgottenPasswordConsoleConfig;
-import org.forgerock.openam.selfservice.config.ForgottenPasswordExtractor;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
-import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
-import org.forgerock.openam.selfservice.config.UserRegistrationExtractor;
+import org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig;
+import org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig;
+import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.ProgressStageProvider;
+import org.forgerock.selfservice.core.UserUpdateService;
 import org.forgerock.selfservice.core.annotations.SelfService;
 import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
@@ -60,15 +63,10 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Override
     protected void configure() {
         bind(ProcessStore.class).to(ProcessStoreImpl.class);
-        bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
-
-        bind(new TypeLiteral<ConsoleConfigExtractor<UserRegistrationConsoleConfig>>() {})
-                .to(UserRegistrationExtractor.class);
-        bind(new TypeLiteral<ConsoleConfigExtractor<ForgottenPasswordConsoleConfig>>() {})
-                .to(ForgottenPasswordExtractor.class);
+        bind(KbaResource.class);
 
         try {
             bind(Client.class)
@@ -81,6 +79,9 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         // Registration CREST services
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
+        expose(UserUpdateService.class);
+        expose(KbaResource.class);
         // Exposed to be accessible to custom progress stages
         expose(ConnectionFactory.class).annotatedWith(SelfService.class);
         expose(Client.class).annotatedWith(SelfService.class);
@@ -90,20 +91,37 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Singleton
     SelfServiceRequestHandler<UserRegistrationConsoleConfig> getUserRegistrationService(
             SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
-            ConsoleConfigExtractor<UserRegistrationConsoleConfig> configExtractor,
             ServiceConfigProviderFactory configProviderFactory) {
 
-        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
+        return new SelfServiceRequestHandler<>(UserRegistrationBuilder.class,
+                configHandler, configProviderFactory, serviceFactory);
     }
 
     @Provides
     @Singleton
     SelfServiceRequestHandler<ForgottenPasswordConsoleConfig> getForgottenPasswordService(
             SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
-            ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> configExtractor,
             ServiceConfigProviderFactory configProviderFactory) {
 
-        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
+        return new SelfServiceRequestHandler<>(ForgottenPasswordBuilder.class,
+                configHandler, configProviderFactory, serviceFactory);
+    }
+
+    @Provides
+    @Singleton
+    SelfServiceRequestHandler<ForgottenUsernameConsoleConfig> getForgottenUsernameService(
+            SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
+            ServiceConfigProviderFactory configProviderFactory) {
+
+        return new SelfServiceRequestHandler<>(ForgottenUsernameBuilder.class,
+                configHandler, configProviderFactory, serviceFactory);
+    }
+
+    @Provides
+    @Singleton
+    UserUpdateService getUserUpdateService(@SelfService ConnectionFactory connectionFactory) {
+        return new UserUpdateService(connectionFactory,
+                ResourcePath.resourcePath("/users"), new JsonPointer("/kbaInfo"));
     }
 
     @Provides
