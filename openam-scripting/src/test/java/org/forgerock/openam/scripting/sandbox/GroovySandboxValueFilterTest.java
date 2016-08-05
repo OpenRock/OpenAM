@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.scripting.sandbox;
 
+import org.forgerock.openam.scripting.common.sandbox.GroovySandboxValueFilter;
 import org.mozilla.javascript.ClassShutter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

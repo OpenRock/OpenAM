@@ -17,6 +17,8 @@
 package org.forgerock.openam.scripting;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.scripting.common.ScriptValidator;
+import org.forgerock.openam.scripting.common.ScriptingLanguage;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;

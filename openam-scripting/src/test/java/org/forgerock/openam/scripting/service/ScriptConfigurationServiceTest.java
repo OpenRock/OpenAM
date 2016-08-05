@@ -25,7 +25,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
 
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.scripting.ScriptException;
 import org.mockito.Mock;

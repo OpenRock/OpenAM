@@ -29,7 +29,7 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.scripting.rest.batch.helpers.Requester;
-import org.forgerock.openam.scripting.ScriptEvaluator;
+import org.forgerock.openam.scripting.common.ScriptEvaluator;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.promise.ExceptionHandler;

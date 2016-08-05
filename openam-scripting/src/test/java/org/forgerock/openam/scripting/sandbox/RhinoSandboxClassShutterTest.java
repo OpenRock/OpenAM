@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.scripting.sandbox;
 
+import org.forgerock.openam.scripting.common.sandbox.RhinoSandboxClassShutter;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

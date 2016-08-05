@@ -33,7 +33,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
-import org.forgerock.openam.scripting.ScriptEvaluator;
+import org.forgerock.openam.scripting.common.ScriptEvaluator;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

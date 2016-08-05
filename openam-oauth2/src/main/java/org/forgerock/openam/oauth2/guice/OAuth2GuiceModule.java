@@ -123,7 +123,7 @@ import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.scripting.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.common.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.tokens.TokenType;

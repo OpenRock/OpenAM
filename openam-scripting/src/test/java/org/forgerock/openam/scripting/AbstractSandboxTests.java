@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.scripting;
 
+import org.forgerock.openam.scripting.common.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.common.StandardScriptEngineManager;
 import org.mozilla.javascript.Wrapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

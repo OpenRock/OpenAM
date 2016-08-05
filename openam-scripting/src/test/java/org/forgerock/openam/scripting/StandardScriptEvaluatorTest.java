@@ -16,8 +16,13 @@
 
 package org.forgerock.openam.scripting;
 
-import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
-import org.forgerock.openam.scripting.factories.RhinoScriptEngineFactory;
+import org.forgerock.openam.scripting.common.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.common.ScriptObject;
+import org.forgerock.openam.scripting.common.ScriptingLanguage;
+import org.forgerock.openam.scripting.common.StandardScriptEngineManager;
+import org.forgerock.openam.scripting.common.StandardScriptEvaluator;
+import org.forgerock.openam.scripting.common.factories.GroovyEngineFactory;
+import org.forgerock.openam.scripting.common.factories.RhinoScriptEngineFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

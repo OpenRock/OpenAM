@@ -1,5 +1,6 @@
 package org.forgerock.openam.scripting;
 
+import org.forgerock.openam.scripting.common.ChainedBindings;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

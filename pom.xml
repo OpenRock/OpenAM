@@ -385,6 +385,7 @@
 
         <!-- OpenAM Scripting -->
         <module>openam-scripting</module>
+        <module>openam-scripting-common</module>
 
         <!-- OpenAM Entitlement Module (XACML 3)-->
         <module>openam-entitlements</module>

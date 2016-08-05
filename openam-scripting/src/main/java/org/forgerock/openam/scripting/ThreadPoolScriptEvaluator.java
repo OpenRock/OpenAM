@@ -19,6 +19,10 @@ package org.forgerock.openam.scripting;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorService;
 import org.forgerock.openam.audit.context.ConfigurableExecutorService;
 import org.forgerock.openam.audit.context.ExecutorServiceConfigurator;
+import org.forgerock.openam.scripting.common.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.common.ScriptEvaluator;
+import org.forgerock.openam.scripting.common.ScriptObject;
+import org.forgerock.openam.scripting.common.StandardScriptEngineManager;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
@@ -76,7 +80,7 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
      * the threads will be interrupted (or otherwise stop themselves depending on the engine's implementation)
      * after the timeout period has expired if they have not already returned.
      *
-     * @see org.forgerock.openam.scripting.factories.GroovyEngineFactory
+     * @see org.forgerock.openam.scripting.common.factories.GroovyEngineFactory
      *
      * @param script {@inheritDoc}
      * @param bindings {@inheritDoc}

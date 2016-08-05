@@ -37,7 +37,7 @@
     <name>OpenAM Shared</name>
     <description>OpenAM Shared Components and Modules</description>
     <artifactId>openam-shared</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <properties>
         <checkstyleFailOnError>true</checkstyleFailOnError>
@@ -74,6 +74,11 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>

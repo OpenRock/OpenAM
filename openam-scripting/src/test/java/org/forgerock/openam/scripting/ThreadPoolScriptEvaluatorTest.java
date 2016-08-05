@@ -28,7 +28,6 @@ import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.script.Bindings;
@@ -36,6 +35,10 @@ import javax.script.SimpleBindings;
 
 import org.forgerock.openam.audit.context.ConfigurableExecutorService;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorService;
+import org.forgerock.openam.scripting.common.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.common.ScriptEvaluator;
+import org.forgerock.openam.scripting.common.ScriptObject;
+import org.forgerock.openam.scripting.common.StandardScriptEngineManager;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownListener;

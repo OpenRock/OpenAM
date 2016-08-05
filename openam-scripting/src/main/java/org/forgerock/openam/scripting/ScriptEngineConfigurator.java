@@ -31,6 +31,8 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.scripting.common.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.common.StandardScriptEngineManager;
 import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
 
