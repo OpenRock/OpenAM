@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.scripting.common.factories;
 
+import org.forgerock.openam.scripting.common.javascript.CommonWrapFactory;
 import org.forgerock.util.Reject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
@@ -101,6 +102,7 @@ class RhinoScriptEngine extends AbstractScriptEngine implements Compilable {
 
         Object result = null;
         final Context context = factory.getContext();
+        context.setWrapFactory(new CommonWrapFactory());
         try {
             final Scriptable scope = getScope(context, scriptContext);
             result = compiledScript.exec(context, scope);
